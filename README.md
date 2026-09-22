@@ -1,0 +1,15 @@
+# Iolaus for OpenCode
+
+Iolaus is an independently maintained OpenCode 2 plugin retaining OMO's agent prompts, mode prompts, and model-family selection.
+
+The native prompt-only plugin is being bootstrapped. The original OpenCode2 adapter is preserved under `reference/omo/` for reference, including its task executor, teams, workflows, continuation hooks, and Hashline integration. Reference code is not an installable plugin or an active workspace.
+
+## Development
+
+Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.
+
+## Independence and licensing
+
+This repository has its own Git history and releases. It does not synchronize with, depend on published packages from, or act as an official edition of oh-my-openagent. Source attribution is retained in `NOTICE.md` and `reference/manifest.json`.
+
+Derived OMO code remains subject to the Sustainable Use License in `LICENSE.md`. Third-party notices are preserved with the reference snapshot. This project is not affiliated with the OpenCode or oh-my-openagent maintainers.
