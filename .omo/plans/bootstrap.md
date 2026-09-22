@@ -48,13 +48,13 @@ Source: Ephemushroom/oh-my-openagent at 598cb66580bebaf39c5ea20ee4bef6cb7a906777
 - [x] Confirm name, active/reference boundary, public independent repository.
 - [x] Inspect actual source entrypoints, imports, licenses, remotes, host version path and QA drivers.
 - [x] Write plan before implementation.
-- [ ] Initialize independent repo and implementation worktree.
-- [ ] Copy source reference with complete hash manifest; preserve licensing and attribution.
-- [ ] Verify reference foundation and land PR 1.
-- [ ] Extract prompt closure and add isolated native registration layer.
-- [ ] Verify routing/options/registration/bundle behavior.
-- [ ] Drive enabled/disabled native harness QA and record isolation/cleanup evidence.
-- [ ] Add independent CI and user documentation.
+- [x] Initialize independent repo and implementation worktree.
+- [x] Copy source reference with complete hash manifest; preserve licensing and attribution.
+- [x] Verify reference foundation and land PR 1 (800 files, CI passed, merged).
+- [x] Extract prompt closure and add isolated native registration layer (verification in progress).
+- [x] Verify routing/options/registration/bundle behavior (9 tests, typecheck, build, package boundary PASS).
+- [x] Drive enabled/disabled native harness QA and record isolation/cleanup evidence (OpenCode 2.0.13, evidence bundle 20260922-iolaus-bootstrap-4).
+- [x] Add independent CI and user documentation.
 - [ ] Review, merge PR 2, sync dev and clean worktrees.
 
 Native goal/todo tools and omo-agent-toolkit ulw-loop CLI are unavailable in this harness. This disk ledger records the same scoped goal, criteria and per-unit verification loop. One exploratory subagent failed with provider HTTP 404; continue locally rather than depending on an unavailable provider.
