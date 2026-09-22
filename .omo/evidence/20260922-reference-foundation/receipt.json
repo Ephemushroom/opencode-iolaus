@@ -1,0 +1,11 @@
+{
+  "command": "node script/check-reference.mjs",
+  "sourceCommit": "598cb66580bebaf39c5ea20ee4bef6cb7a906777",
+  "verifiedFiles": 800,
+  "verdict": "PASS",
+  "repository": "Ephemushroom/opencode-iolaus",
+  "visibility": "PUBLIC",
+  "isFork": false,
+  "parent": null,
+  "defaultBranch": "dev"
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+*.tgz
+.DS_Store
+.omo/*
+!.omo/plans/
+!.omo/evidence/
+.env
+.env.*
+!.env.example
