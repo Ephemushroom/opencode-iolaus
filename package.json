@@ -1,0 +1,28 @@
+{
+  "name": "opencode-iolaus",
+  "version": "0.1.0",
+  "description": "Iolaus for OpenCode 2: OMO-derived agent prompts, explicit modes, and model-family selection.",
+  "type": "module",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "repository": { "type": "git", "url": "git+https://github.com/Ephemushroom/opencode-iolaus.git" },
+  "main": "./dist/index.js",
+  "exports": { ".": "./dist/index.js", "./prompts": "./dist/prompts.js" },
+  "files": ["dist/index.js", "dist/prompts.js", "README.md", "LICENSE.md", "NOTICE.md"],
+  "scripts": {
+    "build": "bun run script/build.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test",
+    "check:reference": "node script/check-reference.mjs",
+    "check:package": "bun run build && bun run script/check-package.ts",
+    "qa:live": "node script/qa-live.mjs",
+    "prepack": "bun run check:package"
+  },
+  "peerDependencies": { "@opencode/plugin": "2.0.13" },
+  "devDependencies": {
+    "@opencode/plugin": "2.0.13",
+    "@types/bun": "latest",
+    "@types/js-yaml": "^4.0.9",
+    "typescript": "^5.9.3",
+    "js-yaml": "4.1.1"
+  }
+}

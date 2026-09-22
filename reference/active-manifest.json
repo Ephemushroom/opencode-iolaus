@@ -1,0 +1,514 @@
+{
+  "files": [
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-category-skills-guide.ts",
+      "path": "src/omo/agents/dynamic-agent-category-skills-guide.ts",
+      "sourceSha256": "373afce6ba66e9dbd8df110569d38d795d754848771f30d0b3c7b97afd498631",
+      "activeSha256": "373afce6ba66e9dbd8df110569d38d795d754848771f30d0b3c7b97afd498631"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-gemini-fallback-overrides.ts",
+      "path": "src/omo/agents/sisyphus-gemini-fallback-overrides.ts",
+      "sourceSha256": "02da036915b6083e3fe1620f0062cdda19a468b369775a209b7eefed4e665549",
+      "activeSha256": "02da036915b6083e3fe1620f0062cdda19a468b369775a209b7eefed4e665549"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
+      "path": "src/omo/agents/dynamic-agent-core-sections.ts",
+      "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
+      "activeSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",
+      "path": "src/omo/agents/dynamic-agent-prompt-types.ts",
+      "sourceSha256": "ad07980db42d06de36cd66466ccb2a3959cc47486dcfaaf14211c6efe167b090",
+      "activeSha256": "ad07980db42d06de36cd66466ccb2a3959cc47486dcfaaf14211c6efe167b090"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-style.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-style.ts",
+      "sourceSha256": "5fc529b140b7b52fc13539b1eeef0831a83fe4577129a09fc3338e043dd0dcbb",
+      "activeSha256": "5fc529b140b7b52fc13539b1eeef0831a83fe4577129a09fc3338e043dd0dcbb"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/gpt-prompt-identity.ts",
+      "path": "src/omo/agents/gpt-prompt-identity.ts",
+      "sourceSha256": "8d51ba16938e68ab4593a84b78dc804227c5bcba748c96a6fed2afad8a98f2ac",
+      "activeSha256": "8d51ba16938e68ab4593a84b78dc804227c5bcba748c96a6fed2afad8a98f2ac"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-tool-categorization.ts",
+      "path": "src/omo/agents/dynamic-agent-tool-categorization.ts",
+      "sourceSha256": "b9e6d97587a889d27fb58a2660c8ccd3b1f05bfee43c87d71e6a033c5ed32b35",
+      "activeSha256": "b9e6d97587a889d27fb58a2660c8ccd3b1f05bfee43c87d71e6a033c5ed32b35"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/gpt-apply-patch-guard.ts",
+      "path": "src/omo/agents/gpt-apply-patch-guard.ts",
+      "sourceSha256": "f936911e7ab6d34b0703964a38e347f522977a6915bc90f2fbc4f7b973c0887b",
+      "activeSha256": "f936911e7ab6d34b0703964a38e347f522977a6915bc90f2fbc4f7b973c0887b"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/types.ts",
+      "path": "src/omo/agents/types.ts",
+      "sourceSha256": "13cd6dbfbc6acaef4983b7ff25af9f3106188e14340f8400a81fafd22fc5df11",
+      "activeSha256": "c567f17116c0def6e69977ce9f2f305e4262ae59aec81affde73c882725e0f59"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt.ts",
+      "sourceSha256": "9a3da04c45180e7bcf6178d1fb521ba4301ba820e4f5ef530af8b6da2d98cc6e",
+      "activeSha256": "9a3da04c45180e7bcf6178d1fb521ba4301ba820e4f5ef530af8b6da2d98cc6e"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-policy-sections.ts",
+      "path": "src/omo/agents/dynamic-agent-policy-sections.ts",
+      "sourceSha256": "65ea2dde70eb4e805f3097fbdc4361525fa25f2b5393cbc9ed37027b01ab28ba",
+      "activeSha256": "65ea2dde70eb4e805f3097fbdc4361525fa25f2b5393cbc9ed37027b01ab28ba"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-builder.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-builder.ts",
+      "sourceSha256": "0487f6e4ba0ce01ff96c255330439b3751aef9058c84463ef3cfed9544605eb1",
+      "activeSha256": "0487f6e4ba0ce01ff96c255330439b3751aef9058c84463ef3cfed9544605eb1"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/kimi-tool-loop-guard.ts",
+      "path": "src/omo/agents/kimi-tool-loop-guard.ts",
+      "sourceSha256": "0f80c7032103709e6e398ae95a958148b9ead5b0e87e0bff89e69965db97dac1",
+      "activeSha256": "0f80c7032103709e6e398ae95a958148b9ead5b0e87e0bff89e69965db97dac1"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-builder.ts",
+      "path": "src/omo/agents/dynamic-agent-prompt-builder.ts",
+      "sourceSha256": "9a221551d67a23cf9d2c0d31f10eba6da809b8877788ca51f58f0780c41de086",
+      "activeSha256": "9a221551d67a23cf9d2c0d31f10eba6da809b8877788ca51f58f0780c41de086"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-sections.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-sections.ts",
+      "sourceSha256": "525589f90fe65939ab91be327077d82e0a8a431eacb950bf96f41479ca55656d",
+      "activeSha256": "525589f90fe65939ab91be327077d82e0a8a431eacb950bf96f41479ca55656d"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/index.ts",
+      "path": "src/omo/agents/index.ts",
+      "sourceSha256": "a1a17766b3698c35b8062a1a9daa6bd94abe04678e563989c805ee4ede170898",
+      "activeSha256": "eaaa835ce32b01064fc4237ead775164dd8382a85ac2deffe72a881b8007d369"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-role.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-role.ts",
+      "sourceSha256": "38e8b605b274ca0e65cd425ca2e981520c42ddb0ca95e08ce83a51353c5ea3e8",
+      "activeSha256": "38e8b605b274ca0e65cd425ca2e981520c42ddb0ca95e08ce83a51353c5ea3e8"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-exploration.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-exploration.ts",
+      "sourceSha256": "93591b0653c489c7a930c632a4b0055f4388d281863f65f13e4e7d015e47d1b2",
+      "activeSha256": "93591b0653c489c7a930c632a4b0055f4388d281863f65f13e4e7d015e47d1b2"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-execution.ts",
+      "path": "src/omo/agents/sisyphus-dynamic-prompt-execution.ts",
+      "sourceSha256": "e22da9dd9c2adc2199f3f802eed9b0ec3f5f9bfb431177c922ddea9ab97b8da8",
+      "activeSha256": "e22da9dd9c2adc2199f3f802eed9b0ec3f5f9bfb431177c922ddea9ab97b8da8"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/gpt.ts",
+      "path": "src/omo/agents/sisyphus-junior/gpt.ts",
+      "sourceSha256": "abb42e868ec02e6f32c7bc24f3de498e3f92e4eff63455338d7304afc5307ea6",
+      "activeSha256": "abb42e868ec02e6f32c7bc24f3de498e3f92e4eff63455338d7304afc5307ea6"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/kimi-k3.ts",
+      "path": "src/omo/agents/sisyphus-junior/kimi-k3.ts",
+      "sourceSha256": "dcca7e432795521a0474c0be57f5fb48c72775f50954fdb16ddd073e8cf7b9c5",
+      "activeSha256": "dcca7e432795521a0474c0be57f5fb48c72775f50954fdb16ddd073e8cf7b9c5"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/prompt-router.ts",
+      "path": "src/omo/agents/sisyphus-junior/prompt-router.ts",
+      "sourceSha256": "22c644f2e2a05d38d18cea4ff6eb5cc77e7e83054af3e8520537332ae9fa132e",
+      "activeSha256": "22c644f2e2a05d38d18cea4ff6eb5cc77e7e83054af3e8520537332ae9fa132e"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/kimi-k2-7.ts",
+      "path": "src/omo/agents/sisyphus-junior/kimi-k2-7.ts",
+      "sourceSha256": "5735a947e600c0ed9600b124f510a8ca8616bef896f034463a44b5ae76179865",
+      "activeSha256": "5735a947e600c0ed9600b124f510a8ca8616bef896f034463a44b5ae76179865"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/kimi-k2-6.ts",
+      "path": "src/omo/agents/sisyphus-junior/kimi-k2-6.ts",
+      "sourceSha256": "45543c473593c8a0f0d2cc6727833b687e58aab0001df3ab03075ebe58652113",
+      "activeSha256": "45543c473593c8a0f0d2cc6727833b687e58aab0001df3ab03075ebe58652113"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/default.ts",
+      "path": "src/omo/agents/sisyphus-junior/default.ts",
+      "sourceSha256": "0f5b7500150e7ccec22e255182b995f738c1dfe0c88e7b16958ba38f28854ac7",
+      "activeSha256": "0f5b7500150e7ccec22e255182b995f738c1dfe0c88e7b16958ba38f28854ac7"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/gemini.ts",
+      "path": "src/omo/agents/sisyphus-junior/gemini.ts",
+      "sourceSha256": "f6c9c0076c25200af04192b17e29e1339c3896eb113f157cc984daf233e12333",
+      "activeSha256": "f6c9c0076c25200af04192b17e29e1339c3896eb113f157cc984daf233e12333"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/glm-5-2.ts",
+      "path": "src/omo/agents/sisyphus-junior/glm-5-2.ts",
+      "sourceSha256": "fc1968684be4b69f904a8a7f10edf48326fbf80b6519ea7c853f7b246a393fdf",
+      "activeSha256": "fc1968684be4b69f904a8a7f10edf48326fbf80b6519ea7c853f7b246a393fdf"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/index.ts",
+      "path": "src/omo/agents/sisyphus-junior/index.ts",
+      "sourceSha256": "ad6c64a21463c6943ce590ab5abf5cb8c20273de145a12447ddd90ae66c78b35",
+      "activeSha256": "ad6c64a21463c6943ce590ab5abf5cb8c20273de145a12447ddd90ae66c78b35"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/gpt-5-5.ts",
+      "path": "src/omo/agents/sisyphus-junior/gpt-5-5.ts",
+      "sourceSha256": "c3b883aa140de6038018c6692f647265da9279a21b27d8fb31cfcc5afe8bfe35",
+      "activeSha256": "c3b883aa140de6038018c6692f647265da9279a21b27d8fb31cfcc5afe8bfe35"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus-junior/gpt-5-4.ts",
+      "path": "src/omo/agents/sisyphus-junior/gpt-5-4.ts",
+      "sourceSha256": "01c2d3ada2c31038cc3aeb718835d2d20e3920f49a4b6e7979c3fcbe467a2289",
+      "activeSha256": "01c2d3ada2c31038cc3aeb718835d2d20e3920f49a4b6e7979c3fcbe467a2289"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/hephaestus/gpt.ts",
+      "path": "src/omo/agents/hephaestus/gpt.ts",
+      "sourceSha256": "0bd1580813c4686945ee80206156790719f1a4550ef58b71e6224496d7f63e11",
+      "activeSha256": "0bd1580813c4686945ee80206156790719f1a4550ef58b71e6224496d7f63e11"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-6.ts",
+      "path": "src/omo/agents/hephaestus/gpt-5-6.ts",
+      "sourceSha256": "ae1651de7dcf7448b4af887cfeda154489b1733779bd5be253209392e5b53944",
+      "activeSha256": "ae1651de7dcf7448b4af887cfeda154489b1733779bd5be253209392e5b53944"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/hephaestus/prompt-router.ts",
+      "path": "src/omo/agents/hephaestus/prompt-router.ts",
+      "sourceSha256": "254b65abd8a6a3429fbf805b4639a80b2620a03af69e29c17ca198481dc3e314",
+      "activeSha256": "254b65abd8a6a3429fbf805b4639a80b2620a03af69e29c17ca198481dc3e314"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-5.ts",
+      "path": "src/omo/agents/hephaestus/gpt-5-5.ts",
+      "sourceSha256": "f3e57be0cf8aefc9e3712a5dec8a9960dee7f1ed4e008295036f12d7eac01d05",
+      "activeSha256": "f3e57be0cf8aefc9e3712a5dec8a9960dee7f1ed4e008295036f12d7eac01d05"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-4.ts",
+      "path": "src/omo/agents/hephaestus/gpt-5-4.ts",
+      "sourceSha256": "fc01891a68dcf4bfa55aa46cf1ddd470c711ade51935a952df495f3ae859d4cd",
+      "activeSha256": "fc01891a68dcf4bfa55aa46cf1ddd470c711ade51935a952df495f3ae859d4cd"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/oracle-prompt.ts",
+      "path": "src/omo/agents/specialists/oracle-prompt.ts",
+      "sourceSha256": "94d67937ceb15a3a6f5c41d668fa393db9c0e9b646e18de303926264b2a52b7b",
+      "activeSha256": "94d67937ceb15a3a6f5c41d668fa393db9c0e9b646e18de303926264b2a52b7b"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/momus-prompt.ts",
+      "path": "src/omo/agents/specialists/momus-prompt.ts",
+      "sourceSha256": "e59c6a44d79ee29f7838dcbaa977091e1b777c936c96f681d70495db3e4611ed",
+      "activeSha256": "e59c6a44d79ee29f7838dcbaa977091e1b777c936c96f681d70495db3e4611ed"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/librarian-prompt.ts",
+      "path": "src/omo/agents/specialists/librarian-prompt.ts",
+      "sourceSha256": "7f05ba7f50aa1dc26b81c5a24f6eaf944ca29651836d699247a72b3a4bd5af48",
+      "activeSha256": "7f05ba7f50aa1dc26b81c5a24f6eaf944ca29651836d699247a72b3a4bd5af48"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/metis-prompt.ts",
+      "path": "src/omo/agents/specialists/metis-prompt.ts",
+      "sourceSha256": "19ed8977ea536650ee2023e047e82f5e23c3ab3afcfca56dd884348fabb4435a",
+      "activeSha256": "19ed8977ea536650ee2023e047e82f5e23c3ab3afcfca56dd884348fabb4435a"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/momus-gpt-5-6.ts",
+      "path": "src/omo/agents/specialists/momus-gpt-5-6.ts",
+      "sourceSha256": "51933fcbcd5f82df47103ed730c9820b3fb5ecf34aa5d78e3f9b331479cb3095",
+      "activeSha256": "51933fcbcd5f82df47103ed730c9820b3fb5ecf34aa5d78e3f9b331479cb3095"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/explore-prompt.ts",
+      "path": "src/omo/agents/specialists/explore-prompt.ts",
+      "sourceSha256": "4a33f441396e51814b38327e6a36d62d4c786f3b6e2667b140ddbb2092898f7e",
+      "activeSha256": "4a33f441396e51814b38327e6a36d62d4c786f3b6e2667b140ddbb2092898f7e"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/specialists/multimodal-looker-prompt.ts",
+      "path": "src/omo/agents/specialists/multimodal-looker-prompt.ts",
+      "sourceSha256": "f79237acf2ac36c917b258135db94c71854540b9a3305ca98012858f0892779e",
+      "activeSha256": "f79237acf2ac36c917b258135db94c71854540b9a3305ca98012858f0892779e"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k3.ts",
+      "path": "src/omo/agents/sisyphus/kimi-k3.ts",
+      "sourceSha256": "64956832332bdb1163f69f19e718dbe274633661f60e27c479c650436e5c7f85",
+      "activeSha256": "64956832332bdb1163f69f19e718dbe274633661f60e27c479c650436e5c7f85"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k2-7.ts",
+      "path": "src/omo/agents/sisyphus/kimi-k2-7.ts",
+      "sourceSha256": "45586fcb80733827dca79dc787933855a0ab4639b65cc03e3da8c4989a32204b",
+      "activeSha256": "45586fcb80733827dca79dc787933855a0ab4639b65cc03e3da8c4989a32204b"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-5.ts",
+      "path": "src/omo/agents/sisyphus/claude-opus-5.ts",
+      "sourceSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4",
+      "activeSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k2-6.ts",
+      "path": "src/omo/agents/sisyphus/kimi-k2-6.ts",
+      "sourceSha256": "d268cb7bfb8f716cb4fbff7eb10ee6e754dbd594bbbd84e5e0ea4082e702e8bf",
+      "activeSha256": "d268cb7bfb8f716cb4fbff7eb10ee6e754dbd594bbbd84e5e0ea4082e702e8bf"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/default.ts",
+      "path": "src/omo/agents/sisyphus/default.ts",
+      "sourceSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4",
+      "activeSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/gemini.ts",
+      "path": "src/omo/agents/sisyphus/gemini.ts",
+      "sourceSha256": "379c340cb347c0a92c7ca3aa67271a6d979b28992ea368fb908a71f870a986b1",
+      "activeSha256": "379c340cb347c0a92c7ca3aa67271a6d979b28992ea368fb908a71f870a986b1"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/glm-5-2.ts",
+      "path": "src/omo/agents/sisyphus/glm-5-2.ts",
+      "sourceSha256": "e3297aeeec85395f57168b289fc29cc7958390cd66c333031275760ede987bf7",
+      "activeSha256": "e3297aeeec85395f57168b289fc29cc7958390cd66c333031275760ede987bf7"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-4-7.ts",
+      "path": "src/omo/agents/sisyphus/claude-opus-4-7.ts",
+      "sourceSha256": "77c51f10f73443be01153af1cee49d97bf74ae17982aa43d65ae663ee527f840",
+      "activeSha256": "77c51f10f73443be01153af1cee49d97bf74ae17982aa43d65ae663ee527f840"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/grok-4.ts",
+      "path": "src/omo/agents/sisyphus/grok-4.ts",
+      "sourceSha256": "fb94ce98ca0d9d04c3840d3d9b5aec172a13e1e1544770bc82af01cffd2332e4",
+      "activeSha256": "fb94ce98ca0d9d04c3840d3d9b5aec172a13e1e1544770bc82af01cffd2332e4"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-task-system-guide.ts",
+      "path": "src/omo/agents/sisyphus/gpt-task-system-guide.ts",
+      "sourceSha256": "4644137ffec7fa8601d88b5fbfdd9b41fa6dca3bbb4b84f50fa0f791d2948e5f",
+      "activeSha256": "4644137ffec7fa8601d88b5fbfdd9b41fa6dca3bbb4b84f50fa0f791d2948e5f"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/claude-fable-5.ts",
+      "path": "src/omo/agents/sisyphus/claude-fable-5.ts",
+      "sourceSha256": "3966945cb800f2adab36d9fdf430eeef21c566850834fb9ba827d9795a5c1228",
+      "activeSha256": "3966945cb800f2adab36d9fdf430eeef21c566850834fb9ba827d9795a5c1228"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-4-8.ts",
+      "path": "src/omo/agents/sisyphus/claude-opus-4-8.ts",
+      "sourceSha256": "d7d01d45aef9ef5f655e79d882d474136866bcff5b481bfb86bd99a0217d59ff",
+      "activeSha256": "d7d01d45aef9ef5f655e79d882d474136866bcff5b481bfb86bd99a0217d59ff"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/index.ts",
+      "path": "src/omo/agents/sisyphus/index.ts",
+      "sourceSha256": "793952d8a0ad614d0677f46525bf39e6278b69100114bb383daf37b83ba4c87d",
+      "activeSha256": "793952d8a0ad614d0677f46525bf39e6278b69100114bb383daf37b83ba4c87d"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-5-5.ts",
+      "path": "src/omo/agents/sisyphus/gpt-5-5.ts",
+      "sourceSha256": "de56dd3fe8a1da6e8b3d928394b5fd7ba1f5b9da8da49801daf096e2137f3484",
+      "activeSha256": "de56dd3fe8a1da6e8b3d928394b5fd7ba1f5b9da8da49801daf096e2137f3484"
+    },
+    {
+      "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-5-4.ts",
+      "path": "src/omo/agents/sisyphus/gpt-5-4.ts",
+      "sourceSha256": "9fbd81076730faff9d13b8815f5b8b119ed7e5d36a64bfc0cbb76587e17c558e",
+      "activeSha256": "9fbd81076730faff9d13b8815f5b8b119ed7e5d36a64bfc0cbb76587e17c558e"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/mode/team.md",
+      "path": "src/omo/modes/prompts/mode/team.md",
+      "sourceSha256": "5e7ab9391fcd43ebf9471de3de7babff6af228f17bbffa47685f47877f380a87",
+      "activeSha256": "5e7ab9391fcd43ebf9471de3de7babff6af228f17bbffa47685f47877f380a87"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/mode/hyperplan.md",
+      "path": "src/omo/modes/prompts/mode/hyperplan.md",
+      "sourceSha256": "2700405641cf91557bb04eafa8d98771510aafa2a51aeb090ffd540699075ab5",
+      "activeSha256": "2700405641cf91557bb04eafa8d98771510aafa2a51aeb090ffd540699075ab5"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/default.md",
+      "path": "src/omo/modes/prompts/ultrawork/default.md",
+      "sourceSha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6",
+      "activeSha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gpt.md",
+      "path": "src/omo/modes/prompts/ultrawork/gpt.md",
+      "sourceSha256": "4fb81febc9e6c9e8235228af2fd5d1e9dd0fb63b3b7367a79cf3b63f19b304e7",
+      "activeSha256": "4fb81febc9e6c9e8235228af2fd5d1e9dd0fb63b3b7367a79cf3b63f19b304e7"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/codex.md",
+      "path": "src/omo/modes/prompts/ultrawork/codex.md",
+      "sourceSha256": "0dc0fa1b57be2511ffc64372c0a7a862c2f0465b41b8f3ac23ba058c6a138ded",
+      "activeSha256": "0dc0fa1b57be2511ffc64372c0a7a862c2f0465b41b8f3ac23ba058c6a138ded"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/glm.md",
+      "path": "src/omo/modes/prompts/ultrawork/glm.md",
+      "sourceSha256": "31ee2a75dee454265e00ed2018c7485073412bd64b87547e4a724b28acb159dd",
+      "activeSha256": "31ee2a75dee454265e00ed2018c7485073412bd64b87547e4a724b28acb159dd"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/planner.md",
+      "path": "src/omo/modes/prompts/ultrawork/planner.md",
+      "sourceSha256": "1cf2b3a0247d4bd83cf8afe7b6b34fa75f3333442132f62cacb308115626e24a",
+      "activeSha256": "1cf2b3a0247d4bd83cf8afe7b6b34fa75f3333442132f62cacb308115626e24a"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gemini.md",
+      "path": "src/omo/modes/prompts/ultrawork/gemini.md",
+      "sourceSha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44",
+      "activeSha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/prometheus/default.md",
+      "path": "src/omo/modes/prompts/prometheus/default.md",
+      "sourceSha256": "16a4fc20cb2fa4810354b44f6aa589038a8f5b1fcfa4b0944a905e0af6d1cc9e",
+      "activeSha256": "16a4fc20cb2fa4810354b44f6aa589038a8f5b1fcfa4b0944a905e0af6d1cc9e"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi-k2-7.md",
+      "path": "src/omo/modes/prompts/atlas/kimi-k2-7.md",
+      "sourceSha256": "3fe3753c3ff953d704cbcacdb8ca516ac49f11d5f50ade28f994524af0c64a24",
+      "activeSha256": "3fe3753c3ff953d704cbcacdb8ca516ac49f11d5f50ade28f994524af0c64a24"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi.md",
+      "path": "src/omo/modes/prompts/atlas/kimi.md",
+      "sourceSha256": "f6bb5ff2f721bbd48aeb59c399adfe3172fbfe3e62248175bfc074b1a09ea2d2",
+      "activeSha256": "f6bb5ff2f721bbd48aeb59c399adfe3172fbfe3e62248175bfc074b1a09ea2d2"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/default.md",
+      "path": "src/omo/modes/prompts/atlas/default.md",
+      "sourceSha256": "ae78e9bd557d6520f4ee2cc8bc749b503ce42beee8a1369f4b230c1a1654b60a",
+      "activeSha256": "ae78e9bd557d6520f4ee2cc8bc749b503ce42beee8a1369f4b230c1a1654b60a"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi-k3.md",
+      "path": "src/omo/modes/prompts/atlas/kimi-k3.md",
+      "sourceSha256": "25853da40661a894c74511fb81e92e606ce67bd309d5391edf803cc11386619b",
+      "activeSha256": "25853da40661a894c74511fb81e92e606ce67bd309d5391edf803cc11386619b"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/gpt.md",
+      "path": "src/omo/modes/prompts/atlas/gpt.md",
+      "sourceSha256": "c2192d7542965999b819b9550f4f6b2d952af026ce562e85174347935a4028ac",
+      "activeSha256": "c2192d7542965999b819b9550f4f6b2d952af026ce562e85174347935a4028ac"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/glm.md",
+      "path": "src/omo/modes/prompts/atlas/glm.md",
+      "sourceSha256": "594c6e50937da2b655930552aed16284def1e7259c2ddc9f74b0afb2b97bed5b",
+      "activeSha256": "594c6e50937da2b655930552aed16284def1e7259c2ddc9f74b0afb2b97bed5b"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/gemini.md",
+      "path": "src/omo/modes/prompts/atlas/gemini.md",
+      "sourceSha256": "3da83ccd7f8fcbdfda34f581fbe5af0166fb724405bb375d9c9fddfecdce1c09",
+      "activeSha256": "3da83ccd7f8fcbdfda34f581fbe5af0166fb724405bb375d9c9fddfecdce1c09"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/prompts/atlas/opus-4-7.md",
+      "path": "src/omo/modes/prompts/atlas/opus-4-7.md",
+      "sourceSha256": "6b3f4f1c0b7dcd6342c4de957152ee902e2060fc36e2b06d6e94d2afba722eca",
+      "activeSha256": "6b3f4f1c0b7dcd6342c4de957152ee902e2060fc36e2b06d6e94d2afba722eca"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/variant-resolver.ts",
+      "path": "src/omo/modes/src/variant-resolver.ts",
+      "sourceSha256": "d06584d3b60a4d9767c6877f94faa2fe83dce15a6aec52e32afba30bef2424a1",
+      "activeSha256": "f4443f9771226baa662f0248e34be820dd3f6b885fd0a6711307aa93975ffeef"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/ultrawork-prompts.ts",
+      "path": "src/omo/modes/src/ultrawork-prompts.ts",
+      "sourceSha256": "5298322e012ffcf0c7a8399d3dd6ba974021766c7f412a1c264e61c9f432b731",
+      "activeSha256": "5298322e012ffcf0c7a8399d3dd6ba974021766c7f412a1c264e61c9f432b731"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/loader.ts",
+      "path": "src/omo/modes/src/loader.ts",
+      "sourceSha256": "b8f5600783c9f72a1705b3f315b5709727aa06af2d941fbf211b2f1cdcb2723f",
+      "activeSha256": "28dfd56e06e381aa273f8c673449d3d0664a074f2c5accaa77804257c397966f"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/types.ts",
+      "path": "src/omo/modes/src/types.ts",
+      "sourceSha256": "86f34dbab09fd7fba42a5b01625db61664edaec0fb4efdcacc908bcf279ac6a1",
+      "activeSha256": "86f34dbab09fd7fba42a5b01625db61664edaec0fb4efdcacc908bcf279ac6a1"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/mode-prompts.ts",
+      "path": "src/omo/modes/src/mode-prompts.ts",
+      "sourceSha256": "8cd95cc798798d235f01a115f843ca35278c1d627e1fdc988cfcd9216b4ae78e",
+      "activeSha256": "8cd95cc798798d235f01a115f843ca35278c1d627e1fdc988cfcd9216b4ae78e"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/atlas-prompts.ts",
+      "path": "src/omo/modes/src/atlas-prompts.ts",
+      "sourceSha256": "e764da28662f3d859b88f9e3cedb8eabefefae45bf4e2d3b9b29c31573febdf7",
+      "activeSha256": "e764da28662f3d859b88f9e3cedb8eabefefae45bf4e2d3b9b29c31573febdf7"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/index.ts",
+      "path": "src/omo/modes/src/index.ts",
+      "sourceSha256": "5194d81aae5d5850a01900efb7fb42b60d53965bff2e813686a0eeadc5930717",
+      "activeSha256": "5194d81aae5d5850a01900efb7fb42b60d53965bff2e813686a0eeadc5930717"
+    },
+    {
+      "source": "reference/omo/packages/prompts-core/src/prometheus-prompts.ts",
+      "path": "src/omo/modes/src/prometheus-prompts.ts",
+      "sourceSha256": "5d1869a0b38e4d7c0ad330ea7d72c422708efbf9f254628bfd47a2bbab5deeb9",
+      "activeSha256": "5d1869a0b38e4d7c0ad330ea7d72c422708efbf9f254628bfd47a2bbab5deeb9"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-family-detectors.ts",
+      "path": "src/omo/model-family-detectors.ts",
+      "sourceSha256": "1e6e92e0fdd8fa0d7e2ce8cb8bb5ffc83e91ce69c071ae26fbe7677daaad9376",
+      "activeSha256": "1e6e92e0fdd8fa0d7e2ce8cb8bb5ffc83e91ce69c071ae26fbe7677daaad9376"
+    },
+    {
+      "source": "reference/omo/packages/utils/src/frontmatter.ts",
+      "path": "src/omo/frontmatter.ts",
+      "sourceSha256": "adcb289d4c6ad4eca3fef97a58fbf23f549b1e78951db71d69145b196f6ec710",
+      "activeSha256": "adcb289d4c6ad4eca3fef97a58fbf23f549b1e78951db71d69145b196f6ec710"
+    },
+    {
+      "source": "reference/omo/packages/omo-opencode2/src/agents/sisyphus-prompt.ts",
+      "path": "src/prompts/sisyphus-route.ts",
+      "sourceSha256": "bff4ee97a4ecd5a6353c41a85283cae53fdfb7513de924a53e7e430a68431c94",
+      "activeSha256": "c305d80705c57c3a3bc5489bcc92d238d5af9abe27ff43b6d64584ec4d7f8c9e"
+    }
+  ]
+}

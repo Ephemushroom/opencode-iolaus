@@ -4,6 +4,19 @@ Iolaus is an independently maintained OpenCode 2 plugin retaining OMO's agent pr
 
 The native prompt-only plugin is being bootstrapped. The original OpenCode2 adapter is preserved under `reference/omo/` for reference, including its task executor, teams, workflows, continuation hooks, and Hashline integration. Reference code is not an installable plugin or an active workspace.
 
+## Usage
+
+Add the package to OpenCode's V2 plugin list:
+
+```jsonc
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugins": ["opencode-iolaus"]
+}
+```
+
+Iolaus registers namespaced agents such as `iolaus-sisyphus` and native commands such as `/iolaus-ultrawork`. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.
