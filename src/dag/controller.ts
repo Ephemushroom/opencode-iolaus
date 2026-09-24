@@ -7,10 +7,11 @@ import type { DagDefinition, DagEvent, DagNodeRecord, DagResultEnvelope, DagRunR
 
 export interface DagController {
   readonly create: (definition: DagDefinition, ownerSessionID: string) => Promise<DagRunRecord>
+  readonly list: (ownerSessionID?: string) => Promise<readonly DagRunRecord[]>
   readonly snapshot: (runID: string, ownerSessionID: string) => Promise<DagSnapshot>
   readonly wait: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
-  readonly cancel: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
-  readonly retry: (runID: string, ownerSessionID: string, nodeID?: string) => Promise<DagRunRecord>
+  readonly cancel: (runID: string, ownerSessionID: string, expectedGeneration?: number) => Promise<DagRunRecord>
+  readonly retry: (runID: string, ownerSessionID: string, nodeID?: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly resume: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
   readonly amend: (runID: string, ownerSessionID: string, definition: DagDefinition) => Promise<DagRunRecord>
   readonly close: () => void
@@ -22,6 +23,7 @@ export interface DagControllerOptions {
   readonly maxParallel?: number
   readonly now?: () => number
   readonly trace?: (event: string, data?: Record<string, unknown>) => void
+  readonly onEvent?: (event: DagEvent, ownerSessionID: string) => void | Promise<void>
 }
 
 type Waiter = { readonly resolve: (run: DagRunRecord) => void; readonly reject: (error: unknown) => void }
@@ -62,6 +64,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
     store.appendAction({ runID: run.runID, ...(nodeID ? { nodeID } : {}), kind: type, idempotencyKey: `${type}:${nodeID ?? "run"}:${run.generation}:${now()}`, ...(payload === undefined ? {} : { payload }), createdAt: now() })
     const created = store.appendEvent({ schemaVersion: 1, runID: run.runID, generation: run.generation, type, createdAt: now(), ...(nodeID ? { nodeID } : {}), ...(payload === undefined ? {} : { payload }) })
     trace(`iolaus.dag.${type}`, { runID: run.runID, generation: run.generation, ...(nodeID ? { nodeID } : {}), sequence: created.sequence })
+    void options.onEvent?.(created, run.ownerSessionID)
   }
   const withQueue = async <T>(runID: string, task: () => Promise<T>): Promise<T> => {
     const previous = queues.get(runID) ?? Promise.resolve()
@@ -177,21 +180,24 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const run: DagRunRecord = { runID, ownerSessionID, name: definition.name, definition, fingerprint: fp, generation: 1, status: "running", nodes: definition.nodes.map((node) => ({ definition: node, fingerprint: fingerprints.get(node.id)!, status: "pending", attempt: 0, createdAt, updatedAt: createdAt })), createdAt, updatedAt: createdAt }
       store.createRun(run); event(run, "run.started"); await schedule(runID); return store.getRun(runID)!
     },
+    async list(ownerSessionID) { return store.listRuns(ownerSessionID) },
     async snapshot(runID, ownerSessionID) { const run = owned(runID, ownerSessionID); return { run, events: store.events(runID) } },
     async wait(runID, ownerSessionID) {
       const current = owned(runID, ownerSessionID)
       if (terminal(current.status)) return current
       return await new Promise<DagRunRecord>((resolve, reject) => { const set = waiters.get(runID) ?? new Set<Waiter>(); set.add({ resolve, reject }); waiters.set(runID, set) })
     },
-    async cancel(runID, ownerSessionID) {
+    async cancel(runID, ownerSessionID, expectedGeneration) {
       let run = owned(runID, ownerSessionID)
+      if (expectedGeneration !== undefined && run.generation !== expectedGeneration) throw new DagValidationError("DAG generation has changed")
       if (terminal(run.status)) return run
       const refs = run.nodes.filter((node) => node.execution && (node.status === "starting" || node.status === "running")).map((node) => node.execution!)
       run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "needs_retry" ? { ...node, status: "cancelled", updatedAt: now() } : node) }
       save(run); event(run, "run.cancelled"); for (const ref of refs) await runner.cancel(ref); notify(run); return run
     },
-    async retry(runID, ownerSessionID, nodeID) {
+    async retry(runID, ownerSessionID, nodeID, expectedGeneration) {
       let run = owned(runID, ownerSessionID)
+      if (expectedGeneration !== undefined && run.generation !== expectedGeneration) throw new DagValidationError("DAG generation has changed")
       if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry")) throw new DagValidationError("Retry requires a terminal run or a node needing retry")
       const selected = nodeID ? new Set([nodeID]) : new Set(run.nodes.filter((node) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry").map((node) => node.definition.id))
       run = { ...run, generation: run.generation + 1, status: "running", updatedAt: now(), nodes: run.nodes.map((node) => selected.has(node.definition.id) ? { ...node, status: "pending", error: undefined, execution: undefined, updatedAt: now() } : node) }

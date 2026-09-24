@@ -63,12 +63,20 @@ export class DagStore {
     })
   }
 
-  saveRun(run: DagRunRecord): void {
+  saveRun(run: DagRunRecord, events: readonly Omit<DagEvent, "eventID" | "sequence">[] = []): readonly DagEvent[] {
+    const committed: DagEvent[] = []
     this.transaction(() => {
       this.db.run("UPDATE dag_runs SET definition_json = ?, fingerprint = ?, generation = ?, status = ?, updated_at = ? WHERE run_id = ?", [canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.updatedAt, run.runID])
       this.db.run("DELETE FROM dag_nodes WHERE run_id = ?", [run.runID])
       for (const node of run.nodes) this.writeNode(run.runID, node)
+      for (const event of events) {
+        const entry = this.appendEvent(event)
+        this.appendAction({ runID: run.runID, nodeID: event.nodeID, kind: event.type,
+          idempotencyKey: entry.eventID, payload: event.payload, createdAt: event.createdAt })
+        committed.push(entry)
+      }
     })
+    return committed
   }
 
   getRun(runID: string): DagRunRecord | undefined {
@@ -88,6 +96,13 @@ export class DagStore {
         createdAt: node.created_at, updatedAt: node.updated_at,
       })),
     }
+  }
+
+  listRuns(ownerSessionID?: string): readonly DagRunRecord[] {
+    const rows = ownerSessionID === undefined
+      ? this.db.query("SELECT run_id FROM dag_runs ORDER BY updated_at DESC").all() as Array<{ run_id: string }>
+      : this.db.query("SELECT run_id FROM dag_runs WHERE owner_session_id = ? ORDER BY updated_at DESC").all(ownerSessionID) as Array<{ run_id: string }>
+    return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
   }
 
   appendAction(action: Omit<DagAction, "actionID">): boolean {

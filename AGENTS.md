@@ -26,9 +26,10 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
   `iolaus-prometheus`, and `iolaus-atlas`.
 - Restart recovery is conservative. Already-admitted prompts are not blindly
   replayed; interrupted work requires explicit retry/resume.
-- Full DAG TUI, fan-in aggregators, conditional routing and human gates are
-  planned follow-ups. Do not claim them as implemented until their runtime QA
-  evidence exists.
+- The first read-only DAG sidebar is implemented through the `./tui` export and
+  typed RPC snapshot/events. Interactive cancel/retry controls, fan-in
+  aggregators, conditional routing and human gates are planned follow-ups. Do
+  not claim them as implemented until their runtime QA evidence exists.
 
 ## Verification
 

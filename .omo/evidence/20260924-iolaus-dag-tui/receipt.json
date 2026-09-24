@@ -1,0 +1,17 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.15",
+  "tracePath": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-tui/.omo/evidence/20260924-iolaus-dag-tui/trace.ndjson",
+  "tmuxLog": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-tui/.omo/evidence/20260924-iolaus-dag-tui/tmux.log",
+  "nativeTuiLoaded": true,
+  "realBefore": {
+    "config": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+    "database": "594210a605b3d7b33b9af1041c2f49b6deba8cbda7133d0060bd3374a6fe3de2"
+  },
+  "realAfter": {
+    "config": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+    "database": "594210a605b3d7b33b9af1041c2f49b6deba8cbda7133d0060bd3374a6fe3de2"
+  },
+  "sandboxRemoved": true,
+  "omitted": "No provider credentials, auth files, prompts, or inherited secret-bearing environment values were recorded."
+}

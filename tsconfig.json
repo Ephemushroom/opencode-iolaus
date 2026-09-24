@@ -7,8 +7,10 @@
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["bun"],
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "jsx": "preserve",
+    "jsxImportSource": "@opentui/solid"
   },
-  "include": ["src/**/*.ts", "script/**/*.ts", "tests/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "script/**/*.ts", "tests/**/*.ts"],
   "exclude": ["reference", "node_modules", "dist"]
 }

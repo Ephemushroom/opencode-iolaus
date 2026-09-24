@@ -1,13 +1,13 @@
 {
   "name": "opencode-iolaus",
   "version": "0.1.0",
-  "description": "Iolaus for OpenCode 2: OMO-derived agent prompts, explicit modes, and model-family selection.",
+  "description": "Iolaus for OpenCode 2: OMO-derived agents, explicit modes, model-family selection, durable DAG orchestration and TUI.",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE.md",
   "repository": { "type": "git", "url": "git+https://github.com/Ephemushroom/opencode-iolaus.git" },
   "main": "./dist/index.js",
-  "exports": { ".": "./dist/index.js", "./prompts": "./dist/prompts.js" },
-  "files": ["dist/index.js", "dist/prompts.js", "README.md", "LICENSE.md", "NOTICE.md"],
+  "exports": { ".": "./dist/index.js", "./prompts": "./dist/prompts.js", "./tui": "./dist/tui.js" },
+  "files": ["dist/index.js", "dist/prompts.js", "dist/tui.js", "README.md", "LICENSE.md", "NOTICE.md"],
   "scripts": {
     "build": "bun run script/build.ts",
     "typecheck": "tsc --noEmit",
@@ -17,9 +17,17 @@
     "qa:live": "node script/qa-live.mjs",
     "prepack": "bun run check:package"
   },
-  "peerDependencies": { "@opencode/plugin": "2.0.15" },
+  "peerDependencies": {
+    "@opencode/plugin": "2.0.15",
+    "@opentui/core": ">=0.5.10",
+    "@opentui/solid": ">=0.5.10",
+    "solid-js": ">=1.9.0"
+  },
+  "dependencies": { "zod": "4.1.8" },
   "devDependencies": {
     "@opencode/plugin": "2.0.15",
+    "@opentui/solid": "0.5.10",
+    "solid-js": "1.9.12",
     "@types/bun": "latest",
     "@types/js-yaml": "^4.0.9",
     "typescript": "^5.9.3",

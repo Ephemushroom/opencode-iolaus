@@ -15,6 +15,14 @@ Add the package to OpenCode's V2 plugin list:
 }
 ```
 
+For the live DAG sidebar, add the TUI entry alongside the main plugin:
+
+```jsonc
+{
+  "plugins": ["opencode-iolaus", "opencode-iolaus/tui"]
+}
+```
+
 Iolaus registers namespaced agents such as `iolaus-sisyphus` and native commands such as `/iolaus-ultrawork`. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
 
 ## Durable DAG
@@ -23,8 +31,10 @@ The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state under
 `.iolaus/dag/state.db`. The first runtime slice supports graph validation,
 dependency-frontier scheduling, node-level retry, cancellation, restart-safe
 completed state, and generation/provenance-aware result envelopes. DAG nodes use
-the namespaced Iolaus Agents and native OpenCode sessions. Fan-in aggregators,
-conditional routing, human gates, and the full TUI panel are planned follow-ups.
+the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
+is available through the `opencode-iolaus/tui` entry. Fan-in aggregators,
+conditional routing, human gates, and interactive panel actions are planned
+follow-ups.
 
 ## Development
 

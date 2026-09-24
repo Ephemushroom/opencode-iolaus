@@ -23,6 +23,6 @@ if (existsSync(join(root, "dist/metafile.json"))) {
   if (metafile.includes("reference/")) throw new Error("Reference source entered the build graph")
 }
 
-const packageFiles = ["dist/index.js", "dist/prompts.js", "README.md", "LICENSE.md", "NOTICE.md"]
+const packageFiles = ["dist/index.js", "dist/prompts.js", "dist/tui.js", "README.md", "LICENSE.md", "NOTICE.md"]
 for (const file of packageFiles) if (!existsSync(join(root, file))) throw new Error(`Missing package file: ${file}`)
 console.log(JSON.stringify({ activeFiles: manifest.files.length, packageFiles, verdict: "PASS" }, null, 2))
