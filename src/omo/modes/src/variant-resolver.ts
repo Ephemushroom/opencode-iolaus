@@ -7,7 +7,7 @@ import {
   isKimiK2CodeModel,
   isKimiK3Model,
   isMiniMaxModel,
-} from "../../model-family-detectors"
+} from "@iolaus/model-core"
 import type { VariantTable } from "./types"
 
 type ModelMatcher = (modelID: string) => boolean

@@ -29,11 +29,11 @@ function assistantText(messages: readonly unknown[]): string {
 export function createOpenCodeDagRunner(ctx: Pick<Context, "session"> & { readonly location: { readonly directory: string } }): DagRunner {
   return {
     async start(input) {
-      if (input.node.agent === undefined || input.node.model === undefined) throw new Error(`Iolaus DAG node ${input.node.id} has no execution target`)
+      if (input.node.agent === undefined) throw new Error(`Iolaus DAG node ${input.node.id} has no execution target`)
       const session = await ctx.session.create({
         title: `Iolaus DAG · ${input.node.id}`,
         agent: Agent.ID.make(input.node.agent),
-        model: Model.Ref.parse(input.node.model),
+        ...(input.node.model === undefined ? {} : { model: Model.Ref.parse(input.node.model) }),
         location: { directory: ctx.location.directory },
         metadata: { iolaus_dag_node: input.node.id, iolaus_dag_attempt: input.attempt },
       })

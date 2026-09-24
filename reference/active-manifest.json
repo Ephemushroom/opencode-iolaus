@@ -4,7 +4,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-category-skills-guide.ts",
       "path": "src/omo/agents/dynamic-agent-category-skills-guide.ts",
       "sourceSha256": "373afce6ba66e9dbd8df110569d38d795d754848771f30d0b3c7b97afd498631",
-      "activeSha256": "1d31511c532b993a4acce232de95468b4694feae75741fcc25b4cc13fa937908"
+      "activeSha256": "fe9874ae0408082e5b26ac45042c59cb27030289e735343f33ceac691774ee97"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-gemini-fallback-overrides.ts",
@@ -16,7 +16,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
       "path": "src/omo/agents/dynamic-agent-core-sections.ts",
       "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
-      "activeSha256": "2058546a2e87f42aba48c93af1856b04884b18d21de569ff7d502e9e07a2e69a"
+      "activeSha256": "11df5210ac9ad38ea03cabe32175d4431ff6e49d6c896531931092e65f56e580"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",
@@ -52,7 +52,7 @@
       "source": "reference/omo/packages/agents-core/src/types.ts",
       "path": "src/omo/agents/types.ts",
       "sourceSha256": "13cd6dbfbc6acaef4983b7ff25af9f3106188e14340f8400a81fafd22fc5df11",
-      "activeSha256": "ca5598cc068cc3c73f08d29ce6a45d82c16c2027d558e0019979acb65608219f"
+      "activeSha256": "2c11599d0f84ca7737793d255b4d24646d1faa204ca2847c0c8ce940a8ddf48b"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt.ts",
@@ -334,7 +334,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-5-5.ts",
       "path": "src/omo/agents/sisyphus/gpt-5-5.ts",
       "sourceSha256": "de56dd3fe8a1da6e8b3d928394b5fd7ba1f5b9da8da49801daf096e2137f3484",
-      "activeSha256": "de56dd3fe8a1da6e8b3d928394b5fd7ba1f5b9da8da49801daf096e2137f3484"
+      "activeSha256": "1a3c2f9ab2c423d615eb50977e0d9056b016c8c7cd5c863a779c3e089b66a966"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-5-4.ts",
@@ -448,7 +448,7 @@
       "source": "reference/omo/packages/prompts-core/src/variant-resolver.ts",
       "path": "src/omo/modes/src/variant-resolver.ts",
       "sourceSha256": "d06584d3b60a4d9767c6877f94faa2fe83dce15a6aec52e32afba30bef2424a1",
-      "activeSha256": "83d743d3758c966022d512878ccea56c094511609d470057d958b522e735a6b2"
+      "activeSha256": "818c5b1b92b7e404fed1f7e2b837d453fc3da80185c72b8918f97de406f7fe5d"
     },
     {
       "source": "reference/omo/packages/prompts-core/src/ultrawork-prompts.ts",
@@ -494,7 +494,7 @@
     },
     {
       "source": "reference/omo/packages/model-core/src/model-family-detectors.ts",
-      "path": "src/omo/model-family-detectors.ts",
+      "path": "packages/model-core/src/model-family-detectors.ts",
       "sourceSha256": "1e6e92e0fdd8fa0d7e2ce8cb8bb5ffc83e91ce69c071ae26fbe7677daaad9376",
       "activeSha256": "eab5d5c9b97276caf83e0d51a61fae9208899960e96d9f16ffec81520e5ae6fb"
     },
@@ -509,6 +509,60 @@
       "path": "src/prompts/sisyphus-route.ts",
       "sourceSha256": "bff4ee97a4ecd5a6353c41a85283cae53fdfb7513de924a53e7e430a68431c94",
       "activeSha256": "b9354087ffc1daa129a857166f71ed79d70942a5a8ec4c509d7e2742dd0d2740"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-requirement-types.ts",
+      "path": "packages/model-core/src/model-requirement-types.ts",
+      "sourceSha256": "48bf7a980c017b592af3c7d1eb137de67598348076682568c8edc8ff3a347f8d",
+      "activeSha256": "48bf7a980c017b592af3c7d1eb137de67598348076682568c8edc8ff3a347f8d"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/agent-model-requirements.ts",
+      "path": "packages/model-core/src/agent-model-requirements.ts",
+      "sourceSha256": "a9b7c5eca2bcda169ce0dfa14da8302f79d36625aca449500a6c701e6c1166fc",
+      "activeSha256": "43cb02693c089eeb3c8d346e63522afc3573baa73a0112cd57717e1745644ca2"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/category-model-requirements.ts",
+      "path": "packages/model-core/src/category-model-requirements.ts",
+      "sourceSha256": "b50335b54431a241053dd95ee3ec6c7c32a3d3a376badf21e3c1db022f0567ba",
+      "activeSha256": "0460573340fd2de423680e30ca3bf135afefb656f7f16a29911a804cc441720f"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-requirements.ts",
+      "path": "packages/model-core/src/model-requirements.ts",
+      "sourceSha256": "f34d8c98efe64c4d251da23710cf2f2905f60f1ca39f88ff8fed81ebbb76787e",
+      "activeSha256": "f34d8c98efe64c4d251da23710cf2f2905f60f1ca39f88ff8fed81ebbb76787e"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-resolution-pipeline.ts",
+      "path": "packages/model-core/src/model-resolution-pipeline.ts",
+      "sourceSha256": "4991f639463ff9426f2b5008abcc02ec110bb73689a636bd85c8bce46f4fd318",
+      "activeSha256": "4991f639463ff9426f2b5008abcc02ec110bb73689a636bd85c8bce46f4fd318"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-availability.ts",
+      "path": "packages/model-core/src/model-availability.ts",
+      "sourceSha256": "45caf3fe0d208eb40eb3a9d655df4a016cc573311d6760c68f2acde49a31ad10",
+      "activeSha256": "4653e0eff58129fbb0a03eafd075e314c4bf96ac34929dade4e6cc6e3fbb6adf"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/provider-model-id-transform.ts",
+      "path": "packages/model-core/src/provider-model-id-transform.ts",
+      "sourceSha256": "4fc093cca1bbd01086c93769383ef07e2b0658f48dab55e003fb7797b6813692",
+      "activeSha256": "4fc093cca1bbd01086c93769383ef07e2b0658f48dab55e003fb7797b6813692"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/model-normalization.ts",
+      "path": "packages/model-core/src/model-normalization.ts",
+      "sourceSha256": "e179b6020095ae9f240ac4374c6f9dfe1828d673c0a090a02d070e42cf2f9611",
+      "activeSha256": "e179b6020095ae9f240ac4374c6f9dfe1828d673c0a090a02d070e42cf2f9611"
+    },
+    {
+      "source": "reference/omo/packages/model-core/src/provider-cache.ts",
+      "path": "packages/model-core/src/provider-cache.ts",
+      "sourceSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180",
+      "activeSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180"
     }
   ]
 }

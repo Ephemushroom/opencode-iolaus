@@ -6,11 +6,23 @@
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["bun"],
+    "types": [
+      "bun"
+    ],
     "allowImportingTsExtensions": true,
     "jsx": "preserve",
     "jsxImportSource": "@opentui/solid"
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "script/**/*.ts", "tests/**/*.ts"],
-  "exclude": ["reference", "node_modules", "dist"]
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "packages/*/src/**/*.ts",
+    "script/**/*.ts",
+    "tests/**/*.ts"
+  ],
+  "exclude": [
+    "reference",
+    "node_modules",
+    "dist"
+  ]
 }

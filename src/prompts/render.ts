@@ -2,14 +2,14 @@ import {
   EXPLORE_PROMPT, MULTIMODAL_LOOKER_PROMPT, buildLibrarianPrompt,
   buildDynamicHephaestusPrompt, isHephaestusSupportedModel, buildSisyphusJuniorPrompt,
   getMetisPrompt, getMomusPromptSelection, getOraclePromptSelection,
-  type AvailableAgent, type AvailableSkill, type AvailableTool,
+  type AvailableAgent, type AvailableCategory, type AvailableSkill, type AvailableTool,
 } from "../omo/agents"
 import {
   atlasPromptVariants, prometheusPromptVariants, ultraworkPromptVariants,
   HYPERPLAN_MODE_PROMPT, TEAM_MODE_PROMPT, loadPromptSync, resolveVariant,
 } from "../omo/modes/src"
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
-import type { AgentName, ModeName } from "./catalog"
+import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
 import { NATIVE_BINDINGS } from "./native-bindings"
 
 export interface PromptContext {
@@ -17,15 +17,16 @@ export interface PromptContext {
   agents?: AvailableAgent[]
   skills?: AvailableSkill[]
   tools?: AvailableTool[]
+  categories?: AvailableCategory[]
 }
 
 export function renderAgent(name: AgentName, context: PromptContext): string {
-  const { model, agents = [], skills = [], tools = [] } = context
+  const { model, agents = [], skills = [], tools = [], categories = [] } = context
   switch (name) {
-    case "sisyphus": return buildSisyphusPromptForModel(model, agents, tools, skills, [], false)
+    case "sisyphus": return buildSisyphusPromptForModel(model, agents, tools, skills, categories, false)
     case "hephaestus":
       return isHephaestusSupportedModel(model)
-        ? buildDynamicHephaestusPrompt({ model, availableAgents: agents, availableSkills: skills, availableTools: tools })
+        ? buildDynamicHephaestusPrompt({ model, availableAgents: agents, availableSkills: skills, availableTools: tools, availableCategories: categories })
         : buildSisyphusJuniorPrompt(model, false)
     case "sisyphus-junior": return buildSisyphusJuniorPrompt(model, false)
     case "explore": return EXPLORE_PROMPT
@@ -40,6 +41,11 @@ export function renderAgent(name: AgentName, context: PromptContext): string {
       return loadPromptSync({ source: atlasPromptVariants[variant], name, variant }).body
     }
   }
+}
+
+export function renderCategory(name: CategoryName, model: string): string {
+  const append = `<Category_Context name="${name}">\n${CATEGORY_DESCRIPTIONS[name]}\n</Category_Context>`
+  return buildSisyphusJuniorPrompt(model, false, append)
 }
 
 export function renderMode(mode: ModeName, model: string, agent?: AgentName): string {

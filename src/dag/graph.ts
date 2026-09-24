@@ -20,7 +20,10 @@ export function validateDefinition(definition: DagDefinition): void {
     if (isGate(node)) {
       if (node.agent !== undefined || node.model !== undefined) throw new DagValidationError(`Gate node must not name an agent or model: ${node.id}`)
       if (!node.prompt.trim()) throw new DagValidationError(`Gate node needs a message for the approver: ${node.id}`)
-    } else if (!node.agent?.trim() || !node.model?.includes("/")) throw new DagValidationError(`Invalid execution target: ${node.id}`)
+    } else {
+      if (!node.agent?.trim()) throw new DagValidationError(`Invalid execution target: ${node.id}`)
+      if (node.model !== undefined && !node.model.includes("/")) throw new DagValidationError(`Invalid model reference: ${node.id}`)
+    }
     if (node.maxAttempts !== undefined && (!Number.isInteger(node.maxAttempts) || node.maxAttempts < 1)) {
       throw new DagValidationError(`Invalid maxAttempts for node: ${node.id}`)
     }

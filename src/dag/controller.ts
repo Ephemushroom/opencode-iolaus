@@ -24,6 +24,8 @@ export interface DagController {
 export interface DagControllerOptions {
   readonly directory: string
   readonly runner: DagRunner
+  /** Returns the configured "provider/model[#variant]" for an agent ID, or undefined. */
+  readonly defaultModel?: (agent: string) => string | undefined
   readonly maxParallel?: number
   readonly now?: () => number
   readonly trace?: (event: string, data?: Record<string, unknown>) => void
@@ -75,6 +77,18 @@ export function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
   const inputs = resolveInputs(node, run)
   if (inputs.length === 0) return node.definition.prompt
   return `${node.definition.prompt}\n\n<iolaus-dag-inputs>${jsonText(inputs)}</iolaus-dag-inputs>`
+}
+
+export function applyDefaultModels(definition: DagDefinition, defaultModel: DagControllerOptions["defaultModel"]): DagDefinition {
+  if (!defaultModel) return definition
+  return {
+    ...definition,
+    nodes: definition.nodes.map((node) => {
+      if (isGate(node) || node.model !== undefined || node.agent === undefined) return node
+      const model = defaultModel(node.agent)
+      return model === undefined ? node : { ...node, model }
+    }),
+  }
 }
 
 export function createDagController(options: DagControllerOptions): DagController {
@@ -224,7 +238,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
   }
 
   const controller: DagController = {
-    async create(definition, ownerSessionID) {
+    async create(input, ownerSessionID) {
+      const definition = applyDefaultModels(input, options.defaultModel)
       validateDefinition(definition)
       const createdAt = now()
       const runID = randomUUID()
@@ -300,7 +315,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
         return updated
       })
     },
-    async amend(runID, ownerSessionID, definition) {
+    async amend(runID, ownerSessionID, input) {
+      const definition = applyDefaultModels(input, options.defaultModel)
       validateDefinition(definition)
       const previous = owned(runID, ownerSessionID)
       const previousByID = new Map(previous.nodes.map((node) => [node.definition.id, node]))

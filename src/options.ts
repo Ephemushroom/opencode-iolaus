@@ -1,9 +1,12 @@
-import { AGENT_NAMES, MODE_NAMES, type AgentName, type ModeName } from "./prompts/catalog"
+import { AGENT_NAMES, CATEGORY_NAMES, MODE_NAMES, type AgentName, type CategoryName, type ModeName } from "./prompts/catalog"
 
 export interface Options {
   enabled: boolean
   agents: AgentName[]
+  categories: CategoryName[]
   modes: ModeName[]
+  /** Inline models config, merged after `.iolaus/models.json` layers. */
+  models?: unknown
 }
 
 function selection<T extends string>(value: unknown, allowed: readonly T[], name: string): T[] {
@@ -15,7 +18,7 @@ function selection<T extends string>(value: unknown, allowed: readonly T[], name
 }
 
 export function parseOptions(input: Record<string, unknown>): Options {
-  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "modes"].includes(key))
+  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models"].includes(key))
   if (unknown.length) throw new TypeError(`Unknown Iolaus options: ${unknown.join(", ")}`)
   if (input.enabled !== undefined && typeof input.enabled !== "boolean") {
     throw new TypeError("Iolaus enabled must be a boolean")
@@ -23,6 +26,8 @@ export function parseOptions(input: Record<string, unknown>): Options {
   return {
     enabled: input.enabled !== false,
     agents: selection(input.agents, AGENT_NAMES, "agents"),
+    categories: selection(input.categories, CATEGORY_NAMES, "categories"),
     modes: selection(input.modes, MODE_NAMES, "modes"),
+    ...(input.models === undefined ? {} : { models: input.models }),
   }
 }

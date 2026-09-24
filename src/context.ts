@@ -1,9 +1,9 @@
 import type { Context } from "@opencode/plugin/promise/plugin"
 import type { SessionContext } from "@opencode/plugin/promise/session"
 import type { Options } from "./options"
-import { agentName, explicitMode } from "./prompts/catalog"
-import { agentMarker } from "./registration"
-import { bindNative, renderAgent, renderMode } from "./prompts/render"
+import { CATEGORY_DESCRIPTIONS, agentName, categoryName, explicitMode } from "./prompts/catalog"
+import { agentMarker, categoryMarker } from "./registration"
+import { bindNative, renderAgent, renderCategory, renderMode } from "./prompts/render"
 import { categorizeTools } from "./omo/agents"
 import { trace } from "./trace"
 
@@ -40,20 +40,30 @@ export async function composeContext(
   options: Options,
 ): Promise<void> {
   const name = agentName(event.agent)
+  const category = categoryName(event.agent)
   const mode = explicitMode(lastUserText(event.messages))
   const selectedMode = mode && options.modes.includes(mode) ? mode : undefined
-  const index = name && options.agents.includes(name)
-    ? event.system.findIndex((part) => part.type === "text" && part.text === agentMarker(name)) : -1
+  const marker = name && options.agents.includes(name) ? agentMarker(name)
+    : category && options.categories.includes(category) ? categoryMarker(category) : undefined
+  const index = marker ? event.system.findIndex((part) => part.type === "text" && part.text === marker) : -1
   if (index === -1 && !selectedMode) return
   const model = `${event.model.providerID}/${event.model.id}`
-  if (name && index !== -1) {
+  if (category && index !== -1) {
+    event.system[index] = { type: "text", text: bindNative(renderCategory(category, model)) }
+    trace("iolaus.agent.rendered", { agent: category, kind: "category", model, sessionID: event.sessionID })
+  } else if (name && index !== -1) {
     const [agents, skills] = await Promise.all([ctx.agent.list(), ctx.skill.list()])
+    const lanes = agents.data.filter((agent) => categoryName(String(agent.id)) !== undefined)
     const prompt = renderAgent(name, {
       model,
-      agents: agents.data.filter((agent) => agent.mode !== "primary" && !agent.hidden).map((agent) => ({
+      agents: agents.data.filter((agent) => agent.mode !== "primary" && !agent.hidden && categoryName(String(agent.id)) === undefined).map((agent) => ({
         name: String(agent.id), description: agent.description ?? "",
         metadata: { category: "specialist", cost: "CHEAP", triggers: [] },
       })),
+      categories: lanes.map((agent) => {
+        const lane = categoryName(String(agent.id))!
+        return { name: lane, description: CATEGORY_DESCRIPTIONS[lane], ...(agent.model ? { model: `${agent.model.providerID}/${agent.model.id}` } : {}) }
+      }),
       skills: skills.data.map((skill) => ({ name: skill.id, description: skill.description ?? "", location: "plugin" })),
       tools: categorizeTools(Object.keys(event.tools)),
     })

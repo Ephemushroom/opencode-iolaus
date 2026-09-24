@@ -18,7 +18,7 @@ import {
   isSWE2Model,
   isKimiK3Model,
   isMiniMaxModel,
-} from "../model-family-detectors";
+} from "@iolaus/model-core";
 
 export {
   isClaudeFable5Model,
