@@ -3,6 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { createDagController, resolveInputs } from "../src/dag/controller"
+import { evaluateCondition, selectField } from "../src/dag/condition"
 import { canonicalJson } from "../src/dag/canonical-json"
 import { fingerprint, graphFingerprint } from "../src/dag/fingerprint"
 import { DagValidationError, validateDefinition } from "../src/dag/graph"
@@ -133,4 +134,112 @@ test("field binding selects one payload key and fan-in requires dependencies", (
   ])
   expect(() => validateDefinition(definition([{ ...node("solo"), inputs: [{ node: "*" }] }]))).toThrow('Fan-in binding "*" requires dependsOn')
   expect(() => validateDefinition(definition([node("a"), { ...node("z", ["a"]), inputs: [{ node: "*" }] }]))).not.toThrow()
+})
+
+test("condition evaluation selects dotted fields and composes all/any/not", () => {
+  const source = new Map<string, import("../src/dag/types").JsonValue | null>([
+    ["review", { text: "Verdict: PASS", score: 9, nested: { tags: ["a", "b"] } }],
+    ["skipped", null],
+  ])
+  expect(selectField(source.get("review")!, "nested.tags.1")).toBe("b")
+  expect(selectField(source.get("review")!, "missing.path")).toBeNull()
+  expect(evaluateCondition({ node: "review", field: "text", includes: "PASS" }, source)).toBe(true)
+  expect(evaluateCondition({ node: "review", field: "text", matches: "^Verdict: (PASS|FAIL)$" }, source)).toBe(true)
+  expect(evaluateCondition({ node: "review", field: "score", equals: 9 }, source)).toBe(true)
+  expect(evaluateCondition({ node: "review", field: "score", equals: "9" }, source)).toBe(false)
+  expect(evaluateCondition({ node: "skipped", exists: true }, source)).toBe(false)
+  expect(evaluateCondition({ node: "skipped", exists: false }, source)).toBe(true)
+  expect(evaluateCondition({ all: [{ node: "review", field: "text", includes: "PASS" }, { not: { node: "skipped", exists: true } }] }, source)).toBe(true)
+  expect(evaluateCondition({ any: [{ node: "review", field: "text", includes: "FAIL" }, { node: "review", field: "score", equals: 9 }] }, source)).toBe(true)
+})
+
+test("conditional routing skips the false branch, runs the true branch and keeps dependents unblocked", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const prompts = new Map<string, string>()
+  const runner = fakeRunner()
+  const start = runner.start.bind(runner)
+  runner.start = async (input) => { prompts.set(input.node.id, input.prompt); return start(input) }
+  const controller = createDagController({ directory, runner })
+  const review = node("review")
+  const ship: DagNodeDefinition = { ...node("ship", ["review"]), when: { node: "review", field: "node", equals: "review" } }
+  const fix: DagNodeDefinition = { ...node("fix", ["review"]), when: { node: "review", field: "node", equals: "something-else" } }
+  const report: DagNodeDefinition = { ...node("report", ["ship", "fix"]), inputs: [{ node: "*" }] }
+  const run = await controller.create(definition([review, ship, fix, report]), "owner")
+  const finished = await controller.wait(run.runID, "owner")
+  expect(finished.status).toBe("completed")
+  const status = Object.fromEntries(finished.nodes.map((n) => [n.definition.id, n.status]))
+  expect(status).toEqual({ review: "completed", ship: "completed", fix: "skipped", report: "completed" })
+  expect(runner.started).toEqual(["review", "ship", "report"])
+  const prompt = prompts.get("report")!
+  const inputs = JSON.parse(prompt.slice(prompt.indexOf("<iolaus-dag-inputs>") + "<iolaus-dag-inputs>".length, prompt.indexOf("</iolaus-dag-inputs>")))
+  expect(inputs.map((i: { node: string; value: unknown; provenance: { status: string } }) => [i.node, i.value, i.provenance.status])).toEqual([
+    ["ship", { node: "ship", attempt: 1 }, "completed"], ["fix", null, "skipped"],
+  ])
+  const { events } = await controller.snapshot(run.runID, "owner")
+  expect(events.some((e) => e.type === "node.skipped" && e.nodeID === "fix")).toBe(true)
+  controller.close()
+})
+
+test("condition validation rejects non-dependency references, empty groups and bad regex", () => {
+  expect(() => validateDefinition(definition([node("a"), { ...node("b", ["a"]), when: { node: "zzz", exists: true } }]))).toThrow("non-dependency")
+  expect(() => validateDefinition(definition([node("a"), { ...node("b", ["a"]), when: { node: "a" } }]))).toThrow("no predicate")
+  expect(() => validateDefinition(definition([node("a"), { ...node("b", ["a"]), when: { all: [] } }]))).toThrow('Empty "all"')
+  expect(() => validateDefinition(definition([node("a"), { ...node("b", ["a"]), when: { node: "a", matches: "(" } }]))).toThrow("Invalid condition regex")
+  expect(() => validateDefinition(definition([node("a"), { ...node("b", ["a"]), when: { node: "a", field: "text", includes: "ok" } }]))).not.toThrow()
+})
+
+test("gate pauses the run, approve resumes with a human result, reject fails and blocks dependents", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const runner = fakeRunner()
+  const controller = createDagController({ directory, runner })
+  const plan = node("plan")
+  const gate: DagNodeDefinition = { id: "gate", kind: "gate", prompt: "Approve the plan?", dependsOn: ["plan"], inputs: [{ node: "plan" }] }
+  const execute: DagNodeDefinition = { ...node("execute", ["gate"]), inputs: [{ node: "gate" }] }
+  const run = await controller.create(definition([plan, gate, execute]), "owner")
+  let waited = false
+  const waiting = controller.wait(run.runID, "owner").then((r) => { waited = true; return r })
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  let snapshot = await controller.snapshot(run.runID, "owner")
+  expect(snapshot.run.status).toBe("paused")
+  expect(snapshot.run.nodes.find((n) => n.definition.id === "gate")?.status).toBe("waiting_approval")
+  expect(snapshot.run.nodes.find((n) => n.definition.id === "execute")?.status).toBe("pending")
+  expect(runner.started).toEqual(["plan"])
+  expect(waited).toBe(false)
+  expect(snapshot.events.some((e) => e.type === "run.paused")).toBe(true)
+  expect(snapshot.events.some((e) => e.type === "node.waiting" && e.nodeID === "gate")).toBe(true)
+  await expect(controller.approve(run.runID, "owner", "plan")).rejects.toThrow("Not a gate node")
+  await expect(controller.approve(run.runID, "intruder", "gate")).rejects.toThrow("another session")
+  const approved = await controller.approve(run.runID, "owner", "gate", "looks good")
+  expect(approved.nodes.find((n) => n.definition.id === "gate")?.result?.payload).toEqual({ decision: "approved", note: "looks good" })
+  expect(approved.nodes.find((n) => n.definition.id === "gate")?.result?.provenance.agent).toBe("human")
+  const finished = await waiting
+  expect(finished.status).toBe("completed")
+  expect(runner.started).toEqual(["plan", "execute"])
+  await expect(controller.approve(run.runID, "owner", "gate")).rejects.toThrow("not waiting")
+
+  const second = await controller.create(definition([plan, gate, execute]), "owner")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  const rejected = await controller.reject(second.runID, "owner", "gate", "not yet")
+  expect(rejected.status).toBe("failed")
+  expect(rejected.nodes.find((n) => n.definition.id === "gate")?.status).toBe("failed")
+  expect(rejected.nodes.find((n) => n.definition.id === "gate")?.error).toBe("Rejected by approver: not yet")
+  expect(rejected.nodes.find((n) => n.definition.id === "execute")?.status).toBe("blocked")
+  snapshot = await controller.snapshot(second.runID, "owner")
+  expect(snapshot.events.some((e) => e.type === "node.rejected")).toBe(true)
+  const retried = await controller.retry(second.runID, "owner")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  const again = await controller.snapshot(second.runID, "owner")
+  expect(retried.generation).toBe(2)
+  expect(again.run.status).toBe("paused")
+  expect(again.run.nodes.find((n) => n.definition.id === "gate")?.status).toBe("waiting_approval")
+  const cancelled = await controller.cancel(second.runID, "owner")
+  expect(cancelled.nodes.find((n) => n.definition.id === "gate")?.status).toBe("cancelled")
+  controller.close()
+})
+
+test("gate validation requires a message and forbids an execution target", () => {
+  expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "  ", dependsOn: [] }]))).toThrow("needs a message")
+  expect(() => validateDefinition(definition([{ id: "g", kind: "gate", agent: "iolaus-sisyphus", prompt: "ok?", dependsOn: [] }]))).toThrow("must not name an agent")
+  expect(() => validateDefinition(definition([{ id: "g", kind: "aggregator", agent: "x", model: "p/m", prompt: "ok?", dependsOn: [] }]))).toThrow("Unsupported node kind")
+  expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "ok?", dependsOn: [] }]))).not.toThrow()
 })

@@ -1,5 +1,6 @@
 import { randomUUID } from "node:crypto"
-import { DagValidationError, dependencyState, validateDefinition } from "./graph"
+import { evaluateCondition } from "./condition"
+import { DagValidationError, dependencyState, isGate, validateDefinition } from "./graph"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
@@ -14,6 +15,8 @@ export interface DagController {
   readonly cancel: (runID: string, ownerSessionID: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly retry: (runID: string, ownerSessionID: string, nodeID?: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly resume: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
+  readonly approve: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Promise<DagRunRecord>
+  readonly reject: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly amend: (runID: string, ownerSessionID: string, definition: DagDefinition) => Promise<DagRunRecord>
   readonly close: () => void
 }
@@ -47,7 +50,11 @@ export function resolveInputs(node: DagNodeRecord, run: DagRunRecord): DagResolv
   const bindings = (node.definition.inputs ?? []).flatMap((binding) =>
     binding.node === "*" ? node.definition.dependsOn.map((id) => ({ node: id, ...(binding.field === undefined ? {} : { field: binding.field }) })) : [binding])
   return bindings.map((binding) => {
-    const result = run.nodes.find((candidate) => candidate.definition.id === binding.node)?.result
+    const source = run.nodes.find((candidate) => candidate.definition.id === binding.node)
+    const result = source?.result
+    if (source?.status === "skipped") {
+      return { node: binding.node, field: binding.field ?? "payload", value: null, provenance: { agent: source.definition.agent ?? "", model: source.definition.model ?? "", attempt: source.attempt, status: "skipped", sessionID: null } }
+    }
     const payload = result?.payload ?? null
     const value = binding.field !== undefined && payload !== null && typeof payload === "object" && !Array.isArray(payload)
       ? payload[binding.field] ?? null : payload
@@ -58,6 +65,10 @@ export function resolveInputs(node: DagNodeRecord, run: DagRunRecord): DagResolv
       provenance: result ? { agent: result.provenance.agent, model: result.provenance.model, attempt: result.attempt, status: result.status, sessionID: result.provenance.execution?.sessionID ?? null } : null,
     }
   })
+}
+
+export function conditionSource(run: DagRunRecord): Map<string, JsonValue | null> {
+  return new Map(run.nodes.map((node) => [node.definition.id, node.status === "skipped" ? null : node.result?.payload ?? null]))
 }
 
 export function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
@@ -118,8 +129,17 @@ export function createDagController(options: DagControllerOptions): DagControlle
     nodes: run.nodes.map((node) => node.definition.id === nodeID ? update(node) : node),
   })
   const updateRunStatus = (run: DagRunRecord): DagRunRecord => {
-    if (run.nodes.some((node) => node.status === "starting" || node.status === "running" || node.status === "pending" || node.status === "ready" || node.status === "needs_retry")) return run
-    const status: DagRunRecord["status"] = run.nodes.every((node) => node.status === "completed" || node.status === "reused") ? "completed" : run.status === "cancelled" ? "cancelled" : "failed"
+    const active = run.nodes.some((node) => node.status === "starting" || node.status === "running" || node.status === "ready" || node.status === "needs_retry")
+    const pending = run.nodes.some((node) => node.status === "pending")
+    const waiting = run.nodes.some((node) => node.status === "waiting_approval")
+    if (waiting && !active) {
+      if (run.status === "paused") return run
+      const paused = { ...run, status: "paused" as const, updatedAt: now() }
+      event(paused, "run.paused")
+      return paused
+    }
+    if (active || pending) return run.status === "paused" ? { ...run, status: "running", updatedAt: now() } : run
+    const status: DagRunRecord["status"] = run.nodes.every((node) => node.status === "completed" || node.status === "reused" || node.status === "skipped") ? "completed" : run.status === "cancelled" ? "cancelled" : "failed"
     if (run.status === status) return run
     const updated = { ...run, status, updatedAt: now() }
     event(updated, status === "completed" ? "run.completed" : status === "cancelled" ? "run.cancelled" : "run.failed")
@@ -142,7 +162,19 @@ export function createDagController(options: DagControllerOptions): DagControlle
         event(run, "node.blocked", node.definition.id)
         continue
       }
-      if (state !== "ready" || activeCount(run) + launches.length >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
+      if (state !== "ready") continue
+      if (node.definition.when && !evaluateCondition(node.definition.when, conditionSource(run))) {
+        run = updateNode(run, node.definition.id, (current) => ({ ...current, status: "skipped", error: undefined, updatedAt: now() }))
+        event(run, "node.skipped", node.definition.id, { reason: "condition_false" })
+        records.set(node.definition.id, run.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
+        continue
+      }
+      if (isGate(node.definition)) {
+        run = updateNode(run, node.definition.id, (current) => ({ ...current, status: "waiting_approval", attempt: current.attempt + 1, error: undefined, updatedAt: now() }))
+        event(run, "node.waiting", node.definition.id, { message: node.definition.prompt, inputs: jsonText(resolveInputs(node, run)) })
+        continue
+      }
+      if (activeCount(run) + launches.length >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
       const next = updateNode(run, node.definition.id, (current) => ({ ...current, status: "starting", attempt: current.attempt + 1, updatedAt: now() }))
       run = next
       launches.push(next.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
@@ -169,7 +201,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       await withQueue(runID, async () => {
         const current = store.getRun(runID)
         if (!current) return
-        const envelope: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: current.generation, attempt: node.attempt, status: "completed", payload: result.payload, provenance: { parentNodeIDs: node.definition.dependsOn, execution: ref, agent: node.definition.agent, model: node.definition.model }, createdAt: now() }
+        const envelope: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: current.generation, attempt: node.attempt, status: "completed", payload: result.payload, provenance: { parentNodeIDs: node.definition.dependsOn, execution: ref, agent: node.definition.agent ?? "", model: node.definition.model ?? "" }, createdAt: now() }
         let updated = updateNode(current, nodeID, (value) => ({ ...value, status: "completed", result: envelope, error: undefined, updatedAt: now() }))
         event(updated, "node.completed", nodeID, envelope.payload)
         updated = updateRunStatus(updated); save(updated)
@@ -219,7 +251,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       if (expectedGeneration !== undefined && run.generation !== expectedGeneration) throw new DagValidationError("DAG generation has changed")
       if (terminal(run.status)) return run
       const refs = run.nodes.filter((node) => node.execution && (node.status === "starting" || node.status === "running")).map((node) => node.execution!)
-      run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "needs_retry" ? { ...node, status: "cancelled", updatedAt: now() } : node) }
+      run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "needs_retry" || node.status === "waiting_approval" ? { ...node, status: "cancelled", updatedAt: now() } : node) }
       save(run); event(run, "run.cancelled"); for (const ref of refs) await runner.cancel(ref); notify(run); return run
     },
     async retry(runID, ownerSessionID, nodeID, expectedGeneration) {
@@ -231,6 +263,43 @@ export function createDagController(options: DagControllerOptions): DagControlle
       save(run); event(run, "node.retrying", nodeID); await schedule(runID); return store.getRun(runID)!
     },
     async resume(runID, ownerSessionID) { return this.retry(runID, ownerSessionID) },
+    async approve(runID, ownerSessionID, nodeID, note, expectedGeneration) {
+      await withQueue(runID, async () => {
+        const run = owned(runID, ownerSessionID)
+        if (expectedGeneration !== undefined && run.generation !== expectedGeneration) throw new DagValidationError("DAG generation has changed")
+        const gate = run.nodes.find((node) => node.definition.id === nodeID)
+        if (!gate || !isGate(gate.definition)) throw new DagValidationError(`Not a gate node: ${nodeID}`)
+        if (gate.status !== "waiting_approval") throw new DagValidationError(`Gate is not waiting for approval: ${nodeID}`)
+        const payload: JsonValue = { decision: "approved", ...(note === undefined ? {} : { note }) }
+        const envelope: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: run.generation, attempt: gate.attempt, status: "completed", payload, provenance: { parentNodeIDs: gate.definition.dependsOn, agent: "human", model: "gate" }, createdAt: now() }
+        let updated = updateNode(run, nodeID, (value) => ({ ...value, status: "completed", result: envelope, error: undefined, updatedAt: now() }))
+        event(updated, "node.approved", nodeID, payload)
+        updated = updateRunStatus(updated); save(updated)
+      })
+      await schedule(runID)
+      return store.getRun(runID)!
+    },
+    async reject(runID, ownerSessionID, nodeID, note, expectedGeneration) {
+      return withQueue(runID, async () => {
+        const run = owned(runID, ownerSessionID)
+        if (expectedGeneration !== undefined && run.generation !== expectedGeneration) throw new DagValidationError("DAG generation has changed")
+        const gate = run.nodes.find((node) => node.definition.id === nodeID)
+        if (!gate || !isGate(gate.definition)) throw new DagValidationError(`Not a gate node: ${nodeID}`)
+        if (gate.status !== "waiting_approval") throw new DagValidationError(`Gate is not waiting for approval: ${nodeID}`)
+        const message = note?.trim() ? `Rejected by approver: ${note.trim()}` : "Rejected by approver"
+        let updated = updateNode(run, nodeID, (value) => ({ ...value, status: "failed", error: message, updatedAt: now() }))
+        event(updated, "node.rejected", nodeID, { decision: "rejected", ...(note === undefined ? {} : { note }) })
+        const records = new Map(updated.nodes.map((node) => [node.definition.id, node]))
+        for (const node of updated.nodes) {
+          if (node.status !== "pending" && node.status !== "needs_retry") continue
+          if (dependencyState(node.definition, records) !== "blocked") continue
+          updated = updateNode(updated, node.definition.id, (value) => ({ ...value, status: "blocked", error: "A dependency did not complete successfully", updatedAt: now() }))
+          event(updated, "node.blocked", node.definition.id)
+        }
+        updated = updateRunStatus(updated); save(updated)
+        return updated
+      })
+    },
     async amend(runID, ownerSessionID, definition) {
       validateDefinition(definition)
       const previous = owned(runID, ownerSessionID)

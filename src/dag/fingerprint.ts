@@ -6,9 +6,10 @@ function normalizedNode(node: DagNodeDefinition): Record<string, unknown> {
   return {
     id: node.id,
     kind: node.kind ?? "agent",
-    agent: node.agent,
-    model: node.model,
+    agent: node.agent ?? null,
+    model: node.model ?? null,
     prompt: node.prompt,
+    when: node.when ?? null,
     dependsOn: [...node.dependsOn].sort(),
     inputs: [...(node.inputs ?? [])]
       .map((input) => ({ node: input.node, field: input.field ?? "payload" }))

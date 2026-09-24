@@ -1,8 +1,8 @@
 export type JsonPrimitive = string | number | boolean | null
 export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonValue }
 
-export type DagNodeKind = "agent" | "aggregator"
-export type DagRunStatus = "running" | "completed" | "failed" | "cancelled" | "interrupted"
+export type DagNodeKind = "agent" | "aggregator" | "gate"
+export type DagRunStatus = "running" | "paused" | "completed" | "failed" | "cancelled" | "interrupted"
 export type DagNodeStatus =
   | "pending"
   | "ready"
@@ -16,6 +16,26 @@ export type DagNodeStatus =
   | "cancelled"
   | "interrupted"
   | "needs_retry"
+  | "skipped"
+  | "waiting_approval"
+
+/**
+ * Deterministic predicate over settled upstream results. `node` must be a
+ * dependency. `field` is a dotted path into the upstream payload; omit it to
+ * test the whole payload. A skipped or failed upstream resolves to null.
+ */
+export type DagCondition =
+  | {
+      readonly node: string
+      readonly field?: string
+      readonly equals?: JsonValue
+      readonly includes?: string
+      readonly matches?: string
+      readonly exists?: boolean
+    }
+  | { readonly all: readonly DagCondition[] }
+  | { readonly any: readonly DagCondition[] }
+  | { readonly not: DagCondition }
 
 /**
  * Binds an upstream node result into this node's prompt. `node: "*"` expands to
@@ -35,19 +55,25 @@ export interface DagResolvedInput {
     readonly agent: string
     readonly model: string
     readonly attempt: number
-    readonly status: DagResultEnvelope["status"]
+    readonly status: DagResultEnvelope["status"] | "skipped"
     readonly sessionID: string | null
   } | null
 }
 
+/**
+ * `agent` and `model` are required for agent nodes. A `gate` node has no
+ * execution target: `prompt` is the message shown to the human, and the node
+ * waits in `waiting_approval` until approved or rejected.
+ */
 export interface DagNodeDefinition {
   readonly id: string
   readonly kind?: DagNodeKind
-  readonly agent: string
-  readonly model: string
+  readonly agent?: string
+  readonly model?: string
   readonly prompt: string
   readonly dependsOn: readonly string[]
   readonly inputs?: readonly DagInputBinding[]
+  readonly when?: DagCondition
   readonly maxAttempts?: number
 }
 
@@ -125,6 +151,11 @@ export interface DagEvent {
     | "node.blocked"
     | "node.retrying"
     | "node.reused"
+    | "node.skipped"
+    | "node.waiting"
+    | "node.approved"
+    | "node.rejected"
+    | "run.paused"
   readonly payload?: JsonValue
   readonly createdAt: number
 }

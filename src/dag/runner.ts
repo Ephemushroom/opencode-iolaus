@@ -29,6 +29,7 @@ function assistantText(messages: readonly unknown[]): string {
 export function createOpenCodeDagRunner(ctx: Pick<Context, "session"> & { readonly location: { readonly directory: string } }): DagRunner {
   return {
     async start(input) {
+      if (input.node.agent === undefined || input.node.model === undefined) throw new Error(`Iolaus DAG node ${input.node.id} has no execution target`)
       const session = await ctx.session.create({
         title: `Iolaus DAG · ${input.node.id}`,
         agent: Agent.ID.make(input.node.agent),

@@ -81,7 +81,8 @@ const server = http.createServer(async (req, res) => {
      let text = "IOLAUS_QA_DONE"
      if (childNode) {
        call = undefined
-       if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
+       if (childNode[1] === "REVIEW") text = "IOLAUS_ROUTE_VERDICT_PASS"
+       else if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
      } else if (active.dag && tools.includes("iolaus_dag")) {
        const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
        let runID
@@ -94,8 +95,17 @@ const server = http.createServer(async (req, res) => {
        }
        call = priorDagResult?.status === "completed" || priorDagResult?.status === "failed"
          ? undefined
+         : runID && priorDagResult?.status === "paused"
+           ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: "gate", note: "QA approved" } }
          : runID
            ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
+           : active.route
+             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA routing", maxParallel: 2, nodes: [
+                 { id: "gate", kind: "gate", prompt: "IOLAUS_GATE_APPROVE_QA", dependsOn: [] },
+                 { id: "review", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REVIEW", dependsOn: ["gate"], inputs: [{ node: "gate" }] },
+                 { id: "ship", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_SHIP", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_PASS" } },
+                 { id: "fix", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_FIX", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_FAIL" } },
+                 { id: "report", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REPORT", dependsOn: ["ship", "fix"], inputs: [{ node: "*" }] } ] } } }
            : active.fanin
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA fan-in", maxParallel: 2, nodes: [
                  { id: "a", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
@@ -119,6 +129,7 @@ try {
      { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
      { name: "dag", enabled: true, agent: "build", dag: true },
      { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
+     { name: "route", enabled: true, agent: "build", dag: true, route: true },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -169,6 +180,26 @@ try {
          assert.deepEqual(inputs.map((i) => i.provenance.agent), ["iolaus-sisyphus", "iolaus-hephaestus"], "Fan-in provenance agent missing")
          assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
+       }
+       if (scenario.route) {
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const texts = captured.map(messageText)
+         for (const name of ["iolaus.dag.node.waiting", "iolaus.dag.run.paused", "iolaus.dag.node.approved", "iolaus.dag.node.skipped", "iolaus.dag.run.completed"]) {
+           assert.ok(traces.some((t) => t.event === name), `Missing trace ${name}`)
+         }
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.skipped" && t.nodeID === "fix"), "fix branch was not skipped")
+         assert.ok(!texts.some((text) => text.includes("IOLAUS_DAG_NODE_FIX")), "Skipped fix branch was prompted")
+         assert.ok(texts.some((text) => text.includes("IOLAUS_DAG_NODE_SHIP")), "ship branch was not prompted")
+         const review = texts.find((text) => text.includes("IOLAUS_DAG_NODE_REVIEW"))
+         assert.ok(review, "review child was not prompted")
+         const gateInput = JSON.parse(review.match(/<iolaus-dag-inputs>(.*?)<\/iolaus-dag-inputs>/s)[1])[0]
+         assert.deepEqual(gateInput.value, { decision: "approved", note: "QA approved" }, "Gate approval payload missing from review input")
+         assert.equal(gateInput.provenance.agent, "human", "Gate provenance should be human")
+         const report = texts.find((text) => text.includes("IOLAUS_DAG_NODE_REPORT"))
+         assert.ok(report, "report child was not prompted")
+         const inputs = JSON.parse(report.match(/<iolaus-dag-inputs>(.*?)<\/iolaus-dag-inputs>/s)[1])
+         assert.deepEqual(inputs.map((i) => [i.node, i.provenance.status]), [["ship", "completed"], ["fix", "skipped"]], "Report inputs did not reflect routing")
+         assert.equal(inputs[1].value, null, "Skipped branch should bind null")
        }
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
     })

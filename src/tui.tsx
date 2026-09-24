@@ -1,13 +1,15 @@
 import { Plugin } from "@opencode/plugin/tui"
 import type { Context } from "@opencode/plugin/tui/context"
 import { createSignal, onCleanup, onMount } from "solid-js"
-import type { DagRunRecord } from "./dag/types"
-import { IOLAUS_DAG_RPC } from "./dag/rpc"
+import { IOLAUS_DAG_RPC, type DagView } from "./dag/rpc"
 import { trace } from "./trace"
 
-function statusGlyph(status: DagRunRecord["status"]): string {
+type DagViewRun = DagView["runs"][number]
+
+function statusGlyph(status: string): string {
   switch (status) {
     case "completed": return "✓"
+    case "paused": return "⏸"
     case "failed": return "!"
     case "cancelled": return "×"
     case "interrupted": return "?"
@@ -16,10 +18,10 @@ function statusGlyph(status: DagRunRecord["status"]): string {
 }
 
 function DagSidebar(props: { readonly sessionID: string; readonly client: Context["client"] }) {
-  const [runs, setRuns] = createSignal<readonly DagRunRecord[]>([])
+  const [runs, setRuns] = createSignal<readonly DagViewRun[]>([])
   const rpc = props.client.rpc(IOLAUS_DAG_RPC)
   const refresh = async () => {
-    const result = await rpc.snapshot({ sessionID: props.sessionID }) as unknown as { readonly runs?: readonly DagRunRecord[] }
+    const result = await rpc.snapshot({ sessionID: props.sessionID }) as unknown as { readonly runs?: readonly DagViewRun[] }
     setRuns(result.runs ?? [])
   }
   onMount(() => {
@@ -36,8 +38,13 @@ function DagSidebar(props: { readonly sessionID: string; readonly client: Contex
         : runs().map((run) => (
           <box flexDirection="column" marginBottom={1}>
             <text>{statusGlyph(run.status)} {run.name} · gen {run.generation}</text>
-            <text>{run.nodes.filter((node) => node.status === "completed" || node.status === "reused").length}/{run.nodes.length} nodes complete</text>
-            {run.nodes.map((node) => <text>  {node.status.padEnd(12)} {node.definition.id}</text>)}
+            <text>{run.nodes.filter((node) => node.status === "completed" || node.status === "reused" || node.status === "skipped").length}/{run.nodes.length} nodes settled</text>
+            {run.nodes.map((node) => (
+              <box flexDirection="column">
+                <text>  {node.status.padEnd(16)} {node.id}</text>
+                {node.status === "waiting_approval" && node.prompt ? <text>    gate: {node.prompt}</text> : null}
+              </box>
+            ))}
           </box>
         ))}
     </box>
