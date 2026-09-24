@@ -4,7 +4,7 @@ import {
   isGlmModel,
   isGptModel,
   isKimiK2Model,
-  isKimiK27Model,
+  isKimiK2CodeModel,
   isKimiK3Model,
   isMiniMaxModel,
 } from "../../model-family-detectors"
@@ -24,7 +24,7 @@ const MODEL_MATCHERS: Readonly<Record<string, ModelMatcher>> = {
   gpt: isGptModel,
   gemini: isGeminiModel,
   "kimi-k3": isKimiK3Model,
-  "kimi-k2-7": isKimiK27Model,
+  "kimi-k2-7": isKimiK2CodeModel,
   kimi: isKimiK2Model,
   glm: isGlmModel,
   "opus-4-7": isClaudeOpus47Model,

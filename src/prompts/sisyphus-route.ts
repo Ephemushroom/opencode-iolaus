@@ -17,9 +17,10 @@ import {
   isGlmModel,
   isGpt5_5Model,
   isGpt5_6Model,
+  isGpt6Model,
   isGptNativeSisyphusModel,
   isKimiK2Model,
-  isKimiK27Model,
+  isKimiK2CodeModel,
   isKimiK3Model,
 } from "../omo/agents"
 import type { AvailableAgent, AvailableCategory, AvailableSkill, AvailableTool } from "../omo/agents"
@@ -39,9 +40,9 @@ export function buildSisyphusPromptForModel(
   useTaskSystem: boolean,
 ): string {
   if (isKimiK3Model(model)) return buildKimiK3SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
-  if (isKimiK27Model(model)) return buildKimiK27SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
+  if (isKimiK2CodeModel(model)) return buildKimiK27SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
   if (isKimiK2Model(model)) return buildKimiK26SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
-  if (isGpt5_5Model(model) || isGpt5_6Model(model)) return buildGpt55SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
+  if (isGpt5_5Model(model) || isGpt5_6Model(model) || isGpt6Model(model)) return buildGpt55SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
   if (isGptNativeSisyphusModel(model)) return buildGpt54SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
   if (isClaudeFable5Model(model)) return buildClaudeFable5SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
   if (isClaudeOpus5Model(model)) return buildClaudeOpus5SisyphusPrompt(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)

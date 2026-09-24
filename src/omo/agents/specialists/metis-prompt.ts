@@ -1,5 +1,5 @@
 import type { AgentPromptMetadata } from "../types"
-import { isKimiK27Model } from "../types"
+import { isKimiK2CodeModel } from "../types"
 import { buildAntiDuplicationSection } from "../dynamic-agent-prompt-builder"
 
 /**
@@ -390,7 +390,7 @@ export const METIS_AGENT_DESCRIPTION =
 
 /** Selects the model-family Metis prompt variant. */
 export function getMetisPrompt(model: string): string {
-  return isKimiK27Model(model) ? METIS_K2_7_SYSTEM_PROMPT : METIS_SYSTEM_PROMPT
+  return isKimiK2CodeModel(model) ? METIS_K2_7_SYSTEM_PROMPT : METIS_SYSTEM_PROMPT
 }
 
 export const metisPromptMetadata: AgentPromptMetadata = {
