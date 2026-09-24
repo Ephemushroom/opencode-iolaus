@@ -27,6 +27,8 @@ export interface DagControllerOptions {
 }
 
 type Waiter = { readonly resolve: (run: DagRunRecord) => void; readonly reject: (error: unknown) => void }
+type SharedController = { readonly controller: DagController; refs: number }
+const sharedControllers = new Map<string, SharedController>()
 
 function terminal(status: DagRunRecord["status"]): boolean {
   return status === "completed" || status === "failed" || status === "cancelled"
@@ -51,7 +53,13 @@ function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
 }
 
 export function createDagController(options: DagControllerOptions): DagController {
-  const store = new DagStore(resolveDagDatabasePath(options.directory))
+  const databasePath = resolveDagDatabasePath(options.directory)
+  const existing = sharedControllers.get(databasePath)
+  if (existing) {
+    existing.refs += 1
+    return { ...existing.controller, close: () => releaseSharedController(databasePath, existing) }
+  }
+  const store = new DagStore(databasePath)
   const runner = options.runner
   const now = options.now ?? Date.now
   const maxParallel = options.maxParallel ?? 4
@@ -169,7 +177,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
     }
   }
 
-  return {
+  const controller: DagController = {
     async create(definition, ownerSessionID) {
       validateDefinition(definition)
       const createdAt = now()
@@ -220,4 +228,14 @@ export function createDagController(options: DagControllerOptions): DagControlle
     },
     close() { closed = true; store.close() },
   }
+  const shared: SharedController = { controller, refs: 1 }
+  sharedControllers.set(databasePath, shared)
+  return { ...controller, close: () => releaseSharedController(databasePath, shared) }
+}
+
+function releaseSharedController(path: string, shared: SharedController): void {
+  shared.refs -= 1
+  if (shared.refs > 0) return
+  sharedControllers.delete(path)
+  shared.controller.close()
 }

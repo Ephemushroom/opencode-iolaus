@@ -76,13 +76,24 @@ const server = http.createServer(async (req, res) => {
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
     assert.ok(requests.length < 60, "Unexpected model loop")
      let call
-     if (active.dag && input.includes("IOLAUS_DAG_NODE")) {
+     const isChildNodeRequest = active.dag && (body.input ?? []).some((item) => item?.type === "message" && JSON.stringify(item).includes("IOLAUS_DAG_NODE"))
+     if (isChildNodeRequest) {
        call = undefined
      } else if (active.dag && tools.includes("iolaus_dag")) {
-       const runID = input.match(/"runID":"([^"]+)"/)?.[1]
-       call = runID
-         ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
-         : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+       const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
+       let runID
+       let priorDagResult
+       if (typeof priorOutput === "string") {
+         try {
+           priorDagResult = JSON.parse(priorOutput)
+           runID = priorDagResult?.runID
+         } catch {}
+       }
+       call = priorDagResult?.status === "completed" || priorDagResult?.status === "failed"
+         ? undefined
+         : runID
+           ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
+           : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events("IOLAUS_QA_DONE", call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
