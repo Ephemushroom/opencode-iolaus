@@ -128,7 +128,7 @@ try {
     const fixture = { project, env }
     writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY")) },null,2))
     if (scenario.name === "native") {
-       await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.15/) })
+       await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.16/) })
       await check("run help", async () => { const r = await run("help", ["run","--help"], fixture); assert.equal(r.code,0) })
     }
     await check(`${scenario.name}: live session`, async () => {

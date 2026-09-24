@@ -18,14 +18,14 @@
     "prepack": "bun run check:package"
   },
   "peerDependencies": {
-    "@opencode/plugin": "2.0.15",
+    "@opencode/plugin": "2.0.16",
     "@opentui/core": ">=0.5.10",
     "@opentui/solid": ">=0.5.10",
     "solid-js": ">=1.9.0"
   },
   "dependencies": { "zod": "4.1.8" },
   "devDependencies": {
-    "@opencode/plugin": "2.0.15",
+    "@opencode/plugin": "2.0.16",
     "@opentui/solid": "0.5.10",
     "solid-js": "1.9.12",
     "@types/bun": "latest",
