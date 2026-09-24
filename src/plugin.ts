@@ -6,6 +6,7 @@ import { trace } from "./trace"
 import { createDagController } from "./dag/controller"
 import { createOpenCodeDagRunner } from "./dag/runner"
 import { createDagTool } from "./dag/tool"
+import { registerDagRpc } from "./dag/register-rpc"
 
 export default Plugin.define({
   id: "iolaus",
@@ -16,8 +17,15 @@ export default Plugin.define({
     await registerAgents(ctx, options)
     await registerModes(ctx, options)
     await ctx.session.hook("context", (event) => composeContext(event, ctx, options))
-    const controller = createDagController({ directory: ctx.location.directory, runner: createOpenCodeDagRunner(ctx), trace })
+    let rpcRegistration: Awaited<ReturnType<typeof registerDagRpc>> | undefined
+    const controller = createDagController({
+      directory: ctx.location.directory,
+      runner: createOpenCodeDagRunner(ctx),
+      trace,
+      onEvent: (event, sessionID) => rpcRegistration?.events.emit("updated", { sessionID, runID: event.runID, sequence: event.sequence, type: event.type }),
+    })
     await ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
-    return () => controller.close()
+    rpcRegistration = await registerDagRpc(ctx, controller)
+    return async () => { controller.close(); await rpcRegistration?.dispose() }
   },
 })
