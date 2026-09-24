@@ -75,8 +75,15 @@ const server = http.createServer(async (req, res) => {
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
     assert.ok(requests.length < 60, "Unexpected model loop")
-    let call
-    if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
+     let call
+     if (active.dag && input.includes("IOLAUS_DAG_NODE")) {
+       call = undefined
+     } else if (active.dag && tools.includes("iolaus_dag")) {
+       const runID = input.match(/"runID":"([^"]+)"/)?.[1]
+       call = runID
+         ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
+         : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+     } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events("IOLAUS_QA_DONE", call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
     res.end("data: [DONE]\n\n")
@@ -90,7 +97,8 @@ try {
     { name: "native", enabled: true, agent: "build", nativeRead: true },
     { name: "agent", enabled: true, agent: "iolaus-sisyphus", nativeRead: true },
     { name: "disabled", enabled: false, agent: "build", nativeRead: true },
-    { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
+     { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
+     { name: "dag", enabled: true, agent: "build", dag: true },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -109,22 +117,28 @@ try {
     const fixture = { project, env }
     writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY")) },null,2))
     if (scenario.name === "native") {
-      await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.13/) })
+       await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.15/) })
       await check("run help", async () => { const r = await run("help", ["run","--help"], fixture); assert.equal(r.code,0) })
     }
     await check(`${scenario.name}: live session`, async () => {
       const args = ["run", "--standalone", "--auto", "--print-logs", "--agent", scenario.agent, "--model", "openai/gpt-5.5"]
-      args.push(scenario.mode ? `/iolaus-${scenario.mode} Read fixture.txt and report the result.`
-        : scenario.nativeRead ? "Read fixture.txt and report the result." : "Return IOLAUS_QA_DONE.")
+       args.push(scenario.mode ? `/iolaus-${scenario.mode} Read fixture.txt and report the result.`
+         : scenario.dag ? "Run an Iolaus DAG and report the completed node result."
+         : scenario.nativeRead ? "Read fixture.txt and report the result." : "Return IOLAUS_QA_DONE.")
       const result = await run(scenario.name,args,fixture)
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-      assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.name === "agent")
-      assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.name === "agent" || scenario.name === "dag")
+       assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
+       if (scenario.dag) {
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.completed"), "DAG node did not complete")
+       }
       const captured = requests.filter((r) => r.scenario === scenario.name)
       assert.ok(captured.length)
-      assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite"].includes(t) || t?.startsWith("team_"))))
+       assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite"].includes(t) || t?.startsWith("team_"))))
+       if (scenario.dag) assert.ok(captured.some((r) => r.tools.includes("iolaus_dag")), "DAG tool was not exposed")
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
     })
   }
