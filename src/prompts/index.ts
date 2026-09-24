@@ -1,5 +1,5 @@
-export { AGENT_NAMES, MODE_NAMES, agentID, agentName, explicitMode, modeMarker } from "./catalog"
-export type { AgentName, ModeName } from "./catalog"
-export { renderAgent, renderMode, bindNative } from "./render"
+export { AGENT_NAMES, CATEGORY_NAMES, MODE_NAMES, PRIMARY_AGENTS, agentID, agentName, categoryID, categoryName, explicitMode, modeMarker } from "./catalog"
+export type { AgentName, CategoryName, ModeName } from "./catalog"
+export { renderAgent, renderCategory, renderMode, bindNative } from "./render"
 export type { PromptContext } from "./render"
 export { resolveVariant } from "../omo/modes/src/variant-resolver"

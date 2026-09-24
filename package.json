@@ -4,10 +4,24 @@
   "description": "Iolaus for OpenCode 2: OMO-derived agents, explicit modes, model-family selection, durable DAG orchestration and TUI.",
   "type": "module",
   "license": "SEE LICENSE IN LICENSE.md",
-  "repository": { "type": "git", "url": "git+https://github.com/Ephemushroom/opencode-iolaus.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ephemushroom/opencode-iolaus.git"
+  },
   "main": "./dist/index.js",
-  "exports": { ".": "./dist/index.js", "./prompts": "./dist/prompts.js", "./tui": "./dist/tui.js" },
-  "files": ["dist/index.js", "dist/prompts.js", "dist/tui.js", "README.md", "LICENSE.md", "NOTICE.md"],
+  "exports": {
+    ".": "./dist/index.js",
+    "./prompts": "./dist/prompts.js",
+    "./tui": "./dist/tui.js"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/prompts.js",
+    "dist/tui.js",
+    "README.md",
+    "LICENSE.md",
+    "NOTICE.md"
+  ],
   "scripts": {
     "build": "bun run script/build.ts",
     "typecheck": "tsc --noEmit",
@@ -23,7 +37,10 @@
     "@opentui/solid": ">=0.5.10",
     "solid-js": ">=1.9.0"
   },
-  "dependencies": { "zod": "4.1.8" },
+  "dependencies": {
+    "zod": "4.1.8",
+    "@iolaus/model-core": "workspace:*"
+  },
   "devDependencies": {
     "@opencode/plugin": "2.0.16",
     "@opentui/solid": "0.5.10",
@@ -31,6 +48,10 @@
     "@types/bun": "latest",
     "@types/js-yaml": "^4.0.9",
     "typescript": "^5.9.3",
-    "js-yaml": "4.1.1"
-  }
+    "js-yaml": "4.1.1",
+    "@opencode/schema": "2.0.16"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
 }

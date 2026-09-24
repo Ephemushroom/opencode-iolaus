@@ -38,7 +38,7 @@ test("namespaced registrations preserve native agents and user definitions", asy
   for (const value of before) expect(fixture.agents.get(String(value.id))).toEqual(value)
   expect(fixture.defaultAgent).toBe("build")
   for (const name of AGENT_NAMES) expect(fixture.agents.has(agentID(name))).toBe(true)
-  expect(fixture.agents.get("iolaus-sisyphus")?.model).toBeUndefined()
+  expect(fixture.agents.get("iolaus-sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
   const once = structuredClone([...fixture.agents.values()])
   await registerAgents(fixture.ctx, parseOptions({}))
   expect([...fixture.agents.values()]).toEqual(once)

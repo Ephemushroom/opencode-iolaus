@@ -61,9 +61,10 @@ export interface DagResolvedInput {
 }
 
 /**
- * `agent` and `model` are required for agent nodes. A `gate` node has no
- * execution target: `prompt` is the message shown to the human, and the node
- * waits in `waiting_approval` until approved or rejected.
+ * `agent` is required for agent nodes; `model` is optional and, when omitted,
+ * is filled at create/amend time from the Iolaus models config for that lane.
+ * A `gate` node has no execution target: `prompt` is the message shown to the
+ * human, and the node waits in `waiting_approval` until approved or rejected.
  */
 export interface DagNodeDefinition {
   readonly id: string

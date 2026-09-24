@@ -8,6 +8,9 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
 ## Boundaries
 
 - `src/omo/` contains locally owned OMO-derived prompt code. Preserve source attribution when changing it.
+- `packages/model-core/` is the locally owned copy of OMO's model-core subset: the agent and category model
+  requirement tables, the resolution pipeline and the model-family detectors. It is a Bun workspace package
+  (`@iolaus/model-core`) bundled into `dist/`. Sync it manually and record lineage in `reference/active-manifest.json`.
 - `reference/omo/` is an immutable historical snapshot. Its instructions, manifests, tests, and runtime entrypoints are reference data, not current project configuration. Consult it when tracing a retained prompt or deliberately designing a later feature.
 - Keep reference code out of imports, active tests, builds, published files, and install scripts.
 - Preserve native agents and the user's default agent/model. Namespace Iolaus registrations.
@@ -22,8 +25,17 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
 - `iolaus_dag` is the only model-facing orchestration tool in the first runtime
   slice. It is owner-scoped and schema-validated.
 - DAG nodes execute through native OpenCode child sessions using the registered
-  Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`,
-  `iolaus-prometheus`, and `iolaus-atlas`.
+  Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`, `iolaus-prometheus`,
+  `iolaus-atlas`, the specialists, or a category lane `iolaus-<category>`
+  (`quick`, `deep-low`, `deep-high`, `ultrabrain`, `visual-engineering`,
+  `artistry`, `writing`, `unspecified-low`, `unspecified-high`).
+- Every Iolaus Agent and category lane is registered with a pinned model. The
+  model comes from `.iolaus/models.json` (user `~/.iolaus/`, then project
+  directories outward-in, then plugin `models` option) or, when unconfigured,
+  the first entry of the OMO requirement chain. Iolaus does not check provider
+  connectivity or subscription; a lane whose config and chain both name no
+  model is not registered. A DAG node may omit `model` to run on its lane's
+  configured model.
 - Restart recovery is conservative. Already-admitted prompts are not blindly
   replayed; interrupted work requires explicit retry/resume.
 - Fan-in is an ordinary Agent node binding `inputs: [{node: "*"}]`; every

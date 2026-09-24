@@ -71,7 +71,7 @@ const server = http.createServer(async (req, res) => {
     const body = JSON.parse(Buffer.concat(chunks).toString())
     const tools = (body.tools ?? []).map((t) => t.name ?? t.function?.name)
     const input = JSON.stringify(body.input)
-    const record = { scenario: active.name, model: body.model, tools, input, instructions: body.instructions }
+    const record = { scenario: active.name, model: body.model, reasoning: body.reasoning ?? null, service_tier: body.service_tier ?? null, tools, input, instructions: body.instructions }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
     assert.ok(requests.length < 60, "Unexpected model loop")
@@ -82,6 +82,7 @@ const server = http.createServer(async (req, res) => {
      if (childNode) {
        call = undefined
        if (childNode[1] === "REVIEW") text = "IOLAUS_ROUTE_VERDICT_PASS"
+       else if (childNode[1] === "QUICK" || childNode[1] === "ORACLE") text = `IOLAUS_LANE_RESULT_${childNode[1]}`
        else if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
      } else if (active.dag && tools.includes("iolaus_dag")) {
        const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
@@ -99,6 +100,10 @@ const server = http.createServer(async (req, res) => {
            ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: "gate", note: "QA approved" } }
          : runID
            ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
+           : active.lanes
+             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA lanes", maxParallel: 2, nodes: [
+                 { id: "quick", agent: "iolaus-quick", prompt: "IOLAUS_DAG_NODE_QUICK", dependsOn: [] },
+                 { id: "oracle", agent: "iolaus-oracle", prompt: "IOLAUS_DAG_NODE_ORACLE", dependsOn: [] } ] } } }
            : active.route
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA routing", maxParallel: 2, nodes: [
                  { id: "gate", kind: "gate", prompt: "IOLAUS_GATE_APPROVE_QA", dependsOn: [] },
@@ -130,6 +135,7 @@ try {
      { name: "dag", enabled: true, agent: "build", dag: true },
      { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
      { name: "route", enabled: true, agent: "build", dag: true, route: true },
+     { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -140,7 +146,7 @@ try {
     const env = { PATH: process.env.PATH, TMPDIR: sandbox, HOME: home, USERPROFILE: home, PWD: project,
       XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(home,"data"), XDG_CACHE_HOME: join(home,"cache"), XDG_STATE_HOME: join(home,"state"),
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key" }
-    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled } }],
+    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, ...(scenario.models ? { models: scenario.models } : {}) } }],
       model: "openai/gpt-5.5", default_agent: "build", permissions: [{ action: "*", resource: "*", effect: "allow" }],
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
@@ -180,6 +186,26 @@ try {
          assert.deepEqual(inputs.map((i) => i.provenance.agent), ["iolaus-sisyphus", "iolaus-hephaestus"], "Fan-in provenance agent missing")
          assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
+       }
+       if (scenario.lanes) {
+         const pinned = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, `${t.model}${t.variant ? `#${t.variant}` : ""}|${t.source}`]))
+         assert.equal(pinned["iolaus-oracle"], "openai/gpt-5.6-sol#xhigh|config", "oracle lane did not follow models config")
+         assert.equal(pinned["iolaus-quick"], "openai/gpt-6-luna-fast#low|config", "quick lane did not follow models config")
+         assert.equal(pinned["iolaus-sisyphus"], "anthropic/claude-opus-5-5#max|requirement", "sisyphus lane did not follow the requirement table")
+         assert.equal(pinned["iolaus-deep-high"], "openai/gpt-6-astra#xhigh|requirement", "deep-high lane missing")
+         assert.ok(!traces.some((t) => t.event === "iolaus.category.hidden" || t.event === "iolaus.agent.hidden"), "No lane should be hidden when every chain names a model")
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const quick = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_QUICK"))
+         const oracle = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_ORACLE"))
+         assert.ok(quick && oracle, "lane children were not prompted")
+         assert.equal(quick.model, "gpt-6-luna", `quick child hit ${quick.model}`)
+         assert.equal(quick.reasoning?.effort, "low", `quick child effort ${JSON.stringify(quick.reasoning)}`)
+         assert.equal(oracle.model, "gpt-5.6-sol", `oracle child hit ${oracle.model}`)
+         assert.equal(oracle.reasoning?.effort, "xhigh", `oracle child effort ${JSON.stringify(oracle.reasoning)}`)
+         assert.ok(traces.some((t) => t.event === "iolaus.agent.rendered" && t.agent === "quick" && t.kind === "category"), "quick lane did not render the category prompt")
+         const finalWait = captured.map((r) => r.input).find((input) => input.includes("IOLAUS_LANE_RESULT_QUICK") && input.includes("openai/gpt-6-luna-fast#low"))
+         assert.ok(finalWait, "DAG result did not record the lane model in provenance")
+         assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 2)
        }
        if (scenario.route) {
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")

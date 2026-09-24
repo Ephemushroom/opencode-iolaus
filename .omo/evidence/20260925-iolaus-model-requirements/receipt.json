@@ -1,0 +1,254 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "results": [
+    {
+      "name": "host version",
+      "verdict": "PASS"
+    },
+    {
+      "name": "run help",
+      "verdict": "PASS"
+    },
+    {
+      "name": "native: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "agent: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "disabled: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mode: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "dag: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "fanin: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "route: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "lanes: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cleanup",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mock protocol",
+      "verdict": "PASS"
+    }
+  ],
+  "before": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2",
+      "/Users/Bryan/.omo/opencode2.json": "f4261a0547834d4462b630684aaa1a2c9a0b2683c219229e411b42fc0138a51a",
+      "/Users/Bryan/.omo/omo.jsonc": "441f14eeaba42a3a90444c92aec07c19013f5a7ebfbbb63215d8d2b6ee5025c2"
+    },
+    "sessions": {
+      "session": "2706",
+      "session_v2": "2466"
+    }
+  },
+  "after": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2",
+      "/Users/Bryan/.omo/opencode2.json": "f4261a0547834d4462b630684aaa1a2c9a0b2683c219229e411b42fc0138a51a",
+      "/Users/Bryan/.omo/omo.jsonc": "441f14eeaba42a3a90444c92aec07c19013f5a7ebfbbb63215d8d2b6ee5025c2"
+    },
+    "sessions": {
+      "session": "2706",
+      "session_v2": "2466"
+    }
+  },
+  "processes": [
+    {
+      "name": "version",
+      "args": [
+        "--version"
+      ],
+      "pid": 14633,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "help",
+      "args": [
+        "run",
+        "--help"
+      ],
+      "pid": 14634,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "native",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 14635,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "agent",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-sisyphus",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 14640,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "disabled",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 14642,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "mode",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "/iolaus-ultrawork Read fixture.txt and report the result."
+      ],
+      "pid": 14652,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "dag",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 14657,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "fanin",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 14659,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "route",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 14661,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "lanes",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 14663,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    }
+  ],
+  "sandboxRemoved": true,
+  "mockClosed": true,
+  "requestCount": 37,
+  "omitted": "No user credentials or inherited environment dumps. Local mock only."
+}

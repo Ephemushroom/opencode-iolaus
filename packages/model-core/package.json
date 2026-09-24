@@ -1,0 +1,8 @@
+{
+  "name": "@iolaus/model-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OMO-derived model requirement tables, resolution pipeline and model-family detectors retained by Iolaus.",
+  "exports": { ".": "./src/index.ts" }
+}

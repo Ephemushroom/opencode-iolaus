@@ -57,6 +57,11 @@ export function buildCategorySkillsDelegationGuide(
     const description = category.description || category.name
     return `- \`${category.name}\` - ${description}`
   })
+  const laneRows = categories.map((category) => {
+    const description = category.description || category.name
+    const model = category.model ? ` (model: ${category.model})` : ""
+    return `- \`iolaus-${category.name}\`${model} - ${description}`
+  })
 
   const customSkills = skills.filter((skill) => skill.location !== "plugin")
   const skillsSection = buildSkillsSection(skills)
@@ -68,12 +73,14 @@ export function buildCategorySkillsDelegationGuide(
 
   return `### Iolaus DAG Agent Selection
 
-Available categories remain useful as routing metadata, but execution is owned by
-the durable \`iolaus_dag\` graph. Select the exact namespaced Agent, define the
-node prompt and dependencies, and load relevant skills inside the node prompt.
-Use \`snapshot\`/\`wait\` for completion and \`retry\` for a failed generation.
+Each category is a registered Agent \`iolaus-<category>\` running on its configured
+model. Use it as a DAG node's \`agent\` (omit \`model\` to inherit the lane's model) or
+as a one-off native subagent. Execution is owned by the durable \`iolaus_dag\` graph:
+select the exact namespaced Agent, define the node prompt and dependencies, and load
+relevant skills inside the node prompt. Use \`snapshot\`/\`wait\` for completion and
+\`retry\` for a failed generation.
 
-${categoryRows.join("\n")}
+${laneRows.join("\n")}
 
 ${skillsSection}${customPriorityNote}`
 
@@ -145,7 +152,7 @@ task(category="quick", load_skills=[], run_in_background=true, prompt="Redesign 
 |---|---|
 | Visual design, UI, styling, animations, layout, design systems | \`visual-engineering\` |
 | Hard logic and architecture decisions | \`ultrabrain\` |
-| 3D graphics, computer use, browser use, backend, logic, algorithms, CAPTCHA solving, multimodal, autonomous research + end-to-end implementation | \`deep\` |
+| 3D graphics, computer use, browser use, backend, logic, algorithms, CAPTCHA solving, multimodal, autonomous research + end-to-end implementation | \`deep-low\` |
 | Single-file typo, trivial config change | \`quick\` |
 
 **When in doubt about category, it is almost never \`quick\` or \`unspecified-*\`. Match the domain.**`

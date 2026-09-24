@@ -5,10 +5,12 @@
     "": {
       "name": "opencode-iolaus",
       "dependencies": {
+        "@iolaus/model-core": "workspace:*",
         "zod": "4.1.8",
       },
       "devDependencies": {
         "@opencode/plugin": "2.0.16",
+        "@opencode/schema": "2.0.16",
         "@opentui/solid": "0.5.10",
         "@types/bun": "latest",
         "@types/js-yaml": "^4.0.9",
@@ -22,6 +24,10 @@
         "@opentui/solid": ">=0.5.10",
         "solid-js": ">=1.9.0",
       },
+    },
+    "packages/model-core": {
+      "name": "@iolaus/model-core",
+      "version": "0.1.0",
     },
   },
   "packages": {
@@ -140,6 +146,8 @@
     "@effect/platform-node-shared": ["@effect/platform-node-shared@4.0.0-rc.112", "", { "dependencies": { "@types/ws": "^8.18.1", "ws": "^8.21.3" }, "peerDependencies": { "effect": "^4.0.0-rc.112" } }, "sha512-ttjz0xKamFN7vL8pNDYVwddJLjZvqKePc05djlz2VcdaKbLsnYbtMnL1rbOfHgEnIUSHGh7FkjaN4DM1Ov81sQ=="],
 
     "@gar/promise-retry": ["@gar/promise-retry@1.0.3", "", {}, "sha512-GmzA9ckNokPypTg10pgpeHNQe7ph+iIKKmhKu3Ob9ANkswreCx7R3cKmY781K8QK3AqVL3xVh9A42JvIAbkkSA=="],
+
+    "@iolaus/model-core": ["@iolaus/model-core@workspace:packages/model-core"],
 
     "@isaacs/cliui": ["@isaacs/cliui@8.0.2", "", { "dependencies": { "string-width": "^5.1.2", "string-width-cjs": "npm:string-width@^4.2.0", "strip-ansi": "^7.0.1", "strip-ansi-cjs": "npm:strip-ansi@^6.0.1", "wrap-ansi": "^8.1.0", "wrap-ansi-cjs": "npm:wrap-ansi@^7.0.0" } }, "sha512-O8jcjabXaleOG9DQ0+ARXWZBTfnP4WNAqzuiJK7ll44AmxGKv/J2M4TPjxjY3znBCfvBXFzucm1twdyFybFqEA=="],
 

@@ -25,6 +25,17 @@ For the live DAG sidebar, add the TUI entry alongside the main plugin:
 
 Iolaus registers namespaced agents such as `iolaus-sisyphus` and native commands such as `/iolaus-ultrawork`. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
 
+Model routing follows configuration only. Write `.iolaus/models.json` in your home directory or in a project directory (project layers override user layers) to pin models per lane:
+
+```json
+{
+  "agents": { "oracle": "openai/gpt-5.6-sol#xhigh", "sisyphus": { "model": "anthropic/claude-opus-5-5", "variant": "max" } },
+  "categories": { "quick": "openai/gpt-6-luna-fast#low", "writing": "anthropic/claude-fable-5-1" }
+}
+```
+
+The same object may be passed as the plugin `models` option. Lanes you do not configure use the first entry of OMO's requirement chain; a lane with no model at all is not registered. Use `agents` / `categories` options to select which lanes register.
+
 ## Durable DAG
 
 The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state under
@@ -32,7 +43,10 @@ The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state under
 dependency-frontier scheduling, node-level retry, cancellation, restart-safe
 completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
-is available through the `opencode-iolaus/tui` entry. Fan-in binds every
+is available through the `opencode-iolaus/tui` entry. Every Iolaus Agent and
+category lane (`iolaus-quick`, `iolaus-deep-low`, `iolaus-deep-high`, ...) runs on a
+pinned model taken from `.iolaus/models.json` or, unconfigured, from OMO's
+requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
 pause the run for a human approve/reject. Interactive panel actions are a

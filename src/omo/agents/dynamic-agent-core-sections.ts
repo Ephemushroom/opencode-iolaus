@@ -205,7 +205,7 @@ export function buildParallelDelegationSection(
 ): string {
   const isNonClaude = !model.toLowerCase().includes("claude")
   const hasDelegationCategory = categories.some(
-    (category) => category.name === "deep" || category.name === "unspecified-high",
+    (category) => category.name === "deep-low" || category.name === "deep-high" || category.name === "unspecified-high",
   )
 
   if (!isNonClaude || !hasDelegationCategory) {
@@ -219,7 +219,7 @@ export function buildParallelDelegationSection(
 **MANDATORY - for ANY implementation task:**
 
 1. Decompose the task into independent DAG nodes when parallelism pays for its coordination cost.
-2. Assign each node an exact Iolaus Agent ID, model, prompt and \`dependsOn\` list.
+2. Assign each node an exact Iolaus Agent ID (a specialist or a category lane such as \`iolaus-deep-low\`), prompt and \`dependsOn\` list; omit \`model\` unless overriding the lane's configured model.
 3. Use \`iolaus_dag\` for durable parallel execution instead of background task polling.
 4. Preserve explicit result bindings when a later node needs an earlier node's output.
 

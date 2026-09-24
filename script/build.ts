@@ -11,6 +11,7 @@ for (const [entry, output] of [["./src/index.ts", "index.js"], ["./src/prompts/i
     target: "node",
     format: "esm",
     external: ["@opencode/plugin", "@opencode/plugin/*", "@opentui/solid", "solid-js", "solid-js/*"],
+    packages: "bundle",
     loader: { ".md": "text" },
     plugins: entry.endsWith(".tsx") ? [solidPlugin] : [],
     metafile: true,
