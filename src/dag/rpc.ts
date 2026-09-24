@@ -4,8 +4,8 @@ import { z } from "zod"
 const id = z.string().min(1).max(256)
 const session = z.object({ sessionID: id }).strict()
 const node = z.object({
-  id, status: z.string(), agent: z.string(), model: z.string(), attempt: z.number(),
-  dependsOn: z.array(z.string()), error: z.string().optional(),
+  id, status: z.string(), kind: z.string(), agent: z.string(), model: z.string(), attempt: z.number(),
+  dependsOn: z.array(z.string()), error: z.string().optional(), prompt: z.string().optional(),
   sessionID: z.string().optional(), result: z.string().optional(),
 })
 export const DagViewSchema = z.object({
@@ -22,8 +22,8 @@ export const IOLAUS_DAG_RPC = Rpc.define({
     snapshot: { input: session, output: DagViewSchema },
     action: {
       input: session.extend({
-        action: z.enum(["cancel", "retry"]), runID: id,
-        generation: z.number().int().positive(), nodeID: id.optional(),
+        action: z.enum(["cancel", "retry", "approve", "reject"]), runID: id,
+        generation: z.number().int().positive(), nodeID: id.optional(), note: z.string().max(4000).optional(),
       }).strict(),
       output: DagViewSchema,
       errors: { rejected: z.object({ reason: z.string() }) },

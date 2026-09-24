@@ -26,10 +26,16 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
   `iolaus-prometheus`, and `iolaus-atlas`.
 - Restart recovery is conservative. Already-admitted prompts are not blindly
   replayed; interrupted work requires explicit retry/resume.
-- The first read-only DAG sidebar is implemented through the `./tui` export and
-  typed RPC snapshot/events. Interactive cancel/retry controls, fan-in
-  aggregators, conditional routing and human gates are planned follow-ups. Do
-  not claim them as implemented until their runtime QA evidence exists.
+- Fan-in is an ordinary Agent node binding `inputs: [{node: "*"}]`; every
+  upstream result arrives with producer provenance. Conditional routing uses a
+  deterministic `when` predicate over settled upstream payloads; a false
+  condition marks the node `skipped` without blocking dependents. Human gates
+  are `kind: "gate"` nodes that pause the run in `waiting_approval` until
+  `approve`/`reject`; only the user decides a gate.
+- The DAG sidebar is implemented through the `./tui` export and typed RPC
+  snapshot/events, including approve/reject/cancel/retry RPC methods.
+  Interactive sidebar controls are a planned follow-up. Do not claim a feature
+  as implemented until its runtime QA evidence exists under `.omo/evidence/`.
 
 ## Verification
 

@@ -1,10 +1,11 @@
+import { validateCondition } from "./condition"
+import { DagValidationError } from "./graph-error"
 import type { DagDefinition, DagNodeDefinition } from "./types"
 
-export class DagValidationError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = "DagValidationError"
-  }
+export { DagValidationError }
+
+export function isGate(node: DagNodeDefinition): boolean {
+  return node.kind === "gate"
 }
 
 export function validateDefinition(definition: DagDefinition): void {
@@ -15,7 +16,11 @@ export function validateDefinition(definition: DagDefinition): void {
   for (const node of definition.nodes) {
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")
     if (nodes.has(node.id)) throw new DagValidationError(`Duplicate DAG node: ${node.id}`)
-    if (!node.agent.trim() || !node.model.includes("/")) throw new DagValidationError(`Invalid execution target: ${node.id}`)
+    if (node.kind !== undefined && node.kind !== "agent" && node.kind !== "gate") throw new DagValidationError(`Unsupported node kind: ${node.id}`)
+    if (isGate(node)) {
+      if (node.agent !== undefined || node.model !== undefined) throw new DagValidationError(`Gate node must not name an agent or model: ${node.id}`)
+      if (!node.prompt.trim()) throw new DagValidationError(`Gate node needs a message for the approver: ${node.id}`)
+    } else if (!node.agent?.trim() || !node.model?.includes("/")) throw new DagValidationError(`Invalid execution target: ${node.id}`)
     if (node.maxAttempts !== undefined && (!Number.isInteger(node.maxAttempts) || node.maxAttempts < 1)) {
       throw new DagValidationError(`Invalid maxAttempts for node: ${node.id}`)
     }
@@ -26,6 +31,7 @@ export function validateDefinition(definition: DagDefinition): void {
     for (const dependency of node.dependsOn) {
       if (!nodes.has(dependency)) throw new DagValidationError(`Unknown dependency: ${dependency}`)
     }
+    if (node.when) validateCondition(node.when, node.id, new Set(node.dependsOn))
     for (const input of node.inputs ?? []) {
       if (input.node === "*") {
         if (node.dependsOn.length === 0) throw new DagValidationError(`Fan-in binding "*" requires dependsOn: ${node.id}`)
@@ -47,6 +53,11 @@ export function validateDefinition(definition: DagDefinition): void {
   for (const node of definition.nodes) visit(node.id)
 }
 
+/**
+ * A skipped upstream is settled, not a failure: a conditional branch that did
+ * not fire must not block the rest of the graph. Downstream nodes that need
+ * its output guard themselves with `when: {node, exists: true}`.
+ */
 export function dependencyState(
   node: DagNodeDefinition,
   records: ReadonlyMap<string, { readonly status: string }>,
@@ -56,7 +67,7 @@ export function dependencyState(
     const record = records.get(dependency)
     if (!record) throw new DagValidationError(`Missing dependency record: ${dependency}`)
     if (record.status === "failed" || record.status === "cancelled" || record.status === "blocked" || record.status === "interrupted") return "blocked"
-    if (record.status !== "completed" && record.status !== "reused") waiting = true
+    if (record.status !== "completed" && record.status !== "reused" && record.status !== "skipped") waiting = true
   }
   return waiting ? "waiting" : "ready"
 }

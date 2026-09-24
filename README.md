@@ -32,9 +32,11 @@ The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state under
 dependency-frontier scheduling, node-level retry, cancellation, restart-safe
 completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
-is available through the `opencode-iolaus/tui` entry. Fan-in aggregators,
-conditional routing, human gates, and interactive panel actions are planned
-follow-ups.
+is available through the `opencode-iolaus/tui` entry. Fan-in binds every
+upstream result with provenance through `inputs: [{node: "*"}]`, `when`
+predicates route conditionally by skipping branches, and `kind: "gate"` nodes
+pause the run for a human approve/reject. Interactive panel actions are a
+planned follow-up.
 
 ## Development
 

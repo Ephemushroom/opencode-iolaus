@@ -6,15 +6,17 @@ type DagInput = {
   readonly action?: unknown
   readonly run_id?: unknown
   readonly node_id?: unknown
+  readonly note?: unknown
   readonly definition?: unknown
 }
 
 const inputSchema = {
   type: "object",
   properties: {
-    action: { type: "string", enum: ["create", "snapshot", "node", "wait", "cancel", "retry", "resume", "amend"] },
+    action: { type: "string", enum: ["create", "snapshot", "node", "wait", "cancel", "retry", "resume", "approve", "reject", "amend"] },
     run_id: { type: "string" },
     node_id: { type: "string" },
+    note: { type: "string" },
     definition: { type: "object" },
   },
   required: ["action"],
@@ -42,7 +44,7 @@ function content(value: unknown): { content: string } {
 export function createDagTool(controller: DagController): Info {
   return {
     name: "iolaus_dag",
-    description: "Create and operate a durable Iolaus multi-Agent DAG. State lives under .iolaus and node results are retryable by generation. Bind upstream results into a node with inputs: [{node: \"*\"}] to fan in every dependency with provenance; use action \"node\" to inspect one node's full result, agent, model and child sessionID.",
+    description: "Create and operate a durable Iolaus multi-Agent DAG. State lives under .iolaus and node results are retryable by generation. Bind upstream results into a node with inputs: [{node: \"*\"}] to fan in every dependency with provenance; use action \"node\" to inspect one node's full result, agent, model and child sessionID. Add when: {node, field?, equals|includes|matches|exists} (or all/any/not) to run a node only if an upstream result satisfies it; otherwise it is skipped and downstream still proceeds. Add kind: \"gate\" (prompt = message for the approver, no agent/model) to pause the run until a human approves or rejects; approve/reject take run_id, node_id and an optional note.",
     input: inputSchema,
     options: { codemode: false },
     async execute(raw: unknown, context: ToolContext) {
@@ -57,6 +59,8 @@ export function createDagTool(controller: DagController): Info {
           case "cancel": return content(await controller.cancel(requiredString(input.run_id, "run_id"), String(context.sessionID)))
           case "retry": return content(await controller.retry(requiredString(input.run_id, "run_id"), String(context.sessionID), typeof input.node_id === "string" ? input.node_id : undefined))
           case "resume": return content(await controller.resume(requiredString(input.run_id, "run_id"), String(context.sessionID)))
+          case "approve": return content(await controller.approve(requiredString(input.run_id, "run_id"), String(context.sessionID), requiredString(input.node_id, "node_id"), typeof input.note === "string" ? input.note : undefined))
+          case "reject": return content(await controller.reject(requiredString(input.run_id, "run_id"), String(context.sessionID), requiredString(input.node_id, "node_id"), typeof input.note === "string" ? input.note : undefined))
           case "amend": return content(await controller.amend(requiredString(input.run_id, "run_id"), String(context.sessionID), definition(input.definition)))
           default: throw new Error(`Unknown DAG action: ${action}`)
         }
