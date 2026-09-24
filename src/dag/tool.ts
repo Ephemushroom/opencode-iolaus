@@ -12,7 +12,7 @@ type DagInput = {
 const inputSchema = {
   type: "object",
   properties: {
-    action: { type: "string", enum: ["create", "snapshot", "wait", "cancel", "retry", "resume", "amend"] },
+    action: { type: "string", enum: ["create", "snapshot", "node", "wait", "cancel", "retry", "resume", "amend"] },
     run_id: { type: "string" },
     node_id: { type: "string" },
     definition: { type: "object" },
@@ -42,7 +42,7 @@ function content(value: unknown): { content: string } {
 export function createDagTool(controller: DagController): Info {
   return {
     name: "iolaus_dag",
-    description: "Create and operate a durable Iolaus multi-Agent DAG. State lives under .iolaus and node results are retryable by generation.",
+    description: "Create and operate a durable Iolaus multi-Agent DAG. State lives under .iolaus and node results are retryable by generation. Bind upstream results into a node with inputs: [{node: \"*\"}] to fan in every dependency with provenance; use action \"node\" to inspect one node's full result, agent, model and child sessionID.",
     input: inputSchema,
     options: { codemode: false },
     async execute(raw: unknown, context: ToolContext) {
@@ -52,6 +52,7 @@ export function createDagTool(controller: DagController): Info {
         switch (action) {
           case "create": return content(await controller.create(definition(input.definition), String(context.sessionID)))
           case "snapshot": return content(await controller.snapshot(requiredString(input.run_id, "run_id"), String(context.sessionID)))
+          case "node": return content(await controller.node(requiredString(input.run_id, "run_id"), String(context.sessionID), requiredString(input.node_id, "node_id")))
           case "wait": return content(await controller.wait(requiredString(input.run_id, "run_id"), String(context.sessionID)))
           case "cancel": return content(await controller.cancel(requiredString(input.run_id, "run_id"), String(context.sessionID)))
           case "retry": return content(await controller.retry(requiredString(input.run_id, "run_id"), String(context.sessionID), typeof input.node_id === "string" ? input.node_id : undefined))

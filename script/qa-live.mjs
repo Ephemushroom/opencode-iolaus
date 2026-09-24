@@ -76,9 +76,12 @@ const server = http.createServer(async (req, res) => {
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
     assert.ok(requests.length < 60, "Unexpected model loop")
      let call
-     const isChildNodeRequest = active.dag && (body.input ?? []).some((item) => item?.type === "message" && JSON.stringify(item).includes("IOLAUS_DAG_NODE"))
-     if (isChildNodeRequest) {
+     const messageText = (body.input ?? []).filter((item) => item?.type === "message").map((item) => JSON.stringify(item)).join("\n")
+     const childNode = active.dag ? (messageText.match(/IOLAUS_DAG_NODE(?:_([A-Z]+))?/) ?? undefined) : undefined
+     let text = "IOLAUS_QA_DONE"
+     if (childNode) {
        call = undefined
+       if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
      } else if (active.dag && tools.includes("iolaus_dag")) {
        const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
        let runID
@@ -93,10 +96,15 @@ const server = http.createServer(async (req, res) => {
          ? undefined
          : runID
            ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
-           : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+           : active.fanin
+             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA fan-in", maxParallel: 2, nodes: [
+                 { id: "a", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
+                 { id: "b", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
+                 { id: "merge", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
+             : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
-    for (const event of events("IOLAUS_QA_DONE", call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
+    for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
     res.end("data: [DONE]\n\n")
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
 })
@@ -110,6 +118,7 @@ try {
     { name: "disabled", enabled: false, agent: "build", nativeRead: true },
      { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
      { name: "dag", enabled: true, agent: "build", dag: true },
+     { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -140,7 +149,7 @@ try {
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.name === "agent" || scenario.name === "dag")
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.name === "agent" || Boolean(scenario.dag))
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
        if (scenario.dag) {
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
@@ -150,6 +159,17 @@ try {
       assert.ok(captured.length)
        assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite"].includes(t) || t?.startsWith("team_"))))
        if (scenario.dag) assert.ok(captured.some((r) => r.tools.includes("iolaus_dag")), "DAG tool was not exposed")
+       if (scenario.fanin) {
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const merge = captured.map(messageText).find((text) => text.includes("IOLAUS_DAG_NODE_MERGE"))
+         assert.ok(merge, "Fan-in merge child was not prompted")
+         const inputs = JSON.parse(merge.match(/<iolaus-dag-inputs>(.*?)<\/iolaus-dag-inputs>/s)[1])
+         assert.deepEqual(inputs.map((i) => i.node), ["a", "b"], "Fan-in did not expand to every dependency")
+         assert.ok(inputs[0].value.text.includes("IOLAUS_FANIN_RESULT_A") && inputs[1].value.text.includes("IOLAUS_FANIN_RESULT_B"), "Fan-in payloads missing")
+         assert.deepEqual(inputs.map((i) => i.provenance.agent), ["iolaus-sisyphus", "iolaus-hephaestus"], "Fan-in provenance agent missing")
+         assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
+         assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
+       }
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
     })
   }

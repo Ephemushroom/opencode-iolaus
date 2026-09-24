@@ -1,0 +1,17 @@
+{
+  "project": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home/project",
+  "env": {
+    "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF",
+    "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home",
+    "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home",
+    "PWD": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home/project",
+    "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/config",
+    "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home/data",
+    "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home/cache",
+    "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home/state",
+    "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Q78UGF/fanin/home",
+    "OPENCODE_DISABLE_AUTOUPDATE": "1",
+    "OPENCODE_DISABLE_MODELS_FETCH": "1",
+    "IOLAUS_TRACE": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-fanin/.omo/evidence/20260924-iolaus-dag-fanin-provenance/fanin-trace.ndjson"
+  }
+}

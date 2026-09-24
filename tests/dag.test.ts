@@ -2,7 +2,7 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { createDagController } from "../src/dag/controller"
+import { createDagController, resolveInputs } from "../src/dag/controller"
 import { canonicalJson } from "../src/dag/canonical-json"
 import { fingerprint, graphFingerprint } from "../src/dag/fingerprint"
 import { DagValidationError, validateDefinition } from "../src/dag/graph"
@@ -94,4 +94,43 @@ test("completed DAG state survives controller restart through SQLite WAL", async
   expect(restored.run.nodes[0]?.result?.payload).toEqual({ node: "a", attempt: 1 })
   expect(restored.events.some((event) => event.type === "node.completed")).toBe(true)
   second.close()
+})
+
+test("fan-in binding expands to every dependency and carries producer provenance", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const prompts = new Map<string, string>()
+  const runner = fakeRunner()
+  const start = runner.start.bind(runner)
+  runner.start = async (input) => { prompts.set(input.node.id, input.prompt); return start(input) }
+  const controller = createDagController({ directory, runner })
+  const b = { ...node("b"), agent: "iolaus-hephaestus", model: "anthropic/claude-opus-5-5" }
+  const merge: DagNodeDefinition = { ...node("merge", ["a", "b"]), inputs: [{ node: "*" }] }
+  const run = await controller.create(definition([node("a"), b, merge]), "owner")
+  const finished = await controller.wait(run.runID, "owner")
+  expect(finished.status).toBe("completed")
+  expect(prompts.get("a")).toBe("run a")
+  const prompt = prompts.get("merge")!
+  const inputs = JSON.parse(prompt.slice(prompt.indexOf("<iolaus-dag-inputs>") + "<iolaus-dag-inputs>".length, prompt.indexOf("</iolaus-dag-inputs>")))
+  expect(inputs).toEqual([
+    { node: "a", field: "payload", value: { node: "a", attempt: 1 }, provenance: { agent: "iolaus-sisyphus", model: "openai/gpt-5.5", attempt: 1, status: "completed", sessionID: "session-a-1" } },
+    { node: "b", field: "payload", value: { node: "b", attempt: 1 }, provenance: { agent: "iolaus-hephaestus", model: "anthropic/claude-opus-5-5", attempt: 1, status: "completed", sessionID: "session-b-1" } },
+  ])
+  const record = await controller.node(run.runID, "owner", "b")
+  expect(record.result?.provenance.agent).toBe("iolaus-hephaestus")
+  expect(record.result?.provenance.execution?.sessionID).toBe("session-b-1")
+  await expect(controller.node(run.runID, "other", "b")).rejects.toThrow("another session")
+  await expect(controller.node(run.runID, "owner", "zzz")).rejects.toThrow("Unknown DAG node")
+  controller.close()
+})
+
+test("field binding selects one payload key and fan-in requires dependencies", () => {
+  const run = {
+    nodes: [{ definition: node("a"), result: { payload: { text: "hello", score: 3 }, attempt: 2, status: "completed", provenance: { agent: "x", model: "p/m" } } }],
+  } as unknown as Parameters<typeof resolveInputs>[1]
+  const target = { definition: { ...node("z", ["a"]), inputs: [{ node: "a", field: "text" }, { node: "*", field: "score" }] } } as unknown as Parameters<typeof resolveInputs>[0]
+  expect(resolveInputs(target, run).map((input) => [input.node, input.field, input.value, input.provenance?.sessionID])).toEqual([
+    ["a", "text", "hello", null], ["a", "score", 3, null],
+  ])
+  expect(() => validateDefinition(definition([{ ...node("solo"), inputs: [{ node: "*" }] }]))).toThrow('Fan-in binding "*" requires dependsOn')
+  expect(() => validateDefinition(definition([node("a"), { ...node("z", ["a"]), inputs: [{ node: "*" }] }]))).not.toThrow()
 })

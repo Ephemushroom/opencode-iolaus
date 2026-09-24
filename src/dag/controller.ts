@@ -3,12 +3,13 @@ import { DagValidationError, dependencyState, validateDefinition } from "./graph
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
-import type { DagDefinition, DagEvent, DagNodeRecord, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
+import type { DagDefinition, DagEvent, DagNodeRecord, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
 
 export interface DagController {
   readonly create: (definition: DagDefinition, ownerSessionID: string) => Promise<DagRunRecord>
   readonly list: (ownerSessionID?: string) => Promise<readonly DagRunRecord[]>
   readonly snapshot: (runID: string, ownerSessionID: string) => Promise<DagSnapshot>
+  readonly node: (runID: string, ownerSessionID: string, nodeID: string) => Promise<DagNodeRecord>
   readonly wait: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
   readonly cancel: (runID: string, ownerSessionID: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly retry: (runID: string, ownerSessionID: string, nodeID?: string, expectedGeneration?: number) => Promise<DagRunRecord>
@@ -38,17 +39,30 @@ function nodeTerminal(status: DagNodeRecord["status"]): boolean {
   return status === "completed" || status === "reused" || status === "failed" || status === "blocked" || status === "cancelled"
 }
 
-function jsonText(value: JsonValue): string {
+function jsonText(value: unknown): string {
   return JSON.stringify(value)
 }
 
-function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
-  const bindings = node.definition.inputs ?? []
-  if (bindings.length === 0) return node.definition.prompt
-  const inputs = bindings.map((binding) => {
-    const source = run.nodes.find((candidate) => candidate.definition.id === binding.node)
-    return { node: binding.node, field: binding.field ?? "payload", value: source?.result?.payload ?? null }
+export function resolveInputs(node: DagNodeRecord, run: DagRunRecord): DagResolvedInput[] {
+  const bindings = (node.definition.inputs ?? []).flatMap((binding) =>
+    binding.node === "*" ? node.definition.dependsOn.map((id) => ({ node: id, ...(binding.field === undefined ? {} : { field: binding.field }) })) : [binding])
+  return bindings.map((binding) => {
+    const result = run.nodes.find((candidate) => candidate.definition.id === binding.node)?.result
+    const payload = result?.payload ?? null
+    const value = binding.field !== undefined && payload !== null && typeof payload === "object" && !Array.isArray(payload)
+      ? payload[binding.field] ?? null : payload
+    return {
+      node: binding.node,
+      field: binding.field ?? "payload",
+      value,
+      provenance: result ? { agent: result.provenance.agent, model: result.provenance.model, attempt: result.attempt, status: result.status, sessionID: result.provenance.execution?.sessionID ?? null } : null,
+    }
   })
+}
+
+export function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
+  const inputs = resolveInputs(node, run)
+  if (inputs.length === 0) return node.definition.prompt
   return `${node.definition.prompt}\n\n<iolaus-dag-inputs>${jsonText(inputs)}</iolaus-dag-inputs>`
 }
 
@@ -190,6 +204,11 @@ export function createDagController(options: DagControllerOptions): DagControlle
     },
     async list(ownerSessionID) { return store.listRuns(ownerSessionID) },
     async snapshot(runID, ownerSessionID) { const run = owned(runID, ownerSessionID); return { run, events: store.events(runID) } },
+    async node(runID, ownerSessionID, nodeID) {
+      const record = owned(runID, ownerSessionID).nodes.find((candidate) => candidate.definition.id === nodeID)
+      if (!record) throw new DagValidationError(`Unknown DAG node: ${nodeID}`)
+      return record
+    },
     async wait(runID, ownerSessionID) {
       const current = owned(runID, ownerSessionID)
       if (terminal(current.status)) return current
