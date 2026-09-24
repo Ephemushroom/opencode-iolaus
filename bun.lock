@@ -5,6 +5,7 @@
     "": {
       "name": "opencode-iolaus",
       "dependencies": {
+        "@iolaus/ast-grep-core": "workspace:*",
         "@iolaus/model-core": "workspace:*",
         "zod": "4.1.8",
       },
@@ -24,6 +25,10 @@
         "@opentui/solid": ">=0.5.10",
         "solid-js": ">=1.9.0",
       },
+    },
+    "packages/ast-grep-core": {
+      "name": "@iolaus/ast-grep-core",
+      "version": "0.1.0",
     },
     "packages/model-core": {
       "name": "@iolaus/model-core",
@@ -146,6 +151,8 @@
     "@effect/platform-node-shared": ["@effect/platform-node-shared@4.0.0-rc.112", "", { "dependencies": { "@types/ws": "^8.18.1", "ws": "^8.21.3" }, "peerDependencies": { "effect": "^4.0.0-rc.112" } }, "sha512-ttjz0xKamFN7vL8pNDYVwddJLjZvqKePc05djlz2VcdaKbLsnYbtMnL1rbOfHgEnIUSHGh7FkjaN4DM1Ov81sQ=="],
 
     "@gar/promise-retry": ["@gar/promise-retry@1.0.3", "", {}, "sha512-GmzA9ckNokPypTg10pgpeHNQe7ph+iIKKmhKu3Ob9ANkswreCx7R3cKmY781K8QK3AqVL3xVh9A42JvIAbkkSA=="],
+
+    "@iolaus/ast-grep-core": ["@iolaus/ast-grep-core@workspace:packages/ast-grep-core"],
 
     "@iolaus/model-core": ["@iolaus/model-core@workspace:packages/model-core"],
 

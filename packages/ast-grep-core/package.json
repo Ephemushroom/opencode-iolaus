@@ -1,0 +1,8 @@
+{
+  "name": "@iolaus/ast-grep-core",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "OMO-derived ast-grep runner, pattern hints and search/rewrite/scan executors retained by Iolaus.",
+  "exports": { ".": "./src/index.ts" }
+}

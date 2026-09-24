@@ -117,12 +117,16 @@ const server = http.createServer(async (req, res) => {
                  { id: "b", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
                  { id: "merge", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
              : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+     } else if (active.astGrep && tools.includes("execute")) {
+       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
+       call = done ? undefined : { name: "execute", args: { code: active.astGrep } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
     res.end("data: [DONE]\n\n")
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
 })
+const AST_GREP_FIXTURE = "console.log(add(1, 2))\nconsole.log(\"hello\")\nconst x = 1\n"
 let after
 try {
   server.listen(0, "127.0.0.1"); await once(server, "listening")
@@ -136,6 +140,12 @@ try {
      { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
      { name: "route", enabled: true, agent: "build", dag: true, route: true },
      { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
+     { name: "astgrep-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true,
+       astGrep: 'const r = await tools.ast_grep.search({ pattern: "console.log($A)", language: "typescript", paths: ["src"] }); return { ok: r.ok, count: r.matches.length, lines: r.matches.map((m) => m.path + ":" + m.range.start.line), first: r.matches[0].metavariables.single.A }' },
+     { name: "astgrep-rewrite", enabled: true, agent: "build",
+       astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied, planned: r.counts ? r.counts.plannedMatches : null, code: r.error ? r.error.code : null }' },
+     { name: "astgrep-deny", enabled: true, agent: "iolaus-prometheus", agentPermissions: true,
+       astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied === true, code: r.error ? r.error.code : null }' },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -147,10 +157,11 @@ try {
       XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(home,"data"), XDG_CACHE_HOME: join(home,"cache"), XDG_STATE_HOME: join(home,"state"),
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key" }
     const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, ...(scenario.models ? { models: scenario.models } : {}) } }],
-      model: "openai/gpt-5.5", default_agent: "build", permissions: [{ action: "*", resource: "*", effect: "allow" }],
+      model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
     writeFileSync(join(project,"fixture.txt"), "IOLAUS_QA_NATIVE_READ_RESULT\n")
+    if (scenario.astGrep) { mkdirSync(join(project, "src")); writeFileSync(join(project, "src", "a.ts"), AST_GREP_FIXTURE) }
     const fixture = { project, env }
     writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY")) },null,2))
     if (scenario.name === "native") {
@@ -166,7 +177,7 @@ try {
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.name === "agent" || Boolean(scenario.dag))
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || Boolean(scenario.dag))
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
        if (scenario.dag) {
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
@@ -186,6 +197,39 @@ try {
          assert.deepEqual(inputs.map((i) => i.provenance.agent), ["iolaus-sisyphus", "iolaus-hephaestus"], "Fan-in provenance agent missing")
          assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
+       }
+       if (scenario.astGrep) {
+         assert.ok(traces.some((t) => t.event === "iolaus.ast_grep.registered" && t.binary), "ast_grep tools were not registered")
+         const withTools = captured.filter((r) => r.tools.includes("execute"))
+         assert.ok(withTools.length, "execute was not offered to the agent")
+         const catalog = withTools[0].instructions.slice(withTools[0].instructions.indexOf("# Code Mode"))
+         assert.ok(catalog.includes("tools.ast_grep.search("), "ast_grep.search missing from the Code Mode catalog")
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+         assert.ok(outputs.length, "execute returned no output to the model")
+         const out = outputs.at(-1)
+         const calls = traces.filter((t) => t.event === "iolaus.ast_grep.call")
+         const source = readFileSync(join(fixture.project, "src", "a.ts"), "utf8")
+         if (scenario.name === "astgrep-explore") {
+           assert.match(catalog, /- ast_grep \(2 tools\)/, "read-only explore must see only search and scan")
+           assert.ok(!catalog.includes("tools.ast_grep.rewrite("), "read-only explore must not see ast_grep.rewrite")
+           assert.match(out, /"count": 2/, `structured search result missing: ${out}`)
+           assert.ok(out.includes("src/a.ts:1") && out.includes("src/a.ts:2"), `match locations missing: ${out}`)
+           assert.match(out, /"first": "add\(1, 2\)"/, `metavariable capture missing: ${out}`)
+           assert.ok(calls.some((t) => t.tool === "search" && t.ok && t.agent === "iolaus-explore" && t.matches === 2), "search call trace missing")
+           assert.equal(source, AST_GREP_FIXTURE)
+         }
+         if (scenario.name === "astgrep-rewrite") {
+           assert.match(out, /"applied": true/, `rewrite was not applied: ${out}`)
+           assert.equal(source, "logger.info(add(1, 2))\nlogger.info(\"hello\")\nconst x = 1\n")
+           assert.ok(calls.some((t) => t.tool === "rewrite" && t.ok && t.applied), "rewrite call trace missing")
+         }
+         if (scenario.name === "astgrep-deny") {
+           assert.match(catalog, /- ast_grep \(3 tools/, "prometheus may edit plans, so rewrite stays visible")
+           assert.ok(catalog.includes("tools.ast_grep.rewrite("), "pinned rewrite signature missing for a writer")
+           assert.match(out, /"code": "PERMISSION_DENIED"/, `planner write outside plans was not denied: ${out}`)
+           assert.equal(source, AST_GREP_FIXTURE, "denied rewrite modified the file")
+           assert.ok(calls.some((t) => t.tool === "rewrite" && !t.ok && t.code === "PERMISSION_DENIED"), "deny call trace missing")
+         }
        }
        if (scenario.lanes) {
          const pinned = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, `${t.model}${t.variant ? `#${t.variant}` : ""}|${t.source}`]))

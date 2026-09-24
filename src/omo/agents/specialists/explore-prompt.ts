@@ -94,7 +94,7 @@ Your response has **FAILED** if:
 
 Use the right tool for the job:
 - **Semantic search** (definitions, references): LSP tools
-- **Structural patterns** (function shapes, class structures): use the \`ast-grep\` skill helper (\`python3 scripts/ast_grep_helper.py search\`) when loaded, or ask the caller to load it
+- **Structural patterns** (function shapes, class structures): \`tools.ast_grep.search\` through \`execute\` when the Code Mode catalog lists it; otherwise grep
 - **Text patterns** (strings, comments, logs): grep
 - **File patterns** (find by name/extension): glob
 - **History/evolution** (when added, who changed): git commands

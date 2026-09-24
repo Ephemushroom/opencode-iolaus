@@ -65,7 +65,7 @@ export async function registerAgents(
         agent.system = agentMarker(name)
         if (READ_ONLY.has(name)) {
           agent.permissions.push({ action: "*", resource: "*", effect: "deny" })
-          for (const action of ["read", "glob", "grep", "webfetch", "websearch", "skill"]) {
+          for (const action of ["read", "glob", "grep", "webfetch", "websearch", "skill", "execute"]) {
             agent.permissions.push({ action, resource: "*", effect: "allow" })
           }
         }

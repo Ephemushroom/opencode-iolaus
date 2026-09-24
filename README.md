@@ -52,6 +52,8 @@ predicates route conditionally by skipping branches, and `kind: "gate"` nodes
 pause the run for a human approve/reject. Interactive panel actions are a
 planned follow-up.
 
+When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or `{ "astGrep": false }` to turn the tools off.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.

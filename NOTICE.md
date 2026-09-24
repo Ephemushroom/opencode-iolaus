@@ -9,7 +9,7 @@ Iolaus is a modified derivative of portions of oh-my-openagent (formerly oh-my-o
 
 The original authors' copyright, license, and third-party notices remain in the retained source. Some historical package manifests describe a different license; the source root license and applicable component notices are authoritative.
 
-Iolaus changes the product identity, repository ownership and delivery process. The active edition retains prompt construction and model-family routing and replaces harness integration with a narrow OpenCode 2 adapter. Historical runtime implementations are kept solely as reference material, outside the build and package payload. Modified active files carry their source mapping in `reference/active-manifest.json` when introduced.
+Iolaus changes the product identity, repository ownership and delivery process. The active edition retains prompt construction and model-family routing and replaces harness integration with a narrow OpenCode 2 adapter. Historical runtime implementations are kept solely as reference material, outside the build and package payload. Modified active files carry their source mapping in `reference/active-manifest.json` when introduced. Files ported from upstream after the snapshot (`packages/ast-grep-core/`, from `oh-my-openagent@ed0fb0601:packages/ast-grep-mcp`) record that upstream path and commit as their manifest `source`.
 
 Reference files are byte-identical to the source commit. Historical `AGENTS.md` filenames are changed to `AGENTS.reference.md` to prevent archived development rules becoming active project instructions. `reference/manifest.json` records the path mapping and SHA-256 for every retained file.
 

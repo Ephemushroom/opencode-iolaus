@@ -226,13 +226,13 @@
       "source": "reference/omo/packages/agents-core/src/specialists/librarian-prompt.ts",
       "path": "src/omo/agents/specialists/librarian-prompt.ts",
       "sourceSha256": "7f05ba7f50aa1dc26b81c5a24f6eaf944ca29651836d699247a72b3a4bd5af48",
-      "activeSha256": "7f05ba7f50aa1dc26b81c5a24f6eaf944ca29651836d699247a72b3a4bd5af48"
+      "activeSha256": "481c221f6168db04263305332177fbb41f002f2485536e11da67275521e9a806"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/metis-prompt.ts",
       "path": "src/omo/agents/specialists/metis-prompt.ts",
       "sourceSha256": "19ed8977ea536650ee2023e047e82f5e23c3ab3afcfca56dd884348fabb4435a",
-      "activeSha256": "48ff66f8342947575e104d4b5d933ff47ba6e3d1e3089eedd91aff7a7d6a84a1"
+      "activeSha256": "31cd6c1cc17313c41f3db5aacce43353791297a9e9f5d26f823469dfe72cacf4"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/momus-gpt-5-6.ts",
@@ -244,7 +244,7 @@
       "source": "reference/omo/packages/agents-core/src/specialists/explore-prompt.ts",
       "path": "src/omo/agents/specialists/explore-prompt.ts",
       "sourceSha256": "4a33f441396e51814b38327e6a36d62d4c786f3b6e2667b140ddbb2092898f7e",
-      "activeSha256": "4a33f441396e51814b38327e6a36d62d4c786f3b6e2667b140ddbb2092898f7e"
+      "activeSha256": "6143610bcd5ab94ef7215a783f90b635ffa987d652912bd6a46ea33a683e60f0"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/multimodal-looker-prompt.ts",
@@ -563,6 +563,42 @@
       "path": "packages/model-core/src/provider-cache.ts",
       "sourceSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180",
       "activeSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/sg-runner.ts",
+      "path": "packages/ast-grep-core/src/sg-runner.ts",
+      "sourceSha256": "f81740186a819763aaac81afb11f237dc77e256a7b847d192686fa352a61491e",
+      "activeSha256": "f81740186a819763aaac81afb11f237dc77e256a7b847d192686fa352a61491e"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/normalize.ts",
+      "path": "packages/ast-grep-core/src/normalize.ts",
+      "sourceSha256": "8a6388aae9966c8261d247ac3136a83410db1c8b0cb9997d4bbfc5fae86d8fae",
+      "activeSha256": "8a6388aae9966c8261d247ac3136a83410db1c8b0cb9997d4bbfc5fae86d8fae"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/pattern-hints.ts",
+      "path": "packages/ast-grep-core/src/pattern-hints.ts",
+      "sourceSha256": "da9ce37050621f68867532578237598b9bf66619f6015d9b32741066fe6f4133",
+      "activeSha256": "da9ce37050621f68867532578237598b9bf66619f6015d9b32741066fe6f4133"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/tools/search.ts",
+      "path": "packages/ast-grep-core/src/tools/search.ts",
+      "sourceSha256": "6eb625f2bbfb18d51c321aeffc2b8a0f8cb843226eec07653b6e39aa19a7b0f4",
+      "activeSha256": "6eb625f2bbfb18d51c321aeffc2b8a0f8cb843226eec07653b6e39aa19a7b0f4"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/tools/rewrite.ts",
+      "path": "packages/ast-grep-core/src/tools/rewrite.ts",
+      "sourceSha256": "3a2ef5c9e32873828362940afd3622e791152d065c6295ed6de95629e7095ce1",
+      "activeSha256": "071580b6b36f1e6b0f97f05e2383be13f1cd0c85977aa78b8fd39d603d3cc8c9"
+    },
+    {
+      "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/tools/scan.ts",
+      "path": "packages/ast-grep-core/src/tools/scan.ts",
+      "sourceSha256": "ce0fd29fb227d8523b55cf03ebfd8b390ac84c23f3bc8e5775aedaf45b01693a",
+      "activeSha256": "dfe5ff0933d34594ef42f17a45f4c310c830338f1f8b4a2ddd2550d22b22a04b"
     }
   ]
 }
