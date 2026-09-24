@@ -17,9 +17,9 @@
     "qa:live": "node script/qa-live.mjs",
     "prepack": "bun run check:package"
   },
-  "peerDependencies": { "@opencode/plugin": "2.0.13" },
+  "peerDependencies": { "@opencode/plugin": "2.0.15" },
   "devDependencies": {
-    "@opencode/plugin": "2.0.13",
+    "@opencode/plugin": "2.0.15",
     "@types/bun": "latest",
     "@types/js-yaml": "^4.0.9",
     "typescript": "^5.9.3",
