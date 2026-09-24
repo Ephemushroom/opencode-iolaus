@@ -5,7 +5,7 @@ import type { SessionContext } from "@opencode/plugin/promise/session"
 import { Session } from "@opencode/schema/session"
 import { registerAgents, agentMarker } from "../src/registration"
 import { parseOptions } from "../src/options"
-import { composeContext } from "../src/context"
+import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
 import { bindNative, renderAgent, renderMode } from "../src/prompts/render"
 
@@ -104,6 +104,26 @@ test("mode requires explicit marker and resets with the next user request", asyn
   const before = structuredClone(next)
   await composeContext(next, catalogs, parseOptions({}))
   expect(next).toEqual(before)
+})
+
+test("mode dispatch drops the native default prompt and keeps env, tool catalog and project guidance", async () => {
+  const event = context("build")
+  event.system = [
+    { type: "text", text: `${NATIVE_DEFAULT_PROMPT_PREFIX}. Help the user.\n\n# Delegation\nDo not spawn subagents.` },
+    { type: "text", text: "# Your Model\n- Name: GPT-5.5" },
+    { type: "text", text: "Here is some useful information about the environment\n<env>...</env>\n# Code Mode\nUse execute." },
+    { type: "text", text: "Instructions from: AGENTS.md\nproject guidance" },
+  ]
+  event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
+  await composeContext(event, catalogs, parseOptions({}))
+  const texts = event.system.map((part) => part.text)
+  expect(texts.some((text) => text.startsWith(NATIVE_DEFAULT_PROMPT_PREFIX))).toBe(false)
+  expect(texts.some((text) => text.includes("Do not spawn subagents"))).toBe(false)
+  expect(texts[0]).toBe("# Your Model\n- Name: GPT-5.5")
+  expect(texts[1]).toContain("# Code Mode")
+  expect(texts[2]).toContain("project guidance")
+  expect(texts.at(-1)).toBe(bindNative(renderMode("ultrawork", "openai/gpt-5.5")))
+  expect(event.system).toHaveLength(4)
 })
 
 test("omitted agent and mode selections disable their context paths", async () => {

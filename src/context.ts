@@ -16,6 +16,24 @@ export function lastUserText(messages: SessionContext["messages"]): string {
   return ""
 }
 
+/**
+ * OpenCode injects its default agent prose as a single system part that opens
+ * with this sentence. It carries harness style rules and a "do not spawn
+ * subagents" clause that conflict with the OMO mode prompts, so mode dispatch
+ * drops it. Environment facts, Code Mode tool catalog and AGENTS.md live in
+ * separate parts and are kept.
+ */
+export const NATIVE_DEFAULT_PROMPT_PREFIX = "You are an AI agent running in OpenCode, a coding agent harness"
+
+export function dropNativeDefaultPrompt(system: SessionContext["system"]): number {
+  let removed = 0
+  for (let i = system.length - 1; i >= 0; i--) {
+    const part = system[i]
+    if (part.type === "text" && part.text.startsWith(NATIVE_DEFAULT_PROMPT_PREFIX)) { system.splice(i, 1); removed++ }
+  }
+  return removed
+}
+
 export async function composeContext(
   event: SessionContext,
   ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list"> },
@@ -43,7 +61,8 @@ export async function composeContext(
     trace("iolaus.agent.rendered", { agent: name, model, sessionID: event.sessionID })
   }
   if (selectedMode) {
+    const removed = dropNativeDefaultPrompt(event.system)
     event.system.push({ type: "text", text: bindNative(renderMode(selectedMode, model, name)) })
-    trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID })
+    trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID, nativePromptRemoved: removed })
   }
 }
