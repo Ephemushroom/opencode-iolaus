@@ -34,7 +34,7 @@
       "source": "reference/omo/packages/agents-core/src/gpt-prompt-identity.ts",
       "path": "src/omo/agents/gpt-prompt-identity.ts",
       "sourceSha256": "8d51ba16938e68ab4593a84b78dc804227c5bcba748c96a6fed2afad8a98f2ac",
-      "activeSha256": "8d51ba16938e68ab4593a84b78dc804227c5bcba748c96a6fed2afad8a98f2ac"
+      "activeSha256": "8ca6a81c3a97067d2440ddeed36431e8e8ee5c995587b38b1fdb7046a10f01c5"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-tool-categorization.ts",
@@ -52,7 +52,7 @@
       "source": "reference/omo/packages/agents-core/src/types.ts",
       "path": "src/omo/agents/types.ts",
       "sourceSha256": "13cd6dbfbc6acaef4983b7ff25af9f3106188e14340f8400a81fafd22fc5df11",
-      "activeSha256": "c567f17116c0def6e69977ce9f2f305e4262ae59aec81affde73c882725e0f59"
+      "activeSha256": "ca5598cc068cc3c73f08d29ce6a45d82c16c2027d558e0019979acb65608219f"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt.ts",
@@ -130,7 +130,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus-junior/prompt-router.ts",
       "path": "src/omo/agents/sisyphus-junior/prompt-router.ts",
       "sourceSha256": "22c644f2e2a05d38d18cea4ff6eb5cc77e7e83054af3e8520537332ae9fa132e",
-      "activeSha256": "22c644f2e2a05d38d18cea4ff6eb5cc77e7e83054af3e8520537332ae9fa132e"
+      "activeSha256": "c1873f55907f84aa675e9d8ba2db82fa307d812f94455c7278328c2d32694b57"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-junior/kimi-k2-7.ts",
@@ -232,7 +232,7 @@
       "source": "reference/omo/packages/agents-core/src/specialists/metis-prompt.ts",
       "path": "src/omo/agents/specialists/metis-prompt.ts",
       "sourceSha256": "19ed8977ea536650ee2023e047e82f5e23c3ab3afcfca56dd884348fabb4435a",
-      "activeSha256": "19ed8977ea536650ee2023e047e82f5e23c3ab3afcfca56dd884348fabb4435a"
+      "activeSha256": "48ff66f8342947575e104d4b5d933ff47ba6e3d1e3089eedd91aff7a7d6a84a1"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/momus-gpt-5-6.ts",
@@ -268,7 +268,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-5.ts",
       "path": "src/omo/agents/sisyphus/claude-opus-5.ts",
       "sourceSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4",
-      "activeSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4"
+      "activeSha256": "732ff0df71f0f64d8b7a1f3fb9f959079978eff2a1037a3a028b5fab49bcbd5c"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k2-6.ts",
@@ -448,7 +448,7 @@
       "source": "reference/omo/packages/prompts-core/src/variant-resolver.ts",
       "path": "src/omo/modes/src/variant-resolver.ts",
       "sourceSha256": "d06584d3b60a4d9767c6877f94faa2fe83dce15a6aec52e32afba30bef2424a1",
-      "activeSha256": "f4443f9771226baa662f0248e34be820dd3f6b885fd0a6711307aa93975ffeef"
+      "activeSha256": "83d743d3758c966022d512878ccea56c094511609d470057d958b522e735a6b2"
     },
     {
       "source": "reference/omo/packages/prompts-core/src/ultrawork-prompts.ts",
@@ -496,7 +496,7 @@
       "source": "reference/omo/packages/model-core/src/model-family-detectors.ts",
       "path": "src/omo/model-family-detectors.ts",
       "sourceSha256": "1e6e92e0fdd8fa0d7e2ce8cb8bb5ffc83e91ce69c071ae26fbe7677daaad9376",
-      "activeSha256": "1e6e92e0fdd8fa0d7e2ce8cb8bb5ffc83e91ce69c071ae26fbe7677daaad9376"
+      "activeSha256": "eab5d5c9b97276caf83e0d51a61fae9208899960e96d9f16ffec81520e5ae6fb"
     },
     {
       "source": "reference/omo/packages/utils/src/frontmatter.ts",
@@ -508,7 +508,7 @@
       "source": "reference/omo/packages/omo-opencode2/src/agents/sisyphus-prompt.ts",
       "path": "src/prompts/sisyphus-route.ts",
       "sourceSha256": "bff4ee97a4ecd5a6353c41a85283cae53fdfb7513de924a53e7e430a68431c94",
-      "activeSha256": "c305d80705c57c3a3bc5489bcc92d238d5af9abe27ff43b6d64584ec4d7f8c9e"
+      "activeSha256": "b9354087ffc1daa129a857166f71ed79d70942a5a8ec4c509d7e2742dd0d2740"
     }
   ]
 }

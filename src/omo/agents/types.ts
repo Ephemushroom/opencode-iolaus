@@ -13,6 +13,9 @@ import {
   isGrok46Model,
   isKimiK2Model,
   isKimiK27Model,
+  isKimiK28Model,
+  isKimiK2CodeModel,
+  isSWE2Model,
   isKimiK3Model,
   isMiniMaxModel,
 } from "../model-family-detectors";
@@ -32,6 +35,9 @@ export {
   isGrok46Model,
   isKimiK2Model,
   isKimiK27Model,
+  isKimiK28Model,
+  isKimiK2CodeModel,
+  isSWE2Model,
   isKimiK3Model,
   isMiniMaxModel,
 };
