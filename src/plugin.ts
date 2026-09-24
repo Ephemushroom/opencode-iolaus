@@ -1,4 +1,4 @@
-import { Plugin } from "@opencode/plugin"
+import { Agent, Plugin } from "@opencode/plugin"
 import { parseOptions } from "./options"
 import { registerAgents, registerModes } from "./registration"
 import { composeContext } from "./context"
@@ -9,6 +9,9 @@ import { createDagTool } from "./dag/tool"
 import { registerDagRpc } from "./dag/register-rpc"
 import { loadModelsConfig, modelString, resolveLane } from "./models"
 import { agentName, categoryName } from "./prompts/catalog"
+import { resolveAstGrepBinary } from "./ast-grep/binary"
+import { AST_GREP_NAMESPACE, AST_GREP_NAMESPACE_DESCRIPTION, createAstGrepTools } from "./ast-grep/tools"
+import type { PermissionRule } from "./ast-grep/permissions"
 
 export default Plugin.define({
   id: "iolaus",
@@ -35,6 +38,28 @@ export default Plugin.define({
       onEvent: (event, sessionID) => rpcRegistration?.events.emit("updated", { sessionID, runID: event.runID, sequence: event.sequence, type: event.type }),
     })
     await ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
+    const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
+    trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })
+    if (sgPath) {
+      const tools = createAstGrepTools(sgPath, {
+        async directory(sessionID) {
+          const session = await ctx.session.get({ sessionID: sessionID as never })
+          return String(session.location?.directory ?? ctx.location.directory)
+        },
+        async rules(sessionID, agent) {
+          const [info, session] = await Promise.all([
+            ctx.agent.get({ agentID: Agent.ID.make(agent) }).then((result) => result.data).catch(() => undefined),
+            ctx.session.get({ sessionID: sessionID as never }).catch(() => undefined),
+          ])
+          return [...(info?.permissions ?? []), ...((session as { permissions?: readonly PermissionRule[] } | undefined)?.permissions ?? [])] as PermissionRule[]
+        },
+        trace,
+      })
+      await ctx.tool.transform((editor) => {
+        editor.namespace({ name: AST_GREP_NAMESPACE, description: AST_GREP_NAMESPACE_DESCRIPTION })
+        for (const tool of tools) editor.add(tool)
+      })
+    }
     rpcRegistration = await registerDagRpc(ctx, controller)
     return async () => { controller.close(); await rpcRegistration?.dispose() }
   },

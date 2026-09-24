@@ -39,7 +39,8 @@
   },
   "dependencies": {
     "zod": "4.1.8",
-    "@iolaus/model-core": "workspace:*"
+    "@iolaus/model-core": "workspace:*",
+    "@iolaus/ast-grep-core": "workspace:*"
   },
   "devDependencies": {
     "@opencode/plugin": "2.0.16",

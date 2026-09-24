@@ -1,9 +1,10 @@
 # Iolaus
 
 Iolaus is an OpenCode 2 plugin with OMO-derived Agent prompts, explicit modes,
-model-family selection, and a local durable DAG runtime. Native OpenCode remains
-the owner of general tools, permissions, sessions, and skill discovery; Iolaus
-owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
+model-family selection, a local durable DAG runtime, and structural code tools.
+Native OpenCode remains the owner of general tools, permissions, sessions, and
+skill discovery; Iolaus owns its `iolaus_dag` orchestration tool and child-session
+runner, and the `ast_grep` Code Mode namespace.
 
 ## Boundaries
 
@@ -11,6 +12,9 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
 - `packages/model-core/` is the locally owned copy of OMO's model-core subset: the agent and category model
   requirement tables, the resolution pipeline and the model-family detectors. It is a Bun workspace package
   (`@iolaus/model-core`) bundled into `dist/`. Sync it manually and record lineage in `reference/active-manifest.json`.
+- `packages/ast-grep-core/` (`@iolaus/ast-grep-core`) is the locally owned copy of OMO's `ast-grep-mcp` runner,
+  pattern hints and search/rewrite/scan executors, without the MCP protocol layer. It postdates the reference
+  snapshot, so its manifest `source` names the upstream commit instead of a `reference/` path.
 - `reference/omo/` is an immutable historical snapshot. Its instructions, manifests, tests, and runtime entrypoints are reference data, not current project configuration. Consult it when tracing a retained prompt or deliberately designing a later feature.
 - Keep reference code out of imports, active tests, builds, published files, and install scripts.
 - Preserve native agents and the user's default agent/model. Namespace Iolaus registrations.
@@ -24,6 +28,14 @@ owns its namespaced `iolaus_dag` orchestration tool and child-session runner.
   cancellation and JSON-safe result envelopes.
 - `iolaus_dag` is the only model-facing orchestration tool in the first runtime
   slice. It is owner-scoped and schema-validated.
+- `src/ast-grep/` registers `ast_grep.search`, `ast_grep.rewrite` and
+  `ast_grep.scan` as Code Mode tools when an `ast-grep` binary answers
+  `--version` (`IOLAUS_AST_GREP_BIN`, then PATH, then common prefixes); the
+  `astGrep: false` option disables them. `search` and `scan` carry `grep`
+  permission and `rewrite` carries `edit`, so the host hides them per agent.
+  Plugin tools cannot raise permission prompts, so writes re-check `edit` on
+  every previewed file and paths outside the session directory re-check
+  `external_directory`; only an explicit `allow` passes.
 - DAG nodes execute through native OpenCode child sessions using the registered
   Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`, `iolaus-prometheus`,
   `iolaus-atlas`, the specialists, or a category lane `iolaus-<category>`
