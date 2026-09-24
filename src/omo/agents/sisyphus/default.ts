@@ -26,6 +26,20 @@ import {
 } from "../dynamic-agent-prompt-builder";
 
 export function buildTaskManagementSection(useTaskSystem: boolean): string {
+  return `<Iolaus_DAG_Management>
+## Durable DAG Management (CRITICAL)
+
+For user-requested work with multiple steps, independent concerns, or uncertain scope, use \`iolaus_dag\` instead of a todo list.
+
+1. Create explicit nodes with the exact Iolaus Agent ID, model, prompt and \`dependsOn\` edges.
+2. Use Prometheus for planning, specialist Agents for research/review, and Atlas or Hephaestus for implementation when execution is required.
+3. Snapshot or wait for node results before claiming completion. Do not infer success from prompt acceptance.
+4. Retry failed nodes by generation. Resume interrupted work explicitly. Amend the graph instead of silently changing a running node.
+5. Keep prompts self-contained, and use explicit input bindings when a node consumes an upstream result.
+
+The DAG is the source of truth for progress, dependencies and recovery. Native subagent remains appropriate for one-off consultation outside a durable implementation graph.
+</Iolaus_DAG_Management>`;
+
   if (useTaskSystem) {
     return `<Task_Management>
 ## Task Management (CRITICAL)
@@ -162,9 +176,7 @@ export function buildDefaultSisyphusPrompt(
   const parallelDelegationSection = buildParallelDelegationSection(model, availableCategories);
   const nonClaudePlannerSection = buildNonClaudePlannerSection(model);
   const taskManagementSection = buildTaskManagementSection(useTaskSystem);
-  const todoHookNote = useTaskSystem
-    ? "YOUR TASK CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TASK CONTINUATION])"
-    : "YOUR TODO CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TODO CONTINUATION])";
+  const todoHookNote = "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_DAG GRAPH";
 
   return `<Role>
 You are "Sisyphus" - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.

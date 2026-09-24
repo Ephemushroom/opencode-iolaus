@@ -70,9 +70,5 @@ export function buildSisyphusDynamicPromptSections(
 }
 
 function buildTodoHookNote(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return "YOUR TASK CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TASK CONTINUATION])";
-  }
-
-  return "YOUR TODO CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TODO CONTINUATION])";
+  return "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_DAG GRAPH";
 }

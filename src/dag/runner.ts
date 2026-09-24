@@ -36,12 +36,15 @@ export function createOpenCodeDagRunner(ctx: Pick<Context, "session"> & { readon
         location: { directory: ctx.location.directory },
         metadata: { iolaus_dag_node: input.node.id, iolaus_dag_attempt: input.attempt },
       })
-      await ctx.session.prompt({ sessionID: session.id, text: input.prompt, delivery: "steer", resume: true })
+      await ctx.session.prompt({ sessionID: session.id, text: input.prompt, delivery: "queue" })
       return { nodeID: input.node.id, attempt: input.attempt, sessionID: String(session.id) }
     },
     async wait(ref) {
       await ctx.session.wait({ sessionID: ref.sessionID })
+      const session = await ctx.session.get({ sessionID: ref.sessionID })
       const messages = await ctx.session.context({ sessionID: ref.sessionID })
+      if (session.outcome === "failed") throw new Error("Iolaus DAG child session failed")
+      if (session.outcome === "interrupted") throw new Error("Iolaus DAG child session was interrupted")
       return { payload: { text: assistantText(messages) } }
     },
     async cancel(ref) {

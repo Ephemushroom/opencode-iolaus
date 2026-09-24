@@ -66,6 +66,17 @@ export function buildCategorySkillsDelegationGuide(
 > **User-installed skills get PRIORITY.** When in doubt, INCLUDE rather than omit.`
       : ""
 
+  return `### Iolaus DAG Agent Selection
+
+Available categories remain useful as routing metadata, but execution is owned by
+the durable \`iolaus_dag\` graph. Select the exact namespaced Agent, define the
+node prompt and dependencies, and load relevant skills inside the node prompt.
+Use \`snapshot\`/\`wait\` for completion and \`retry\` for a failed generation.
+
+${categoryRows.join("\n")}
+
+${skillsSection}${customPriorityNote}`
+
   return `### Category + Skills Delegation System
 
 **task() combines categories and skills for optimal task execution.**
