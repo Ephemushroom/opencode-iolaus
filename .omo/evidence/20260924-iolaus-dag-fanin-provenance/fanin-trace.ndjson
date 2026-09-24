@@ -1,0 +1,15 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.0.16"}
+{"event":"iolaus.dag.run.started","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"a","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"a","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_f2c20a1e7ffevh15Ps1s3EXvC4"}
+{"event":"iolaus.dag.node.completed","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"a","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"b","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"b","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"hephaestus","model":"openai/gpt-5.5","sessionID":"ses_f2c20a1c2ffczghmr9kzuQ3VGR"}
+{"event":"iolaus.dag.node.completed","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"b","sequence":7}
+{"event":"iolaus.dag.node.ready","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"merge","sequence":8}
+{"event":"iolaus.dag.node.started","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"merge","sequence":9}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_f2c20a1a5ffdnb7j25b9jiAQ9y"}
+{"event":"iolaus.dag.node.completed","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"nodeID":"merge","sequence":10}
+{"event":"iolaus.dag.run.completed","runID":"caf37a23-713b-4973-919b-f4b21eb530bd","generation":1,"sequence":11}

@@ -17,9 +17,27 @@ export type DagNodeStatus =
   | "interrupted"
   | "needs_retry"
 
+/**
+ * Binds an upstream node result into this node's prompt. `node: "*"` expands to
+ * every entry of `dependsOn`, which is the default fan-in shape: a downstream
+ * Agent reads all parallel results with their provenance and synthesises them.
+ */
 export interface DagInputBinding {
   readonly node: string
   readonly field?: string
+}
+
+export interface DagResolvedInput {
+  readonly node: string
+  readonly field: string
+  readonly value: JsonValue
+  readonly provenance: {
+    readonly agent: string
+    readonly model: string
+    readonly attempt: number
+    readonly status: DagResultEnvelope["status"]
+    readonly sessionID: string | null
+  } | null
 }
 
 export interface DagNodeDefinition {

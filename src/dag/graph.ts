@@ -27,6 +27,10 @@ export function validateDefinition(definition: DagDefinition): void {
       if (!nodes.has(dependency)) throw new DagValidationError(`Unknown dependency: ${dependency}`)
     }
     for (const input of node.inputs ?? []) {
+      if (input.node === "*") {
+        if (node.dependsOn.length === 0) throw new DagValidationError(`Fan-in binding "*" requires dependsOn: ${node.id}`)
+        continue
+      }
       if (!nodes.has(input.node)) throw new DagValidationError(`Unknown input node: ${input.node}`)
     }
   }
