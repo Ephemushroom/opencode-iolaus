@@ -3,9 +3,10 @@ import type { Context } from "@opencode/plugin/promise/plugin"
 import type { Options } from "./options"
 import {
   AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, PRIMARY_AGENTS, agentID, categoryID, modeMarker,
-  type AgentName, type CategoryName,
+  type AgentName, type CategoryName, type ModeName,
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
+import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
 import { trace } from "./trace"
 
 const READ_ONLY = new Set<AgentName>(["oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
@@ -104,6 +105,10 @@ export async function registerAgents(
   return plan
 }
 
+export function modeDispatchText(mode: ModeName, task: string): string {
+  return `${modeMarker(mode)}\n${task}`
+}
+
 export async function registerModes(ctx: {
   command: Pick<Context["command"], "transform">
   session: Pick<Context["session"], "prompt">
@@ -112,15 +117,17 @@ export async function registerModes(ctx: {
     for (const mode of options.modes) {
       editor.add({
         name: `iolaus-${mode}`,
-        description: `Apply the retained OMO ${mode} prompt with native OpenCode tools.`,
+        description: DAG_MODE_TEMPLATES[mode]
+          ? `Run the task as the Iolaus "${DAG_MODE_TEMPLATES[mode]}" DAG template under the retained OMO ${mode} prompt.`
+          : `Apply the retained OMO ${mode} prompt with native OpenCode tools.`,
         async execute({ sessionID, prompt, delivery }) {
           await ctx.session.prompt({
             ...prompt,
             sessionID,
-            text: `${modeMarker(mode)}\n${prompt.text ?? ""}`,
+            text: modeDispatchText(mode, prompt.text ?? ""),
             delivery,
           })
-          trace("iolaus.mode.dispatched", { mode, sessionID })
+          trace("iolaus.mode.dispatched", { mode, sessionID, dag: DAG_MODE_TEMPLATES[mode] ?? null })
         },
       })
     }

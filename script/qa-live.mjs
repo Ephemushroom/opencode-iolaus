@@ -79,7 +79,13 @@ const server = http.createServer(async (req, res) => {
      const messageText = (body.input ?? []).filter((item) => item?.type === "message").map((item) => JSON.stringify(item)).join("\n")
      const childNode = active.dag ? (messageText.match(/IOLAUS_DAG_NODE(?:_([A-Z]+))?/) ?? undefined) : undefined
      let text = "IOLAUS_QA_DONE"
-     if (active.template && messageText.includes("You are the reviewer node")) {
+     if (active.template === "ultrawork" && messageText.includes("You are the reviewer node")) {
+       // Scripted loop: round 0 and round 1 fail, round 2 passes.
+       call = undefined
+       text = messageText.includes("Round 2:") ? "All scenarios verified.\nVERDICT: PASS" : "Scenario 3 lacks evidence.\nVERDICT: FAIL"
+     } else if (active.template === "ultrawork" && (messageText.includes("Achieve this goal end to end") || messageText.includes("the reviewer rejected the work"))) {
+       call = undefined; text = messageText.includes("Round 2:") ? "IOLAUS_ULTRAWORK_FIX2" : messageText.includes("Round 1:") ? "IOLAUS_ULTRAWORK_FIX1" : "IOLAUS_ULTRAWORK_WORK"
+     } else if (active.template && messageText.includes("You are the reviewer node")) {
        // Scripted reviewer: first review fails, the re-review passes.
        call = undefined
        text = messageText.includes("This is the revised plan") ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
@@ -112,6 +118,8 @@ const server = http.createServer(async (req, res) => {
            ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: waitingGate, note: "QA approved" } }
          : runID
            ? { name: "iolaus_dag", args: { action: active.template && priorDagResult?.status === "running" ? "snapshot" : "wait", run_id: runID } }
+           : active.template === "ultrawork"
+             ? { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "IOLAUS_ULTRAWORK_TASK", iterations: 3, executor: "iolaus-sisyphus" } } }
            : active.template === "unavailable"
              ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", reviewer: "iolaus-no-such-lane" } } }
            : active.template
@@ -169,6 +177,8 @@ try {
      // plan-review template through the real tool: Prometheus plans, Momus fails once, Prometheus revises, Momus passes, gate, Sisyphus executes.
      { name: "template", enabled: true, agent: "build", dag: true, template: true, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "template-unavailable", enabled: true, agent: "build", dag: true, template: "unavailable", models: { agents: { prometheus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
+     // /iolaus-ultrawork is a DAG mode: the command text tells the primary to create the ultrawork template; the loop runs three rounds.
+     { name: "ultrawork-dag", enabled: true, agent: "build", dag: true, mode: "ultrawork", template: "ultrawork", models: { agents: { momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
      { name: "astgrep-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.search({ pattern: "console.log($A)", language: "typescript", paths: ["src"] }); return { ok: r.ok, count: r.matches.length, lines: r.matches.map((m) => m.path + ":" + m.range.start.line), first: r.matches[0].metavariables.single.A }' },
@@ -213,7 +223,8 @@ try {
     }
     await check(`${scenario.name}: live session`, async () => {
       const args = ["run", "--standalone", "--auto", "--print-logs", "--agent", scenario.agent, "--model", "openai/gpt-5.5"]
-       args.push(scenario.mode ? `/iolaus-${scenario.mode} Read fixture.txt and report the result.`
+       args.push(scenario.template === "ultrawork" ? `/iolaus-ultrawork IOLAUS_ULTRAWORK_TASK`
+         : scenario.mode ? `/iolaus-${scenario.mode} Read fixture.txt and report the result.`
          : scenario.dag ? "Run an Iolaus DAG and report the completed node result."
          : scenario.nativeRead ? "Read fixture.txt and report the result." : "Return IOLAUS_QA_DONE.")
       const result = await run(scenario.name,args,fixture)
@@ -221,7 +232,7 @@ try {
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
        assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
-       assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
+       assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), Boolean(scenario.mode))
        if (scenario.dag && scenario.template !== "unavailable") {
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.completed"), "DAG node did not complete")
@@ -338,6 +349,29 @@ try {
          assert.ok(created, "create with template returned no run")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "iolaus-prometheus")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").model, "openai/gpt-5.5", "plan node did not get the configured Prometheus model")
+       }
+       if (scenario.template === "ultrawork") {
+         // `opencode run "/iolaus-ultrawork ..."` resolves the command client-side, so the plugin command's execute (and its
+         // dispatched trace) is not involved; the context hook is what makes the mode a DAG, and its trace carries `dag`.
+         const commanding = captured.find((r) => r.instructions.includes('<iolaus-mode-dag template="ultrawork">'))
+         assert.ok(commanding, "commanding session's system prompt lacks the mode DAG instruction")
+         const children = captured.filter((r) => JSON.parse(r.input).some((item) => item?.type === "message" && JSON.stringify(item).includes("<iolaus-dag-child>")))
+         assert.ok(children.length >= 3, "DAG worker children were not prompted with the child marker")
+         assert.ok(children.every((r) => !r.instructions.includes("<iolaus-mode-dag")), "a DAG worker child was told to create another run")
+         assert.ok(children.every((r) => r.instructions.includes("ULTRAWORK")), "DAG worker children did not get the ultrawork prompt")
+         const order = traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.nodeID)
+         assert.deepEqual(order, ["work", "review", "fix1", "review1", "fix2", "review2"], `loop rounds ran out of order: ${order}`)
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.waiting" && t.nodeID === "accept"), "loop did not reach the accept gate after the passing round")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.approved" && t.nodeID === "accept"), "accept gate was not approved")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.run.completed"), "ultrawork run did not complete")
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const texts = captured.map(messageText)
+         const work = texts.find((t) => t.includes("Achieve this goal end to end"))
+         assert.ok((work ?? "").includes("<iolaus-mode:ultrawork>"), "work child prompt lacks the ultrawork marker")
+         assert.ok(traces.some((t) => t.event === "iolaus.mode.rendered" && t.dag === "ultrawork"), "commanding session did not render the DAG instruction")
+         assert.ok(traces.filter((t) => t.event === "iolaus.mode.rendered" && t.dag === null).length >= 3, "ultrawork prompt was not rendered for the loop's worker children")
+         const fix2 = texts.find((t) => t.includes("Round 2: the reviewer rejected"))
+         assert.ok(fix2 && fix2.includes("IOLAUS_ULTRAWORK_FIX1") && fix2.includes("Scenario 3 lacks evidence"), "fix2 prompt lacks the previous fix and review inputs")
        }
        if (scenario.template === "unavailable") {
          const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))

@@ -6,6 +6,7 @@ import { agentMarker, categoryMarker } from "./registration"
 import { bindNative, renderAgent, renderCategory, renderMode } from "./prompts/render"
 import { categorizeTools } from "./omo/agents"
 import { trace } from "./trace"
+import { DAG_CHILD_MARKER, DAG_MODE_TEMPLATES, modeDagInstruction } from "./prompts/mode-dag"
 
 export function lastUserText(messages: SessionContext["messages"]): string {
   for (const message of [...messages].reverse()) {
@@ -72,7 +73,9 @@ export async function composeContext(
   }
   if (selectedMode) {
     const removed = dropNativeDefaultPrompt(event.system)
-    event.system.push({ type: "text", text: bindNative(renderMode(selectedMode, model, name)) })
-    trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID, nativePromptRemoved: removed })
+    const child = lastUserText(event.messages).includes(DAG_CHILD_MARKER)
+    const instruction = child ? undefined : modeDagInstruction(selectedMode)
+    event.system.push({ type: "text", text: bindNative(`${renderMode(selectedMode, model, name)}${instruction ? `\n\n${instruction}` : ""}`) })
+    trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID, nativePromptRemoved: removed, dag: instruction ? DAG_MODE_TEMPLATES[selectedMode] : null })
   }
 }
