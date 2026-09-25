@@ -79,6 +79,19 @@ runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
   condition marks the node `skipped` without blocking dependents. Human gates
   are `kind: "gate"` nodes that pause the run in `waiting_approval` until
   `approve`/`reject`; only the user decides a gate.
+- Routing is fail-closed. `applyDefaultModels` rejects a definition at
+  create/amend with `model_unavailable: no configured model for <node> (<lane>)`
+  when an agent node names no `model` and its lane resolves to none; no run is
+  stored. The scheduler re-scans the frontier after a skip or block settles in
+  the same pass, so a node behind a skipped branch is not left pending.
+- `src/dag/templates.ts` expands `iolaus_dag` action `template` (or `create`
+  with `template` and no `definition`) into ordinary definitions. `plan-review`:
+  `plan` (iolaus-prometheus) → `review` (iolaus-momus) → `revise` when the review
+  ends `VERDICT: FAIL` → `rereview` → `approve` gate → `execute` (default
+  iolaus-sisyphus). `goal-review`: `work` (default iolaus-hephaestus) → `review`
+  → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
+  and `maxAttempts` are overrides. The four primaries orchestrate through the
+  same tool, so templates are the shared shape, not agent-specific prompts.
 - The DAG sidebar is implemented through the `./tui` export and typed RPC
   snapshot/events, including approve/reject/cancel/retry RPC methods.
   Interactive sidebar controls are a planned follow-up. Do not claim a feature

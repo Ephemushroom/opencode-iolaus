@@ -135,10 +135,12 @@ test("DAG nodes without a model receive the configured lane model at create time
   const definition = applyDefaultModels({ schemaVersion: 1, name: "t", nodes: [
     { id: "a", agent: "iolaus-quick", prompt: "p", dependsOn: [] },
     { id: "b", agent: "iolaus-oracle", model: "openai/gpt-5.5", prompt: "p", dependsOn: [] },
-    { id: "c", agent: "build", prompt: "p", dependsOn: [] },
+    { id: "c", agent: "build", model: "openai/gpt-5.5", prompt: "p", dependsOn: [] },
     { id: "g", kind: "gate", prompt: "ok?", dependsOn: [] },
   ] }, defaultModel)
-  expect(definition.nodes.map((node) => node.model)).toEqual(["openai/gpt-6-luna-fast#low", "openai/gpt-5.5", undefined, undefined])
+  expect(definition.nodes.map((node) => node.model)).toEqual(["openai/gpt-6-luna-fast#low", "openai/gpt-5.5", "openai/gpt-5.5", undefined])
   expect(() => validateDefinition(definition)).not.toThrow()
+  // Fail-closed: a lane with no configured model and no explicit model is rejected before the run exists.
+  expect(() => applyDefaultModels({ schemaVersion: 1, name: "t", nodes: [{ id: "c", agent: "build", prompt: "p", dependsOn: [] }] }, defaultModel)).toThrow(/model_unavailable.*c \(build\)/)
   expect(() => validateDefinition({ schemaVersion: 1, name: "t", nodes: [{ id: "x", agent: "build", model: "gpt-5.5", prompt: "p", dependsOn: [] }] })).toThrow(DagValidationError)
 })
