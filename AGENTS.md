@@ -92,6 +92,20 @@ runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
   → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
   and `maxAttempts` are overrides. The four primaries orchestrate through the
   same tool, so templates are the shared shape, not agent-specific prompts.
+- `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
+  session that received `/iolaus-ultrawork` or `/iolaus-hyperplan` gets the OMO
+  mode prompt plus an `<iolaus-mode-dag>` block telling it to `create` the
+  matching template and `wait`; a paused gate is the user's decision. The
+  `ultrawork` template unrolls the loop as `work` → `review` → `fix<n>` →
+  `review<n>` guarded by the previous verdict (up to `iterations`, default 3),
+  then an `accept` gate; worker prompts carry the ultrawork marker plus
+  `<iolaus-dag-child>`, which suppresses the DAG block so a child does the work
+  instead of spawning another run. `hyperplan` fans `members` (default the
+  four category lanes) through analyse → cross-attack → defend, then Metis
+  distills, Prometheus plans, Momus reviews, gate. `team` remains a prompt-only
+  mode. `opencode run "/iolaus-<mode> ..."` resolves the command client-side, so
+  the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
+  context hook is what makes the mode a DAG.
 - The DAG sidebar is implemented through the `./tui` export and typed RPC
   snapshot/events, including approve/reject/cancel/retry RPC methods.
   Interactive sidebar controls are a planned follow-up. Do not claim a feature

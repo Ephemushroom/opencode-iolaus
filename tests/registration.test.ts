@@ -3,7 +3,7 @@ import { Agent, Model } from "@opencode/plugin"
 import type { AgentEditor } from "@opencode/plugin/promise/agent"
 import type { SessionContext } from "@opencode/plugin/promise/session"
 import { Session } from "@opencode/schema/session"
-import { registerAgents, agentMarker } from "../src/registration"
+import { registerAgents, agentMarker, modeDispatchText } from "../src/registration"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
@@ -98,7 +98,9 @@ test("mode requires explicit marker and resets with the next user request", asyn
   const event = context("build")
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
   await composeContext(event, catalogs, parseOptions({}))
-  expect(event.system.at(-1)?.text).toBe(bindNative(renderMode("ultrawork", "openai/gpt-5.5")))
+  const { modeDagInstruction } = await import("../src/prompts/mode-dag")
+  const ultraworkSystem = bindNative(`${renderMode("ultrawork", "openai/gpt-5.5")}\n\n${modeDagInstruction("ultrawork")}`)
+  expect(event.system.at(-1)?.text).toBe(ultraworkSystem)
   const next = context("build")
   next.messages = [...event.messages, { role: "user", content: [{ type: "text", text: "A different request" }] }]
   const before = structuredClone(next)
@@ -122,7 +124,8 @@ test("mode dispatch drops the native default prompt and keeps env, tool catalog 
   expect(texts[0]).toBe("# Your Model\n- Name: GPT-5.5")
   expect(texts[1]).toContain("# Code Mode")
   expect(texts[2]).toContain("project guidance")
-  expect(texts.at(-1)).toBe(bindNative(renderMode("ultrawork", "openai/gpt-5.5")))
+  const { modeDagInstruction } = await import("../src/prompts/mode-dag")
+  expect(texts.at(-1)).toBe(bindNative(`${renderMode("ultrawork", "openai/gpt-5.5")}\n\n${modeDagInstruction("ultrawork")}`))
   expect(event.system).toHaveLength(4)
 })
 
@@ -132,4 +135,16 @@ test("omitted agent and mode selections disable their context paths", async () =
   const before = structuredClone(event)
   await composeContext(event, catalogs, parseOptions({ agents: [], modes: [] }))
   expect(event).toEqual(before)
+})
+
+test("ultrawork and hyperplan render a DAG instruction for the commanding session but not for DAG children", async () => {
+  const { modeDagInstruction, DAG_CHILD_MARKER } = await import("../src/prompts/mode-dag")
+  const { expandTemplate } = await import("../src/dag/templates")
+  expect(modeDagInstruction("ultrawork")).toContain('"template": "ultrawork"')
+  expect(modeDagInstruction("hyperplan")).toContain('"template": "hyperplan"')
+  expect(modeDagInstruction("team")).toBeUndefined()
+  const work = expandTemplate({ template: "ultrawork", task: "t" }).nodes.find((n) => n.id === "work")!
+  expect(work.prompt.startsWith(`${modeMarker("ultrawork")}\n${DAG_CHILD_MARKER}`)).toBe(true)
+  expect(explicitMode(work.prompt)).toBe("ultrawork")
+  expect(modeDispatchText("ultrawork", "x")).toBe(`${modeMarker("ultrawork")}\nx`)
 })
