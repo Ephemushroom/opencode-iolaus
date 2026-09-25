@@ -117,9 +117,12 @@ const server = http.createServer(async (req, res) => {
                  { id: "b", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
                  { id: "merge", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
              : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
-     } else if (active.astGrep && tools.includes("execute")) {
-       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
-       call = done ? undefined : { name: "execute", args: { code: active.astGrep } }
+     } else if ((active.astGrep || active.code) && tools.includes("execute")) {
+       const outputs = (body.input ?? []).filter((item) => item?.type === "function_call_output")
+       // Remote MCP servers connect asynchronously after startup; retry until their tools are in the catalog.
+       const pending = active.mcps && outputs.length && outputs.length < 8 && String(outputs.at(-1).output).includes("Unknown tool")
+       if (pending) await new Promise((done) => setTimeout(done, 2000))
+       call = outputs.length && !pending ? undefined : { name: "execute", args: { code: active.astGrep ?? active.code } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
@@ -146,6 +149,10 @@ try {
        astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied, planned: r.counts ? r.counts.plannedMatches : null, code: r.error ? r.error.code : null }' },
      { name: "astgrep-deny", enabled: true, agent: "iolaus-prometheus", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied === true, code: r.error ? r.error.code : null }' },
+     // Live network: both built-in remote MCP servers answer real read-only queries.
+     { name: "mcps-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, mcps: ["context7", "grep_app"],
+       code: 'const found = search({ query: "context7 grep_app", limit: 20 }).items.map((i) => i.path).filter((p) => p.includes("context7") || p.includes("grep_app")).sort(); const lib = await tools.context7["resolve-library-id"]({ libraryName: "react", query: "useEffect cleanup" }); const code = await tools.grep_app.searchGitHub({ query: "useEffect(() => {", language: ["TypeScript", "TSX"] }); const text = JSON.stringify(code); return { found, lib: JSON.stringify(lib).slice(0, 300), grepHit: text.includes("useEffect(() => {"), code: text.slice(0, 300) }' },
+     { name: "mcps-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, code: 'return Object.keys(tools)' },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -156,7 +163,7 @@ try {
     const env = { PATH: process.env.PATH, TMPDIR: sandbox, HOME: home, USERPROFILE: home, PWD: project,
       XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(home,"data"), XDG_CACHE_HOME: join(home,"cache"), XDG_STATE_HOME: join(home,"state"),
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key" }
-    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, ...(scenario.models ? { models: scenario.models } : {}) } }],
+    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.models ? { models: scenario.models } : {}) } }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
@@ -229,6 +236,32 @@ try {
            assert.match(out, /"code": "PERMISSION_DENIED"/, `planner write outside plans was not denied: ${out}`)
            assert.equal(source, AST_GREP_FIXTURE, "denied rewrite modified the file")
            assert.ok(calls.some((t) => t.tool === "rewrite" && !t.ok && t.code === "PERMISSION_DENIED"), "deny call trace missing")
+         }
+       }
+       if (scenario.code) {
+         const withTools = captured.filter((r) => r.tools.includes("execute"))
+         assert.ok(withTools.length, "execute was not offered to the agent")
+         const catalog = withTools.at(-1).instructions.slice(withTools.at(-1).instructions.indexOf("# Code Mode"))
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+         assert.ok(outputs.length, "execute returned no output to the model")
+         const out = outputs.at(-1)
+         const registered = traces.find((t) => t.event === "iolaus.mcp.registered")
+         if (scenario.name === "mcps-librarian") {
+           assert.deepEqual(registered?.registered, ["context7", "grep_app"], "built-in MCP servers were not registered")
+           // The system-prompt catalog is rendered once per session, before remote servers finish connecting,
+           // so the runtime catalog (Code Mode `search`) is the authority for MCP namespaces.
+           assert.match(out, /tools\.context7\[\\?"query-docs\\?"\]/, `context7 query-docs missing from runtime catalog: ${out}`)
+           assert.match(out, /tools\.context7\[\\?"resolve-library-id\\?"\]/, `context7 resolve-library-id missing from runtime catalog: ${out}`)
+           assert.match(out, /tools\.grep_app\.searchGitHub/, `grep_app.searchGitHub missing from runtime catalog: ${out}`)
+           assert.match(out, /\/reactjs\/react\.dev|\/facebook\/react|\/websites\/react_dev/i, `context7 did not resolve react: ${out}`)
+           assert.match(out, /"grepHit": true/, `grep_app returned no useEffect match: ${out}`)
+           assert.ok(!out.includes("No results found"), `grep_app returned no results: ${out}`)
+           assert.ok(!out.includes("PERMISSION_DENIED") && !out.includes("permission"), `MCP call was denied for librarian: ${out}`)
+         }
+         if (scenario.name === "mcps-off") {
+           assert.equal(registered, undefined, "mcps: [] must not register servers")
+           assert.ok(!catalog.includes("context7") && !catalog.includes("grep_app"), "disabled MCP namespaces leaked into the catalog")
+           assert.ok(!out.includes("context7") && !out.includes("grep_app"), `disabled MCP namespaces leaked into tools: ${out}`)
          }
        }
        if (scenario.lanes) {

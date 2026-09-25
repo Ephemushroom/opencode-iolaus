@@ -54,6 +54,8 @@ planned follow-up.
 
 When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or `{ "astGrep": false }` to turn the tools off.
 
+Iolaus also registers two remote MCP servers from upstream OMO: `context7` (official library documentation, `https://mcp.context7.com/mcp`; set `CONTEXT7_API_KEY` for higher rate limits) and `grep_app` (regex code search across public GitHub repositories, `https://mcp.grep.app`, no account). Queries sent to those tools leave your machine. Their tools appear in Code Mode as `tools.context7[...]` and `tools.grep_app.searchGitHub`, and read-only specialists such as the librarian may call them. A server you define yourself under the same name is left untouched. Pass `{ "mcps": [] }` to register neither, or `{ "mcps": ["context7"] }` to pick one.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.

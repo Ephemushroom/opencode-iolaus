@@ -4,7 +4,8 @@ Iolaus is an OpenCode 2 plugin with OMO-derived Agent prompts, explicit modes,
 model-family selection, a local durable DAG runtime, and structural code tools.
 Native OpenCode remains the owner of general tools, permissions, sessions, and
 skill discovery; Iolaus owns its `iolaus_dag` orchestration tool and child-session
-runner, and the `ast_grep` Code Mode namespace.
+runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
+`grep_app` remote MCP registrations.
 
 ## Boundaries
 
@@ -36,6 +37,18 @@ runner, and the `ast_grep` Code Mode namespace.
   Plugin tools cannot raise permission prompts, so writes re-check `edit` on
   every previewed file and paths outside the session directory re-check
   `external_directory`; only an explicit `allow` passes.
+- `src/mcp.ts` registers the remote MCP servers `context7`
+  (`mcp.context7.com`, `CONTEXT7_API_KEY` optional) and `grep_app`
+  (`mcp.grep.app`, anonymous) through `ctx.mcp.transform`, skipping any name
+  the user already defines. The `mcps` option selects them; `[]` disables both.
+  Their tools enter Code Mode as `tools.context7["resolve-library-id"]`,
+  `tools.context7["query-docs"]` and `tools.grep_app.searchGitHub`; read-only
+  specialists carry `context7_*` and `grep_app_*` allows. Upstream's
+  `websearch` (host has native websearch) and `lsp` are not registered; the
+  native binding maps inherited `lsp_*` names to the project's type checker,
+  tests and `ast_grep`. Remote servers connect after startup, so the
+  system-prompt catalog rendered for the first turn may lag; the runtime
+  `search()` catalog is the authority.
 - DAG nodes execute through native OpenCode child sessions using the registered
   Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`, `iolaus-prometheus`,
   `iolaus-atlas`, the specialists, or a category lane `iolaus-<category>`

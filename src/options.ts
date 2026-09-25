@@ -1,3 +1,4 @@
+import { MCP_NAMES, type McpName } from "./mcp"
 import { AGENT_NAMES, CATEGORY_NAMES, MODE_NAMES, type AgentName, type CategoryName, type ModeName } from "./prompts/catalog"
 
 export interface Options {
@@ -7,6 +8,8 @@ export interface Options {
   modes: ModeName[]
   /** Register the `ast_grep` Code Mode tools when an ast-grep binary is available. */
   astGrep: boolean
+  /** Built-in remote MCP servers to register unless the user already defines the same name. `[]` disables them. */
+  mcps: McpName[]
   /** Inline models config, merged after `.iolaus/models.json` layers. */
   models?: unknown
 }
@@ -20,7 +23,7 @@ function selection<T extends string>(value: unknown, allowed: readonly T[], name
 }
 
 export function parseOptions(input: Record<string, unknown>): Options {
-  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep"].includes(key))
+  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps"].includes(key))
   if (unknown.length) throw new TypeError(`Unknown Iolaus options: ${unknown.join(", ")}`)
   if (input.enabled !== undefined && typeof input.enabled !== "boolean") {
     throw new TypeError("Iolaus enabled must be a boolean")
@@ -34,6 +37,7 @@ export function parseOptions(input: Record<string, unknown>): Options {
     categories: selection(input.categories, CATEGORY_NAMES, "categories"),
     modes: selection(input.modes, MODE_NAMES, "modes"),
     astGrep: input.astGrep !== false,
+    mcps: selection(input.mcps, MCP_NAMES, "mcps"),
     ...(input.models === undefined ? {} : { models: input.models }),
   }
 }
