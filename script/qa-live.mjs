@@ -2,7 +2,7 @@ import assert from "node:assert/strict"
 import { spawn, execFileSync } from "node:child_process"
 import { createHash } from "node:crypto"
 import { once } from "node:events"
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, appendFileSync } from "node:fs"
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync, appendFileSync, symlinkSync } from "node:fs"
 import http from "node:http"
 import { homedir, tmpdir } from "node:os"
 import { dirname, join, resolve } from "node:path"
@@ -74,7 +74,7 @@ const server = http.createServer(async (req, res) => {
     const record = { scenario: active.name, model: body.model, reasoning: body.reasoning ?? null, service_tier: body.service_tier ?? null, tools, input, instructions: body.instructions }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
-    assert.ok(requests.length < 60, "Unexpected model loop")
+    assert.ok(requests.length < 120, "Unexpected model loop")
      let call
      const messageText = (body.input ?? []).filter((item) => item?.type === "message").map((item) => JSON.stringify(item)).join("\n")
      const childNode = active.dag ? (messageText.match(/IOLAUS_DAG_NODE(?:_([A-Z]+))?/) ?? undefined) : undefined
@@ -123,12 +123,20 @@ const server = http.createServer(async (req, res) => {
        const pending = active.mcps && outputs.length && outputs.length < 8 && String(outputs.at(-1).output).includes("Unknown tool")
        if (pending) await new Promise((done) => setTimeout(done, 2000))
        call = outputs.length && !pending ? undefined : { name: "execute", args: { code: active.astGrep ?? active.code } }
+     } else if (active.verify && (tools.includes("patch") || tools.includes("edit"))) {
+       // GPT model IDs get apply_patch (`patch`) instead of edit/write; drive whichever the host offers.
+       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
+       const replacement = "const x: number = \"one\" // changed as requested by the user"
+       call = done ? undefined : tools.includes("patch")
+         ? { name: "patch", args: { patchText: `*** Begin Patch\n*** Update File: src/a.ts\n@@\n-const x = 1\n+${replacement}\n*** End Patch` } }
+         : { name: "edit", args: { filePath: "src/a.ts", oldString: "const x = 1", newString: replacement } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
     res.end("data: [DONE]\n\n")
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
 })
+const TSC_BIN = join(root, "node_modules", ".bin", "tsc")
 const AST_GREP_FIXTURE = "console.log(add(1, 2))\nconsole.log(\"hello\")\nconst x = 1\n"
 let after
 try {
@@ -153,6 +161,9 @@ try {
      { name: "mcps-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, mcps: ["context7", "grep_app"],
        code: 'const found = search({ query: "context7 grep_app", limit: 20 }).items.map((i) => i.path).filter((p) => p.includes("context7") || p.includes("grep_app")).sort(); const lib = await tools.context7["resolve-library-id"]({ libraryName: "react", query: "useEffect cleanup" }); const code = await tools.grep_app.searchGitHub({ query: "useEffect(() => {", language: ["TypeScript", "TSX"] }); const text = JSON.stringify(code); return { found, lib: JSON.stringify(lib).slice(0, 300), grepHit: text.includes("useEffect(() => {"), code: text.slice(0, 300) }' },
      { name: "mcps-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, code: 'return Object.keys(tools)' },
+     // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
+     { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
+     { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
   ]) {
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
@@ -163,12 +174,18 @@ try {
     const env = { PATH: process.env.PATH, TMPDIR: sandbox, HOME: home, USERPROFILE: home, PWD: project,
       XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(home,"data"), XDG_CACHE_HOME: join(home,"cache"), XDG_STATE_HOME: join(home,"state"),
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key" }
-    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.models ? { models: scenario.models } : {}) } }],
+    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) } }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
     writeFileSync(join(project,"fixture.txt"), "IOLAUS_QA_NATIVE_READ_RESULT\n")
     if (scenario.astGrep) { mkdirSync(join(project, "src")); writeFileSync(join(project, "src", "a.ts"), AST_GREP_FIXTURE) }
+    if (scenario.verify) {
+      mkdirSync(join(project, "src")); writeFileSync(join(project, "src", "a.ts"), "const x = 1\nexport default x\n")
+      writeFileSync(join(project, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, noEmit: true, types: [] }, include: ["src"] }))
+      mkdirSync(join(project, "node_modules", ".bin"), { recursive: true })
+      symlinkSync(TSC_BIN, join(project, "node_modules", ".bin", "tsc"))
+    }
     const fixture = { project, env }
     writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY")) },null,2))
     if (scenario.name === "native") {
@@ -305,6 +322,27 @@ try {
          assert.equal(inputs[1].value, null, "Skipped branch should bind null")
        }
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
+      if (scenario.verify) {
+        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+        assert.ok(outputs.length, `mutation returned no output to the model (tools: ${captured.at(-1)?.tools})`)
+        const out = outputs.at(-1)
+        const source = readFileSync(join(fixture.project, "src", "a.ts"), "utf8")
+        assert.ok(source.includes('const x: number = "one"'), "edit was not applied")
+        assert.equal(traces.some((t) => t.event === "iolaus.verify.registered" && t.enabled), scenario.verify === "tsc")
+        if (scenario.verify === "tsc") {
+          const ran = traces.find((t) => t.event === "iolaus.verify.ran")
+          assert.ok(ran, `verify hook did not run: ${JSON.stringify(traces.filter((t) => String(t.event).startsWith("iolaus.verify")))}`)
+          assert.deepEqual(ran.paths, ["src/a.ts"])
+          assert.ok(ran.checkers.some((c) => c.name === "tsc" && !c.ok && c.diagnostics === 1), `tsc did not report the changed file: ${JSON.stringify(ran.checkers)}`)
+          assert.equal(ran.comments, 1)
+          assert.ok(out.includes("[iolaus verify] 2 issues"), `verification report missing from tool result: ${out}`)
+          assert.ok(out.includes("tsc: src/a.ts:1") && out.includes("TS2322"), `tsc diagnostic missing: ${out}`)
+          assert.ok(out.includes("comment-check: src/a.ts:1"), `comment diagnostic missing: ${out}`)
+        } else {
+          assert.ok(!traces.some((t) => String(t.event).startsWith("iolaus.verify.ran")), "verify ran while disabled")
+          assert.ok(!out.includes("[iolaus verify]"), `disabled verify still appended a report: ${out}`)
+        }
+      }
     })
   }
 } finally {

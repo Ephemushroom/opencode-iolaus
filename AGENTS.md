@@ -49,6 +49,16 @@ runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
   tests and `ast_grep`. Remote servers connect after startup, so the
   system-prompt catalog rendered for the first turn may lag; the runtime
   `search()` catalog is the authority.
+- `src/verify/` hooks `tool.hook("execute.after")` for `edit`, `write` and
+  `patch`. After a completed mutation it runs the project's checkers on the
+  changed files and appends only their diagnostics, plus request-narrating
+  comments, to the tool result. Checkers come from `.iolaus/verify.json`
+  (`checkers[].argv` run via execFile, no shell; `timeoutMs`; `commentPattern`
+  or `null`), from the plugin `verify` option as an inline object, or, when
+  neither exists, `tsc --noEmit` if `tsconfig.json` is present. `verify: false`
+  or `{checkers: [], commentPattern: null}` disables it. Hook failures never
+  fail the edit. GPT model IDs get `patch` instead of `edit`/`write`; paths are
+  taken from `*** Update/Add File:` headers as well as `filePath`/`path`.
 - DAG nodes execute through native OpenCode child sessions using the registered
   Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`, `iolaus-prometheus`,
   `iolaus-atlas`, the specialists, or a category lane `iolaus-<category>`

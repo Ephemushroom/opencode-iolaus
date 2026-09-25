@@ -56,6 +56,8 @@ When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to Ope
 
 Iolaus also registers two remote MCP servers from upstream OMO: `context7` (official library documentation, `https://mcp.context7.com/mcp`; set `CONTEXT7_API_KEY` for higher rate limits) and `grep_app` (regex code search across public GitHub repositories, `https://mcp.grep.app`, no account). Queries sent to those tools leave your machine. Their tools appear in Code Mode as `tools.context7[...]` and `tools.grep_app.searchGitHub`, and read-only specialists such as the librarian may call them. A server you define yourself under the same name is left untouched. Pass `{ "mcps": [] }` to register neither, or `{ "mcps": ["context7"] }` to pick one.
 
+After every `edit`, `write` or `patch`, Iolaus verifies the changed files and appends the findings to the tool result the agent sees: type or lint errors located in those files, and comments that narrate the request instead of the code ("as requested by the user"). Without configuration a project with `tsconfig.json` gets `tsc --noEmit`. Put `.iolaus/verify.json` in the project to choose checkers, for example `{ "checkers": [{ "name": "biome", "argv": ["bunx", "biome", "check", "."], "extensions": [".ts", ".tsx"] }], "timeoutMs": 60000 }`. Commands run without a shell. Set the plugin option `"verify": false` to turn it off.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.

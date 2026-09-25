@@ -2,6 +2,7 @@ import { Agent, Plugin } from "@opencode/plugin"
 import { parseOptions } from "./options"
 import { registerAgents, registerModes } from "./registration"
 import { registerMcps } from "./mcp"
+import { registerVerifyHook } from "./verify/hook"
 import { composeContext } from "./context"
 import { trace } from "./trace"
 import { createDagController } from "./dag/controller"
@@ -62,6 +63,17 @@ export default Plugin.define({
         for (const tool of tools) editor.add(tool)
       })
     }
+    if (options.verify !== false) {
+      await registerVerifyHook(ctx, {
+        async directory(sessionID) {
+          const session = await ctx.session.get({ sessionID: sessionID as never })
+          return String(session.location?.directory ?? ctx.location.directory)
+        },
+        trace,
+        ...(typeof options.verify === "object" ? { inline: options.verify } : {}),
+      })
+    }
+    trace("iolaus.verify.registered", { enabled: options.verify !== false, inline: typeof options.verify === "object" })
     rpcRegistration = await registerDagRpc(ctx, controller)
     return async () => { controller.close(); await rpcRegistration?.dispose() }
   },
