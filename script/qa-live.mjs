@@ -79,7 +79,15 @@ const server = http.createServer(async (req, res) => {
      const messageText = (body.input ?? []).filter((item) => item?.type === "message").map((item) => JSON.stringify(item)).join("\n")
      const childNode = active.dag ? (messageText.match(/IOLAUS_DAG_NODE(?:_([A-Z]+))?/) ?? undefined) : undefined
      let text = "IOLAUS_QA_DONE"
-     if (childNode) {
+     if (active.template && messageText.includes("You are the reviewer node")) {
+       // Scripted reviewer: first review fails, the re-review passes.
+       call = undefined
+       text = messageText.includes("This is the revised plan") ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
+     } else if (active.template && (messageText.includes("Write the work plan") || messageText.includes("The reviewer rejected the plan"))) {
+       call = undefined; text = messageText.includes("rejected") ? "IOLAUS_PLAN_V2" : "IOLAUS_PLAN_V1"
+     } else if (active.template && messageText.includes("Execute the approved plan")) {
+       call = undefined; text = "IOLAUS_EXECUTED"
+     } else if (childNode) {
        call = undefined
        if (childNode[1] === "REVIEW") text = "IOLAUS_ROUTE_VERDICT_PASS"
        else if (childNode[1] === "QUICK" || childNode[1] === "ORACLE") text = `IOLAUS_LANE_RESULT_${childNode[1]}`
@@ -91,15 +99,23 @@ const server = http.createServer(async (req, res) => {
        if (typeof priorOutput === "string") {
          try {
            priorDagResult = JSON.parse(priorOutput)
+           if (priorDagResult?.run && priorDagResult?.events) priorDagResult = priorDagResult.run
            runID = priorDagResult?.runID
          } catch {}
        }
-       call = priorDagResult?.status === "completed" || priorDagResult?.status === "failed"
+       // wait() blocks until a terminal state, so a run that pauses at a gate after work is observed through snapshot.
+       if (active.template && runID && priorDagResult?.status === "running") await new Promise((done) => setTimeout(done, 1500))
+       const waitingGate = priorDagResult?.nodes?.find?.((n) => n.status === "waiting_approval")?.definition?.id ?? "gate"
+       call = priorDagResult?.status === "completed" || priorDagResult?.status === "failed" || priorDagResult?.error
          ? undefined
          : runID && priorDagResult?.status === "paused"
-           ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: "gate", note: "QA approved" } }
+           ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: waitingGate, note: "QA approved" } }
          : runID
-           ? { name: "iolaus_dag", args: { action: "wait", run_id: runID } }
+           ? { name: "iolaus_dag", args: { action: active.template && priorDagResult?.status === "running" ? "snapshot" : "wait", run_id: runID } }
+           : active.template === "unavailable"
+             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", reviewer: "iolaus-no-such-lane" } } }
+           : active.template
+             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", executor: "iolaus-sisyphus" } } }
            : active.lanes
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA lanes", maxParallel: 2, nodes: [
                  { id: "quick", agent: "iolaus-quick", prompt: "IOLAUS_DAG_NODE_QUICK", dependsOn: [] },
@@ -150,6 +166,9 @@ try {
      { name: "dag", enabled: true, agent: "build", dag: true },
      { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
      { name: "route", enabled: true, agent: "build", dag: true, route: true },
+     // plan-review template through the real tool: Prometheus plans, Momus fails once, Prometheus revises, Momus passes, gate, Sisyphus executes.
+     { name: "template", enabled: true, agent: "build", dag: true, template: true, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
+     { name: "template-unavailable", enabled: true, agent: "build", dag: true, template: "unavailable", models: { agents: { prometheus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
      { name: "astgrep-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.search({ pattern: "console.log($A)", language: "typescript", paths: ["src"] }); return { ok: r.ok, count: r.matches.length, lines: r.matches.map((m) => m.path + ":" + m.range.start.line), first: r.matches[0].metavariables.single.A }' },
@@ -201,9 +220,9 @@ try {
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || Boolean(scenario.dag))
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), scenario.name === "mode")
-       if (scenario.dag) {
+       if (scenario.dag && scenario.template !== "unavailable") {
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.completed"), "DAG node did not complete")
        }
@@ -300,6 +319,31 @@ try {
          const finalWait = captured.map((r) => r.input).find((input) => input.includes("IOLAUS_LANE_RESULT_QUICK") && input.includes("openai/gpt-6-luna-fast#low"))
          assert.ok(finalWait, "DAG result did not record the lane model in provenance")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 2)
+       }
+       if (scenario.template === true) {
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const texts = captured.map(messageText)
+         const order = traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.nodeID)
+         assert.deepEqual(order.slice(0, 4), ["plan", "review", "revise", "rereview"], `template nodes ran out of order: ${order}`)
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.waiting" && t.nodeID === "approve"), "gate did not wait after the passing re-review")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.approved" && t.nodeID === "approve"), "gate was not approved")
+         assert.ok(order.includes("execute"), "executor did not run after approval")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.run.completed"), "template run did not complete")
+         const revise = texts.find((text) => text.includes("The reviewer rejected the plan"))
+         assert.ok(revise && revise.includes("IOLAUS_PLAN_V1") && revise.includes("Step 2 has no verification"), "revise prompt lacks plan and review inputs")
+         const execute = texts.find((text) => text.includes("Execute the approved plan"))
+         assert.ok(execute && execute.includes("IOLAUS_PLAN_V2"), "execute prompt lacks the revised plan")
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))
+         const created = outputs.map((o) => { try { return JSON.parse(o) } catch { return null } }).find((o) => o?.runID && o?.definition)
+         assert.ok(created, "create with template returned no run")
+         assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "iolaus-prometheus")
+         assert.equal(created.definition.nodes.find((n) => n.id === "plan").model, "openai/gpt-5.5", "plan node did not get the configured Prometheus model")
+       }
+       if (scenario.template === "unavailable") {
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))
+         assert.ok(outputs.length, "create returned nothing")
+         assert.match(outputs[0], /model_unavailable.*review \(iolaus-no-such-lane\)/, `fail-closed error missing: ${outputs[0]}`)
+         assert.ok(!traces.some((t) => t.event === "iolaus.dag.run.started"), "run was started despite an unroutable lane")
        }
        if (scenario.route) {
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")

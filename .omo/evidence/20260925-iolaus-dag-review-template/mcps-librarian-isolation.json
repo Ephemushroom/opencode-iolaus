@@ -1,0 +1,17 @@
+{
+  "project": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home/project",
+  "env": {
+    "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x",
+    "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home",
+    "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home",
+    "PWD": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home/project",
+    "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/config",
+    "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home/data",
+    "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home/cache",
+    "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home/state",
+    "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-Hfpv3x/mcps-librarian/home",
+    "OPENCODE_DISABLE_AUTOUPDATE": "1",
+    "OPENCODE_DISABLE_MODELS_FETCH": "1",
+    "IOLAUS_TRACE": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/review/.omo/evidence/20260925-iolaus-dag-review-template/mcps-librarian-trace.ndjson"
+  }
+}

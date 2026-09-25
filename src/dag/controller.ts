@@ -79,16 +79,21 @@ export function buildPrompt(node: DagNodeRecord, run: DagRunRecord): string {
   return `${node.definition.prompt}\n\n<iolaus-dag-inputs>${jsonText(inputs)}</iolaus-dag-inputs>`
 }
 
+/**
+ * Fills each agent node's model from its lane. Routing is fail-closed: a lane that
+ * resolves to no model is reported as `model_unavailable` at create/amend time,
+ * rather than being discovered when the child session fails to start.
+ */
 export function applyDefaultModels(definition: DagDefinition, defaultModel: DagControllerOptions["defaultModel"]): DagDefinition {
-  if (!defaultModel) return definition
-  return {
-    ...definition,
-    nodes: definition.nodes.map((node) => {
-      if (isGate(node) || node.model !== undefined || node.agent === undefined) return node
-      const model = defaultModel(node.agent)
-      return model === undefined ? node : { ...node, model }
-    }),
-  }
+  const missing: string[] = []
+  const nodes = definition.nodes.map((node) => {
+    if (isGate(node) || node.model !== undefined || node.agent === undefined) return node
+    const model = defaultModel?.(node.agent)
+    if (model === undefined) { missing.push(`${node.id} (${node.agent})`); return node }
+    return { ...node, model }
+  })
+  if (missing.length) throw new DagValidationError(`model_unavailable: no configured model for ${missing.join(", ")}; set model on the node or configure the lane in .iolaus/models.json`)
+  return { ...definition, nodes }
 }
 
 export function createDagController(options: DagControllerOptions): DagController {
@@ -168,12 +173,18 @@ export function createDagController(options: DagControllerOptions): DagControlle
     if (!run || closed || terminal(run.status)) return
     const records = new Map(run.nodes.map((node) => [node.definition.id, node]))
     const launches: DagNodeRecord[] = []
+    // A skip or block settled in this pass may unblock a node visited earlier in it; repeat until the frontier is stable.
+    let settled = true
+    do {
+    settled = true
     for (const node of run.nodes) {
       if (node.status !== "pending" && node.status !== "needs_retry") continue
       const state = dependencyState(node.definition, records)
       if (state === "blocked") {
         run = updateNode(run, node.definition.id, (current) => ({ ...current, status: "blocked", error: "A dependency did not complete successfully", updatedAt: now() }))
         event(run, "node.blocked", node.definition.id)
+        records.set(node.definition.id, run.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
+        settled = false
         continue
       }
       if (state !== "ready") continue
@@ -181,6 +192,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
         run = updateNode(run, node.definition.id, (current) => ({ ...current, status: "skipped", error: undefined, updatedAt: now() }))
         event(run, "node.skipped", node.definition.id, { reason: "condition_false" })
         records.set(node.definition.id, run.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
+        settled = false
         continue
       }
       if (isGate(node.definition)) {
@@ -194,6 +206,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       launches.push(next.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
       event(run, "node.ready", node.definition.id)
     }
+    } while (!settled)
     run = updateRunStatus(run)
     save(run)
     for (const node of launches) void launch(runID, node.definition.id)

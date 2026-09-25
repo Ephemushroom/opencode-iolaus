@@ -1,0 +1,452 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "results": [
+    {
+      "name": "host version",
+      "verdict": "PASS"
+    },
+    {
+      "name": "run help",
+      "verdict": "PASS"
+    },
+    {
+      "name": "native: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "agent: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "disabled: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mode: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "dag: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "fanin: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "route: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "template: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "template-unavailable: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "lanes: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "astgrep-explore: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "astgrep-rewrite: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "astgrep-deny: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mcps-librarian: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mcps-off: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "verify-edit: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "verify-off: live session",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cleanup",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mock protocol",
+      "verdict": "PASS"
+    }
+  ],
+  "before": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2",
+      "/Users/Bryan/.omo/opencode2.json": "f4261a0547834d4462b630684aaa1a2c9a0b2683c219229e411b42fc0138a51a",
+      "/Users/Bryan/.omo/omo.jsonc": "a6e0cf00a8fdbaa15b6c4467b7ae384c0500afbb9ab59e965de6fe0aa096b322"
+    },
+    "sessions": {
+      "session": "2706",
+      "session_v2": "2471"
+    }
+  },
+  "after": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2",
+      "/Users/Bryan/.omo/opencode2.json": "f4261a0547834d4462b630684aaa1a2c9a0b2683c219229e411b42fc0138a51a",
+      "/Users/Bryan/.omo/omo.jsonc": "a6e0cf00a8fdbaa15b6c4467b7ae384c0500afbb9ab59e965de6fe0aa096b322"
+    },
+    "sessions": {
+      "session": "2706",
+      "session_v2": "2471"
+    }
+  },
+  "processes": [
+    {
+      "name": "version",
+      "args": [
+        "--version"
+      ],
+      "pid": 21352,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "help",
+      "args": [
+        "run",
+        "--help"
+      ],
+      "pid": 21353,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "native",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 21354,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "agent",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-sisyphus",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 21357,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "disabled",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Read fixture.txt and report the result."
+      ],
+      "pid": 21368,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "mode",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "/iolaus-ultrawork Read fixture.txt and report the result."
+      ],
+      "pid": 21372,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "dag",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21375,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "fanin",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21378,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "route",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21382,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "template",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21385,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "template-unavailable",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21408,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "lanes",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Run an Iolaus DAG and report the completed node result."
+      ],
+      "pid": 21411,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "astgrep-explore",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-explore",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21414,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "astgrep-rewrite",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "build",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21418,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "astgrep-deny",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-prometheus",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21423,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "mcps-librarian",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-librarian",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21434,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "mcps-off",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-librarian",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21456,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "verify-edit",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-sisyphus",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21461,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    },
+    {
+      "name": "verify-off",
+      "args": [
+        "run",
+        "--standalone",
+        "--auto",
+        "--print-logs",
+        "--agent",
+        "iolaus-sisyphus",
+        "--model",
+        "openai/gpt-5.5",
+        "Return IOLAUS_QA_DONE."
+      ],
+      "pid": 21473,
+      "code": 0,
+      "signal": null,
+      "closed": true
+    }
+  ],
+  "sandboxRemoved": true,
+  "mockClosed": true,
+  "requestCount": 75,
+  "omitted": "No user credentials or inherited environment dumps. Local mock only."
+}
