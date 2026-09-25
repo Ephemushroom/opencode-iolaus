@@ -91,7 +91,7 @@ webfetch(official_docs_base_url + "/docs/sitemap.xml")
 With sitemap knowledge, fetch the SPECIFIC documentation pages relevant to the query:
 \`\`\`
 webfetch(specific_doc_page_from_sitemap)
-context7_query-docs(libraryId: id, query: "specific topic")
+tools.context7["query-docs"]({ libraryId: id, query: "specific topic" })
 \`\`\`
 
 **Skip Doc Discovery when**:
@@ -108,10 +108,10 @@ context7_query-docs(libraryId: id, query: "specific topic")
 
 **Execute Documentation Discovery FIRST (Phase 0.5)**, then:
 \`\`\`
-Tool 1: context7_resolve-library-id("library-name")
-        → then context7_query-docs(libraryId: id, query: "specific-topic")
+Tool 1: tools.context7["resolve-library-id"]({ libraryName: "library-name", query: "what you need" })
+        → then tools.context7["query-docs"]({ libraryId: id, query: "specific-topic" })
 Tool 2: webfetch(relevant_pages_from_sitemap)  // Targeted, not random
-Tool 3: grep_app_searchGitHub(query: "usage pattern", language: ["TypeScript"])
+Tool 3: tools.grep_app.searchGitHub({ query: "usage pattern", language: ["TypeScript"] })
 \`\`\`
 
 **Output**: Summarize findings with links to official docs (versioned if applicable) and real-world examples.
@@ -141,9 +141,9 @@ Step 4: Construct permalink
 **Parallel acceleration (4+ calls)**:
 \`\`\`
 Tool 1: gh repo clone owner/repo \${TMPDIR:-/tmp}/repo -- --depth 1
-Tool 2: grep_app_searchGitHub(query: "function_name", repo: "owner/repo")
+Tool 2: tools.grep_app.searchGitHub({ query: "function_name", repo: "owner/repo" })
 Tool 3: gh api repos/owner/repo/commits/HEAD --jq '.sha'
-Tool 4: context7_query-docs(libraryId: id, query: "relevant-api")
+Tool 4: tools.context7["query-docs"]({ libraryId: id, query: "relevant-api" })
 \`\`\`
 
 ---
@@ -176,12 +176,12 @@ gh api repos/owner/repo/pulls/<number>/files
 **Execute Documentation Discovery FIRST (Phase 0.5)**, then execute in parallel (6+ calls):
 \`\`\`
 // Documentation (informed by sitemap discovery)
-Tool 1: context7_resolve-library-id → context7_query-docs
+Tool 1: tools.context7["resolve-library-id"] → tools.context7["query-docs"]
 Tool 2: webfetch(targeted_doc_pages_from_sitemap)
 
 // Code Search
-Tool 3: grep_app_searchGitHub(query: "pattern1", language: [...])
-Tool 4: grep_app_searchGitHub(query: "pattern2", useRegexp: true)
+Tool 3: tools.grep_app.searchGitHub({ query: "pattern1", language: [...] })
+Tool 4: tools.grep_app.searchGitHub({ query: "pattern2", useRegexp: true })
 
 // Source Analysis
 Tool 5: gh repo clone owner/repo \${TMPDIR:-/tmp}/repo -- --depth 1
@@ -230,12 +230,12 @@ https://github.com/tanstack/query/blob/abc123def/packages/react-query/src/useQue
 
 ### Primary Tools by Purpose
 
-- **Official Docs**: Use context7 - \`context7_resolve-library-id\` → \`context7_query-docs\`
-- **Find Docs URL**: Use websearch_exa - \`websearch_web_search_exa("library official documentation")\`
+- **Official Docs**: Use context7 inside execute - \`tools.context7["resolve-library-id"]({ libraryName, query })\` → \`tools.context7["query-docs"]({ libraryId, query })\`
+- **Find Docs URL**: Use websearch - \`websearch("library official documentation")\`
 - **Sitemap Discovery**: Use webfetch - \`webfetch(docs_url + "/sitemap.xml")\` to understand doc structure
 - **Read Doc Page**: Use webfetch - \`webfetch(specific_doc_page)\` for targeted documentation
-- **Latest Info**: Use websearch_exa - \`websearch_web_search_exa("query ${new Date().getFullYear()}")\`
-- **Fast Code Search**: Use grep_app - \`grep_app_searchGitHub(query, language, useRegexp)\`
+- **Latest Info**: Use websearch - \`websearch("query ${new Date().getFullYear()}")\`
+- **Fast Code Search**: Use grep_app inside execute - \`tools.grep_app.searchGitHub({ query, language, useRegexp })\` (public GitHub code, regex supported; several queries fit in one execute call)
 - **Deep Code Search**: Use gh CLI - \`gh search code "query" --repo owner/repo\`
 - **Clone Repo**: Use gh CLI - \`gh repo clone owner/repo \${TMPDIR:-/tmp}/name -- --depth 1\`
 - **Issues/PRs**: Use gh CLI - \`gh search issues/prs "query" --repo owner/repo\`
@@ -271,13 +271,13 @@ Use OS-appropriate temp directory:
 **Always vary queries** when using grep_app:
 \`\`\`
 // GOOD: Different angles
-grep_app_searchGitHub(query: "useQuery(", language: ["TypeScript"])
-grep_app_searchGitHub(query: "queryOptions", language: ["TypeScript"])
-grep_app_searchGitHub(query: "staleTime:", language: ["TypeScript"])
+tools.grep_app.searchGitHub({ query: "useQuery(", language: ["TypeScript"] })
+tools.grep_app.searchGitHub({ query: "queryOptions", language: ["TypeScript"] })
+tools.grep_app.searchGitHub({ query: "staleTime:", language: ["TypeScript"] })
 
 // BAD: Same pattern
-grep_app_searchGitHub(query: "useQuery")
-grep_app_searchGitHub(query: "useQuery")
+tools.grep_app.searchGitHub({ query: "useQuery" })
+tools.grep_app.searchGitHub({ query: "useQuery" })
 \`\`\`
 
 ---

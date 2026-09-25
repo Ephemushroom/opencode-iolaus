@@ -1,6 +1,7 @@
 import { Agent, Plugin } from "@opencode/plugin"
 import { parseOptions } from "./options"
 import { registerAgents, registerModes } from "./registration"
+import { registerMcps } from "./mcp"
 import { composeContext } from "./context"
 import { trace } from "./trace"
 import { createDagController } from "./dag/controller"
@@ -23,6 +24,7 @@ export default Plugin.define({
     trace("iolaus.models.loaded", { sources: models.sources, diagnostics: models.diagnostics })
     await registerAgents(ctx, options, models.config)
     await registerModes(ctx, options)
+    await registerMcps(ctx, options.mcps)
     const defaultModel = (agent: string): string | undefined => {
       const lane = agentName(agent) ?? categoryName(agent)
       const assignment = lane ? resolveLane(lane, models.config) : undefined
