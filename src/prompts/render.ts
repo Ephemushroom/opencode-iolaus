@@ -55,6 +55,6 @@ export function renderMode(mode: ModeName, model: string, agent?: AgentName): st
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }
 
-export function bindNative(prompt: string): string {
-  return `${prompt}\n\n${NATIVE_BINDINGS}`
+export function bindNative(prompt: string, homeText?: string): string {
+  return `${prompt}\n\n${NATIVE_BINDINGS}${homeText ? `\n${homeText}` : ""}`
 }

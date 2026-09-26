@@ -19,6 +19,7 @@ import type { PermissionRule } from "./ast-grep/permissions"
 import { resolveGhBinary } from "./gh/binary"
 import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
 import { effectTool } from "./effect-bridge"
+import { homeContract, provisionHome, resolveHome } from "./home"
 
 /** Session directory for a call, falling back to the plugin's own location. */
 function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
@@ -42,6 +43,9 @@ export default Plugin.define({
     const options = parseOptions({ ...ctx.options })
     trace("iolaus.loaded", { enabled: options.enabled, host: ctx.app.version })
     if (!options.enabled) return
+    const home = resolveHome(ctx.location.directory)
+    const provisioned = provisionHome(home)
+    trace("iolaus.home.ready", { user: home.user, project: home.project, created: provisioned.created })
     const models = loadModelsConfig(ctx.location.directory, { inline: options.models })
     trace("iolaus.models.loaded", { sources: models.sources, diagnostics: models.diagnostics })
     yield* registerAgents(ctx, options, models.config)
@@ -52,7 +56,7 @@ export default Plugin.define({
       const assignment = lane ? resolveLane(lane, models.config) : undefined
       return assignment ? modelString(assignment) : undefined
     }
-    yield* ctx.session.hook("context", (event) => composeContext(event, ctx, options))
+    yield* ctx.session.hook("context", (event) => composeContext(event, ctx, options, homeContract(home)))
 
     // The RPC registration is created after the controller, so events emitted before it exists are dropped.
     let emit: ((sessionID: string, runID: string, sequence: number, type: string) => Effect.Effect<void, unknown>) | undefined
@@ -94,6 +98,7 @@ export default Plugin.define({
       yield* registerVerifyHook(ctx, {
         directory: (sessionID) => Effect.runPromise(sessionDirectory(ctx, sessionID)),
         trace,
+        userLayer: home.user,
         ...(typeof options.verify === "object" ? { inline: options.verify } : {}),
       })
     }

@@ -96,11 +96,13 @@ function mergeConfigs(layers: readonly ModelsConfig[]): ModelsConfig {
 }
 
 export function loadModelsConfig(directory: string, options: { readonly home?: string; readonly inline?: unknown } = {}): LoadedModelsConfig {
-  const home = resolve(options.home ?? process.env.IOLAUS_HOME ?? homedir())
-  const candidates: string[] = [join(home, ".iolaus", MODELS_CONFIG_FILE)]
+  // User layer: IOLAUS_HOME (default ~/.iolaus)/models.json; `home` overrides the OS home for tests.
+  const userLayer = options.home ? join(resolve(options.home), ".iolaus") : resolve(process.env.IOLAUS_HOME ?? join(homedir(), ".iolaus"))
+  const stop = options.home ? resolve(options.home) : homedir()
+  const candidates: string[] = [join(userLayer, MODELS_CONFIG_FILE)]
   const project: string[] = []
   let current = resolve(directory)
-  for (let depth = 0; depth < 64 && current !== home; depth++) {
+  for (let depth = 0; depth < 64 && current !== stop; depth++) {
     project.push(join(current, ".iolaus", MODELS_CONFIG_FILE))
     const parent = dirname(current)
     if (parent === current) break
