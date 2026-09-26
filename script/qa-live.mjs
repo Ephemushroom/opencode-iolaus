@@ -199,10 +199,8 @@ try {
        code: 'const repo = await tools.gh.repo({ repo: "cli/cli" }); const c = await tools.gh.clone({ repo: "cli/cli", depth: 2 }); const log = await tools.gh.log({ clone: c.path, count: 1 }); return { name: repo.data && repo.data.name, cloned: c.ok, path: c.path, sha: log.commits && log.commits[0] && log.commits[0].sha, tools: Object.keys(tools.gh).sort() }' },
      { name: "gh-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
      { name: "gh-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
-     // agent-home: memory tools round trip from a primary; a home skill under the sandbox user layer is registered with the host.
-     { name: "home-memory", enabled: true, agent: "iolaus-sisyphus", agentPermissions: true, homeSkill: true,
-       code: 'const w = await tools.memory.write({ slug: "qa-note", text: "# QA\\nIOLAUS_HOME_NOTE", layer: "user" }); const r = await tools.memory.read({ slug: "qa-note" }); const l = await tools.memory.list({}); return { w: w.ok, layer: w.layer, text: r.text, slugs: l.notes.map((n) => n.slug), skills: Object.keys(tools) }' },
-     { name: "home-memory-readonly", enabled: true, agent: "iolaus-explore", agentPermissions: true, code: 'let denied = null; try { const w = await tools.memory.write({ slug: "x", text: "y" }); denied = { ok: w.ok } } catch (e) { denied = { thrown: String(e).slice(0, 80) } }; const l = await tools.memory.list({}); return { denied, listed: Array.isArray(l.notes), has: Object.keys(tools).includes("memory") }' },
+     // agent-home: a home skill under the sandbox user layer is registered with the host and advertised to the agent.
+     { name: "home-skill", enabled: true, agent: "iolaus-sisyphus", agentPermissions: true, homeSkill: true, code: 'return { tools: Object.keys(tools) }' },
      // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
      { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
      { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
@@ -258,7 +256,8 @@ try {
          assert.ok(ready, "iolaus.home.ready trace missing")
          assert.equal(ready.user, join(home, ".iolaus"), `user layer escaped the sandbox: ${ready.user}`)
          assert.ok(ready.project.startsWith(project), `project layer outside the project: ${ready.project}`)
-         for (const dir of ["agent/plans", "agent/memory", "agent/skills"]) assert.ok(existsSync(join(home, ".iolaus", dir)), `user layer missing ${dir}`)
+         for (const dir of ["agent/plans", "agent/skills"]) assert.ok(existsSync(join(home, ".iolaus", dir)), `user layer missing ${dir}`)
+         assert.ok(!existsSync(join(home, ".iolaus", "agent", "memory")), "Iolaus must not provision a memory directory")
          assert.ok(existsSync(join(project, ".iolaus", "plans")), "project plans dir missing")
          const rendered = requests.filter((r) => r.scenario === scenario.name && r.instructions.includes("<iolaus-native-contract>"))
          if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>User layer ${join(home, ".iolaus")}`)), "rendered prompt lacks the home contract")
@@ -353,21 +352,11 @@ try {
            assert.ok(!out.includes('"name": "cli"'), `explore executed a gh call despite deny: ${out}`)
            assert.ok(!traces.some((t) => t.event === "iolaus.gh.call" && t.agent === "iolaus-explore" && t.ok), "gh tool ran for explore")
          }
-         if (scenario.name === "home-memory") {
-           assert.match(out, /"w": true/, `memory.write failed: ${out}`)
-           assert.match(out, /"layer": "user"/, "note did not land in the user layer")
-           assert.match(out, /IOLAUS_HOME_NOTE/, "memory.read did not return the written note")
-           assert.match(out, /"qa-note"/, "memory.list did not include the note")
-           assert.ok(existsSync(join(home, ".iolaus", "agent", "memory", "qa-note.md")), "note file missing under the sandbox user layer")
+         if (scenario.name === "home-skill") {
            const skills = traces.find((t) => t.event === "iolaus.home.skills")
            assert.deepEqual(skills?.registered, ["iolaus-home:qa-skill"], `home skill was not registered: ${JSON.stringify(skills)}`)
            assert.ok(captured.some((r) => r.instructions.includes("qa-skill") && r.instructions.includes("IOLAUS_HOME_SKILL_DESC")), "home skill not advertised in the system prompt skill list")
-           assert.ok(traces.some((t) => t.event === "iolaus.memory.call" && t.tool === "write" && t.ok && t.agent === "iolaus-sisyphus"), "memory write trace missing")
-         }
-         if (scenario.name === "home-memory-readonly") {
-           assert.match(out, /"listed": true/, `explore could not list memory: ${out}`)
-           assert.ok(!out.includes('"ok": true'), `explore wrote memory despite deny: ${out}`)
-           assert.ok(!traces.some((t) => t.event === "iolaus.memory.call" && t.tool === "write" && t.ok), "memory write ran for a read-only specialist")
+           assert.ok(!out.includes('"memory"'), "memory namespace must not exist")
          }
          if (scenario.name === "gh-off") {
            assert.ok(traces.some((t) => t.event === "iolaus.gh.unavailable" && t.enabled === false), "gh: false did not disable registration")

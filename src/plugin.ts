@@ -21,7 +21,6 @@ import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tool
 import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
 import { registerHomeSkills } from "./home-skills"
-import { MEMORY_NAMESPACE, MEMORY_NAMESPACE_DESCRIPTION, createMemoryTools } from "./home-memory"
 
 /** Session directory for a call, falling back to the plugin's own location. */
 function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
@@ -72,16 +71,8 @@ export default Plugin.define({
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
 
-    // agent-home: skills under agent/skills and .iolaus/skills enter the host skill list; memory notes get Code Mode tools.
+    // agent-home: skills under agent/skills and .iolaus/skills enter the host skill list.
     yield* registerHomeSkills(ctx, home)
-    const memoryTools = createMemoryTools({
-      home: (sessionID) => Effect.runPromise(sessionDirectory(ctx, sessionID)).then((directory) => resolveHome(directory)),
-      trace,
-    })
-    yield* ctx.tool.transform((editor) => {
-      editor.namespace({ name: MEMORY_NAMESPACE, description: MEMORY_NAMESPACE_DESCRIPTION })
-      for (const tool of memoryTools) editor.add(tool)
-    })
 
     const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
     trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })

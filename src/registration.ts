@@ -44,9 +44,6 @@ function applyModel(agent: { model?: unknown }, assignment: LaneAssignment | und
  * pinned model, and a lane whose chain and config both name no model is not
  * registered. Provider connectivity and subscription state are not consulted.
  */
-/** Agents that may write memory notes: the four primaries (they own work) and metis (it distills). */
-const MEMORY_WRITERS = new Set<AgentName>(["sisyphus", "hephaestus", "prometheus", "atlas", "metis"])
-
 export function registerAgents(
   ctx: { agent: Pick<Context["agent"], "transform"> },
   options: Options,
@@ -88,7 +85,6 @@ export function registerAgents(
             ...(home ? [{ action: "edit", resource: `${home.userPlans}/*`, effect: "allow" as const }, { action: "external_directory", resource: `${home.userPlans}/*`, effect: "allow" as const }] : []),
             { action: "shell", resource: "*", effect: "deny" })
         }
-        if (MEMORY_WRITERS.has(name)) agent.permissions.push({ action: "memory", resource: "*", effect: "allow" })
         if (name === "sisyphus-junior") {
           agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" })
         }
