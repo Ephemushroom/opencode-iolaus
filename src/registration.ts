@@ -1,3 +1,4 @@
+import { tmpdir } from "node:os"
 import { Agent, Model } from "@opencode/plugin"
 import type { Context } from "@opencode/plugin/promise/plugin"
 import type { Options } from "./options"
@@ -69,6 +70,11 @@ export async function registerAgents(
           for (const action of ["read", "glob", "grep", "webfetch", "websearch", "skill", "execute", "context7_*", "grep_app_*"]) {
             agent.permissions.push({ action, resource: "*", effect: "allow" })
           }
+        }
+        if (name === "librarian") {
+          // gh clones land under the OS temp dir; native read/grep there need external_directory.
+          agent.permissions.push({ action: "gh", resource: "*", effect: "allow" },
+            { action: "external_directory", resource: `${tmpdir()}/iolaus-gh-*`, effect: "allow" })
         }
         if (name === "prometheus") {
           agent.permissions.push({ action: "edit", resource: "*", effect: "deny" },

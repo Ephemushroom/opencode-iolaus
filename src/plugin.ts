@@ -14,6 +14,8 @@ import { agentName, categoryName } from "./prompts/catalog"
 import { resolveAstGrepBinary } from "./ast-grep/binary"
 import { AST_GREP_NAMESPACE, AST_GREP_NAMESPACE_DESCRIPTION, createAstGrepTools } from "./ast-grep/tools"
 import type { PermissionRule } from "./ast-grep/permissions"
+import { resolveGhBinary } from "./gh/binary"
+import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
 
 export default Plugin.define({
   id: "iolaus",
@@ -60,6 +62,15 @@ export default Plugin.define({
       })
       await ctx.tool.transform((editor) => {
         editor.namespace({ name: AST_GREP_NAMESPACE, description: AST_GREP_NAMESPACE_DESCRIPTION })
+        for (const tool of tools) editor.add(tool)
+      })
+    }
+    const ghBinary = options.gh ? resolveGhBinary() : undefined
+    trace(ghBinary?.authenticated ? "iolaus.gh.registered" : "iolaus.gh.unavailable", { enabled: options.gh, binary: ghBinary?.path ?? null, version: ghBinary?.version ?? null, authenticated: ghBinary?.authenticated ?? false })
+    if (ghBinary?.authenticated) {
+      const tools = createGhTools(ghBinary, { trace })
+      await ctx.tool.transform((editor) => {
+        editor.namespace({ name: GH_NAMESPACE, description: GH_NAMESPACE_DESCRIPTION })
         for (const tool of tools) editor.add(tool)
       })
     }

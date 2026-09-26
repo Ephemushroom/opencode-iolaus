@@ -161,6 +161,8 @@ const server = http.createServer(async (req, res) => {
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
 })
 const TSC_BIN = join(root, "node_modules", ".bin", "tsc")
+let GH_TOKEN
+try { GH_TOKEN = execFileSync("gh", ["auth", "token"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || undefined } catch {}
 const AST_GREP_FIXTURE = "console.log(add(1, 2))\nconsole.log(\"hello\")\nconst x = 1\n"
 let after
 try {
@@ -190,6 +192,11 @@ try {
      { name: "mcps-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, mcps: ["context7", "grep_app"],
        code: 'const found = search({ query: "context7 grep_app", limit: 20 }).items.map((i) => i.path).filter((p) => p.includes("context7") || p.includes("grep_app")).sort(); const lib = await tools.context7["resolve-library-id"]({ libraryName: "react", query: "useEffect cleanup" }); const code = await tools.grep_app.searchGitHub({ query: "useEffect(() => {", language: ["TypeScript", "TSX"] }); const text = JSON.stringify(code); return { found, lib: JSON.stringify(lib).slice(0, 300), grepHit: text.includes("useEffect(() => {"), code: text.slice(0, 300) }' },
      { name: "mcps-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, code: 'return Object.keys(tools)' },
+     // gh namespace (live network via the user's gh login): librarian may call it; explore may not; gh: false removes it.
+     { name: "gh-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: true,
+       code: 'const repo = await tools.gh.repo({ repo: "cli/cli" }); const c = await tools.gh.clone({ repo: "cli/cli", depth: 2 }); const log = await tools.gh.log({ clone: c.path, count: 1 }); return { name: repo.data && repo.data.name, cloned: c.ok, path: c.path, sha: log.commits && log.commits[0] && log.commits[0].sha, tools: Object.keys(tools.gh).sort() }' },
+     { name: "gh-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
+     { name: "gh-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
      // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
      { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
      { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
@@ -202,8 +209,10 @@ try {
     const trace = join(evidence, `${scenario.name}-trace.ndjson`)
     const env = { PATH: process.env.PATH, TMPDIR: sandbox, HOME: home, USERPROFILE: home, PWD: project,
       XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(home,"data"), XDG_CACHE_HOME: join(home,"cache"), XDG_STATE_HOME: join(home,"state"),
-      OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key" }
-    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) } }],
+      OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key",
+      // gh scenarios only: the sandbox HOME has no gh login, so pass the user's token through the environment (never written to disk).
+      ...(scenario.gh && GH_TOKEN ? { GH_TOKEN } : {}) }
+    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) } }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
@@ -216,7 +225,7 @@ try {
       symlinkSync(TSC_BIN, join(project, "node_modules", ".bin", "tsc"))
     }
     const fixture = { project, env }
-    writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY")) },null,2))
+    writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY" && k !== "GH_TOKEN")), ghTokenPassed: Boolean(env.GH_TOKEN) },null,2))
     if (scenario.name === "native") {
        await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.16/) })
       await check("run help", async () => { const r = await run("help", ["run","--help"], fixture); assert.equal(r.code,0) })
@@ -304,6 +313,27 @@ try {
            assert.match(out, /"grepHit": true/, `grep_app returned no useEffect match: ${out}`)
            assert.ok(!out.includes("No results found"), `grep_app returned no results: ${out}`)
            assert.ok(!out.includes("PERMISSION_DENIED") && !out.includes("permission"), `MCP call was denied for librarian: ${out}`)
+         }
+         if (scenario.name === "gh-librarian") {
+           assert.ok(traces.some((t) => t.event === "iolaus.gh.registered" && t.authenticated), "gh tools were not registered")
+           assert.match(catalog, /- gh \(12 tools/, `gh namespace missing from librarian catalog: ${catalog.slice(0, 400)}`)
+           assert.match(out, /"name": "cli"/, `gh.repo did not return cli/cli: ${out}`)
+           assert.match(out, /"cloned": true/, `gh.clone failed: ${out}`)
+           assert.match(out, /"sha": "[0-9a-f]{40}"/, `gh.log returned no commit: ${out}`)
+           const clonePath = out.match(/"path": "([^"]+)"/)?.[1]
+           assert.ok(clonePath && clonePath.includes("/iolaus-gh-"), `clone path not under the gh temp root: ${clonePath}`)
+           assert.ok(existsSync(join(clonePath, "README.md")), "clone directory missing on disk")
+           rmSync(join(clonePath, ".."), { recursive: true, force: true })
+           assert.ok(traces.filter((t) => t.event === "iolaus.gh.call" && t.ok).map((t) => t.tool).includes("clone"), "gh.call trace missing")
+         }
+         if (scenario.name === "gh-explore") {
+           assert.ok(!catalog.includes("- gh ("), "read-only explore must not see the gh namespace")
+           assert.ok(!out.includes('"name": "cli"'), `explore executed a gh call despite deny: ${out}`)
+           assert.ok(!traces.some((t) => t.event === "iolaus.gh.call" && t.agent === "iolaus-explore" && t.ok), "gh tool ran for explore")
+         }
+         if (scenario.name === "gh-off") {
+           assert.ok(traces.some((t) => t.event === "iolaus.gh.unavailable" && t.enabled === false), "gh: false did not disable registration")
+           assert.match(out, /"has": false/, `gh: false still exposed tools: ${out}`)
          }
          if (scenario.name === "mcps-off") {
            assert.equal(registered, undefined, "mcps: [] must not register servers")

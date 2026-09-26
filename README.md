@@ -62,6 +62,8 @@ Iolaus also registers two remote MCP servers from upstream OMO: `context7` (offi
 
 After every `edit`, `write` or `patch`, Iolaus verifies the changed files and appends the findings to the tool result the agent sees: type or lint errors located in those files, and comments that narrate the request instead of the code ("as requested by the user"). Without configuration a project with `tsconfig.json` gets `tsc --noEmit`. Put `.iolaus/verify.json` in the project to choose checkers, for example `{ "checkers": [{ "name": "biome", "argv": ["bunx", "biome", "check", "."], "extensions": [".ts", ".tsx"] }], "timeoutMs": 60000 }`. Commands run without a shell. Set the plugin option `"verify": false` to turn it off.
 
+If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh` namespace in Code Mode: `tools.gh.searchCode`, `searchRepos`, `repo`, `issues`, `issue`, `prs`, `pr`, `prDiff`, and `clone` (shallow, into a temporary directory) followed by `log`, `blame` and `show` on the clone. Calls run the `gh` binary directly with fixed arguments; there is no shell and no `gh api`, so nothing can write to GitHub. Set `"gh": false` to leave it out.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.
