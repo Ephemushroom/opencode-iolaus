@@ -12,6 +12,8 @@ export interface Options {
   mcps: McpName[]
   /** Post-edit verification: `false` disables; an object is an inline `.iolaus/verify.json`. */
   verify: boolean | Record<string, unknown>
+  /** Register the read-only `gh` Code Mode tools when an authenticated gh CLI is available. */
+  gh: boolean
   /** Inline models config, merged after `.iolaus/models.json` layers. */
   models?: unknown
 }
@@ -25,13 +27,16 @@ function selection<T extends string>(value: unknown, allowed: readonly T[], name
 }
 
 export function parseOptions(input: Record<string, unknown>): Options {
-  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify"].includes(key))
+  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify", "gh"].includes(key))
   if (unknown.length) throw new TypeError(`Unknown Iolaus options: ${unknown.join(", ")}`)
   if (input.enabled !== undefined && typeof input.enabled !== "boolean") {
     throw new TypeError("Iolaus enabled must be a boolean")
   }
   if (input.astGrep !== undefined && typeof input.astGrep !== "boolean") {
     throw new TypeError("Iolaus astGrep must be a boolean")
+  }
+  if (input.gh !== undefined && typeof input.gh !== "boolean") {
+    throw new TypeError("Iolaus gh must be a boolean")
   }
   if (input.verify !== undefined && typeof input.verify !== "boolean" && (typeof input.verify !== "object" || input.verify === null || Array.isArray(input.verify))) {
     throw new TypeError("Iolaus verify must be a boolean or an object")
@@ -42,6 +47,7 @@ export function parseOptions(input: Record<string, unknown>): Options {
     categories: selection(input.categories, CATEGORY_NAMES, "categories"),
     modes: selection(input.modes, MODE_NAMES, "modes"),
     astGrep: input.astGrep !== false,
+    gh: input.gh !== false,
     mcps: selection(input.mcps, MCP_NAMES, "mcps"),
     verify: input.verify === undefined ? true : (input.verify as boolean | Record<string, unknown>),
     ...(input.models === undefined ? {} : { models: input.models }),

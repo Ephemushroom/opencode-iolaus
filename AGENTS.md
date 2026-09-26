@@ -4,8 +4,8 @@ Iolaus is an OpenCode 2 plugin with OMO-derived Agent prompts, explicit modes,
 model-family selection, a local durable DAG runtime, and structural code tools.
 Native OpenCode remains the owner of general tools, permissions, sessions, and
 skill discovery; Iolaus owns its `iolaus_dag` orchestration tool and child-session
-runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
-`grep_app` remote MCP registrations.
+runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
+`context7` and `grep_app` remote MCP registrations.
 
 ## Boundaries
 
@@ -49,6 +49,17 @@ runner, the `ast_grep` Code Mode namespace, and the built-in `context7` and
   tests and `ast_grep`. Remote servers connect after startup, so the
   system-prompt catalog rendered for the first turn may lag; the runtime
   `search()` catalog is the authority.
+- `src/gh/` registers a read-only `gh` Code Mode namespace when a `gh` binary
+  answers `--version` and `gh auth status` shows a login (`IOLAUS_GH_BIN`, then
+  PATH, then common prefixes; `gh: false` disables). Twelve tools: searchCode,
+  searchRepos, repo, issues, issue, prs, pr, prDiff, clone, log, blame, show.
+  Every call is `execFile` with fixed argv and validated inputs (OWNER/REPO,
+  ref, hex sha, relative in-repo path), no shell and no `gh api`, so no write
+  subcommand is reachable. `clone` is depth-limited into `$TMPDIR/iolaus-gh-*`;
+  log/blame/show accept only paths under that root. All tools carry permission
+  `gh`; only librarian is allowed it, plus `external_directory` on the clone
+  root so native read/grep can read clones. gh is for known repositories,
+  issues, PRs and history; grep_app remains the wide regex code search.
 - `src/verify/` hooks `tool.hook("execute.after")` for `edit`, `write` and
   `patch`. After a completed mutation it runs the project's checkers on the
   changed files and appends only their diagnostics, plus request-narrating
