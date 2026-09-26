@@ -89,7 +89,14 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   comments, to the tool result. Checkers come from `.iolaus/verify.json`
   (`checkers[].argv` run via execFile, no shell; `timeoutMs`; `commentPattern`
   or `null`), from the plugin `verify` option as an inline object, or, when
-  neither exists, `tsc --noEmit` if `tsconfig.json` is present. `verify: false`
+  neither exists, from marker files: `tsconfig.json` → `tsc --noEmit`,
+  `biome.json` → `biome lint --reporter=github` (else an eslint config →
+  `eslint --format unix`), `pyproject.toml`/`ruff.toml` → `ruff check
+  --output-format concise --no-fix`, `Cargo.toml` → `cargo check
+  --message-format=short`, `go.mod` → `go vet ./...`. Output is parsed as
+  `file(line,col)`, `file:line:col`, `./file:line:col` or GitHub-reporter
+  `::error file=…,line=…::msg`; a checker with `format: "json"` is parsed as a
+  JSON array (flat, `diagnostics`/`results`, or ESLint per-file groups). `verify: false`
   or `{checkers: [], commentPattern: null}` disables it. Hook failures never
   fail the edit. GPT model IDs get `patch` instead of `edit`/`write`; paths are
   taken from `*** Update/Add File:` headers as well as `filePath`/`path`.

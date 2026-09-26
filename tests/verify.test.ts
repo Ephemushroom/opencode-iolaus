@@ -106,3 +106,50 @@ test("verify option accepts boolean or object", () => {
   expect(parseOptions({ verify: { checkers: [] } }).verify).toEqual({ checkers: [] })
   expect(() => parseOptions({ verify: "yes" })).toThrow(/verify must be/)
 })
+
+test("checkers are detected per stack from marker files; every command is read-only", () => {
+  const dir = project({ "tsconfig.json": "{}", "biome.json": "{}", "pyproject.toml": "", "Cargo.toml": "", "go.mod": "module x" })
+  const names = detectCheckers(dir).map((c) => c.name)
+  expect(names).toEqual(["tsc", "biome", "ruff", "cargo", "go vet"])
+  for (const c of detectCheckers(dir)) expect(c.argv.join(" ")).not.toMatch(/--fix|--write|--apply/)
+  rmSync(dir, { recursive: true, force: true })
+  const eslintDir = project({ "eslint.config.js": "" })
+  expect(detectCheckers(eslintDir).map((c) => c.name)).toEqual(["eslint"])
+  rmSync(eslintDir, { recursive: true, force: true })
+  expect(detectCheckers(project({}))).toEqual([])
+})
+
+test("location parser accepts tsc, unix, go/cargo relative paths and biome's github reporter", () => {
+  const out = [
+    "src/a.ts(3,7): error TS2322: bad type",
+    "./a.go:9:2: unreachable code",
+    "src/main.rs:4:5: error: mismatched types",
+    "::error title=lint/suspicious/noDebugger,file=src/a.ts,line=12,endLine=12,col=1,endColumn=9::This is an unexpected use of the debugger statement.",
+    "::error title=lint/x,file=src/other.ts,line=1,col=1::ignored",
+    "warning: 1 warning emitted",
+  ].join("\n")
+  const d = filterDiagnostics(out, "/p", ["/p/src/a.ts", "/p/a.go", "/p/src/main.rs"])
+  expect(d).toEqual([
+    { path: "src/a.ts", line: 3, message: "error TS2322: bad type" },
+    { path: "a.go", line: 9, message: "unreachable code" },
+    { path: "src/main.rs", line: 4, message: "error: mismatched types" },
+    { path: "src/a.ts", line: 12, message: "lint/suspicious/noDebugger: This is an unexpected use of the debugger statement." },
+  ])
+})
+
+test("json format parses flat arrays, wrapped arrays and eslint's per-file groups", async () => {
+  const { filterJsonDiagnostics } = await import("../src/verify/run")
+  expect(filterJsonDiagnostics(JSON.stringify([{ file: "src/a.ts", line: 2, message: "m1" }, { path: "src/b.ts", line: 1, message: "other" }]), "/p", ["/p/src/a.ts"]))
+    .toEqual([{ path: "src/a.ts", line: 2, message: "m1" }])
+  expect(filterJsonDiagnostics(JSON.stringify({ diagnostics: [{ filename: "src/a.ts", location: { row: 7 }, code: "F401" }] }), "/p", ["/p/src/a.ts"]))
+    .toEqual([{ path: "src/a.ts", line: 7, message: "F401" }])
+  expect(filterJsonDiagnostics(JSON.stringify([{ filePath: "/p/src/a.ts", messages: [{ line: 4, message: "no-unused-vars" }, { line: 9, ruleId: "eqeqeq" }] }]), "/p", ["/p/src/a.ts"]))
+    .toEqual([{ path: "src/a.ts", line: 4, message: "no-unused-vars" }, { path: "src/a.ts", line: 9, message: "eqeqeq" }])
+  expect(filterJsonDiagnostics("not json", "/p", ["/p/src/a.ts"])).toEqual([])
+  expect(() => parseVerifyConfig({ checkers: [{ argv: ["x"], format: "yaml" }] })).toThrow(/format/)
+  expect(parseVerifyConfig({ checkers: [{ argv: ["x"], format: "json" }] }).checkers[0].format).toBe("json")
+  const dir = project({ "src/a.ts": "x" })
+  const report = await verify({ checkers: [{ name: "j", argv: ["node", "-e", `console.log(JSON.stringify([{file:"src/a.ts",line:1,message:"from json"}]))`], format: "json" }], timeoutMs: 10_000, commentPattern: null, source: "config" }, dir, [join(dir, "src/a.ts")])
+  expect(report.checkers[0].diagnostics).toEqual([{ path: "src/a.ts", line: 1, message: "from json" }])
+  rmSync(dir, { recursive: true, force: true })
+})

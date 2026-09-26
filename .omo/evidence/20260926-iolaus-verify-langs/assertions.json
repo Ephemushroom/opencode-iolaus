@@ -1,0 +1,34 @@
+[
+  {
+    "name": "host version",
+    "verdict": "PASS"
+  },
+  {
+    "name": "run help",
+    "verdict": "PASS"
+  },
+  {
+    "name": "native: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "verify-edit: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "verify-off: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "host state isolation",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cleanup",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mock protocol",
+    "verdict": "PASS"
+  }
+]

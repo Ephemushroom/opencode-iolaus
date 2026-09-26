@@ -10,6 +10,8 @@ export interface Checker {
   readonly argv: readonly string[]
   /** Only run when at least one changed file matches (glob-free suffix list, e.g. [".ts", ".tsx"]). */
   readonly extensions?: readonly string[]
+  /** `json`: stdout is a JSON array of {file|path|filename, line, message} or an object with such an array under `diagnostics`/`results`. */
+  readonly format?: DiagnosticFormat
 }
 
 export interface VerifyConfig {
@@ -44,10 +46,14 @@ function parseChecker(value: unknown, index: number): Checker {
   if (record.extensions !== undefined && (!Array.isArray(record.extensions) || record.extensions.some((item) => typeof item !== "string"))) {
     throw new TypeError(`verify.json checkers[${index}].extensions must be a string array`)
   }
+  if (record.format !== undefined && record.format !== "location" && record.format !== "json") {
+    throw new TypeError(`verify.json checkers[${index}].format must be "location" or "json"`)
+  }
   return {
     name: typeof record.name === "string" && record.name ? record.name : String(record.argv[0]),
     argv: [...(record.argv as string[])],
     ...(record.extensions ? { extensions: [...(record.extensions as string[])] } : {}),
+    ...(record.format ? { format: record.format as DiagnosticFormat } : {}),
   }
 }
 
@@ -69,11 +75,28 @@ export function parseVerifyConfig(value: Record<string, unknown>): Omit<VerifyCo
   }
 }
 
-/** With no config, a TypeScript project gets `tsc --noEmit` and nothing else. */
+/** A checker may declare how to parse its output; `location` (default) is `file(line,col)` / `file:line:col`. */
+export type DiagnosticFormat = "location" | "json"
+
+function bin(directory: string, name: string): string {
+  const local = join(directory, "node_modules", ".bin", name)
+  return existsSync(local) ? local : name
+}
+
+/**
+ * With no config, checkers are detected from marker files. Every detected
+ * command is read-only (no `--fix`, no `--write`) and prints file locations.
+ */
 export function detectCheckers(directory: string): Checker[] {
-  if (!existsSync(join(directory, "tsconfig.json"))) return []
-  const local = join(directory, "node_modules", ".bin", "tsc")
-  return [{ name: "tsc", argv: [existsSync(local) ? local : "tsc", "--noEmit", "--pretty", "false"], extensions: [".ts", ".tsx", ".mts", ".cts"] }]
+  const has = (...names: string[]) => names.some((name) => existsSync(join(directory, name)))
+  const checkers: Checker[] = []
+  if (has("tsconfig.json")) checkers.push({ name: "tsc", argv: [bin(directory, "tsc"), "--noEmit", "--pretty", "false"], extensions: [".ts", ".tsx", ".mts", ".cts"] })
+  if (has("biome.json", "biome.jsonc")) checkers.push({ name: "biome", argv: [bin(directory, "biome"), "lint", "--reporter=github", "."], extensions: [".ts", ".tsx", ".js", ".jsx", ".json", ".css"] })
+  else if (has("eslint.config.js", "eslint.config.mjs", "eslint.config.cjs", "eslint.config.ts", ".eslintrc.json", ".eslintrc.cjs", ".eslintrc.js", ".eslintrc")) checkers.push({ name: "eslint", argv: [bin(directory, "eslint"), "--format", "unix", "."], extensions: [".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs"] })
+  if (has("pyproject.toml", "ruff.toml", ".ruff.toml", "setup.py", "requirements.txt")) checkers.push({ name: "ruff", argv: ["ruff", "check", "--output-format", "concise", "--no-fix", "."], extensions: [".py", ".pyi"] })
+  if (has("Cargo.toml")) checkers.push({ name: "cargo", argv: ["cargo", "check", "--quiet", "--message-format=short"], extensions: [".rs"] })
+  if (has("go.mod")) checkers.push({ name: "go vet", argv: ["go", "vet", "./..."], extensions: [".go"] })
+  return checkers
 }
 
 /**
