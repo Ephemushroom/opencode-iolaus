@@ -2,15 +2,21 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { createDagController, resolveInputs } from "../src/dag/controller"
+import { createDagController as createEffectController, resolveInputs } from "../src/dag/controller"
+import { promiseController } from "../src/dag/promise"
+import { runnerFromPromise, type DagRunnerPromise } from "../src/dag/runner"
 import { evaluateCondition, selectField } from "../src/dag/condition"
 import { canonicalJson } from "../src/dag/canonical-json"
 import { fingerprint, graphFingerprint } from "../src/dag/fingerprint"
 import { DagValidationError, validateDefinition } from "../src/dag/graph"
 import type { DagDefinition, DagExecutionRef, DagNodeDefinition } from "../src/dag/types"
-import type { DagRunner } from "../src/dag/runner"
 
 let directory: string | undefined
+
+type ControllerOptions = Omit<Parameters<typeof createEffectController>[0], "runner"> & { readonly runner: DagRunnerPromise }
+function createDagController(options: ControllerOptions) {
+  return promiseController(createEffectController({ ...options, runner: runnerFromPromise(options.runner) }))
+}
 
 afterEach(() => {
   if (directory) rmSync(directory, { recursive: true, force: true })
@@ -25,7 +31,7 @@ function definition(nodes: readonly DagNodeDefinition[]): DagDefinition {
   return { schemaVersion: 1, name: "test", nodes, maxParallel: 2 }
 }
 
-function fakeRunner(failures = new Set<string>()): DagRunner & { readonly started: string[] } {
+function fakeRunner(failures = new Set<string>()): DagRunnerPromise & { readonly started: string[] } {
   const started: string[] = []
   return {
     started,

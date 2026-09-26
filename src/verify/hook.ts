@@ -1,4 +1,5 @@
-import type { Context } from "@opencode/plugin/promise/plugin"
+import { Effect, type Scope } from "effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
 import { loadVerifyConfig, MUTATION_TOOLS } from "./config"
 import { mutatedPaths, renderReport, verify } from "./run"
 
@@ -20,8 +21,8 @@ type AfterEvent = {
  * files and append any diagnostics to the tool result the model sees. Failures of
  * the hook itself never fail the edit.
  */
-export async function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> }, host: VerifyHost): Promise<void> {
-  await ctx.tool.hook("execute.after", async (event) => {
+export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> }, host: VerifyHost): Effect.Effect<void, never, Scope.Scope> {
+  return ctx.tool.hook("execute.after", (event) => Effect.promise(async () => {
     const e = event as unknown as AfterEvent
     if (!MUTATION_TOOLS.has(e.tool) || e.status !== "completed") return
     try {
@@ -51,5 +52,5 @@ export async function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hoo
     } catch (error) {
       host.trace?.("iolaus.verify.failed", { tool: e.tool, error: String(error) })
     }
-  })
+  })).pipe(Effect.asVoid)
 }

@@ -3,7 +3,8 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, realpathSync, rmSync, 
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Agent } from "@opencode/plugin"
-import type { AgentEditor } from "@opencode/plugin/promise/agent"
+import { Effect } from "effect"
+import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import { resolveAstGrepBinary } from "../src/ast-grep/binary"
 import { blockedResources, evaluate, wildcardMatch, type PermissionRule } from "../src/ast-grep/permissions"
 import { AST_GREP_NAMESPACE, createAstGrepTools } from "../src/ast-grep/tools"
@@ -170,7 +171,7 @@ test("astGrep option is a boolean and read-only specialists may reach Code Mode"
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => undefined, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  await registerAgents({ agent: { transform: async (run) => { run(editor); return { dispose: async () => {} } } } }, parseOptions({}))
+  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
   const explore = agents.get(agentID("explore"))!.permissions as PermissionRule[]
   expect(evaluate("execute", "*", explore)).toBe("allow")
   expect(evaluate("grep", "*", explore)).toBe("allow")

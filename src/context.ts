@@ -1,5 +1,6 @@
-import type { Context } from "@opencode/plugin/promise/plugin"
-import type { SessionContext } from "@opencode/plugin/promise/session"
+import { Effect } from "effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
+import type { SessionContext } from "@opencode/plugin/effect/session"
 import type { Options } from "./options"
 import { CATEGORY_DESCRIPTIONS, agentName, categoryName, explicitMode } from "./prompts/catalog"
 import { agentMarker, categoryMarker } from "./registration"
@@ -35,11 +36,12 @@ export function dropNativeDefaultPrompt(system: SessionContext["system"]): numbe
   return removed
 }
 
-export async function composeContext(
+export function composeContext(
   event: SessionContext,
   ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list"> },
   options: Options,
-): Promise<void> {
+): Effect.Effect<void> {
+  return Effect.gen(function* () {
   const name = agentName(event.agent)
   const category = categoryName(event.agent)
   const mode = explicitMode(lastUserText(event.messages))
@@ -53,7 +55,7 @@ export async function composeContext(
     event.system[index] = { type: "text", text: bindNative(renderCategory(category, model)) }
     trace("iolaus.agent.rendered", { agent: category, kind: "category", model, sessionID: event.sessionID })
   } else if (name && index !== -1) {
-    const [agents, skills] = await Promise.all([ctx.agent.list(), ctx.skill.list()])
+    const [agents, skills] = yield* Effect.all([ctx.agent.list(), ctx.skill.list()], { concurrency: 2 }).pipe(Effect.orDie)
     const lanes = agents.data.filter((agent) => categoryName(String(agent.id)) !== undefined)
     const prompt = renderAgent(name, {
       model,
@@ -78,4 +80,5 @@ export async function composeContext(
     event.system.push({ type: "text", text: bindNative(`${renderMode(selectedMode, model, name)}${instruction ? `\n\n${instruction}` : ""}`) })
     trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID, nativePromptRemoved: removed, dag: instruction ? DAG_MODE_TEMPLATES[selectedMode] : null })
   }
+  })
 }

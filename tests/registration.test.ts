@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test"
 import { Agent, Model } from "@opencode/plugin"
-import type { AgentEditor } from "@opencode/plugin/promise/agent"
-import type { SessionContext } from "@opencode/plugin/promise/session"
+import { Effect } from "effect"
+import type { AgentEditor } from "@opencode/plugin/effect/agent"
+import type { SessionContext } from "@opencode/plugin/effect/session"
 import { Session } from "@opencode/schema/session"
 import { registerAgents, agentMarker, modeDispatchText } from "../src/registration"
 import { parseOptions } from "../src/options"
@@ -23,10 +24,7 @@ function registry() {
     },
   }
   return { agents, editor, get defaultAgent() { return defaultAgent },
-    ctx: { agent: { transform: async (run: (editor: AgentEditor) => void) => {
-      run(editor)
-      return { dispose: async () => {} }
-    } } },
+    ctx: { agent: { transform: (run: (editor: AgentEditor) => void) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } },
   }
 }
 
@@ -34,19 +32,19 @@ test("namespaced registrations preserve native agents and user definitions", asy
   const fixture = registry()
   fixture.editor.update("iolaus-oracle", (agent) => { agent.system = "user-owned" })
   const before = structuredClone([...fixture.agents.values()])
-  await registerAgents(fixture.ctx, parseOptions({}))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
   for (const value of before) expect(fixture.agents.get(String(value.id))).toEqual(value)
   expect(fixture.defaultAgent).toBe("build")
   for (const name of AGENT_NAMES) expect(fixture.agents.has(agentID(name))).toBe(true)
   expect(fixture.agents.get("iolaus-sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
   const once = structuredClone([...fixture.agents.values()])
-  await registerAgents(fixture.ctx, parseOptions({}))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
   expect([...fixture.agents.values()]).toEqual(once)
 })
 
 test("specialists restrict native shell, mutation and nested delegation", async () => {
   const fixture = registry()
-  await registerAgents(fixture.ctx, parseOptions({}))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
   function permission(name: string, action: string) {
     return fixture.agents.get(name)?.permissions.filter((rule) => rule.action === "*" || rule.action === action).at(-1)?.effect
   }
@@ -58,9 +56,9 @@ test("specialists restrict native shell, mutation and nested delegation", async 
 })
 
 const catalogs = {
-  agent: { list: async () => ({ location: { directory: "/test" }, data: [] }) },
-  skill: { list: async () => ({ location: { directory: "/test" }, data: [] }) },
-}
+  agent: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
+  skill: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
+} as never as Parameters<typeof composeContext>[1]
 function context(agent = "iolaus-sisyphus", model = "openai/gpt-5.5"): SessionContext {
   return {
     sessionID: Session.ID.make("ses_test"), agent: Agent.ID.make(agent), model: Model.Ref.parse(model),
@@ -73,7 +71,7 @@ test("request model selects prompt while tools, model and other system parts are
   for (const model of ["openai/gpt-5.5", "anthropic/claude-opus-4-8", "zai/glm-5.2"]) {
     const event = context("iolaus-sisyphus", model)
     const tools = structuredClone(event.tools)
-    await composeContext(event, catalogs, parseOptions({}))
+    await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
     expect(event.system[0].text).toBe(bindNative(renderAgent("sisyphus", { model, tools: [{ name: "read", category: "other" }] })))
     expect(event.system[1]).toEqual({ type: "text", text: "project guidance" })
     expect(event.tools).toEqual(tools)
@@ -86,7 +84,7 @@ test("ordinary native requests and user-owned agent prompts remain unchanged", a
     const event = context(agent)
     event.system = [{ type: "text", text: "user-owned" }, ...event.system.slice(1)]
     const before = structuredClone(event)
-    await composeContext(event, catalogs, parseOptions({}))
+    await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
     expect(event).toEqual(before)
   }
 })
@@ -97,14 +95,14 @@ test("mode requires explicit marker and resets with the next user request", asyn
   expect(explicitMode("/iolaus-team inspect this")).toBe("team")
   const event = context("build")
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
-  await composeContext(event, catalogs, parseOptions({}))
+  await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
   const { modeDagInstruction } = await import("../src/prompts/mode-dag")
   const ultraworkSystem = bindNative(`${renderMode("ultrawork", "openai/gpt-5.5")}\n\n${modeDagInstruction("ultrawork")}`)
   expect(event.system.at(-1)?.text).toBe(ultraworkSystem)
   const next = context("build")
   next.messages = [...event.messages, { role: "user", content: [{ type: "text", text: "A different request" }] }]
   const before = structuredClone(next)
-  await composeContext(next, catalogs, parseOptions({}))
+  await Effect.runPromise(composeContext(next, catalogs, parseOptions({})))
   expect(next).toEqual(before)
 })
 
@@ -117,7 +115,7 @@ test("mode dispatch drops the native default prompt and keeps env, tool catalog 
     { type: "text", text: "Instructions from: AGENTS.md\nproject guidance" },
   ]
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
-  await composeContext(event, catalogs, parseOptions({}))
+  await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
   const texts = event.system.map((part) => part.text)
   expect(texts.some((text) => text.startsWith(NATIVE_DEFAULT_PROMPT_PREFIX))).toBe(false)
   expect(texts.some((text) => text.includes("Do not spawn subagents"))).toBe(false)
@@ -133,7 +131,7 @@ test("omitted agent and mode selections disable their context paths", async () =
   const event = context()
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("team")}\nWork` }] }]
   const before = structuredClone(event)
-  await composeContext(event, catalogs, parseOptions({ agents: [], modes: [] }))
+  await Effect.runPromise(composeContext(event, catalogs, parseOptions({ agents: [], modes: [] })))
   expect(event).toEqual(before)
 })
 

@@ -33,14 +33,16 @@
   },
   "peerDependencies": {
     "@opencode/plugin": "2.0.16",
+    "effect": "4.0.0-rc.112",
     "@opentui/core": ">=0.5.10",
     "@opentui/solid": ">=0.5.10",
     "solid-js": ">=1.9.0"
   },
   "dependencies": {
-    "zod": "4.1.8",
+    "@iolaus/ast-grep-core": "workspace:*",
     "@iolaus/model-core": "workspace:*",
-    "@iolaus/ast-grep-core": "workspace:*"
+    "effect": "4.0.0-rc.112",
+    "zod": "4.1.8"
   },
   "devDependencies": {
     "@opencode/plugin": "2.0.16",

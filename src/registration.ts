@@ -1,6 +1,7 @@
 import { tmpdir } from "node:os"
-import { Agent, Model } from "@opencode/plugin"
-import type { Context } from "@opencode/plugin/promise/plugin"
+import { Effect, type Scope } from "effect"
+import { Agent, Model } from "@opencode/plugin/effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
 import type { Options } from "./options"
 import {
   AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, PRIMARY_AGENTS, agentID, categoryID, modeMarker,
@@ -42,13 +43,13 @@ function applyModel(agent: { model?: unknown }, assignment: LaneAssignment | und
  * pinned model, and a lane whose chain and config both name no model is not
  * registered. Provider connectivity and subscription state are not consulted.
  */
-export async function registerAgents(
+export function registerAgents(
   ctx: { agent: Pick<Context["agent"], "transform"> },
   options: Options,
   config: ModelsConfig = {},
-): Promise<RegistrationPlan> {
+): Effect.Effect<RegistrationPlan, never, Scope.Scope> {
   const plan = planRegistration(options, config)
-  await ctx.agent.transform((editor) => {
+  return ctx.agent.transform((editor) => {
     for (const [name, assignment] of plan.agents) {
       const id = agentID(name)
       const existing = editor.get(id)
@@ -107,35 +108,31 @@ export async function registerAgents(
       })
       trace("iolaus.agent.model", { agent: id, model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
     }
-  })
-  return plan
+  }).pipe(Effect.as(plan))
 }
 
 export function modeDispatchText(mode: ModeName, task: string): string {
   return `${modeMarker(mode)}\n${task}`
 }
 
-export async function registerModes(ctx: {
+export function registerModes(ctx: {
   command: Pick<Context["command"], "transform">
   session: Pick<Context["session"], "prompt">
-}, options: Options): Promise<void> {
-  await ctx.command.transform((editor) => {
+}, options: Options): Effect.Effect<void, never, Scope.Scope> {
+  return ctx.command.transform((editor) => {
     for (const mode of options.modes) {
       editor.add({
         name: `iolaus-${mode}`,
         description: DAG_MODE_TEMPLATES[mode]
           ? `Run the task as the Iolaus "${DAG_MODE_TEMPLATES[mode]}" DAG template under the retained OMO ${mode} prompt.`
           : `Apply the retained OMO ${mode} prompt with native OpenCode tools.`,
-        async execute({ sessionID, prompt, delivery }) {
-          await ctx.session.prompt({
-            ...prompt,
-            sessionID,
-            text: modeDispatchText(mode, prompt.text ?? ""),
-            delivery,
-          })
-          trace("iolaus.mode.dispatched", { mode, sessionID, dag: DAG_MODE_TEMPLATES[mode] ?? null })
-        },
+        execute: ({ sessionID, prompt, delivery }) => ctx.session.prompt({
+          ...prompt,
+          sessionID,
+          text: modeDispatchText(mode, prompt.text ?? ""),
+          delivery,
+        }).pipe(Effect.tap(() => Effect.sync(() => trace("iolaus.mode.dispatched", { mode, sessionID, dag: DAG_MODE_TEMPLATES[mode] ?? null })))),
       })
     }
-  })
+  }).pipe(Effect.asVoid)
 }

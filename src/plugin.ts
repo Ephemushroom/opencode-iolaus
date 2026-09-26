@@ -1,4 +1,6 @@
-import { Agent, Plugin } from "@opencode/plugin"
+import { Effect } from "effect"
+import { Agent, Plugin } from "@opencode/plugin/effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
 import { parseOptions } from "./options"
 import { registerAgents, registerModes } from "./registration"
 import { registerMcps } from "./mcp"
@@ -16,76 +18,88 @@ import { AST_GREP_NAMESPACE, AST_GREP_NAMESPACE_DESCRIPTION, createAstGrepTools 
 import type { PermissionRule } from "./ast-grep/permissions"
 import { resolveGhBinary } from "./gh/binary"
 import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
+import { effectTool } from "./effect-bridge"
+
+/** Session directory for a call, falling back to the plugin's own location. */
+function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
+  return ctx.session.get({ sessionID: sessionID as never }).pipe(
+    Effect.map((session) => String(session.location?.directory ?? ctx.location.directory)),
+    Effect.catch(() => Effect.succeed(String(ctx.location.directory))),
+  )
+}
+
+/** Agent rules plus any session-level rules, for tools that must re-check permissions in-process. */
+function permissionRules(ctx: Context, sessionID: string, agent: string): Effect.Effect<readonly PermissionRule[]> {
+  return Effect.all([
+    ctx.agent.get({ agentID: Agent.ID.make(agent) }).pipe(Effect.map((result) => result.data?.permissions ?? []), Effect.catch(() => Effect.succeed([] as readonly unknown[]))),
+    ctx.session.get({ sessionID: sessionID as never }).pipe(Effect.map((session) => (session as { permissions?: readonly PermissionRule[] }).permissions ?? []), Effect.catch(() => Effect.succeed([] as readonly PermissionRule[]))),
+  ], { concurrency: 2 }).pipe(Effect.map(([agentRules, sessionRules]) => [...(agentRules as readonly PermissionRule[]), ...sessionRules]))
+}
 
 export default Plugin.define({
   id: "iolaus",
-  async setup(ctx) {
+  effect: (ctx) => Effect.gen(function* () {
     const options = parseOptions({ ...ctx.options })
     trace("iolaus.loaded", { enabled: options.enabled, host: ctx.app.version })
     if (!options.enabled) return
     const models = loadModelsConfig(ctx.location.directory, { inline: options.models })
     trace("iolaus.models.loaded", { sources: models.sources, diagnostics: models.diagnostics })
-    await registerAgents(ctx, options, models.config)
-    await registerModes(ctx, options)
-    await registerMcps(ctx, options.mcps)
+    yield* registerAgents(ctx, options, models.config)
+    yield* registerModes(ctx, options)
+    yield* registerMcps(ctx, options.mcps)
     const defaultModel = (agent: string): string | undefined => {
       const lane = agentName(agent) ?? categoryName(agent)
       const assignment = lane ? resolveLane(lane, models.config) : undefined
       return assignment ? modelString(assignment) : undefined
     }
-    await ctx.session.hook("context", (event) => composeContext(event, ctx, options))
-    let rpcRegistration: Awaited<ReturnType<typeof registerDagRpc>> | undefined
+    yield* ctx.session.hook("context", (event) => composeContext(event, ctx, options))
+
+    // The RPC registration is created after the controller, so events emitted before it exists are dropped.
+    let emit: ((sessionID: string, runID: string, sequence: number, type: string) => Effect.Effect<void, unknown>) | undefined
     const controller = createDagController({
       directory: ctx.location.directory,
       runner: createOpenCodeDagRunner(ctx),
       defaultModel,
       trace,
-      onEvent: (event, sessionID) => rpcRegistration?.events.emit("updated", { sessionID, runID: event.runID, sequence: event.sequence, type: event.type }),
+      onEvent: (event, sessionID) => emit?.(sessionID, event.runID, event.sequence, event.type),
     })
-    await ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
+    yield* Effect.addFinalizer(() => controller.close)
+    yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
+
     const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
     trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })
     if (sgPath) {
       const tools = createAstGrepTools(sgPath, {
-        async directory(sessionID) {
-          const session = await ctx.session.get({ sessionID: sessionID as never })
-          return String(session.location?.directory ?? ctx.location.directory)
-        },
-        async rules(sessionID, agent) {
-          const [info, session] = await Promise.all([
-            ctx.agent.get({ agentID: Agent.ID.make(agent) }).then((result) => result.data).catch(() => undefined),
-            ctx.session.get({ sessionID: sessionID as never }).catch(() => undefined),
-          ])
-          return [...(info?.permissions ?? []), ...((session as { permissions?: readonly PermissionRule[] } | undefined)?.permissions ?? [])] as PermissionRule[]
-        },
+        directory: (sessionID) => Effect.runPromise(sessionDirectory(ctx, sessionID)),
+        rules: (sessionID, agent) => Effect.runPromise(permissionRules(ctx, sessionID, agent)),
         trace,
       })
-      await ctx.tool.transform((editor) => {
+      yield* ctx.tool.transform((editor) => {
         editor.namespace({ name: AST_GREP_NAMESPACE, description: AST_GREP_NAMESPACE_DESCRIPTION })
-        for (const tool of tools) editor.add(tool)
+        for (const tool of tools) editor.add(effectTool(tool))
       })
     }
+
     const ghBinary = options.gh ? resolveGhBinary() : undefined
     trace(ghBinary?.authenticated ? "iolaus.gh.registered" : "iolaus.gh.unavailable", { enabled: options.gh, binary: ghBinary?.path ?? null, version: ghBinary?.version ?? null, authenticated: ghBinary?.authenticated ?? false })
     if (ghBinary?.authenticated) {
       const tools = createGhTools(ghBinary, { trace })
-      await ctx.tool.transform((editor) => {
+      yield* ctx.tool.transform((editor) => {
         editor.namespace({ name: GH_NAMESPACE, description: GH_NAMESPACE_DESCRIPTION })
-        for (const tool of tools) editor.add(tool)
+        for (const tool of tools) editor.add(effectTool(tool))
       })
     }
+
     if (options.verify !== false) {
-      await registerVerifyHook(ctx, {
-        async directory(sessionID) {
-          const session = await ctx.session.get({ sessionID: sessionID as never })
-          return String(session.location?.directory ?? ctx.location.directory)
-        },
+      yield* registerVerifyHook(ctx, {
+        directory: (sessionID) => Effect.runPromise(sessionDirectory(ctx, sessionID)),
         trace,
         ...(typeof options.verify === "object" ? { inline: options.verify } : {}),
       })
     }
     trace("iolaus.verify.registered", { enabled: options.verify !== false, inline: typeof options.verify === "object" })
-    rpcRegistration = await registerDagRpc(ctx, controller)
-    return async () => { controller.close(); await rpcRegistration?.dispose() }
-  },
+
+    const rpc = yield* registerDagRpc(ctx, controller).pipe(Effect.orDie)
+    emit = (sessionID, runID, sequence, type) => rpc.events.emit("updated", { sessionID, runID, sequence, type })
+  }),
 })
