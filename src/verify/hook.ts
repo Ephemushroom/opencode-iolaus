@@ -7,6 +7,8 @@ export interface VerifyHost {
   readonly directory: (sessionID: string) => Promise<string>
   readonly trace?: (event: string, data: Record<string, unknown>) => void
   readonly inline?: unknown
+  /** User-layer directory holding a fallback verify.json. */
+  readonly userLayer?: string
 }
 
 type AfterEvent = {
@@ -27,7 +29,7 @@ export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> },
     if (!MUTATION_TOOLS.has(e.tool) || e.status !== "completed") return
     try {
       const directory = await host.directory(e.sessionID)
-      const config = loadVerifyConfig(directory, host.inline)
+      const config = loadVerifyConfig(directory, host.inline, host.userLayer)
       if (config.source === "disabled") return
       const paths = mutatedPaths(e.input, directory)
       if (!paths.length) {

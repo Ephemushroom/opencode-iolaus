@@ -77,12 +77,13 @@ export function detectCheckers(directory: string): Checker[] {
 }
 
 /**
- * `.iolaus/verify.json` in the session directory wins; `{ "checkers": [] }` turns
+ * `.iolaus/verify.json` in the session directory wins, then the user layer's
+ * `verify.json`; `{ "checkers": [] }` turns
  * the checkers off while keeping the comment check, `false`-like disabling is
  * `{ "checkers": [], "commentPattern": null }`.
  */
-export function loadVerifyConfig(directory: string, inline?: unknown): VerifyConfig {
-  const file = readJson(join(directory, ".iolaus", VERIFY_CONFIG_FILE))
+export function loadVerifyConfig(directory: string, inline?: unknown, userLayer?: string): VerifyConfig {
+  const file = readJson(join(directory, ".iolaus", VERIFY_CONFIG_FILE)) ?? (userLayer ? readJson(join(userLayer, VERIFY_CONFIG_FILE)) : undefined)
   const record = inline !== undefined
     ? (typeof inline === "object" && inline !== null ? (inline as Record<string, unknown>) : undefined)
     : file

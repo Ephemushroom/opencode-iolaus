@@ -64,6 +64,8 @@ After every `edit`, `write` or `patch`, Iolaus verifies the changed files and ap
 
 If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh` namespace in Code Mode: `tools.gh.searchCode`, `searchRepos`, `repo`, `issues`, `issue`, `prs`, `pr`, `prDiff`, and `clone` (shallow, into a temporary directory) followed by `log`, `blame` and `show` on the clone. Calls run the `gh` binary directly with fixed arguments; there is no shell and no `gh api`, so nothing can write to GitHub. Set `"gh": false` to leave it out.
 
+Iolaus keeps agent state in two layers. `~/.iolaus` (or `IOLAUS_HOME`) is shared across projects: `models.json`, `verify.json`, and `agent/plans`, `agent/memory`, `agent/skills`. `<project>/.iolaus` holds DAG state and project plans and overrides the shared files. Both are created on first run; existing files are never touched. Prompts tell agents where to write.
+
 ## Development
 
 Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.

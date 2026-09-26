@@ -40,6 +40,7 @@ export function composeContext(
   event: SessionContext,
   ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list"> },
   options: Options,
+  homeText?: string,
 ): Effect.Effect<void> {
   return Effect.gen(function* () {
   const name = agentName(event.agent)
@@ -52,7 +53,7 @@ export function composeContext(
   if (index === -1 && !selectedMode) return
   const model = `${event.model.providerID}/${event.model.id}`
   if (category && index !== -1) {
-    event.system[index] = { type: "text", text: bindNative(renderCategory(category, model)) }
+    event.system[index] = { type: "text", text: bindNative(renderCategory(category, model), homeText) }
     trace("iolaus.agent.rendered", { agent: category, kind: "category", model, sessionID: event.sessionID })
   } else if (name && index !== -1) {
     const [agents, skills] = yield* Effect.all([ctx.agent.list(), ctx.skill.list()], { concurrency: 2 }).pipe(Effect.orDie)
@@ -70,14 +71,14 @@ export function composeContext(
       skills: skills.data.map((skill) => ({ name: skill.id, description: skill.description ?? "", location: "plugin" })),
       tools: categorizeTools(Object.keys(event.tools)),
     })
-    event.system[index] = { type: "text", text: bindNative(prompt) }
+    event.system[index] = { type: "text", text: bindNative(prompt, homeText) }
     trace("iolaus.agent.rendered", { agent: name, model, sessionID: event.sessionID })
   }
   if (selectedMode) {
     const removed = dropNativeDefaultPrompt(event.system)
     const child = lastUserText(event.messages).includes(DAG_CHILD_MARKER)
     const instruction = child ? undefined : modeDagInstruction(selectedMode)
-    event.system.push({ type: "text", text: bindNative(`${renderMode(selectedMode, model, name)}${instruction ? `\n\n${instruction}` : ""}`) })
+    event.system.push({ type: "text", text: bindNative(`${renderMode(selectedMode, model, name)}${instruction ? `\n\n${instruction}` : ""}`, homeText) })
     trace("iolaus.mode.rendered", { mode: selectedMode, model, sessionID: event.sessionID, nativePromptRemoved: removed, dag: instruction ? DAG_MODE_TEMPLATES[selectedMode] : null })
   }
   })

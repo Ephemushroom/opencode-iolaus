@@ -243,6 +243,17 @@ try {
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
        assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
+       if (scenario.enabled) {
+         // agent-home: the user layer is provisioned under the sandbox HOME only, and every rendered prompt carries the home contract.
+         const ready = traces.find((t) => t.event === "iolaus.home.ready")
+         assert.ok(ready, "iolaus.home.ready trace missing")
+         assert.equal(ready.user, join(home, ".iolaus"), `user layer escaped the sandbox: ${ready.user}`)
+         assert.ok(ready.project.startsWith(project), `project layer outside the project: ${ready.project}`)
+         for (const dir of ["agent/plans", "agent/memory", "agent/skills"]) assert.ok(existsSync(join(home, ".iolaus", dir)), `user layer missing ${dir}`)
+         assert.ok(existsSync(join(project, ".iolaus", "plans")), "project plans dir missing")
+         const rendered = requests.filter((r) => r.scenario === scenario.name && r.instructions.includes("<iolaus-native-contract>"))
+         if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>User layer ${join(home, ".iolaus")}`)), "rendered prompt lacks the home contract")
+       }
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), Boolean(scenario.mode))
        if (scenario.dag && scenario.template !== "unavailable") {
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.started"), "DAG run did not start")
