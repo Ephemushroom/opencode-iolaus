@@ -8,6 +8,10 @@ export function isGate(node: DagNodeDefinition): boolean {
   return node.kind === "gate"
 }
 
+export function isJudge(node: DagNodeDefinition): boolean {
+  return node.kind === "judge"
+}
+
 export function validateDefinition(definition: DagDefinition): void {
   if (definition.schemaVersion !== 1) throw new DagValidationError("Unsupported DAG schema version")
   if (!definition.name.trim()) throw new DagValidationError("DAG name must be nonempty")
@@ -16,7 +20,7 @@ export function validateDefinition(definition: DagDefinition): void {
   for (const node of definition.nodes) {
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")
     if (nodes.has(node.id)) throw new DagValidationError(`Duplicate DAG node: ${node.id}`)
-    if (node.kind !== undefined && node.kind !== "agent" && node.kind !== "gate") throw new DagValidationError(`Unsupported node kind: ${node.id}`)
+    if (node.kind !== undefined && node.kind !== "agent" && node.kind !== "judge" && node.kind !== "gate") throw new DagValidationError(`Unsupported node kind: ${node.id}`)
     if (isGate(node)) {
       if (node.agent !== undefined || node.model !== undefined) throw new DagValidationError(`Gate node must not name an agent or model: ${node.id}`)
       if (!node.prompt.trim()) throw new DagValidationError(`Gate node needs a message for the approver: ${node.id}`)
@@ -42,6 +46,13 @@ export function validateDefinition(definition: DagDefinition): void {
       }
       if (!nodes.has(input.node)) throw new DagValidationError(`Unknown input node: ${input.node}`)
     }
+  }
+  if (definition.loop) {
+    const loop = definition.loop
+    if (!nodes.has(loop.review)) throw new DagValidationError(`Loop review node is unknown: ${loop.review}`)
+    if (!nodes.has(loop.fix)) throw new DagValidationError(`Loop fix node is unknown: ${loop.fix}`)
+    if (!Number.isInteger(loop.maxRounds) || loop.maxRounds < 1 || loop.maxRounds > 10) throw new DagValidationError("Loop maxRounds must be an integer from 1 to 10")
+    for (const id of loop.tail ?? []) if (!nodes.has(id)) throw new DagValidationError(`Loop tail node is unknown: ${id}`)
   }
   const visiting = new Set<string>()
   const visited = new Set<string>()

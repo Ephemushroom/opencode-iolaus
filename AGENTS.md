@@ -47,6 +47,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   cancellation and JSON-safe result envelopes.
 - `iolaus_dag` is the only model-facing orchestration tool in the first runtime
   slice. It is owner-scoped and schema-validated.
+- Node kinds: `agent` runs a child session; `judge` makes one `generate.text`
+  call on the node's agent lane model with no session (its execution ref is
+  `judge:<node>:<attempt>:<ts>`, the reply is returned by `wait`); `gate`
+  waits for a human. Every template reviewer is a `judge`, so reviews cost one
+  model call instead of a session.
 - `src/ast-grep/` registers `ast_grep.search`, `ast_grep.rewrite` and
   `ast_grep.scan` as Code Mode tools when an `ast-grep` binary answers
   `--version` (`IOLAUS_AST_GREP_BIN`, then PATH, then common prefixes); the
@@ -129,7 +134,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `review<n>` guarded by the previous verdict (up to `iterations`, default 3),
   then an `accept` gate; worker prompts carry the ultrawork marker plus
   `<iolaus-dag-child>`, which suppresses the DAG block so a child does the work
-  instead of spawning another run. `hyperplan` fans `members` (default the
+  instead of spawning another run. The loop is dynamic (`src/dag/loop.ts`): the
+  template creates `work` → `review` → `accept` plus a `loop` spec, and when the
+  newest review settles with `VERDICT: FAIL` and rounds remain the scheduler
+  appends `work<n>` / `review<n>` (event `loop.grown`, generation +1) and
+  rewires the tail gate to the newest review. `iterations` is the round cap. `hyperplan` fans `members` (default the
   four category lanes) through analyse → cross-attack → defend, then Metis
   distills, Prometheus plans, Momus reviews, gate. `team` remains a prompt-only
   mode. `opencode run "/iolaus-<mode> ..."` resolves the command client-side, so

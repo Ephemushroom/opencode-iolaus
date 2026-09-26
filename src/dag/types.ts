@@ -1,7 +1,11 @@
 export type JsonPrimitive = string | number | boolean | null
 export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonValue }
 
-export type DagNodeKind = "agent" | "aggregator" | "gate"
+/**
+ * `agent` runs a child session; `judge` makes one model call with no session and
+ * is the cheap shape for reviews; `gate` waits for a human.
+ */
+export type DagNodeKind = "agent" | "judge" | "aggregator" | "gate"
 export type DagRunStatus = "running" | "paused" | "completed" | "failed" | "cancelled" | "interrupted"
 export type DagNodeStatus =
   | "pending"
@@ -78,9 +82,28 @@ export interface DagNodeDefinition {
   readonly maxAttempts?: number
 }
 
+/**
+ * A review loop the scheduler grows on demand: when `review` settles with FAIL,
+ * a new `fix<n>` (executor) and `review<n>` (reviewer) pair is appended via
+ * amend, up to `maxRounds`. Nodes are never rewritten, so completed work is
+ * reused and the graph stays a DAG.
+ */
+export interface DagLoop {
+  readonly review: string
+  readonly fix: string
+  readonly executorPrompt: string
+  readonly reviewerPrompt: string
+  readonly failIncludes: string
+  readonly passIncludes: string
+  readonly maxRounds: number
+  /** Nodes that wait on the latest review (e.g. the accept gate); their dependsOn/when are rewritten to the newest review. */
+  readonly tail?: readonly string[]
+}
+
 export interface DagDefinition {
   readonly schemaVersion: 1
   readonly name: string
+  readonly loop?: DagLoop
   readonly nodes: readonly DagNodeDefinition[]
   readonly maxParallel?: number
 }
@@ -156,6 +179,7 @@ export interface DagEvent {
     | "node.waiting"
     | "node.approved"
     | "node.rejected"
+    | "loop.grown"
     | "run.paused"
   readonly payload?: JsonValue
   readonly createdAt: number

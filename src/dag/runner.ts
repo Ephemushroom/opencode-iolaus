@@ -55,15 +55,31 @@ function assistantText(messages: readonly unknown[]): string {
 }
 
 type SessionApi = Pick<Context["session"], "create" | "prompt" | "wait" | "get" | "context" | "interrupt">
+type GenerateApi = Pick<Context["generate"], "text">
 
 function runnerError(nodeID: string) {
   return (cause: unknown) => new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), nodeID, cause })
 }
 
-/** Runs a node as a native OpenCode child session on the node's agent and model. */
-export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly location: { readonly directory: string } }): DagRunner {
+/** Prefix marking a judge execution ref; judge nodes have no session, the ref carries the completed text. */
+const JUDGE_REF = "judge:"
+
+/**
+ * Runs agent nodes as native OpenCode child sessions on the node's agent and
+ * model, and judge nodes as one `generate.text` call. A judge has no session,
+ * so its ref encodes the reply and `wait` returns it without a host round trip.
+ */
+export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly generate: GenerateApi; readonly location: { readonly directory: string } }): DagRunner {
+  const judgeReplies = new Map<string, string>()
   return {
     start: (input) => Effect.gen(function* () {
+      if (input.node.kind === "judge") {
+        const model = input.node.model === undefined ? undefined : Model.Ref.parse(input.node.model)
+        const reply = yield* ctx.generate.text({ prompt: input.prompt, ...(model ? { model } : {}) }).pipe(Effect.mapError(runnerError(input.node.id)))
+        const key = `${JUDGE_REF}${input.node.id}:${input.attempt}:${Date.now()}`
+        judgeReplies.set(key, reply.text)
+        return { nodeID: input.node.id, attempt: input.attempt, sessionID: key }
+      }
       if (input.node.agent === undefined) return yield* new DagRunnerError({ message: `Iolaus DAG node ${input.node.id} has no execution target`, nodeID: input.node.id })
       const session = yield* ctx.session.create({
         title: `Iolaus DAG · ${input.node.id}`,
@@ -76,6 +92,12 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
       return { nodeID: input.node.id, attempt: input.attempt, sessionID: String(session.id) }
     }),
     wait: (ref) => Effect.gen(function* () {
+      if (ref.sessionID.startsWith(JUDGE_REF)) {
+        const text = judgeReplies.get(ref.sessionID)
+        judgeReplies.delete(ref.sessionID)
+        if (text === undefined) return yield* new DagRunnerError({ message: "Judge reply was lost", nodeID: ref.nodeID })
+        return { payload: { text } }
+      }
       const sessionID = ref.sessionID as never
       yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
       const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
@@ -84,6 +106,6 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
       if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
       return { payload: { text: assistantText(messages as readonly unknown[]) } }
     }),
-    cancel: (ref) => ctx.session.interrupt({ sessionID: ref.sessionID as never, resume: false }).pipe(Effect.asVoid, Effect.mapError(runnerError(ref.nodeID))),
+    cancel: (ref) => ref.sessionID.startsWith(JUDGE_REF) ? Effect.sync(() => { judgeReplies.delete(ref.sessionID) }) : ctx.session.interrupt({ sessionID: ref.sessionID as never, resume: false }).pipe(Effect.asVoid, Effect.mapError(runnerError(ref.nodeID))),
   }
 }
