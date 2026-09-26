@@ -46,20 +46,61 @@ function inside(directory: string, target: string): boolean {
   return rel === "" || (!rel.startsWith("..") && !isAbsolute(rel))
 }
 
-// tsc:  src/a.ts(3,7): error TS2322: ...      biome/eslint/gcc: src/a.ts:3:7 - error ...
-const LOCATION = /^(?<path>[^\s:(]+(?:\/[^\s:(]+)*)(?:\((?<l1>\d+),\d+\)|:(?<l2>\d+)(?::\d+)?)[\s:-]+(?<msg>.*)$/
+// tsc:  src/a.ts(3,7): error TS2322: ...      eslint unix / ruff concise / cargo short / go vet: src/a.ts:3:7 - error ... or ./a.go:3:2: msg
+const LOCATION = /^(?<path>\.?\.?\/?[^\s:(]+(?:\/[^\s:(]+)*)(?:\((?<l1>\d+),\d+\)|:(?<l2>\d+)(?::\d+)?)[\s:-]+(?<msg>.*)$/
+// biome --reporter=github:  ::error title=lint/x,file=src/a.ts,line=3,endLine=3,col=1,endColumn=2::message
+const GITHUB = /^::(?:error|warning|notice)\b(?<attrs>[^:]*)::(?<msg>.*)$/
 
 /** Keep lines that locate a diagnostic in one of the changed files. */
 export function filterDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
   const wanted = new Set(changed.map((path) => resolve(directory, path)))
   const result: Diagnostic[] = []
   for (const raw of output.split(/\r?\n/)) {
+    const gh = GITHUB.exec(raw.trim())
+    if (gh?.groups) {
+      const attrs = Object.fromEntries(gh.groups.attrs.split(",").map((pair) => pair.split("=").map((s) => s.trim())).filter((pair) => pair.length === 2))
+      if (attrs.file) {
+        const path = resolve(directory, attrs.file)
+        if (wanted.has(path)) result.push({ path: relative(directory, path), ...(attrs.line ? { line: Number(attrs.line) } : {}), message: `${attrs.title ? `${attrs.title}: ` : ""}${gh.groups.msg.trim()}` })
+      }
+      continue
+    }
     const match = LOCATION.exec(raw.trim())
     if (!match?.groups) continue
     const path = resolve(directory, match.groups.path)
     if (!wanted.has(path)) continue
     const line = Number(match.groups.l1 ?? match.groups.l2)
     result.push({ path: relative(directory, path), ...(Number.isFinite(line) ? { line } : {}), message: match.groups.msg.trim() })
+  }
+  return result
+}
+
+/** JSON reporters: an array (or `diagnostics`/`results` array) of objects naming a file and optionally a line and message. */
+export function filterJsonDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
+  const wanted = new Set(changed.map((path) => resolve(directory, path)))
+  let parsed: unknown
+  try { parsed = JSON.parse(output.trim()) } catch { return [] }
+  const list = Array.isArray(parsed) ? parsed
+    : parsed && typeof parsed === "object" && Array.isArray((parsed as { diagnostics?: unknown }).diagnostics) ? (parsed as { diagnostics: unknown[] }).diagnostics
+    : parsed && typeof parsed === "object" && Array.isArray((parsed as { results?: unknown }).results) ? (parsed as { results: unknown[] }).results
+    : []
+  const result: Diagnostic[] = []
+  for (const item of list) {
+    if (!item || typeof item !== "object") continue
+    const record = item as Record<string, unknown>
+    // ESLint's JSON groups messages per file.
+    if (Array.isArray(record.messages) && typeof record.filePath === "string") {
+      const path = resolve(directory, record.filePath)
+      if (!wanted.has(path)) continue
+      for (const m of record.messages as Record<string, unknown>[]) result.push({ path: relative(directory, path), ...(typeof m.line === "number" ? { line: m.line } : {}), message: String(m.message ?? m.ruleId ?? "") })
+      continue
+    }
+    const file = record.file ?? record.path ?? record.filename ?? record.filePath ?? (record.location as { file?: unknown } | undefined)?.file
+    if (typeof file !== "string") continue
+    const path = resolve(directory, file)
+    if (!wanted.has(path)) continue
+    const line = record.line ?? (record.location as { line?: unknown; row?: unknown } | undefined)?.line ?? (record.location as { row?: unknown } | undefined)?.row ?? (record.start as { line?: unknown } | undefined)?.line
+    result.push({ path: relative(directory, path), ...(typeof line === "number" ? { line } : {}), message: String(record.message ?? record.code ?? record.rule ?? "") })
   }
   return result
 }
@@ -71,7 +112,7 @@ function runChecker(checker: Checker, directory: string, changed: readonly strin
     execFile(command, args, { cwd: directory, timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024, encoding: "utf8", signal, env: { ...process.env, FORCE_COLOR: "0", NO_COLOR: "1" } }, (error, stdout, stderr) => {
       const durationMs = Date.now() - started
       const output = `${stdout ?? ""}\n${stderr ?? ""}`
-      const diagnostics = filterDiagnostics(output, directory, changed)
+      const diagnostics = checker.format === "json" ? filterJsonDiagnostics(stdout ?? "", directory, changed) : filterDiagnostics(output, directory, changed)
       const failedToRun = error && !("code" in error && typeof error.code === "number")
       if (failedToRun) return done({ name: checker.name, ok: false, diagnostics, durationMs, error: String((error as Error).message).split("\n")[0] })
       done({ name: checker.name, ok: diagnostics.length === 0, diagnostics, durationMs })
