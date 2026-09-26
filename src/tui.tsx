@@ -51,13 +51,19 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
   const [now, setNow] = createSignal(Date.now())
   const [busy, setBusy] = createSignal<string | undefined>(undefined)
   const { activity, watch } = useActivity(context)
+  const seenGates = new Set<string>()
 
   const refresh = async () => {
     const result = await rpc.snapshot({ sessionID: props.sessionID }) as unknown as { readonly runs?: readonly DagViewRun[] }
     const next = result.runs ?? []
     setRuns(next)
     watch(next.flatMap((run) => run.nodes.filter((n) => n.status === "running" && n.sessionID).map((n) => n.sessionID!)))
-    // Keep a valid selection: default to the first gate waiting, else the first running node.
+    // A gate that has just started waiting takes the selection, so `a`/`r` act on it without the user hunting for it.
+    const waiting = next.flatMap((r) => r.nodes.filter((n) => n.status === "waiting_approval").map((n) => ({ runID: r.runID, nodeID: n.id, key: `${r.runID}:${n.id}:${n.attempt}` })))
+    const fresh = waiting.find((gate) => !seenGates.has(gate.key))
+    for (const gate of waiting) seenGates.add(gate.key)
+    if (fresh) { setSelected({ runID: fresh.runID, nodeID: fresh.nodeID }); return }
+    // Otherwise keep a valid selection: default to the first gate waiting, else the first running node.
     const current = selected()
     const stillThere = current && next.some((r) => r.runID === current.runID && r.nodes.some((n) => n.id === current.nodeID))
     if (!stillThere) {

@@ -132,10 +132,10 @@ test("category lanes render the model-routed junior prompt with a category conte
 })
 
 test("DAG nodes without a model receive the configured lane model at create time; explicit models win", () => {
-  const defaultModel = (agent: string) => agent === "iolaus-quick" ? "openai/gpt-6-luna-fast#low" : agent === "iolaus-oracle" ? "openai/gpt-5.6-sol#xhigh" : undefined
+  const defaultModel = (agent: string) => agent === "quick" ? "openai/gpt-6-luna-fast#low" : agent === "oracle" ? "openai/gpt-5.6-sol#xhigh" : undefined
   const definition = applyDefaultModels({ schemaVersion: 1, name: "t", nodes: [
-    { id: "a", agent: "iolaus-quick", prompt: "p", dependsOn: [] },
-    { id: "b", agent: "iolaus-oracle", model: "openai/gpt-5.5", prompt: "p", dependsOn: [] },
+    { id: "a", agent: "quick", prompt: "p", dependsOn: [] },
+    { id: "b", agent: "oracle", model: "openai/gpt-5.5", prompt: "p", dependsOn: [] },
     { id: "c", agent: "build", model: "openai/gpt-5.5", prompt: "p", dependsOn: [] },
     { id: "g", kind: "gate", prompt: "ok?", dependsOn: [] },
   ] }, defaultModel)

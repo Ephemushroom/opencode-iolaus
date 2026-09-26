@@ -1,0 +1,34 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.16",
+  "tracePath": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/names/.omo/evidence/20260926-iolaus-short-ids-tui/trace.ndjson",
+  "tmuxLog": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/names/.omo/evidence/20260926-iolaus-short-ids-tui/tmux.log",
+  "nativeTuiLoaded": true,
+  "screens": [
+    "idle",
+    "agents",
+    "running",
+    "gate",
+    "completed",
+    "opened"
+  ],
+  "nodeOrder": [
+    "plan",
+    "review",
+    "revise",
+    "rereview",
+    "approve",
+    "execute"
+  ],
+  "requestCount": 12,
+  "realBefore": {
+    "config": "21c728ed03239e718eed4e93f1631e7ac932517601aea6eaf277233e8036d62a",
+    "database": "fb3235c4da224b46d18618ae7d1b95910abf9e31a1953d9a0e6a44cfba1ca4ca"
+  },
+  "realAfter": {
+    "config": "21c728ed03239e718eed4e93f1631e7ac932517601aea6eaf277233e8036d62a",
+    "database": "fb3235c4da224b46d18618ae7d1b95910abf9e31a1953d9a0e6a44cfba1ca4ca"
+  },
+  "sandboxRemoved": true,
+  "omitted": "No provider credentials, auth files, prompts, or inherited secret-bearing environment values were recorded."
+}

@@ -1,0 +1,106 @@
+[
+  {
+    "name": "host version",
+    "verdict": "PASS"
+  },
+  {
+    "name": "run help",
+    "verdict": "PASS"
+  },
+  {
+    "name": "native: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "agent: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "disabled: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mode: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "dag: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "fanin: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "route: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "template: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "template-unavailable: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ultrawork-dag: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "lanes: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "astgrep-explore: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "astgrep-rewrite: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "astgrep-deny: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mcps-librarian: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mcps-off: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gh-librarian: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gh-explore: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gh-off: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "verify-edit: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "verify-off: live session",
+    "verdict": "PASS"
+  },
+  {
+    "name": "host state isolation",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cleanup",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mock protocol",
+    "verdict": "PASS"
+  }
+]

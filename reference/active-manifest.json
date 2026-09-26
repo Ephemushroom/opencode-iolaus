@@ -4,7 +4,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-category-skills-guide.ts",
       "path": "src/omo/agents/dynamic-agent-category-skills-guide.ts",
       "sourceSha256": "373afce6ba66e9dbd8df110569d38d795d754848771f30d0b3c7b97afd498631",
-      "activeSha256": "fe9874ae0408082e5b26ac45042c59cb27030289e735343f33ceac691774ee97"
+      "activeSha256": "539ade41e1b062eaa6da5aa9d76a49c301d064a4dcb4b3289b4da03ad363e8d1"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-gemini-fallback-overrides.ts",
@@ -16,7 +16,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
       "path": "src/omo/agents/dynamic-agent-core-sections.ts",
       "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
-      "activeSha256": "11df5210ac9ad38ea03cabe32175d4431ff6e49d6c896531931092e65f56e580"
+      "activeSha256": "c0227eda2169770e819ed62edb1215f11c6f703f4774c33d2f9f5edafccd5cec"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",

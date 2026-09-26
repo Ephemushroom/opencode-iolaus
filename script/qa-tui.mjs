@@ -78,7 +78,7 @@ const mock = http.createServer(async (req, res) => {
   else if (tools.includes("iolaus_dag")) {
     const prior = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
     let result; try { result = JSON.parse(prior); if (result?.run && result?.events) result = result.run } catch {}
-    if (!result) call = { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TUI_TASK", executor: "iolaus-sisyphus" } } }
+    if (!result) call = { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TUI_TASK", executor: "sisyphus" } } }
     else if (result.status === "running" || result.status === "paused") { await new Promise((done) => setTimeout(done, 3000)); call = { name: "iolaus_dag", args: { action: "snapshot", run_id: result.runID } } }
   }
   res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
@@ -128,11 +128,22 @@ const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const traceHas = (pattern) => existsSync(tracePath) && pattern.test(readFileSync(tracePath, "utf8"))
 const waitFor = async (pattern, timeoutMs, label) => { const until = Date.now() + timeoutMs; while (Date.now() < until) { if (traceHas(pattern)) return; await sleep(300) } throw new Error(`timed out waiting for ${label}`) }
 const screens = {}
+const strip = (text) => text.replace(/\x1b\[[0-9;]*m/g, "")
 spawnSync("tmux", ["resize-window", "-t", session, "-x", "160", "-y", "45"], { env, encoding: "utf8" })
 try {
   await waitFor(/iolaus\.tui\.loaded/, 20000, "tui load")
   await sleep(1500)
   screens.idle = capture("01-idle")
+  // Cycle the primary agents with Shift+Tab (the host footer shows "shift+tab agents") and record each footer, back to Build.
+  const footers = []
+  for (let i = 0; i < 10; i++) {
+    keys("BTab"); await sleep(400)
+    const footer = strip(capture(`01-agent-${i}`)).split("\n").find((line) => / · GPT-5\.5/.test(line)) ?? ""
+    footers.push(footer.trim())
+    if (/\bBuild · GPT-5\.5/.test(footer)) break
+  }
+  screens.agents = footers.join("\n")
+  writeFileSync(join(evidence, "01-agent-footers.txt"), screens.agents + "\n")
   keys("Run a plan-review DAG for IOLAUS_TUI_TASK", "Enter")
   await waitFor(/iolaus\.dag\.node\.started.*"nodeID":"plan"/, 30000, "plan node start")
   await sleep(800)
@@ -162,7 +173,11 @@ try {
 
 const trace = existsSync(tracePath) ? readFileSync(tracePath, "utf8") : ""
 assert.match(trace, /iolaus\.tui\.loaded/)
-const strip = (text) => text.replace(/\x1b\[[0-9;]*m/g, "")
+assert.match(screens.agents, /\bSisyphus · GPT-5\.5/, `agent cycle did not show "Sisyphus": ${screens.agents}`)
+// Hephaestus is a subagent and is not in the primary cycle; Prometheus and Atlas are.
+assert.match(screens.agents, /\bPrometheus · GPT-5\.5/, `agent cycle did not show "Prometheus": ${screens.agents}`)
+assert.match(screens.agents, /\bAtlas · GPT-5\.5/, `agent cycle did not show "Atlas": ${screens.agents}`)
+assert.ok(!/iolaus-(sisyphus|hephaestus|prometheus|atlas)/.test(screens.agents), `primary agents still show the iolaus- prefix: ${screens.agents}`)
 assert.match(strip(screens.running), /Iolaus DAG/, "sidebar header missing")
 assert.match(strip(screens.running), /DAG · 1 run/, "footer summary missing on the running screen")
 assert.match(strip(screens.running), /▶ plan|plan.*▶/, "running plan node not rendered with the running glyph")
@@ -177,7 +192,7 @@ assert.match(strip(screens.completed), /✓ execute/, "execute node not shown co
 assert.match(trace, /iolaus\.tui\.open.*"sessionID":"ses_/, "open keybind did not target a child session")
 const nodeOrder = [...trace.matchAll(/iolaus\.dag\.node\.(?:completed|approved)[^\n]*"nodeID":"([a-z]+)"/g)].map((m) => m[1])
 assert.deepEqual(nodeOrder, ["plan", "review", "revise", "rereview", "approve", "execute"], `unexpected node order ${nodeOrder}`)
-assert.ok(!trace.includes('"agent":"momus"'), "judge review opened a momus child session")
+assert.ok(!/iolaus\.agent\.rendered[^\n]*"agent":"momus"/.test(trace), "judge review opened a momus child session")
 const realAfter = { config: await digest(realConfig), database: await digest(realDatabase) }
 assert.deepEqual(realAfter, realBefore)
 writeFileSync(join(evidence, "receipt.json"), JSON.stringify({

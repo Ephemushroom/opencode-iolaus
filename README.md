@@ -23,7 +23,7 @@ For the live DAG sidebar, add the TUI entry alongside the main plugin:
 }
 ```
 
-Iolaus registers namespaced agents such as `iolaus-sisyphus` and native commands such as `/iolaus-ultrawork`. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
+Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
 
 Model routing follows configuration only. Write `.iolaus/models.json` in your home directory or in a project directory (project layers override user layers) to pin models per lane:
 
@@ -44,7 +44,7 @@ dependency-frontier scheduling, node-level retry, cancellation, restart-safe
 completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
 is available through the `opencode-iolaus/tui` entry. Every Iolaus Agent and
-category lane (`iolaus-quick`, `iolaus-deep-low`, `iolaus-deep-high`, ...) runs on a
+category lane (`quick`, `deep-low`, `deep-high`, ...) runs on a
 pinned model taken from `.iolaus/models.json` or, unconfigured, from OMO's
 requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
@@ -55,7 +55,7 @@ The sidebar shows every run with a progress bar and colour-coded nodes (gates fi
 
 Two templates come built in. `{ "action": "create", "template": { "template": "plan-review", "task": "..." } }` has Prometheus write the plan, Momus review it (the reply ends `VERDICT: PASS` or `VERDICT: FAIL`), Prometheus revise on failure, Momus re-review, then pauses at a gate before the executor runs; `goal-review` does the same around Hephaestus doing the work. Use action `template` to see the expanded definition and edit it before creating. Creation is fail-closed: a node whose lane has no configured model is rejected with `model_unavailable` instead of starting a run that would fail later.
 
-`/iolaus-ultrawork <task>` and `/iolaus-hyperplan <request>` now run as DAGs. Ultrawork loops work → review → fix → re-review until Momus passes the work, growing the graph one round at a time up to `iterations` (default three), then pauses at a gate for you. Reviews are judge nodes: a single model call on Momus's lane, no child session. Hyperplan runs four category lanes through independent analysis, cross-attack and defence in parallel, has Metis distill the surviving positions, Prometheus write the plan and Momus review it. Both are also available as templates (`"template": "ultrawork"` with `iterations`, `"template": "hyperplan"` with `members`). `/iolaus-team` is unchanged.
+`/ultrawork <task>` and `/hyperplan <request>` now run as DAGs. Ultrawork loops work → review → fix → re-review until Momus passes the work, growing the graph one round at a time up to `iterations` (default three), then pauses at a gate for you. Reviews are judge nodes: a single model call on Momus's lane, no child session. Hyperplan runs four category lanes through independent analysis, cross-attack and defence in parallel, has Metis distill the surviving positions, Prometheus write the plan and Momus review it. Both are also available as templates (`"template": "ultrawork"` with `iterations`, `"template": "hyperplan"` with `members`). `/iolaus-team` is unchanged.
 
 When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or `{ "astGrep": false }` to turn the tools off.
 

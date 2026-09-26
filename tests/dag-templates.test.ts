@@ -20,7 +20,7 @@ function createDagController(options: ControllerOptions) {
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 
 function lanes(agent: string): string | undefined {
-  return ({ "iolaus-prometheus": "anthropic/claude-fable-5-1", "iolaus-momus": "openai/gpt-6-astra", "iolaus-sisyphus": "anthropic/claude-opus-5-5", "iolaus-hephaestus": "openai/gpt-6-sol" } as Record<string, string>)[agent]
+  return ({ "prometheus": "anthropic/claude-fable-5-1", "momus": "openai/gpt-6-astra", "sisyphus": "anthropic/claude-opus-5-5", "hephaestus": "openai/gpt-6-sol" } as Record<string, string>)[agent]
 }
 
 /** Replies per node id; a reviewer's reply list is consumed in order across attempts. */
@@ -39,18 +39,18 @@ test("plan-review template expands to a valid definition and rejects bad input",
   const def = expandTemplate({ template: "plan-review", task: "Add rate limiting to the API" })
   validateDefinition(applyDefaultModels(def, lanes))
   expect(def.nodes.map((n) => n.id)).toEqual(["plan", "review", "revise", "rereview", "approve", "execute"])
-  expect(def.nodes.find((n) => n.id === "plan")?.agent).toBe("iolaus-prometheus")
-  expect(def.nodes.find((n) => n.id === "review")?.agent).toBe("iolaus-momus")
+  expect(def.nodes.find((n) => n.id === "plan")?.agent).toBe("prometheus")
+  expect(def.nodes.find((n) => n.id === "review")?.agent).toBe("momus")
   expect(def.nodes.find((n) => n.id === "approve")?.kind).toBe("gate")
   expect(def.nodes.find((n) => n.id === "execute")?.dependsOn).toEqual(["approve"])
-  const noGate = expandTemplate({ template: "plan-review", task: "x", gate: false, reviewer: "iolaus-metis", executor: "iolaus-hephaestus" })
+  const noGate = expandTemplate({ template: "plan-review", task: "x", gate: false, reviewer: "metis", executor: "hephaestus" })
   validateDefinition(applyDefaultModels(noGate, (a) => lanes(a) ?? "openai/gpt-5.5"))
   expect(noGate.nodes.map((n) => n.id)).not.toContain("approve")
   expect(noGate.nodes.find((n) => n.id === "execute")?.when).toBeDefined()
   const goal = expandTemplate({ template: "goal-review", task: "Make the tests green" })
   validateDefinition(applyDefaultModels(goal, lanes))
   expect(goal.nodes.map((n) => n.id)).toEqual(["work", "review", "fix", "rereview", "accept"])
-  expect(goal.nodes.find((n) => n.id === "work")?.agent).toBe("iolaus-hephaestus")
+  expect(goal.nodes.find((n) => n.id === "work")?.agent).toBe("hephaestus")
   expect(() => expandTemplate({ template: "nope", task: "x" })).toThrow(/Unknown DAG template/)
   expect(() => expandTemplate({ template: "plan-review" })).toThrow(/task/)
   expect(() => expandTemplate({ template: "plan-review", task: "x", maxAttempts: 0 })).toThrow(/maxAttempts/)
@@ -59,10 +59,10 @@ test("plan-review template expands to a valid definition and rejects bad input",
 
 test("routing is fail-closed: a lane without a model is rejected as model_unavailable at create", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
-  const effectController = createEffectController({ directory, runner: runnerFromPromise(scriptedRunner({})), defaultModel: (agent) => agent === "iolaus-sisyphus" ? "openai/gpt-5.5" : undefined })
+  const effectController = createEffectController({ directory, runner: runnerFromPromise(scriptedRunner({})), defaultModel: (agent) => agent === "sisyphus" ? "openai/gpt-5.5" : undefined })
   const controller = promiseController(effectController)
   const def: DagDefinition = { schemaVersion: 1, name: "t", nodes: [
-    { id: "a", agent: "iolaus-sisyphus", prompt: "a", dependsOn: [] },
+    { id: "a", agent: "sisyphus", prompt: "a", dependsOn: [] },
     { id: "b", agent: "iolaus-unconfigured", prompt: "b", dependsOn: ["a"] },
     { id: "c", agent: "iolaus-other", model: "openai/gpt-5.5", prompt: "c", dependsOn: [] },
   ] }
@@ -71,7 +71,7 @@ test("routing is fail-closed: a lane without a model is rejected as model_unavai
   const tool = createDagTool(effectController)
   const call = (input: unknown) => Effect.runPromise(tool.execute(input as never, { sessionID: "owner" } as never))
   const result = await call({ action: "create", template: { template: "plan-review", task: "x" } })
-  expect(JSON.parse(String(result.content)).error).toMatch(/model_unavailable.*plan \(iolaus-prometheus\)/)
+  expect(JSON.parse(String(result.content)).error).toMatch(/model_unavailable.*plan \(prometheus\)/)
   const expanded = await call({ action: "template", template: { template: "goal-review", task: "ship it" } })
   expect(JSON.parse(String(expanded.content)).nodes.map((n: { id: string }) => n.id)).toEqual(["work", "review", "fix", "rereview", "accept"])
   controller.close()
@@ -187,33 +187,33 @@ test("judge nodes run one generate.text call with no session; agent nodes still 
     },
   }
   const runner = createOpenCodeDagRunner(ctx as never)
-  const judge = { id: "j", kind: "judge" as const, agent: "iolaus-momus", model: "openai/gpt-5.5", prompt: "Judge this", dependsOn: [] }
+  const judge = { id: "j", kind: "judge" as const, agent: "momus", model: "openai/gpt-5.5", prompt: "Judge this", dependsOn: [] }
   const ref = await Effect.runPromise(runner.start({ node: judge, prompt: "Judge this please", attempt: 1 }))
   expect(ref.sessionID.startsWith("judge:")).toBe(true)
   const result = await Effect.runPromise(runner.wait(ref))
   expect(result.payload).toEqual({ text: `judged\n${REVIEW_VERDICT_PASS}` })
-  const agentRef = await Effect.runPromise(runner.start({ node: { id: "a", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "do", dependsOn: [] }, prompt: "do", attempt: 1 }))
+  const agentRef = await Effect.runPromise(runner.start({ node: { id: "a", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "do", dependsOn: [] }, prompt: "do", attempt: 1 }))
   expect(agentRef.sessionID).toBe("ses_child")
   expect((await Effect.runPromise(runner.wait(agentRef))).payload).toEqual({ text: "child done" })
   expect(calls).toEqual(["generate:Judge this:model", "session.create"])
 })
 
 test("hyperplan template fans members through analyse, attack, defend, then distill, plan, review", async () => {
-  const def = expandTemplate({ template: "hyperplan", task: "Design the cache", members: ["iolaus-ultrabrain", "iolaus-artistry"] })
+  const def = expandTemplate({ template: "hyperplan", task: "Design the cache", members: ["ultrabrain", "artistry"] })
   const all = (a: string) => lanes(a) ?? "openai/gpt-5.5"
   validateDefinition(applyDefaultModels(def, all))
   expect(def.maxParallel).toBe(2)
   expect(def.nodes.map((n) => n.id)).toEqual(["analyze-ultrabrain", "analyze-artistry", "attack-ultrabrain", "attack-artistry", "defend-ultrabrain", "defend-artistry", "distill", "plan", "review", "approve"])
   expect(def.nodes.find((n) => n.id === "attack-artistry")?.dependsOn).toEqual(["analyze-ultrabrain", "analyze-artistry"])
-  expect(def.nodes.find((n) => n.id === "distill")?.agent).toBe("iolaus-metis")
-  expect(def.nodes.find((n) => n.id === "plan")?.agent).toBe("iolaus-prometheus")
-  expect(expandTemplate({ template: "hyperplan", task: "x" }).nodes.filter((n) => n.id.startsWith("analyze-")).map((n) => n.agent)).toEqual(["iolaus-unspecified-low", "iolaus-unspecified-high", "iolaus-ultrabrain", "iolaus-artistry"])
+  expect(def.nodes.find((n) => n.id === "distill")?.agent).toBe("metis")
+  expect(def.nodes.find((n) => n.id === "plan")?.agent).toBe("prometheus")
+  expect(expandTemplate({ template: "hyperplan", task: "x" }).nodes.filter((n) => n.id.startsWith("analyze-")).map((n) => n.agent)).toEqual(["unspecified-low", "unspecified-high", "ultrabrain", "artistry"])
   expect(() => expandTemplate({ template: "hyperplan", task: "x", members: ["iolaus-a"] })).toThrow(/members/)
   expect(() => expandTemplate({ template: "hyperplan", task: "x", members: ["iolaus-a", "iolaus-a"] })).toThrow(/members/)
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
   const runner = scriptedRunner({ review: [`Solid.\n${REVIEW_VERDICT_PASS}`] })
   const controller = createDagController({ directory, runner, defaultModel: all })
-  const run = await controller.create(expandTemplate({ template: "hyperplan", task: "t", members: ["iolaus-ultrabrain", "iolaus-artistry"], gate: false }), "owner")
+  const run = await controller.create(expandTemplate({ template: "hyperplan", task: "t", members: ["ultrabrain", "artistry"], gate: false }), "owner")
   const finished = await controller.wait(run.runID, "owner")
   expect(finished.status).toBe("completed")
   expect(runner.started.slice(0, 2).sort()).toEqual(["analyze-artistry", "analyze-ultrabrain"])

@@ -4,7 +4,7 @@ import { Effect } from "effect"
 import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import type { SessionContext } from "@opencode/plugin/effect/session"
 import { Session } from "@opencode/schema/session"
-import { registerAgents, agentMarker, modeDispatchText } from "../src/registration"
+import { registerAgents, registerModes, agentMarker, modeDispatchText } from "../src/registration"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
@@ -28,15 +28,19 @@ function registry() {
   }
 }
 
-test("namespaced registrations preserve native agents and user definitions", async () => {
+test("registrations keep native agents and user definitions, and take over only the host's explore", async () => {
   const fixture = registry()
-  fixture.editor.update("iolaus-oracle", (agent) => { agent.system = "user-owned" })
+  fixture.editor.update("oracle", (agent) => { agent.system = "user-owned" })
   const before = structuredClone([...fixture.agents.values()])
   await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
-  for (const value of before) expect(fixture.agents.get(String(value.id))).toEqual(value)
+  for (const value of before.filter((agent) => agent.id !== "explore")) expect(fixture.agents.get(String(value.id))).toEqual(value)
+  const explore = fixture.agents.get("explore")!
+  expect(explore.system).toBe(agentMarker("explore"))
+  expect(String(explore.name)).toBe("Explore")
+  expect(explore.mode).toBe("subagent")
   expect(fixture.defaultAgent).toBe("build")
   for (const name of AGENT_NAMES) expect(fixture.agents.has(agentID(name))).toBe(true)
-  expect(fixture.agents.get("iolaus-sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
+  expect(fixture.agents.get("sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
   const once = structuredClone([...fixture.agents.values()])
   await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
   expect([...fixture.agents.values()]).toEqual(once)
@@ -50,16 +54,16 @@ test("specialists restrict native shell, mutation and nested delegation", async 
   }
   for (const name of ["oracle", "explore", "librarian", "metis", "momus", "multimodal-looker"]) {
     for (const action of ["shell", "edit", "subagent"]) expect(permission(agentID(name as "oracle"), action)).toBe("deny")
-    expect(permission(`iolaus-${name}`, "read")).toBe("allow")
+    expect(permission(name, "read")).toBe("allow")
   }
-  expect(permission("iolaus-sisyphus-junior", "subagent")).toBe("deny")
+  expect(permission("sisyphus-junior", "subagent")).toBe("deny")
 })
 
 const catalogs = {
   agent: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
   skill: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
 } as never as Parameters<typeof composeContext>[1]
-function context(agent = "iolaus-sisyphus", model = "openai/gpt-5.5"): SessionContext {
+function context(agent = "sisyphus", model = "openai/gpt-5.5"): SessionContext {
   return {
     sessionID: Session.ID.make("ses_test"), agent: Agent.ID.make(agent), model: Model.Ref.parse(model),
     system: [{ type: "text", text: agent === "build" ? "native" : agentMarker("sisyphus") }, { type: "text", text: "project guidance" }],
@@ -69,7 +73,7 @@ function context(agent = "iolaus-sisyphus", model = "openai/gpt-5.5"): SessionCo
 
 test("request model selects prompt while tools, model and other system parts are preserved", async () => {
   for (const model of ["openai/gpt-5.5", "anthropic/claude-opus-4-8", "zai/glm-5.2"]) {
-    const event = context("iolaus-sisyphus", model)
+    const event = context("sisyphus", model)
     const tools = structuredClone(event.tools)
     await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
     expect(event.system[0].text).toBe(bindNative(renderAgent("sisyphus", { model, tools: [{ name: "read", category: "other" }] })))
@@ -80,7 +84,7 @@ test("request model selects prompt while tools, model and other system parts are
 })
 
 test("ordinary native requests and user-owned agent prompts remain unchanged", async () => {
-  for (const agent of ["build", "iolaus-sisyphus"]) {
+  for (const agent of ["build", "sisyphus"]) {
     const event = context(agent)
     event.system = [{ type: "text", text: "user-owned" }, ...event.system.slice(1)]
     const before = structuredClone(event)
@@ -92,7 +96,9 @@ test("ordinary native requests and user-owned agent prompts remain unchanged", a
 test("mode requires explicit marker and resets with the next user request", async () => {
   expect(explicitMode("Explain ultrawork and team modes")).toBeUndefined()
   expect(explicitMode(`Quoted: ${modeMarker("team")}\n`)).toBeUndefined()
-  expect(explicitMode("/iolaus-team inspect this")).toBe("team")
+  expect(explicitMode("/team inspect this")).toBe("team")
+  expect(explicitMode("/iolaus-team inspect this")).toBeUndefined()
+  expect(explicitMode("/teamwork now")).toBeUndefined()
   const event = context("build")
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
   await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
@@ -145,4 +151,34 @@ test("ultrawork and hyperplan render a DAG instruction for the commanding sessio
   expect(work.prompt.startsWith(`${modeMarker("ultrawork")}\n${DAG_CHILD_MARKER}`)).toBe(true)
   expect(explicitMode(work.prompt)).toBe("ultrawork")
   expect(modeDispatchText("ultrawork", "x")).toBe(`${modeMarker("ultrawork")}\nx`)
+})
+
+test("ids and display names are the bare lane names; explore replaces the host agent with its own rules", async () => {
+  const fixture = registry()
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  const name = (id: string) => String(fixture.agents.get(id)?.name)
+  expect(name("sisyphus")).toBe("Sisyphus")
+  expect(name("sisyphus-junior")).toBe("Sisyphus Junior")
+  expect(name("multimodal-looker")).toBe("Multimodal Looker")
+  expect(name("deep-high")).toBe("Deep High")
+  expect(name("quick")).toBe("Quick")
+  expect(name("explore")).toBe("Explore")
+  expect([...fixture.agents.keys()].some((id) => id.startsWith("iolaus-"))).toBe(false)
+  // The host's explore rules are dropped, so ours decide: read-only with Code Mode, no host-specific ask on external dirs.
+  const rules = fixture.agents.get("explore")!.permissions
+  expect(rules[0]).toEqual({ action: "*", resource: "*", effect: "deny" })
+  expect(rules.some((rule) => rule.action === "execute" && rule.effect === "allow")).toBe(true)
+  // A second registration pass is a no-op.
+  const once = structuredClone([...fixture.agents.values()])
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  expect([...fixture.agents.values()]).toEqual(once)
+})
+
+test("mode commands register under their short names", async () => {
+  const names: string[] = []
+  await Effect.runPromise(Effect.scoped(registerModes({
+    command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { names.push(definition.name) } }); return { dispose: Effect.void } }) },
+    session: { prompt: () => Effect.succeed(undefined) } as never,
+  }, parseOptions({}))))
+  expect(names).toEqual(["ultrawork", "hyperplan", "team"])
 })

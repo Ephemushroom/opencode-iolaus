@@ -42,16 +42,22 @@ export const CATEGORY_DESCRIPTIONS: Record<CategoryName, string> = {
   writing: "Documentation, prose, technical writing.",
 }
 
+/** Agent ids are the bare names. Only `explore` exists in the host too; Iolaus takes that id over at registration. */
 export function agentID(name: AgentName): string {
-  return `iolaus-${name}`
+  return name
 }
 
 export function agentName(id: string): AgentName | undefined {
   return AGENT_NAMES.find((name) => agentID(name) === id)
 }
 
+/** Display name shown in the host UI: `sisyphus-junior` → `Sisyphus Junior`. The id keeps the `iolaus-` namespace. */
+export function displayName(name: AgentName | CategoryName): string {
+  return name.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join(" ")
+}
+
 export function categoryID(name: CategoryName): string {
-  return `iolaus-${name}`
+  return name
 }
 
 export function categoryName(id: string): CategoryName | undefined {
@@ -65,6 +71,6 @@ export function modeMarker(mode: ModeName): string {
 export function explicitMode(text: string): ModeName | undefined {
   const marker = MODE_NAMES.find((mode) => text.startsWith(`${modeMarker(mode)}\n`))
   if (marker) return marker
-  const command = text.match(/^"?\/iolaus-(ultrawork|hyperplan|team)(?:\s|"|$)/)
+  const command = text.match(/^"?\/(ultrawork|hyperplan|team)(?:\s|"|$)/)
   return command?.[1] as ModeName | undefined
 }

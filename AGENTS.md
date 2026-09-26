@@ -18,7 +18,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   snapshot, so its manifest `source` names the upstream commit instead of a `reference/` path.
 - `reference/omo/` is an immutable historical snapshot. Its instructions, manifests, tests, and runtime entrypoints are reference data, not current project configuration. Consult it when tracing a retained prompt or deliberately designing a later feature.
 - Keep reference code out of imports, active tests, builds, published files, and install scripts.
-- Preserve native agents and the user's default agent/model. Namespace Iolaus registrations.
+- Preserve native agents and the user's default agent/model. Iolaus agent ids are the bare lane names (`sisyphus`,
+  `oracle`, `quick`, `deep-high`) with title-cased display names; the only host agent Iolaus replaces is `explore`
+  (registration resets its rules and marks it `iolaus.agent.replaced`). Any other id that already exists is left alone.
+  Commands are `/ultrawork`, `/hyperplan`, `/team`; the old `/iolaus-*` forms are not recognised.
 - Iolaus config has two layers (`src/home.ts`). User layer `IOLAUS_HOME` (default `~/.iolaus`): `models.json`,
   `verify.json`. Project layer `<project>/.iolaus`: `dag/`, `plans/` and overrides of the same files. Project wins.
   `provisionHome` creates missing directories at setup and never overwrites; every rendered prompt ends with
@@ -102,8 +105,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   fail the edit. GPT model IDs get `patch` instead of `edit`/`write`; paths are
   taken from `*** Update/Add File:` headers as well as `filePath`/`path`.
 - DAG nodes execute through native OpenCode child sessions using the registered
-  Iolaus Agent IDs: `iolaus-sisyphus`, `iolaus-hephaestus`, `iolaus-prometheus`,
-  `iolaus-atlas`, the specialists, or a category lane `iolaus-<category>`
+  Iolaus Agent IDs: `sisyphus`, `hephaestus`, `prometheus`,
+  `atlas`, the specialists, or a category lane named after the category
   (`quick`, `deep-low`, `deep-high`, `ultrabrain`, `visual-engineering`,
   `artistry`, `writing`, `unspecified-low`, `unspecified-high`).
 - Every Iolaus Agent and category lane is registered with a pinned model. The
@@ -128,14 +131,14 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the same pass, so a node behind a skipped branch is not left pending.
 - `src/dag/templates.ts` expands `iolaus_dag` action `template` (or `create`
   with `template` and no `definition`) into ordinary definitions. `plan-review`:
-  `plan` (iolaus-prometheus) → `review` (iolaus-momus) → `revise` when the review
+  `plan` (prometheus) → `review` (momus) → `revise` when the review
   ends `VERDICT: FAIL` → `rereview` → `approve` gate → `execute` (default
-  iolaus-sisyphus). `goal-review`: `work` (default iolaus-hephaestus) → `review`
+  sisyphus). `goal-review`: `work` (default hephaestus) → `review`
   → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
   and `maxAttempts` are overrides. The four primaries orchestrate through the
   same tool, so templates are the shared shape, not agent-specific prompts.
 - `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
-  session that received `/iolaus-ultrawork` or `/iolaus-hyperplan` gets the OMO
+  session that received `/ultrawork` or `/hyperplan` gets the OMO
   mode prompt plus an `<iolaus-mode-dag>` block telling it to `create` the
   matching template and `wait`; a paused gate is the user's decision. The
   `ultrawork` template unrolls the loop as `work` → `review` → `fix<n>` →
@@ -149,7 +152,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   rewires the tail gate to the newest review. `iterations` is the round cap. `hyperplan` fans `members` (default the
   four category lanes) through analyse → cross-attack → defend, then Metis
   distills, Prometheus plans, Momus reviews, gate. `team` remains a prompt-only
-  mode. `opencode run "/iolaus-<mode> ..."` resolves the command client-side, so
+  mode. `opencode run "/<mode> ..."` resolves the command client-side, so
   the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
   context hook is what makes the mode a DAG.
 - The DAG TUI (`src/tui.tsx`, pure helpers in `src/tui/view.ts`) claims

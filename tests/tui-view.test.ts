@@ -3,7 +3,7 @@ import { activityLine, depths, elapsed, orderNodes, progressBar, settledCount, s
 
 const theme = { success: "green", warning: "yellow", accent: "purple", error: "red", textMuted: "gray", text: "white" }
 const node = (id: string, status: string, dependsOn: string[] = [], extra: Partial<DagViewRun["nodes"][number]> = {}) =>
-  ({ id, status, kind: "agent", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", attempt: 1, dependsOn, ...extra })
+  ({ id, status, kind: "agent", agent: "sisyphus", model: "openai/gpt-5.5", attempt: 1, dependsOn, ...extra })
 const run: DagViewRun = { runID: "r1", name: "plan-review: task", generation: 2, status: "paused", updatedAt: 0, nodes: [
   node("plan", "completed"), node("review", "completed", ["plan"], { kind: "judge" }), node("revise", "skipped", ["review"]),
   node("approve", "waiting_approval", ["review", "rereview"], { kind: "gate", prompt: "Approve?" }), node("execute", "pending", ["approve"]),

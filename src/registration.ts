@@ -4,12 +4,15 @@ import { Agent, Model } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { Options } from "./options"
 import {
-  AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, PRIMARY_AGENTS, agentID, categoryID, modeMarker,
+  AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, PRIMARY_AGENTS, agentID, categoryID, displayName, modeMarker,
   type AgentName, type CategoryName, type ModeName,
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
 import { trace } from "./trace"
+
+/** Host agents whose id Iolaus takes over: the host registers `explore` itself (plugin `opencode.agent`). */
+const REPLACES_HOST = new Set<AgentName>(["explore"])
 
 const READ_ONLY = new Set<AgentName>(["oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
 
@@ -53,7 +56,9 @@ export function registerAgents(
     for (const [name, assignment] of plan.agents) {
       const id = agentID(name)
       const existing = editor.get(id)
-      if (existing && existing.system !== agentMarker(name)) continue
+      // `explore` is the host's own agent; Iolaus replaces it. Any other id already defined elsewhere is left alone.
+      const takeover = existing !== undefined && REPLACES_HOST.has(name) && existing.system !== agentMarker(name)
+      if (existing && existing.system !== agentMarker(name) && !takeover) continue
       if (!assignment) {
         if (existing) editor.remove(id)
         trace("iolaus.agent.hidden", { agent: id, reason: "no configured model" })
@@ -61,8 +66,10 @@ export function registerAgents(
       }
       editor.update(id, (agent) => {
         applyModel(agent, assignment)
-        if (existing) return
-        agent.name = Agent.Name.make(id)
+        if (existing && !takeover) return
+        // The host's explore rules would otherwise stay ahead of ours; start from an empty rule list.
+        if (takeover) agent.permissions.length = 0
+        agent.name = Agent.Name.make(displayName(name))
         agent.description = AGENT_DESCRIPTIONS[name]
         agent.mode = PRIMARY_AGENTS.has(name) ? "primary" : "subagent"
         agent.system = agentMarker(name)
@@ -86,7 +93,8 @@ export function registerAgents(
           agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" })
         }
       })
-      trace("iolaus.agent.model", { agent: id, model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
+      if (takeover) trace("iolaus.agent.replaced", { agent: id, previous: String(existing.name) })
+      trace("iolaus.agent.model", { agent: id, name: String(editor.get(id)?.name ?? id), model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
     }
     for (const [name, assignment] of plan.categories) {
       const id = categoryID(name)
@@ -100,13 +108,13 @@ export function registerAgents(
       editor.update(id, (agent) => {
         applyModel(agent, assignment)
         if (existing) return
-        agent.name = Agent.Name.make(id)
+        agent.name = Agent.Name.make(displayName(name))
         agent.description = CATEGORY_DESCRIPTIONS[name]
         agent.mode = "subagent"
         agent.system = categoryMarker(name)
         agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" })
       })
-      trace("iolaus.agent.model", { agent: id, model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
+      trace("iolaus.agent.model", { agent: id, name: String(editor.get(id)?.name ?? id), model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
     }
   }).pipe(Effect.as(plan))
 }
@@ -122,7 +130,7 @@ export function registerModes(ctx: {
   return ctx.command.transform((editor) => {
     for (const mode of options.modes) {
       editor.add({
-        name: `iolaus-${mode}`,
+        name: mode,
         description: DAG_MODE_TEMPLATES[mode]
           ? `Run the task as the Iolaus "${DAG_MODE_TEMPLATES[mode]}" DAG template under the retained OMO ${mode} prompt.`
           : `Apply the retained OMO ${mode} prompt with native OpenCode tools.`,

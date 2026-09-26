@@ -194,8 +194,8 @@ export function buildNonClaudePlannerSection(model: string): string {
   return `### Iolaus DAG Planning (Non-Claude)
 
 For multi-step work, create an \`iolaus_dag\` graph before implementation. Use
-\`iolaus-prometheus\` for the planning node, explicit dependencies for execution
-nodes, and \`iolaus-atlas\` or \`iolaus-hephaestus\` for implementation. Read the
+\`prometheus\` for the planning node, explicit dependencies for execution
+nodes, and \`atlas\` or \`hephaestus\` for implementation. Read the
 graph snapshot and wait for the node result before reporting completion.`
 }
 
@@ -219,7 +219,7 @@ export function buildParallelDelegationSection(
 **MANDATORY - for ANY implementation task:**
 
 1. Decompose the task into independent DAG nodes when parallelism pays for its coordination cost.
-2. Assign each node an exact Iolaus Agent ID (a specialist or a category lane such as \`iolaus-deep-low\`), prompt and \`dependsOn\` list; omit \`model\` unless overriding the lane's configured model.
+2. Assign each node an exact Iolaus Agent ID (a specialist or a category lane such as \`deep-low\`), prompt and \`dependsOn\` list; omit \`model\` unless overriding the lane's configured model.
 3. Use \`iolaus_dag\` for durable parallel execution instead of background task polling.
 4. Preserve explicit result bindings when a later node needs an earlier node's output.
 

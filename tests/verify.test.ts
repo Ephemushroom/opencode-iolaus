@@ -87,7 +87,7 @@ test("hook appends the report to completed mutations only", async () => {
   const traces: unknown[] = []
   await Effect.runPromise(Effect.scoped(registerVerifyHook({ tool: { hook: (_name: string, callback: unknown) => Effect.sync(() => { handler = callback as never; return { dispose: Effect.void } }) } } as never,
     { directory: async () => dir, trace: (event, data) => traces.push({ event, ...data }), inline: { checkers: [] } })))
-  const event = { tool: "edit", status: "completed", sessionID: "ses_1", agent: "iolaus-sisyphus", input: { filePath: "src/a.ts" }, result: { output: "ok", content: "Edited." } }
+  const event = { tool: "edit", status: "completed", sessionID: "ses_1", agent: "sisyphus", input: { filePath: "src/a.ts" }, result: { output: "ok", content: "Edited." } }
   await Effect.runPromise(handler!(event))
   expect(event.result.content).toContain("[iolaus verify] 1 issue")
   expect(event.result.content).toContain("comment-check: src/a.ts:1")

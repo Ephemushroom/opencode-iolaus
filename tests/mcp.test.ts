@@ -56,7 +56,7 @@ test("read-only specialists may call context7 and grep_app tools but nothing els
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
   await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
-  const rules = agents.get("iolaus-librarian")!.permissions as readonly PermissionRule[]
+  const rules = agents.get("librarian")!.permissions as readonly PermissionRule[]
   expect(evaluate("context7_resolve-library-id", "*", rules)).toBe("allow")
   expect(evaluate("context7_query-docs", "*", rules)).toBe("allow")
   expect(evaluate("grep_app_searchGitHub", "*", rules)).toBe("allow")
