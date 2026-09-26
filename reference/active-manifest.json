@@ -226,7 +226,7 @@
       "source": "reference/omo/packages/agents-core/src/specialists/librarian-prompt.ts",
       "path": "src/omo/agents/specialists/librarian-prompt.ts",
       "sourceSha256": "7f05ba7f50aa1dc26b81c5a24f6eaf944ca29651836d699247a72b3a4bd5af48",
-      "activeSha256": "c3eb2bd9c514074383eecd580a6d2d671e281e7a6203493fa952783a9665ebc0"
+      "activeSha256": "009b660c5708fa156030cb12a9c524e278684199c2c7d5393b6e312e67e9a7b1"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/metis-prompt.ts",

@@ -86,3 +86,11 @@ test("fixture dir cleanup guard", () => {
   rmSync(dir, { recursive: true, force: true })
   expect(existsSync(dir)).toBe(false)
 })
+
+test("librarian prompt references gh only through tools.gh.* (no shell commands)", async () => {
+  const { buildLibrarianPrompt } = await import("../src/omo/agents/specialists/librarian-prompt")
+  const prompt = buildLibrarianPrompt()
+  expect(prompt).not.toMatch(/\bgh (repo clone|search|api|issue view|pr view)\b/)
+  expect(prompt).not.toMatch(/\bgit (log|blame|rev-parse|show)\b/)
+  for (const name of ["clone", "log", "blame", "show", "issues", "issue", "prs", "pr", "prDiff", "repo", "searchCode"]) expect(prompt).toContain(`tools.gh.${name}`)
+})
