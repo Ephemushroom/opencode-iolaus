@@ -2,7 +2,8 @@
 // (packages/omo-opencode/src/mcp/{context7,grep-app}.ts). Upstream also
 // registers `websearch` and `lsp`; OpenCode 2 has native websearch and Iolaus
 // ships no LSP tools, so neither is carried over.
-import type { MCPEditor } from "@opencode/plugin/promise/mcp"
+import { Effect, type Scope } from "effect"
+import type { MCPEditor } from "@opencode/plugin/effect/mcp"
 import { trace } from "./trace"
 
 export const MCP_NAMES = ["context7", "grep_app"] as const
@@ -37,14 +38,14 @@ export interface McpRegistration {
   readonly deferred: McpName[]
 }
 
-export async function registerMcps(
-  ctx: { mcp: { transform: (fn: (editor: MCPEditor) => void) => Promise<unknown> } },
+export function registerMcps(
+  ctx: { mcp: { transform: (fn: (editor: MCPEditor) => void) => Effect.Effect<unknown, never, Scope.Scope> } },
   names: readonly McpName[],
   env: NodeJS.ProcessEnv = process.env,
-): Promise<McpRegistration> {
+): Effect.Effect<McpRegistration, never, Scope.Scope> {
   const result: McpRegistration = { registered: [], deferred: [] }
-  if (!names.length) return result
-  await ctx.mcp.transform((editor) => {
+  if (!names.length) return Effect.succeed(result)
+  return ctx.mcp.transform((editor) => {
     result.registered.length = 0
     result.deferred.length = 0
     for (const name of names) {
@@ -56,6 +57,5 @@ export async function registerMcps(
       result.registered.push(name)
     }
     trace("iolaus.mcp.registered", { registered: [...result.registered], deferred: [...result.deferred] })
-  })
-  return result
+  }).pipe(Effect.as(result))
 }

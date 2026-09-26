@@ -10,7 +10,7 @@ for (const [entry, output] of [["./src/index.ts", "index.js"], ["./src/prompts/i
     naming: output,
     target: "node",
     format: "esm",
-    external: ["@opencode/plugin", "@opencode/plugin/*", "@opentui/solid", "solid-js", "solid-js/*"],
+    external: ["@opencode/plugin", "@opencode/plugin/*", "@opentui/solid", "solid-js", "solid-js/*", "effect", "effect/*"],
     packages: "bundle",
     loader: { ".md": "text" },
     plugins: entry.endsWith(".tsx") ? [solidPlugin] : [],

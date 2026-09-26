@@ -6,6 +6,7 @@ import { DEFAULT_COMMENT_PATTERN, detectCheckers, loadVerifyConfig, parseVerifyC
 import { filterDiagnostics, mutatedPaths, renderReport, scanComments, verify } from "../src/verify/run"
 import { registerVerifyHook } from "../src/verify/hook"
 import { parseOptions } from "../src/options"
+import { Effect } from "effect"
 
 function project(files: Record<string, string>): string {
   const dir = mkdtempSync(join(tmpdir(), "iolaus-verify-"))
@@ -82,19 +83,19 @@ test("verify runs a real checker without a shell and reports only changed-file i
 
 test("hook appends the report to completed mutations only", async () => {
   const dir = project({ "src/a.ts": "// added by AI\n" })
-  let handler: ((event: unknown) => Promise<void>) | undefined
+  let handler: ((event: unknown) => Effect.Effect<void>) | undefined
   const traces: unknown[] = []
-  await registerVerifyHook({ tool: { hook: async (_name: string, callback: unknown) => { handler = callback as never; return { dispose: async () => {} } } } as never },
-    { directory: async () => dir, trace: (event, data) => traces.push({ event, ...data }), inline: { checkers: [] } })
+  await Effect.runPromise(Effect.scoped(registerVerifyHook({ tool: { hook: (_name: string, callback: unknown) => Effect.sync(() => { handler = callback as never; return { dispose: Effect.void } }) } } as never,
+    { directory: async () => dir, trace: (event, data) => traces.push({ event, ...data }), inline: { checkers: [] } })))
   const event = { tool: "edit", status: "completed", sessionID: "ses_1", agent: "iolaus-sisyphus", input: { filePath: "src/a.ts" }, result: { output: "ok", content: "Edited." } }
-  await handler!(event)
+  await Effect.runPromise(handler!(event))
   expect(event.result.content).toContain("[iolaus verify] 1 issue")
   expect(event.result.content).toContain("comment-check: src/a.ts:1")
   const read = { tool: "read", status: "completed", sessionID: "ses_1", agent: "x", input: { filePath: "src/a.ts" }, result: { content: "text" } }
-  await handler!(read)
+  await Effect.runPromise(handler!(read))
   expect(read.result.content).toBe("text")
   const failed = { tool: "edit", status: "error", sessionID: "ses_1", agent: "x", input: { filePath: "src/a.ts" }, error: {} }
-  await handler!(failed)
+  await Effect.runPromise(handler!(failed))
   expect(traces.filter((t) => (t as { event: string }).event === "iolaus.verify.ran")).toHaveLength(1)
   rmSync(dir, { recursive: true, force: true })
 })

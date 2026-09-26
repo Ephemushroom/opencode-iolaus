@@ -3,7 +3,8 @@ import { existsSync, mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Agent } from "@opencode/plugin"
-import type { AgentEditor } from "@opencode/plugin/promise/agent"
+import { Effect } from "effect"
+import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import { resolveGhBinary } from "../src/gh/binary"
 import { createGhTools, GH_NAMESPACE, GH_PERMISSION } from "../src/gh/tools"
 import { parseOptions } from "../src/options"
@@ -30,7 +31,7 @@ test("gh tools carry the gh permission, and only librarian is allowed it", async
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => {}, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  await registerAgents({ agent: { transform: async (run) => { run(editor); return { dispose: async () => {} } } } }, parseOptions({}))
+  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
   const rules = (id: string) => agents.get(id)!.permissions as readonly PermissionRule[]
   expect(evaluate("gh", "*", rules("iolaus-librarian"))).toBe("allow")
   expect(evaluate("external_directory", `${tmpdir()}/iolaus-gh-abc/react`, rules("iolaus-librarian"))).toBe("allow")

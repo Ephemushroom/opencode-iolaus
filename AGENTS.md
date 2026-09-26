@@ -24,6 +24,20 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Runtime
 
+- Iolaus is written against `@opencode/plugin/effect`. The entry is
+  `Plugin.define({ id, effect })`; every registration (`agent.transform`,
+  `command.transform`, `mcp.transform`, `tool.transform`, `session.hook`,
+  `tool.hook`, `rpc.register`) is an Effect in the plugin's `Scope`, and the
+  DAG controller's `close` runs as a scope finalizer. Failures are typed:
+  `DagValidationError` for caller mistakes, `DagRunnerError` for child
+  execution, which the scheduler turns into node retry/failure and never lets
+  escape. Per-run mutual exclusion is a one-permit `Semaphore`; `wait` is a
+  `Deferred`; launch fibers are forked into the controller scope so `close`
+  interrupts them. `src/dag/promise.ts` is a Promise view for tests and QA;
+  `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
+  the Effect editor. `effect@4.0.0-rc.112` is a peer dependency pinned to the
+  host's version and is external in the bundle.
+
 - `src/dag/` is the active Iolaus durable DAG module. It uses SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
   cancellation and JSON-safe result envelopes.

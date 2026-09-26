@@ -2,8 +2,9 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
+import { Effect } from "effect"
 import { Agent, Model } from "@opencode/plugin"
-import type { AgentEditor } from "@opencode/plugin/promise/agent"
+import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "@iolaus/model-core"
 import { firstChainChoice, loadModelsConfig, modelString, parseModelsConfig, resolveLane } from "../src/models"
 import { AGENT_NAMES, CATEGORY_NAMES, agentID, categoryID } from "../src/prompts/catalog"
@@ -83,12 +84,12 @@ function registry() {
     default: () => undefined, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  return { agents, ctx: { agent: { transform: async (run: (editor: AgentEditor) => void) => { run(editor); return { dispose: async () => {} } } } } }
+  return { agents, ctx: { agent: { transform: (run: (editor: AgentEditor) => void) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } } }
 }
 
 test("registration pins every agent and category lane from config and hides lanes with no model", async () => {
   const fixture = registry()
-  const plan = await registerAgents(fixture.ctx, parseOptions({ models: { agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } } }), parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } }))
+  const plan = await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({ models: { agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } } }), parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } }))))
   expect(fixture.agents.get(agentID("oracle"))?.model).toEqual(Model.Ref.parse("openai/gpt-5.5#high"))
   expect(fixture.agents.get(agentID("explore"))?.model).toEqual(Model.Ref.parse("kimi-for-coding/kimi-for-coding-highspeed#off"))
   expect(fixture.agents.get(agentID("hephaestus"))?.model).toEqual(Model.Ref.parse("openai/gpt-6-sol#medium"))
@@ -106,11 +107,11 @@ test("registration pins every agent and category lane from config and hides lane
   const again = registry()
   const options = parseOptions({ categories: ["quick"] })
   const emptyChain = { agents: {}, categories: {} }
-  await registerAgents(again.ctx, options, emptyChain)
+  await Effect.runPromise(Effect.scoped(registerAgents(again.ctx, options, emptyChain)))
   expect(again.agents.has(categoryID("quick"))).toBe(true)
   expect(again.agents.has(categoryID("writing"))).toBe(false)
   const once = structuredClone([...again.agents.values()])
-  await registerAgents(again.ctx, options, emptyChain)
+  await Effect.runPromise(Effect.scoped(registerAgents(again.ctx, options, emptyChain)))
   expect([...again.agents.values()]).toEqual(once)
 })
 
@@ -119,7 +120,7 @@ test("a lane whose chain names no model is hidden and a user-owned lane is left 
   fixture.agents.set(categoryID("quick"), { ...Agent.Info.default(Agent.ID.make(categoryID("quick"))), system: "user-owned" })
   const plan = planRegistration(parseOptions({}), {})
   expect(plan.categories.get("quick")?.source).toBe("requirement")
-  await registerAgents(fixture.ctx, parseOptions({}), {})
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), {})))
   expect(fixture.agents.get(categoryID("quick"))?.system).toBe("user-owned")
   expect(fixture.agents.get(categoryID("quick"))?.model).toBeUndefined()
 })

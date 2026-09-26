@@ -7,6 +7,7 @@
       "dependencies": {
         "@iolaus/ast-grep-core": "workspace:*",
         "@iolaus/model-core": "workspace:*",
+        "effect": "4.0.0-rc.112",
         "zod": "4.1.8",
       },
       "devDependencies": {

@@ -1,10 +1,10 @@
-import type { Context } from "@opencode/plugin/promise/plugin"
+import { Effect } from "effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
 import type { DagController } from "./controller"
 import { IOLAUS_DAG_RPC, type DagView } from "./rpc"
 
-export async function dagView(controller: DagController, sessionID: string): Promise<DagView> {
-  const runs = await controller.list(sessionID)
-  return { runs: runs.slice(0, 50).map((run) => ({
+export function dagView(controller: DagController, sessionID: string): Effect.Effect<DagView> {
+  return controller.list(sessionID).pipe(Effect.map((runs) => ({ runs: runs.slice(0, 50).map((run) => ({
     runID: run.runID, name: run.name, generation: run.generation,
     status: run.status, updatedAt: run.updatedAt,
     nodes: run.nodes.map((node) => ({
@@ -16,28 +16,22 @@ export async function dagView(controller: DagController, sessionID: string): Pro
       sessionID: node.execution?.sessionID,
       result: node.result ? JSON.stringify(node.result.payload).slice(0, 16000) : undefined,
     })),
-  })) }
+  })) })))
 }
 
-function requireNode(nodeID: string | undefined): string {
-  if (!nodeID) throw new Error("nodeID is required for gate decisions")
-  return nodeID
-}
-
-export async function registerDagRpc(ctx: Pick<Context, "rpc">, controller: DagController) {
+export function registerDagRpc(ctx: Pick<Context, "rpc">, controller: DagController) {
   return ctx.rpc.register(IOLAUS_DAG_RPC, {
     snapshot: ({ sessionID }) => dagView(controller, sessionID),
-    action: async (input, call) => {
-      try {
-        if (input.action === "cancel") await controller.cancel(input.runID, input.sessionID, input.generation)
-        else if (input.action === "approve") await controller.approve(input.runID, input.sessionID, requireNode(input.nodeID), input.note, input.generation)
-        else if (input.action === "reject") await controller.reject(input.runID, input.sessionID, requireNode(input.nodeID), input.note, input.generation)
-        else await controller.retry(input.runID, input.sessionID, input.nodeID, input.generation)
-        return await dagView(controller, input.sessionID)
-      } catch (error) {
-        const reason = error instanceof Error ? error.message : String(error)
-        return call.error("rejected", reason, { reason })
-      }
+    action: (input, call) => {
+      const nodeID = input.nodeID
+      const act = input.action === "cancel" ? controller.cancel(input.runID, input.sessionID, input.generation)
+        : input.action === "approve" ? (nodeID ? controller.approve(input.runID, input.sessionID, nodeID, input.note, input.generation) : Effect.fail(new Error("nodeID is required for gate decisions")))
+        : input.action === "reject" ? (nodeID ? controller.reject(input.runID, input.sessionID, nodeID, input.note, input.generation) : Effect.fail(new Error("nodeID is required for gate decisions")))
+        : controller.retry(input.runID, input.sessionID, nodeID, input.generation)
+      return act.pipe(
+        Effect.flatMap(() => dagView(controller, input.sessionID)),
+        Effect.catch((error) => { const reason = error instanceof Error ? error.message : String(error); return Effect.fail(call.error("rejected", reason, { reason })) }),
+      )
     },
   })
 }

@@ -2,14 +2,21 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { applyDefaultModels, createDagController } from "../src/dag/controller"
+import { applyDefaultModels, createDagController as createEffectController } from "../src/dag/controller"
+import { promiseController } from "../src/dag/promise"
+import { runnerFromPromise, type DagRunnerPromise } from "../src/dag/runner"
 import { validateDefinition } from "../src/dag/graph"
 import { expandTemplate, REVIEW_VERDICT_FAIL, REVIEW_VERDICT_PASS } from "../src/dag/templates"
 import { createDagTool } from "../src/dag/tool"
-import type { DagRunner } from "../src/dag/runner"
+import { Effect } from "effect"
 import type { DagDefinition } from "../src/dag/types"
 
 let directory: string | undefined
+
+type ControllerOptions = Omit<Parameters<typeof createEffectController>[0], "runner"> & { readonly runner: DagRunnerPromise }
+function createDagController(options: ControllerOptions) {
+  return promiseController(createEffectController({ ...options, runner: runnerFromPromise(options.runner) }))
+}
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 
 function lanes(agent: string): string | undefined {
@@ -17,7 +24,7 @@ function lanes(agent: string): string | undefined {
 }
 
 /** Replies per node id; a reviewer's reply list is consumed in order across attempts. */
-function scriptedRunner(replies: Record<string, string[]>): DagRunner & { readonly started: string[]; readonly prompts: Map<string, string> } {
+function scriptedRunner(replies: Record<string, string[]>): DagRunnerPromise & { readonly started: string[]; readonly prompts: Map<string, string> } {
   const started: string[] = []
   const prompts = new Map<string, string>()
   return {
@@ -52,7 +59,8 @@ test("plan-review template expands to a valid definition and rejects bad input",
 
 test("routing is fail-closed: a lane without a model is rejected as model_unavailable at create", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
-  const controller = createDagController({ directory, runner: scriptedRunner({}), defaultModel: (agent) => agent === "iolaus-sisyphus" ? "openai/gpt-5.5" : undefined })
+  const effectController = createEffectController({ directory, runner: runnerFromPromise(scriptedRunner({})), defaultModel: (agent) => agent === "iolaus-sisyphus" ? "openai/gpt-5.5" : undefined })
+  const controller = promiseController(effectController)
   const def: DagDefinition = { schemaVersion: 1, name: "t", nodes: [
     { id: "a", agent: "iolaus-sisyphus", prompt: "a", dependsOn: [] },
     { id: "b", agent: "iolaus-unconfigured", prompt: "b", dependsOn: ["a"] },
@@ -60,10 +68,11 @@ test("routing is fail-closed: a lane without a model is rejected as model_unavai
   ] }
   await expect(controller.create(def, "owner")).rejects.toThrow(/model_unavailable: no configured model for b \(iolaus-unconfigured\)/)
   expect(await controller.list("owner")).toEqual([])
-  const tool = createDagTool(controller)
-  const result = await tool.execute({ action: "create", template: { template: "plan-review", task: "x" } }, { sessionID: "owner" } as never)
+  const tool = createDagTool(effectController)
+  const call = (input: unknown) => Effect.runPromise(tool.execute(input as never, { sessionID: "owner" } as never))
+  const result = await call({ action: "create", template: { template: "plan-review", task: "x" } })
   expect(JSON.parse(String(result.content)).error).toMatch(/model_unavailable.*plan \(iolaus-prometheus\)/)
-  const expanded = await tool.execute({ action: "template", template: { template: "goal-review", task: "ship it" } }, { sessionID: "owner" } as never)
+  const expanded = await call({ action: "template", template: { template: "goal-review", task: "ship it" } })
   expect(JSON.parse(String(expanded.content)).nodes.map((n: { id: string }) => n.id)).toEqual(["work", "review", "fix", "rereview", "accept"])
   controller.close()
 })

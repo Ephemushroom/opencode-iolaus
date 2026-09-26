@@ -168,6 +168,7 @@ let after
 try {
   server.listen(0, "127.0.0.1"); await once(server, "listening")
   const mockURL = `http://127.0.0.1:${server.address().port}/v1`
+  const only = process.env.IOLAUS_QA_ONLY ? new Set(process.env.IOLAUS_QA_ONLY.split(",")) : undefined
   for (const scenario of [
     { name: "native", enabled: true, agent: "build", nativeRead: true },
     { name: "agent", enabled: true, agent: "iolaus-sisyphus", nativeRead: true },
@@ -201,6 +202,7 @@ try {
      { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
      { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
   ]) {
+    if (only && !only.has(scenario.name)) continue
     active = scenario
     const home = join(sandbox, scenario.name, "home"), project = join(home, "project")
     mkdirSync(project, { recursive: true })
