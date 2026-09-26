@@ -19,15 +19,12 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - `reference/omo/` is an immutable historical snapshot. Its instructions, manifests, tests, and runtime entrypoints are reference data, not current project configuration. Consult it when tracing a retained prompt or deliberately designing a later feature.
 - Keep reference code out of imports, active tests, builds, published files, and install scripts.
 - Preserve native agents and the user's default agent/model. Namespace Iolaus registrations.
-- Iolaus state has two layers (`src/home.ts`). User layer `IOLAUS_HOME` (default `~/.iolaus`): `models.json`,
-  `verify.json`, `agent/plans`, `agent/skills`. Project layer `<project>/.iolaus`: `dag/`, `plans/`, `skills/` and
-  overrides of the same files. Project wins. `provisionHome` creates missing directories at setup and never
-  overwrites; every rendered prompt ends with `<iolaus-home>` naming both paths. `src/home-skills.ts` loads
-  `agent/skills/<name>/SKILL.md` and `.iolaus/skills/<name>/SKILL.md` (project shadows user) into the host skill list
-  as `iolaus-home:<name>` via `skill.transform`, never replacing a host-owned id. Prometheus may also edit
-  `agent/plans`. Iolaus has no memory store: cross-session memory belongs to the host or the user's memory plugin
-  (claude-mem), and the contract says so. Never modify the host's global session/config stores outside an isolated QA
-  sandbox.
+- Iolaus config has two layers (`src/home.ts`). User layer `IOLAUS_HOME` (default `~/.iolaus`): `models.json`,
+  `verify.json`. Project layer `<project>/.iolaus`: `dag/`, `plans/` and overrides of the same files. Project wins.
+  `provisionHome` creates missing directories at setup and never overwrites; every rendered prompt ends with
+  `<iolaus-home>` naming both paths. Iolaus owns no skills directory and no memory store: skill discovery is the
+  host's (`~/.agent/skills`, global skills) and cross-session memory is the user's memory plugin's (claude-mem); the
+  contract says so. Never modify the host's global session/config stores outside an isolated QA sandbox.
 - No automatic upstream synchronization or dependency on published OMO packages.
 
 ## Runtime

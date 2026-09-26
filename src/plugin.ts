@@ -20,7 +20,6 @@ import { resolveGhBinary } from "./gh/binary"
 import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
 import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
-import { registerHomeSkills } from "./home-skills"
 
 /** Session directory for a call, falling back to the plugin's own location. */
 function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
@@ -49,7 +48,7 @@ export default Plugin.define({
     trace("iolaus.home.ready", { user: home.user, project: home.project, created: provisioned.created })
     const models = loadModelsConfig(ctx.location.directory, { inline: options.models })
     trace("iolaus.models.loaded", { sources: models.sources, diagnostics: models.diagnostics })
-    yield* registerAgents(ctx, options, models.config, home)
+    yield* registerAgents(ctx, options, models.config)
     yield* registerModes(ctx, options)
     yield* registerMcps(ctx, options.mcps)
     const defaultModel = (agent: string): string | undefined => {
@@ -70,9 +69,6 @@ export default Plugin.define({
     })
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
-
-    // agent-home: skills under agent/skills and .iolaus/skills enter the host skill list.
-    yield* registerHomeSkills(ctx, home)
 
     const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
     trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })
