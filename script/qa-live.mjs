@@ -71,7 +71,8 @@ const server = http.createServer(async (req, res) => {
     const body = JSON.parse(Buffer.concat(chunks).toString())
     const tools = (body.tools ?? []).map((t) => t.name ?? t.function?.name)
     const input = JSON.stringify(body.input)
-    const record = { scenario: active.name, model: body.model, reasoning: body.reasoning ?? null, service_tier: body.service_tier ?? null, tools, input, instructions: body.instructions }
+    // generate.text (judge nodes) sends no instructions; keep the field a string so assertions can call .includes on it.
+    const record = { scenario: active.name, model: body.model, reasoning: body.reasoning ?? null, service_tier: body.service_tier ?? null, tools, input, instructions: body.instructions ?? "" }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
     assert.ok(requests.length < 120, "Unexpected model loop")
@@ -399,11 +400,15 @@ try {
          const commanding = captured.find((r) => r.instructions.includes('<iolaus-mode-dag template="ultrawork">'))
          assert.ok(commanding, "commanding session's system prompt lacks the mode DAG instruction")
          const children = captured.filter((r) => JSON.parse(r.input).some((item) => item?.type === "message" && JSON.stringify(item).includes("<iolaus-dag-child>")))
-         assert.ok(children.length >= 3, "DAG worker children were not prompted with the child marker")
+         assert.ok(children.length >= 3, `DAG worker children were not prompted with the child marker (${children.length})`)
          assert.ok(children.every((r) => !r.instructions.includes("<iolaus-mode-dag")), "a DAG worker child was told to create another run")
          assert.ok(children.every((r) => r.instructions.includes("ULTRAWORK")), "DAG worker children did not get the ultrawork prompt")
          const order = traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.nodeID)
-         assert.deepEqual(order, ["work", "review", "fix1", "review1", "fix2", "review2"], `loop rounds ran out of order: ${order}`)
+         assert.deepEqual(order, ["work", "review", "work1", "review1", "work2", "review2"], `loop rounds ran out of order: ${order}`)
+         // Dynamic loop: the graph started as work/review/accept and grew one pair per FAIL; reviews are judge nodes (no child session).
+         assert.deepEqual(traces.filter((t) => t.event === "iolaus.dag.loop.grown").map((t) => t.nodeID), ["review", "review1"], "loop did not grow once per FAIL")
+         const childSessions = traces.filter((t) => t.event === "iolaus.agent.rendered" && t.agent === "momus")
+         assert.equal(childSessions.length, 0, "judge reviews must not open a momus child session")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.waiting" && t.nodeID === "accept"), "loop did not reach the accept gate after the passing round")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.approved" && t.nodeID === "accept"), "accept gate was not approved")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.completed"), "ultrawork run did not complete")
@@ -414,7 +419,7 @@ try {
          assert.ok(traces.some((t) => t.event === "iolaus.mode.rendered" && t.dag === "ultrawork"), "commanding session did not render the DAG instruction")
          assert.ok(traces.filter((t) => t.event === "iolaus.mode.rendered" && t.dag === null).length >= 3, "ultrawork prompt was not rendered for the loop's worker children")
          const fix2 = texts.find((t) => t.includes("Round 2: the reviewer rejected"))
-         assert.ok(fix2 && fix2.includes("IOLAUS_ULTRAWORK_FIX1") && fix2.includes("Scenario 3 lacks evidence"), "fix2 prompt lacks the previous fix and review inputs")
+         assert.ok(fix2 && fix2.includes("IOLAUS_ULTRAWORK_FIX1") && fix2.includes("Scenario 3 lacks evidence"), "work2 prompt lacks the previous fix and review inputs")
        }
        if (scenario.template === "unavailable") {
          const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))

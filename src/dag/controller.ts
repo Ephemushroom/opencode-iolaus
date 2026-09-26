@@ -3,6 +3,7 @@ import { Deferred, Effect, Exit, Scope, Semaphore } from "effect"
 import { evaluateCondition } from "./condition"
 import { DagRunnerError, DagValidationError, errorMessage } from "./errors"
 import { dependencyState, isGate, validateDefinition } from "./graph"
+import { growLoop } from "./loop"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
@@ -267,8 +268,31 @@ export function createDagController(options: DagControllerOptions): DagControlle
     })
     const outcome = yield* Effect.exit(execution)
     yield* settle(runID, nodeID, node, outcome)
+    yield* grow(runID, nodeID)
     yield* schedule(runID)
   })
+
+  /** Dynamic review loop: after a review settles FAIL with rounds left, append the next fix/review pair. */
+  const grow = (runID: string, nodeID: string): Effect.Effect<void> => locked(runID, Effect.sync(() => {
+    const run = store.getRun(runID)
+    if (!run || !run.definition.loop || terminal(run.status)) return
+    const next = growLoop(run, nodeID)
+    if (!next) return
+    const definition = applyDefaultModels(next, options.defaultModel)
+    validateDefinition(definition)
+    const previousByID = new Map(run.nodes.map((node) => [node.definition.id, node]))
+    const fingerprints = fingerprintNodes(definition)
+    const nodes = definition.nodes.map((node) => {
+      const old = previousByID.get(node.id)
+      if (old && old.fingerprint === fingerprints.get(node.id)) return old
+      // Existing nodes with a changed definition (the loop tail rewired to the newest review) keep their status if untouched.
+      if (old) return { ...old, definition: node, fingerprint: fingerprints.get(node.id)!, updatedAt: now() }
+      return { definition: node, fingerprint: fingerprints.get(node.id)!, status: "pending" as const, attempt: 0, createdAt: now(), updatedAt: now() }
+    })
+    const grown: DagRunRecord = { ...run, definition, fingerprint: graphFingerprint(definition), generation: run.generation + 1, status: "running", nodes, updatedAt: now() }
+    save(grown)
+    event(grown, "loop.grown", nodeID, { round: definition.nodes.filter((node) => node.id.startsWith(`${run.definition.loop!.fix}`)).length })
+  }))
 
   const fingerprintNodes = (definition: DagDefinition): Map<string, string> => {
     const fingerprints = new Map<string, string>()

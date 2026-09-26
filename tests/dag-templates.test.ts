@@ -126,28 +126,76 @@ test("goal-review run: two failed reviews leave the run without an accepted resu
   controller.close()
 })
 
-test("ultrawork template unrolls the loop and stops at the first passing review", async () => {
+test("ultrawork template is a dynamic loop: the graph grows one fix/review pair per FAIL and stops at PASS or maxRounds", async () => {
   const def = expandTemplate({ template: "ultrawork", task: "Make it work", iterations: 3 })
   validateDefinition(applyDefaultModels(def, (a) => lanes(a) ?? "openai/gpt-5.5"))
-  expect(def.nodes.map((n) => n.id)).toEqual(["work", "review", "fix1", "review1", "fix2", "review2", "accept"])
+  expect(def.nodes.map((n) => n.id)).toEqual(["work", "review", "accept"])
+  expect(def.nodes.find((n) => n.id === "review")?.kind).toBe("judge")
+  expect(def.loop).toMatchObject({ review: "review", fix: "work", maxRounds: 3, tail: ["accept"] })
   expect(def.nodes.find((n) => n.id === "work")?.prompt.startsWith("<iolaus-mode:ultrawork>\n")).toBe(true)
-  expect(def.nodes.find((n) => n.id === "fix2")?.inputs).toEqual([{ node: "fix1" }, { node: "review1" }])
-  expect(def.nodes.find((n) => n.id === "accept")?.dependsOn).toEqual(["review", "review1", "review2"])
   expect(() => expandTemplate({ template: "ultrawork", task: "x", iterations: 0 })).toThrow(/iterations/)
+
+  // Two FAILs then a PASS: graph grows to work, review, work1, review1, work2, review2, accept; the gate waits on review2.
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
   const runner = scriptedRunner({ review: [`No.\n${REVIEW_VERDICT_FAIL}`], review1: [`Still no.\n${REVIEW_VERDICT_FAIL}`], review2: [`Yes.\n${REVIEW_VERDICT_PASS}`] })
   const controller = createDagController({ directory, runner, defaultModel: lanes })
-  const run = await controller.create(expandTemplate({ template: "ultrawork", task: "t", iterations: 3, gate: false }), "owner")
-  const finished = await controller.wait(run.runID, "owner")
-  expect(finished.status).toBe("completed")
-  expect(runner.started).toEqual(["work", "review", "fix1", "review1", "fix2", "review2"])
-  expect(runner.prompts.get("fix2")).toContain("Still no.")
+  const run = await controller.create(expandTemplate({ template: "ultrawork", task: "t", iterations: 3 }), "owner")
+  let snap = (await controller.snapshot(run.runID, "owner")).run
+  for (let i = 0; i < 100 && snap.status !== "paused"; i++) { await new Promise((r) => setTimeout(r, 20)); snap = (await controller.snapshot(run.runID, "owner")).run }
+  expect(snap.status).toBe("paused")
+  expect(snap.definition.nodes.map((n) => n.id)).toEqual(["work", "review", "work1", "review1", "work2", "review2", "accept"])
+  expect(snap.definition.nodes.find((n) => n.id === "accept")?.dependsOn).toEqual(["review2"])
+  expect(runner.started).toEqual(["work", "review", "work1", "review1", "work2", "review2"])
+  expect(runner.prompts.get("work2")).toContain("Round 2")
+  expect(runner.prompts.get("work2")).toContain("Still no.")
+  expect(runner.prompts.get("review1")).toContain("Round 1")
+  const grown = (await controller.snapshot(run.runID, "owner")).events.filter((e) => e.type === "loop.grown")
+  expect(grown.map((e) => e.nodeID)).toEqual(["review", "review1"])
+  expect(snap.generation).toBe(3)
+  await controller.approve(run.runID, "owner", "accept")
+  expect((await controller.wait(run.runID, "owner")).status).toBe("completed")
+
+  // First review passes: nothing grows, gate waits on the original review.
   const early = scriptedRunner({ review: [`Fine.\n${REVIEW_VERDICT_PASS}`] })
   const second = createDagController({ directory: mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-")), runner: early, defaultModel: lanes })
   const run2 = await second.create(expandTemplate({ template: "ultrawork", task: "t", iterations: 3, gate: false }), "owner")
   const done = await second.wait(run2.runID, "owner")
-  expect(Object.fromEntries(done.nodes.map((n) => [n.definition.id, n.status]))).toEqual({ work: "completed", review: "completed", fix1: "skipped", review1: "skipped", fix2: "skipped", review2: "skipped" })
-  controller.close(); second.close()
+  expect(done.definition.nodes.map((n) => n.id)).toEqual(["work", "review"])
+  expect(early.started).toEqual(["work", "review"])
+
+  // maxRounds reached with FAIL: run completes without a gate, no further growth.
+  const stubborn = scriptedRunner({ review: [`No.\n${REVIEW_VERDICT_FAIL}`], review1: [`No.\n${REVIEW_VERDICT_FAIL}`] })
+  const third = createDagController({ directory: mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-")), runner: stubborn, defaultModel: lanes })
+  const run3 = await third.create(expandTemplate({ template: "ultrawork", task: "t", iterations: 2 }), "owner")
+  const exhausted = await third.wait(run3.runID, "owner")
+  expect(exhausted.status).toBe("completed")
+  expect(stubborn.started).toEqual(["work", "review", "work1", "review1"])
+  expect(Object.fromEntries(exhausted.nodes.map((n) => [n.definition.id, n.status])).accept).toBe("skipped")
+  controller.close(); second.close(); third.close()
+})
+
+test("judge nodes run one generate.text call with no session; agent nodes still open sessions", async () => {
+  const { createOpenCodeDagRunner } = await import("../src/dag/runner")
+  const calls: string[] = []
+  const ctx = {
+    location: { directory: "/p" },
+    generate: { text: (input: { prompt: string; model?: unknown }) => { calls.push(`generate:${input.prompt.slice(0, 10)}:${input.model ? "model" : "nomodel"}`); return Effect.succeed({ text: `judged\n${REVIEW_VERDICT_PASS}` }) } },
+    session: {
+      create: () => { calls.push("session.create"); return Effect.succeed({ id: "ses_child" }) },
+      prompt: () => Effect.succeed(undefined), wait: () => Effect.succeed(undefined),
+      get: () => Effect.succeed({ outcome: "completed" }), context: () => Effect.succeed([{ type: "assistant", content: [{ type: "text", text: "child done" }] }]), interrupt: () => Effect.succeed(undefined),
+    },
+  }
+  const runner = createOpenCodeDagRunner(ctx as never)
+  const judge = { id: "j", kind: "judge" as const, agent: "iolaus-momus", model: "openai/gpt-5.5", prompt: "Judge this", dependsOn: [] }
+  const ref = await Effect.runPromise(runner.start({ node: judge, prompt: "Judge this please", attempt: 1 }))
+  expect(ref.sessionID.startsWith("judge:")).toBe(true)
+  const result = await Effect.runPromise(runner.wait(ref))
+  expect(result.payload).toEqual({ text: `judged\n${REVIEW_VERDICT_PASS}` })
+  const agentRef = await Effect.runPromise(runner.start({ node: { id: "a", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "do", dependsOn: [] }, prompt: "do", attempt: 1 }))
+  expect(agentRef.sessionID).toBe("ses_child")
+  expect((await Effect.runPromise(runner.wait(agentRef))).payload).toEqual({ text: "child done" })
+  expect(calls).toEqual(["generate:Judge this:model", "session.create"])
 })
 
 test("hyperplan template fans members through analyse, attack, defend, then distill, plan, review", async () => {

@@ -1,7 +1,7 @@
 export { createDagController } from "./controller"
 export { createOpenCodeDagRunner } from "./runner"
 export { DagStore, resolveDagDatabasePath } from "./store"
-export { DagValidationError, dependencyState, isGate, validateDefinition } from "./graph"
+export { DagValidationError, dependencyState, isGate, isJudge, validateDefinition } from "./graph"
 export { evaluateCondition, selectField, validateCondition } from "./condition"
 export { canonicalJson } from "./canonical-json"
 export { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
