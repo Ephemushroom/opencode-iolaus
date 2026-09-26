@@ -39,8 +39,8 @@ Shared across projects. Iolaus reads:
 - models.json   agent/category -> provider/model[#variant]
 - verify.json   post-edit checkers (project .iolaus/verify.json overrides)
 - agent/plans   plans Prometheus writes when a project has no .iolaus
-- agent/memory  notes agents keep between sessions
-- agent/skills  pointers to skills you want every project to see
+- agent/memory  notes agents keep between sessions (tools.memory.*)
+- agent/skills  <name>/SKILL.md skills every project can invoke as iolaus-home:<name>
 
 Project-level .iolaus/ overrides these and holds DAG state.
 `
@@ -64,5 +64,5 @@ export function provisionHome(home: IolausHome): ProvisionResult {
 
 /** Sentence appended to every rendered prompt so agents write to the right place. */
 export function homeContract(home: IolausHome): string {
-  return `<iolaus-home>User layer ${home.user} (agent/plans, agent/memory, agent/skills; models.json, verify.json). Project layer ${home.project} (plans/, dag/; overrides). Write plans to ${home.projectPlans}; use ${home.userPlans} only when working outside a project. Keep durable notes in ${home.userMemory}.</iolaus-home>`
+  return `<iolaus-home>User layer ${home.user} (agent/plans, agent/memory, agent/skills; models.json, verify.json). Project layer ${home.project} (plans/, memory/, skills/, dag/; overrides). Write plans to ${home.projectPlans}; use ${home.userPlans} only when working outside a project. Durable notes go through the Code Mode \`memory\` tools (tools.memory.list/read/write/remove): read them before re-investigating, write one when you learn a decision, convention or pitfall that should outlive this session; layer "project" for this repo, "user" for everywhere. Skills under agent/skills/<name>/SKILL.md and .iolaus/skills/<name>/SKILL.md are loaded as \`iolaus-home:<name>\`.</iolaus-home>`
 }

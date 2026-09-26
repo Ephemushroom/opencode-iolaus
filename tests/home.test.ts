@@ -46,6 +46,7 @@ test("home contract is appended after the native contract", () => {
   const text = bindNative("PROMPT", homeContract(home))
   expect(text.indexOf("<iolaus-native-contract>")).toBeLessThan(text.indexOf("<iolaus-home>"))
   expect(text).toContain("Write plans to /p/.iolaus/plans")
-  expect(text).toContain("/u/agent/memory")
+  expect(text).toContain("tools.memory.list/read/write/remove")
+  expect(text).toContain("iolaus-home:<name>")
   expect(bindNative("PROMPT")).not.toContain("<iolaus-home>")
 })

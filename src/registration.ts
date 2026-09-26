@@ -9,6 +9,7 @@ import {
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
+import type { IolausHome } from "./home"
 import { trace } from "./trace"
 
 const READ_ONLY = new Set<AgentName>(["oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
@@ -43,10 +44,14 @@ function applyModel(agent: { model?: unknown }, assignment: LaneAssignment | und
  * pinned model, and a lane whose chain and config both name no model is not
  * registered. Provider connectivity and subscription state are not consulted.
  */
+/** Agents that may write memory notes: the four primaries (they own work) and metis (it distills). */
+const MEMORY_WRITERS = new Set<AgentName>(["sisyphus", "hephaestus", "prometheus", "atlas", "metis"])
+
 export function registerAgents(
   ctx: { agent: Pick<Context["agent"], "transform"> },
   options: Options,
   config: ModelsConfig = {},
+  home?: IolausHome,
 ): Effect.Effect<RegistrationPlan, never, Scope.Scope> {
   const plan = planRegistration(options, config)
   return ctx.agent.transform((editor) => {
@@ -80,8 +85,10 @@ export function registerAgents(
         if (name === "prometheus") {
           agent.permissions.push({ action: "edit", resource: "*", effect: "deny" },
             { action: "edit", resource: ".iolaus/plans/*", effect: "allow" },
+            ...(home ? [{ action: "edit", resource: `${home.userPlans}/*`, effect: "allow" as const }, { action: "external_directory", resource: `${home.userPlans}/*`, effect: "allow" as const }] : []),
             { action: "shell", resource: "*", effect: "deny" })
         }
+        if (MEMORY_WRITERS.has(name)) agent.permissions.push({ action: "memory", resource: "*", effect: "allow" })
         if (name === "sisyphus-junior") {
           agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" })
         }
