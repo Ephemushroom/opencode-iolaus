@@ -1,0 +1,41 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.0.16"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/project/.iolaus","created":["/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/.iolaus","/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/project/.iolaus","/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/project/.iolaus/plans","/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/project/.iolaus/dag","/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-go1WXY/fanin/home/.iolaus/README.md"]}
+{"event":"iolaus.models.loaded","sources":[],"diagnostics":[]}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":true,"binary":"/opt/homebrew/bin/gh","version":"2.101.0","authenticated":false}
+{"event":"iolaus.verify.registered","enabled":true,"inline":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"anthropic/claude-opus-5-5","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"hephaestus","name":"Hephaestus","model":"openai/gpt-6-sol","variant":"medium","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"prometheus","name":"Prometheus","model":"anthropic/claude-fable-5-1","variant":"xhigh","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"anthropic/claude-sonnet-5","variant":null,"source":"requirement"}
+{"event":"iolaus.agent.model","agent":"sisyphus-junior","name":"Sisyphus Junior","model":"anthropic/claude-sonnet-5","variant":null,"source":"requirement"}
+{"event":"iolaus.agent.model","agent":"oracle","name":"Oracle","model":"openai/gpt-5.6-sol","variant":"xhigh","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"librarian","name":"Librarian","model":"kimi-for-coding/kimi-for-coding-highspeed","variant":"off","source":"requirement"}
+{"event":"iolaus.agent.replaced","agent":"explore","previous":"Explore"}
+{"event":"iolaus.agent.model","agent":"explore","name":"Explore","model":"kimi-for-coding/kimi-for-coding-highspeed","variant":"off","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"metis","name":"Metis","model":"anthropic/claude-fable-5-1","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-6-astra","variant":"xhigh","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"multimodal-looker","name":"Multimodal Looker","model":"openai/gpt-5.6-sol","variant":"low","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"visual-engineering","name":"Visual Engineering","model":"anthropic/claude-fable-5-1","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"ultrabrain","name":"Ultrabrain","model":"openai/gpt-6-astra","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-6-sol-fast","variant":"medium","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/gpt-6-astra","variant":"xhigh","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"artistry","name":"Artistry","model":"anthropic/claude-fable-5-1","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-6-luna-fast","variant":"low","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"unspecified-low","name":"Unspecified Low","model":"xiaomi/mimo-v2.6-pro","variant":"max","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"anthropic/claude-opus-5-5","variant":"medium","source":"requirement"}
+{"event":"iolaus.agent.model","agent":"writing","name":"Writing","model":"anthropic/claude-fable-5-1","variant":"low","source":"requirement"}
+{"event":"iolaus.dag.run.started","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"a","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"a","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_f21c562ecffe1dciT3l3VF8S49"}
+{"event":"iolaus.dag.node.completed","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"a","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"b","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"b","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"hephaestus","model":"openai/gpt-5.5","sessionID":"ses_f21c562ceffelMR0k0gp6HwpYF"}
+{"event":"iolaus.dag.node.completed","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"b","sequence":7}
+{"event":"iolaus.dag.node.ready","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"merge","sequence":8}
+{"event":"iolaus.dag.node.started","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"merge","sequence":9}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_f21c562b9ffeuFupPtqfFBw0zu"}
+{"event":"iolaus.dag.node.completed","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"nodeID":"merge","sequence":10}
+{"event":"iolaus.dag.run.completed","runID":"204bf3eb-a769-42f9-896f-1bc9701b388a","generation":1,"sequence":11}

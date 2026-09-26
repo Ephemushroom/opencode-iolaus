@@ -1,0 +1,45 @@
+ • IOLAUS_TUI_QA_DONE              Iolaus DAG · execute          +
+                                                                                                                                       ┃                     ┃
+  ┃                                                                                                                     Iolaus DAG · ex┃  Iolaus DAG      x  ┃
+  ┃  Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>; prefer the revised plan when present.                      ┃                     ┃
+  ┃  Report what was done and how it was verified.                                                                      Context        ┃  approve · approve  ┃
+  ┃                                                                                                                     15 tokens      ┃                     ┃
+  ┃  TASK:                                                                                                              0% used
+  ┃  IOLAUS_TUI_TASK                                                                                                    $0.00 spent
+  ┃
+  ┃  <iolaus-dag-inputs>[{"node":"plan","field":"payload","value":{"text":"IOLAUS_TUI_PLAN_V1"},"provenance":{           Iolaus DAG
+  ┃  "agent":"iolaus-prometheus","model":"openai/gpt-5.5","attempt":1,"status":"completed","sessionID":                  No active DAG runs
+  ┃  "ses_f21d56668ffeW1hJdTnwgK2VNG"}},{"node":"revise","field":"payload","value":{"text":"IOLAUS_TUI_PLAN_V2"},
+  ┃  "provenance":{"agent":"iolaus-prometheus","model":"openai/gpt-5.5","attempt":1,"status":"completed",
+  ┃  "sessionID":"ses_f21d55697ffdfUwrQajnNgemG9"}}]</iolaus-dag-inputs>
+  ┃
+
+     IOLAUS_TUI_EXECUTED
+
+     IOLAUS_TUI_EXECUTED
+
+     Iolaus-Sisyphus · GPT-5.5 · 28ms · 263.2 tok/s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Iolaus-Sisyphus · GPT-5.5 OpenAI                                                                                   /…/qc1…/T/iolaus-tui-qa-EzDZt8/project
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-EzDZt8/project   15 (0%) · $0.00  ctrl+p commands    DAG · idle
+

@@ -11,9 +11,9 @@ export interface DagTemplateInput {
   /** The task, in the user's words. Becomes the planner's / worker's prompt body. */
   readonly task: string
   readonly name?: string
-  /** Reviewer lane; defaults to `iolaus-momus` for plans and `iolaus-metis`-free `iolaus-momus` for goals. */
+  /** Reviewer lane; defaults to `momus` for plans and `metis`-free `momus` for goals. */
   readonly reviewer?: string
-  /** Executor lane for the post-approval step; defaults to `iolaus-sisyphus`. */
+  /** Executor lane for the post-approval step; defaults to `sisyphus`. */
   readonly executor?: string
   /** Set false to run the executor immediately after a passing review. Default true: a human gate sits between review and execution. */
   readonly gate?: boolean
@@ -32,13 +32,13 @@ const REVIEW_INSTRUCTIONS = `You are the reviewer node of an Iolaus DAG. The ups
 
 function planReview(input: DagTemplateInput): DagNodeDefinition[] {
   const attempts = input.maxAttempts ?? 2
-  const reviewer = input.reviewer ?? "iolaus-momus"
-  const executor = input.executor ?? "iolaus-sisyphus"
+  const reviewer = input.reviewer ?? "momus"
+  const executor = input.executor ?? "sisyphus"
   const gate = input.gate !== false
   return [
-    { id: "plan", agent: "iolaus-prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
+    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
     { id: "review", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nA plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
-    { id: "revise", agent: "iolaus-prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
+    { id: "revise", agent: "prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
     { id: "rereview", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the revised plan after your earlier review. Apply the same standard.\n\nTASK:\n${input.task}`, dependsOn: ["revise"], inputs: [{ node: "revise" }], when: { node: "revise", exists: true }, maxAttempts: attempts },
     ...(gate ? [{ id: "approve", kind: "gate" as const, prompt: `Plan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to start execution or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
     { id: "execute", agent: executor, prompt: `Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>; prefer the revised plan when present. Report what was done and how it was verified.\n\nTASK:\n${input.task}`, dependsOn: gate ? ["approve"] : ["review", "rereview"], inputs: [{ node: "plan" }, { node: "revise" }], ...(gate ? {} : { when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }) },
@@ -47,8 +47,8 @@ function planReview(input: DagTemplateInput): DagNodeDefinition[] {
 
 function goalReview(input: DagTemplateInput): DagNodeDefinition[] {
   const attempts = input.maxAttempts ?? 2
-  const reviewer = input.reviewer ?? "iolaus-momus"
-  const executor = input.executor ?? "iolaus-hephaestus"
+  const reviewer = input.reviewer ?? "momus"
+  const executor = input.executor ?? "hephaestus"
   const gate = input.gate !== false
   return [
     { id: "work", agent: executor, prompt: `Achieve this goal end to end and report what changed and how you verified it.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
@@ -78,8 +78,8 @@ const PASS_ANY = (reviews: readonly string[]) => ({ any: reviews.map((node) => (
 function ultrawork(input: DagTemplateInput): { readonly nodes: DagNodeDefinition[]; readonly loop: DagLoop } {
   const attempts = input.maxAttempts ?? 2
   const rounds = input.iterations ?? 3
-  const reviewer = input.reviewer ?? "iolaus-momus"
-  const executor = input.executor ?? "iolaus-sisyphus"
+  const reviewer = input.reviewer ?? "momus"
+  const executor = input.executor ?? "sisyphus"
   const gate = input.gate !== false
   const marker = `${modeMarker("ultrawork")}\n${DAG_CHILD_MARKER}`
   const standard = `The work passes only if every scenario in the contract is met with real evidence (commands and outputs, not claims), the real-surface artifact is present, and nothing out of scope was changed.`
@@ -100,13 +100,13 @@ function ultrawork(input: DagTemplateInput): { readonly nodes: DagNodeDefinition
   return { nodes, loop }
 }
 
-const HYPERPLAN_MEMBERS = ["iolaus-unspecified-low", "iolaus-unspecified-high", "iolaus-ultrabrain", "iolaus-artistry"] as const
+const HYPERPLAN_MEMBERS = ["unspecified-low", "unspecified-high", "ultrabrain", "artistry"] as const
 
 /** Adversarial planning: independent analysis, cross-attack, defend, distill, then Prometheus plans and Momus reviews. */
 function hyperplan(input: DagTemplateInput): DagNodeDefinition[] {
   const attempts = input.maxAttempts ?? 2
   const members = input.members ?? HYPERPLAN_MEMBERS
-  const reviewer = input.reviewer ?? "iolaus-momus"
+  const reviewer = input.reviewer ?? "momus"
   const gate = input.gate !== false
   const short = (lane: string) => lane.replace(/^iolaus-/, "")
   const analyze = members.map((lane) => `analyze-${short(lane)}`)
@@ -125,11 +125,11 @@ ${input.task}`, dependsOn: analyze, inputs: [{ node: "*" }], maxAttempts: attemp
 
 REQUEST:
 ${input.task}`, dependsOn: attack, inputs: [{ node: "*" }], maxAttempts: attempts })),
-    { id: "distill", agent: "iolaus-metis", prompt: `Distill the defended positions in <iolaus-dag-inputs> into a structured bundle for the planner: agreed facts, surviving risks, rejected approaches with reasons, open questions. Do not write the plan.
+    { id: "distill", agent: "metis", prompt: `Distill the defended positions in <iolaus-dag-inputs> into a structured bundle for the planner: agreed facts, surviving risks, rejected approaches with reasons, open questions. Do not write the plan.
 
 REQUEST:
 ${input.task}`, dependsOn: defend, inputs: [{ node: "*" }], maxAttempts: attempts },
-    { id: "plan", agent: "iolaus-prometheus", prompt: `Write the work plan for this request into .iolaus/plans/ using the distilled bundle in <iolaus-dag-inputs>. You own sequencing, parallelisation and verification gates. Return the plan text in full.
+    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this request into .iolaus/plans/ using the distilled bundle in <iolaus-dag-inputs>. You own sequencing, parallelisation and verification gates. Return the plan text in full.
 
 REQUEST:
 ${input.task}`, dependsOn: ["distill"], inputs: [{ node: "distill" }], maxAttempts: attempts },

@@ -60,7 +60,7 @@ export function buildCategorySkillsDelegationGuide(
   const laneRows = categories.map((category) => {
     const description = category.description || category.name
     const model = category.model ? ` (model: ${category.model})` : ""
-    return `- \`iolaus-${category.name}\`${model} - ${description}`
+    return `- \`${category.name}\`${model} - ${description}`
   })
 
   const customSkills = skills.filter((skill) => skill.location !== "plugin")
@@ -73,10 +73,10 @@ export function buildCategorySkillsDelegationGuide(
 
   return `### Iolaus DAG Agent Selection
 
-Each category is a registered Agent \`iolaus-<category>\` running on its configured
+Each category is a registered Agent named after the category (\`quick\`, \`deep-low\`, ...) running on its configured
 model. Use it as a DAG node's \`agent\` (omit \`model\` to inherit the lane's model) or
 as a one-off native subagent. Execution is owned by the durable \`iolaus_dag\` graph:
-select the exact namespaced Agent, define the node prompt and dependencies, and load
+select the exact Agent ID, define the node prompt and dependencies, and load
 relevant skills inside the node prompt. Use \`snapshot\`/\`wait\` for completion and
 \`retry\` for a failed generation.
 

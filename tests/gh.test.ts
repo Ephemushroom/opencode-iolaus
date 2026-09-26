@@ -13,7 +13,7 @@ import { evaluate, type PermissionRule } from "../src/ast-grep/permissions"
 
 const gh = resolveGhBinary()
 const live = gh?.authenticated ? test : test.skip
-const ctx = (agent = "iolaus-librarian") => ({ sessionID: "ses_test", agent, signal: new AbortController().signal } as never)
+const ctx = (agent = "librarian") => ({ sessionID: "ses_test", agent, signal: new AbortController().signal } as never)
 const byName = (name: string) => createGhTools({ path: gh?.path ?? "/nonexistent/gh", version: "0", authenticated: true }).find((t) => t.name === name)!
 
 test("gh binary probe requires a gh that answers --version; a missing override yields nothing", () => {
@@ -33,12 +33,12 @@ test("gh tools carry the gh permission, and only librarian is allowed it", async
   }
   await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
   const rules = (id: string) => agents.get(id)!.permissions as readonly PermissionRule[]
-  expect(evaluate("gh", "*", rules("iolaus-librarian"))).toBe("allow")
-  expect(evaluate("external_directory", `${tmpdir()}/iolaus-gh-abc/react`, rules("iolaus-librarian"))).toBe("allow")
-  expect(evaluate("external_directory", `${tmpdir()}/other`, rules("iolaus-librarian"))).toBe("deny")
-  expect(evaluate("shell", "*", rules("iolaus-librarian"))).toBe("deny")
-  expect(evaluate("gh", "*", rules("iolaus-explore"))).toBe("deny")
-  expect(evaluate("gh", "*", rules("iolaus-oracle"))).toBe("deny")
+  expect(evaluate("gh", "*", rules("librarian"))).toBe("allow")
+  expect(evaluate("external_directory", `${tmpdir()}/iolaus-gh-abc/react`, rules("librarian"))).toBe("allow")
+  expect(evaluate("external_directory", `${tmpdir()}/other`, rules("librarian"))).toBe("deny")
+  expect(evaluate("shell", "*", rules("librarian"))).toBe("deny")
+  expect(evaluate("gh", "*", rules("explore"))).toBe("deny")
+  expect(evaluate("gh", "*", rules("oracle"))).toBe("deny")
   expect(parseOptions({ gh: false }).gh).toBe(false)
   expect(() => parseOptions({ gh: "yes" })).toThrow(/gh must be/)
 })

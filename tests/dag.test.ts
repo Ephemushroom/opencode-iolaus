@@ -24,7 +24,7 @@ afterEach(() => {
 })
 
 function node(id: string, dependsOn: readonly string[] = []): DagNodeDefinition {
-  return { id, agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: `run ${id}`, dependsOn }
+  return { id, agent: "sisyphus", model: "openai/gpt-5.5", prompt: `run ${id}`, dependsOn }
 }
 
 function definition(nodes: readonly DagNodeDefinition[]): DagDefinition {
@@ -110,7 +110,7 @@ test("fan-in binding expands to every dependency and carries producer provenance
   const start = runner.start.bind(runner)
   runner.start = async (input) => { prompts.set(input.node.id, input.prompt); return start(input) }
   const controller = createDagController({ directory, runner })
-  const b = { ...node("b"), agent: "iolaus-hephaestus", model: "anthropic/claude-opus-5-5" }
+  const b = { ...node("b"), agent: "hephaestus", model: "anthropic/claude-opus-5-5" }
   const merge: DagNodeDefinition = { ...node("merge", ["a", "b"]), inputs: [{ node: "*" }] }
   const run = await controller.create(definition([node("a"), b, merge]), "owner")
   const finished = await controller.wait(run.runID, "owner")
@@ -119,11 +119,11 @@ test("fan-in binding expands to every dependency and carries producer provenance
   const prompt = prompts.get("merge")!
   const inputs = JSON.parse(prompt.slice(prompt.indexOf("<iolaus-dag-inputs>") + "<iolaus-dag-inputs>".length, prompt.indexOf("</iolaus-dag-inputs>")))
   expect(inputs).toEqual([
-    { node: "a", field: "payload", value: { node: "a", attempt: 1 }, provenance: { agent: "iolaus-sisyphus", model: "openai/gpt-5.5", attempt: 1, status: "completed", sessionID: "session-a-1" } },
-    { node: "b", field: "payload", value: { node: "b", attempt: 1 }, provenance: { agent: "iolaus-hephaestus", model: "anthropic/claude-opus-5-5", attempt: 1, status: "completed", sessionID: "session-b-1" } },
+    { node: "a", field: "payload", value: { node: "a", attempt: 1 }, provenance: { agent: "sisyphus", model: "openai/gpt-5.5", attempt: 1, status: "completed", sessionID: "session-a-1" } },
+    { node: "b", field: "payload", value: { node: "b", attempt: 1 }, provenance: { agent: "hephaestus", model: "anthropic/claude-opus-5-5", attempt: 1, status: "completed", sessionID: "session-b-1" } },
   ])
   const record = await controller.node(run.runID, "owner", "b")
-  expect(record.result?.provenance.agent).toBe("iolaus-hephaestus")
+  expect(record.result?.provenance.agent).toBe("hephaestus")
   expect(record.result?.provenance.execution?.sessionID).toBe("session-b-1")
   await expect(controller.node(run.runID, "other", "b")).rejects.toThrow("another session")
   await expect(controller.node(run.runID, "owner", "zzz")).rejects.toThrow("Unknown DAG node")
@@ -245,7 +245,7 @@ test("gate pauses the run, approve resumes with a human result, reject fails and
 
 test("gate validation requires a message and forbids an execution target", () => {
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "  ", dependsOn: [] }]))).toThrow("needs a message")
-  expect(() => validateDefinition(definition([{ id: "g", kind: "gate", agent: "iolaus-sisyphus", prompt: "ok?", dependsOn: [] }]))).toThrow("must not name an agent")
+  expect(() => validateDefinition(definition([{ id: "g", kind: "gate", agent: "sisyphus", prompt: "ok?", dependsOn: [] }]))).toThrow("must not name an agent")
   expect(() => validateDefinition(definition([{ id: "g", kind: "aggregator", agent: "x", model: "p/m", prompt: "ok?", dependsOn: [] }]))).toThrow("Unsupported node kind")
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "ok?", dependsOn: [] }]))).not.toThrow()
 })

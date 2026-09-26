@@ -120,28 +120,28 @@ const server = http.createServer(async (req, res) => {
          : runID
            ? { name: "iolaus_dag", args: { action: active.template && priorDagResult?.status === "running" ? "snapshot" : "wait", run_id: runID } }
            : active.template === "ultrawork"
-             ? { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "IOLAUS_ULTRAWORK_TASK", iterations: 3, executor: "iolaus-sisyphus" } } }
+             ? { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "IOLAUS_ULTRAWORK_TASK", iterations: 3, executor: "sisyphus" } } }
            : active.template === "unavailable"
              ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", reviewer: "iolaus-no-such-lane" } } }
            : active.template
-             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", executor: "iolaus-sisyphus" } } }
+             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", executor: "sisyphus" } } }
            : active.lanes
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA lanes", maxParallel: 2, nodes: [
-                 { id: "quick", agent: "iolaus-quick", prompt: "IOLAUS_DAG_NODE_QUICK", dependsOn: [] },
-                 { id: "oracle", agent: "iolaus-oracle", prompt: "IOLAUS_DAG_NODE_ORACLE", dependsOn: [] } ] } } }
+                 { id: "quick", agent: "quick", prompt: "IOLAUS_DAG_NODE_QUICK", dependsOn: [] },
+                 { id: "oracle", agent: "oracle", prompt: "IOLAUS_DAG_NODE_ORACLE", dependsOn: [] } ] } } }
            : active.route
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA routing", maxParallel: 2, nodes: [
                  { id: "gate", kind: "gate", prompt: "IOLAUS_GATE_APPROVE_QA", dependsOn: [] },
-                 { id: "review", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REVIEW", dependsOn: ["gate"], inputs: [{ node: "gate" }] },
-                 { id: "ship", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_SHIP", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_PASS" } },
-                 { id: "fix", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_FIX", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_FAIL" } },
-                 { id: "report", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REPORT", dependsOn: ["ship", "fix"], inputs: [{ node: "*" }] } ] } } }
+                 { id: "review", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REVIEW", dependsOn: ["gate"], inputs: [{ node: "gate" }] },
+                 { id: "ship", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_SHIP", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_PASS" } },
+                 { id: "fix", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_FIX", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_FAIL" } },
+                 { id: "report", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REPORT", dependsOn: ["ship", "fix"], inputs: [{ node: "*" }] } ] } } }
            : active.fanin
              ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA fan-in", maxParallel: 2, nodes: [
-                 { id: "a", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
-                 { id: "b", agent: "iolaus-hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
-                 { id: "merge", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
-             : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "iolaus-sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+                 { id: "a", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
+                 { id: "b", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
+                 { id: "merge", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
+             : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if ((active.astGrep || active.code) && tools.includes("execute")) {
        const outputs = (body.input ?? []).filter((item) => item?.type === "function_call_output")
        // Remote MCP servers connect asynchronously after startup; retry until their tools are in the catalog.
@@ -162,6 +162,7 @@ const server = http.createServer(async (req, res) => {
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
 })
 const TSC_BIN = join(root, "node_modules", ".bin", "tsc")
+const IOLAUS_AGENT_IDS = new Set(["sisyphus", "hephaestus", "prometheus", "atlas", "sisyphus-junior", "oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
 let GH_TOKEN
 try { GH_TOKEN = execFileSync("gh", ["auth", "token"], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] }).trim() || undefined } catch {}
 const AST_GREP_FIXTURE = "console.log(add(1, 2))\nconsole.log(\"hello\")\nconst x = 1\n"
@@ -172,7 +173,7 @@ try {
   const only = process.env.IOLAUS_QA_ONLY ? new Set(process.env.IOLAUS_QA_ONLY.split(",")) : undefined
   for (const scenario of [
     { name: "native", enabled: true, agent: "build", nativeRead: true },
-    { name: "agent", enabled: true, agent: "iolaus-sisyphus", nativeRead: true },
+    { name: "agent", enabled: true, agent: "sisyphus", nativeRead: true },
     { name: "disabled", enabled: false, agent: "build", nativeRead: true },
      { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
      { name: "dag", enabled: true, agent: "build", dag: true },
@@ -181,27 +182,27 @@ try {
      // plan-review template through the real tool: Prometheus plans, Momus fails once, Prometheus revises, Momus passes, gate, Sisyphus executes.
      { name: "template", enabled: true, agent: "build", dag: true, template: true, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "template-unavailable", enabled: true, agent: "build", dag: true, template: "unavailable", models: { agents: { prometheus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
-     // /iolaus-ultrawork is a DAG mode: the command text tells the primary to create the ultrawork template; the loop runs three rounds.
+     // /ultrawork is a DAG mode: the command text tells the primary to create the ultrawork template; the loop runs three rounds.
      { name: "ultrawork-dag", enabled: true, agent: "build", dag: true, mode: "ultrawork", template: "ultrawork", models: { agents: { momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
-     { name: "astgrep-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true,
+     { name: "astgrep-explore", enabled: true, agent: "explore", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.search({ pattern: "console.log($A)", language: "typescript", paths: ["src"] }); return { ok: r.ok, count: r.matches.length, lines: r.matches.map((m) => m.path + ":" + m.range.start.line), first: r.matches[0].metavariables.single.A }' },
      { name: "astgrep-rewrite", enabled: true, agent: "build",
        astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied, planned: r.counts ? r.counts.plannedMatches : null, code: r.error ? r.error.code : null }' },
-     { name: "astgrep-deny", enabled: true, agent: "iolaus-prometheus", agentPermissions: true,
+     { name: "astgrep-deny", enabled: true, agent: "prometheus", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.rewrite({ pattern: "console.log($A)", rewrite: "logger.info($A)", language: "typescript", paths: ["src"], apply: true }); return { ok: r.ok, applied: r.applied === true, code: r.error ? r.error.code : null }' },
      // Live network: both built-in remote MCP servers answer real read-only queries.
-     { name: "mcps-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, mcps: ["context7", "grep_app"],
+     { name: "mcps-librarian", enabled: true, agent: "librarian", agentPermissions: true, mcps: ["context7", "grep_app"],
        code: 'const found = search({ query: "context7 grep_app", limit: 20 }).items.map((i) => i.path).filter((p) => p.includes("context7") || p.includes("grep_app")).sort(); const lib = await tools.context7["resolve-library-id"]({ libraryName: "react", query: "useEffect cleanup" }); const code = await tools.grep_app.searchGitHub({ query: "useEffect(() => {", language: ["TypeScript", "TSX"] }); const text = JSON.stringify(code); return { found, lib: JSON.stringify(lib).slice(0, 300), grepHit: text.includes("useEffect(() => {"), code: text.slice(0, 300) }' },
-     { name: "mcps-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, code: 'return Object.keys(tools)' },
+     { name: "mcps-off", enabled: true, agent: "librarian", agentPermissions: true, code: 'return Object.keys(tools)' },
      // gh namespace (live network via the user's gh login): librarian may call it; explore may not; gh: false removes it.
-     { name: "gh-librarian", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: true,
+     { name: "gh-librarian", enabled: true, agent: "librarian", agentPermissions: true, gh: true,
        code: 'const repo = await tools.gh.repo({ repo: "cli/cli" }); const c = await tools.gh.clone({ repo: "cli/cli", depth: 2 }); const log = await tools.gh.log({ clone: c.path, count: 1 }); return { name: repo.data && repo.data.name, cloned: c.ok, path: c.path, sha: log.commits && log.commits[0] && log.commits[0].sha, tools: Object.keys(tools.gh).sort() }' },
-     { name: "gh-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
-     { name: "gh-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
+     { name: "gh-explore", enabled: true, agent: "explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
+     { name: "gh-off", enabled: true, agent: "librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
      // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
-     { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
-     { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
+     { name: "verify-edit", enabled: true, agent: "sisyphus", verify: "tsc" },
+     { name: "verify-off", enabled: true, agent: "sisyphus", verify: "off", verifyOption: false },
   ]) {
     if (only && !only.has(scenario.name)) continue
     active = scenario
@@ -235,16 +236,22 @@ try {
     }
     await check(`${scenario.name}: live session`, async () => {
       const args = ["run", "--standalone", "--auto", "--print-logs", "--agent", scenario.agent, "--model", "openai/gpt-5.5"]
-       args.push(scenario.template === "ultrawork" ? `/iolaus-ultrawork IOLAUS_ULTRAWORK_TASK`
-         : scenario.mode ? `/iolaus-${scenario.mode} Read fixture.txt and report the result.`
+       args.push(scenario.template === "ultrawork" ? `/ultrawork IOLAUS_ULTRAWORK_TASK`
+         : scenario.mode ? `/${scenario.mode} Read fixture.txt and report the result.`
          : scenario.dag ? "Run an Iolaus DAG and report the completed node result."
          : scenario.nativeRead ? "Read fixture.txt and report the result." : "Return IOLAUS_QA_DONE.")
       const result = await run(scenario.name,args,fixture)
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), scenario.agent.startsWith("iolaus-") || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), IOLAUS_AGENT_IDS.has(scenario.agent) || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
        if (scenario.enabled) {
+         // Display names drop the namespace; ids keep it; the host's own Explore keeps ours distinguishable.
+         const named = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, t.name]))
+         assert.equal(named["sisyphus"], "Sisyphus", `sisyphus display name: ${named["sisyphus"]}`)
+         assert.equal(named["deep-high"], "Deep High", `deep-high display name: ${named["deep-high"]}`)
+         assert.equal(named["explore"], "Explore", `explore display name: ${named["explore"]}`)
+         assert.ok(traces.some((t) => t.event === "iolaus.agent.replaced" && t.agent === "explore"), "Iolaus did not take over the host's explore agent")
          // agent-home: the user layer is provisioned under the sandbox HOME only, and every rendered prompt carries the home contract.
          const ready = traces.find((t) => t.event === "iolaus.home.ready")
          assert.ok(ready, "iolaus.home.ready trace missing")
@@ -272,7 +279,7 @@ try {
          const inputs = JSON.parse(merge.match(/<iolaus-dag-inputs>(.*?)<\/iolaus-dag-inputs>/s)[1])
          assert.deepEqual(inputs.map((i) => i.node), ["a", "b"], "Fan-in did not expand to every dependency")
          assert.ok(inputs[0].value.text.includes("IOLAUS_FANIN_RESULT_A") && inputs[1].value.text.includes("IOLAUS_FANIN_RESULT_B"), "Fan-in payloads missing")
-         assert.deepEqual(inputs.map((i) => i.provenance.agent), ["iolaus-sisyphus", "iolaus-hephaestus"], "Fan-in provenance agent missing")
+         assert.deepEqual(inputs.map((i) => i.provenance.agent), ["sisyphus", "hephaestus"], "Fan-in provenance agent missing")
          assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
        }
@@ -293,7 +300,7 @@ try {
            assert.match(out, /"count": 2/, `structured search result missing: ${out}`)
            assert.ok(out.includes("src/a.ts:1") && out.includes("src/a.ts:2"), `match locations missing: ${out}`)
            assert.match(out, /"first": "add\(1, 2\)"/, `metavariable capture missing: ${out}`)
-           assert.ok(calls.some((t) => t.tool === "search" && t.ok && t.agent === "iolaus-explore" && t.matches === 2), "search call trace missing")
+           assert.ok(calls.some((t) => t.tool === "search" && t.ok && t.agent === "explore" && t.matches === 2), "search call trace missing")
            assert.equal(source, AST_GREP_FIXTURE)
          }
          if (scenario.name === "astgrep-rewrite") {
@@ -344,7 +351,7 @@ try {
          if (scenario.name === "gh-explore") {
            assert.ok(!catalog.includes("- gh ("), "read-only explore must not see the gh namespace")
            assert.ok(!out.includes('"name": "cli"'), `explore executed a gh call despite deny: ${out}`)
-           assert.ok(!traces.some((t) => t.event === "iolaus.gh.call" && t.agent === "iolaus-explore" && t.ok), "gh tool ran for explore")
+           assert.ok(!traces.some((t) => t.event === "iolaus.gh.call" && t.agent === "explore" && t.ok), "gh tool ran for explore")
          }
          if (scenario.name === "gh-off") {
            assert.ok(traces.some((t) => t.event === "iolaus.gh.unavailable" && t.enabled === false), "gh: false did not disable registration")
@@ -358,10 +365,10 @@ try {
        }
        if (scenario.lanes) {
          const pinned = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, `${t.model}${t.variant ? `#${t.variant}` : ""}|${t.source}`]))
-         assert.equal(pinned["iolaus-oracle"], "openai/gpt-5.6-sol#xhigh|config", "oracle lane did not follow models config")
-         assert.equal(pinned["iolaus-quick"], "openai/gpt-6-luna-fast#low|config", "quick lane did not follow models config")
-         assert.equal(pinned["iolaus-sisyphus"], "anthropic/claude-opus-5-5#max|requirement", "sisyphus lane did not follow the requirement table")
-         assert.equal(pinned["iolaus-deep-high"], "openai/gpt-6-astra#xhigh|requirement", "deep-high lane missing")
+         assert.equal(pinned["oracle"], "openai/gpt-5.6-sol#xhigh|config", "oracle lane did not follow models config")
+         assert.equal(pinned["quick"], "openai/gpt-6-luna-fast#low|config", "quick lane did not follow models config")
+         assert.equal(pinned["sisyphus"], "anthropic/claude-opus-5-5#max|requirement", "sisyphus lane did not follow the requirement table")
+         assert.equal(pinned["deep-high"], "openai/gpt-6-astra#xhigh|requirement", "deep-high lane missing")
          assert.ok(!traces.some((t) => t.event === "iolaus.category.hidden" || t.event === "iolaus.agent.hidden"), "No lane should be hidden when every chain names a model")
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
          const quick = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_QUICK"))
@@ -392,11 +399,11 @@ try {
          const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))
          const created = outputs.map((o) => { try { return JSON.parse(o) } catch { return null } }).find((o) => o?.runID && o?.definition)
          assert.ok(created, "create with template returned no run")
-         assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "iolaus-prometheus")
+         assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "prometheus")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").model, "openai/gpt-5.5", "plan node did not get the configured Prometheus model")
        }
        if (scenario.template === "ultrawork") {
-         // `opencode run "/iolaus-ultrawork ..."` resolves the command client-side, so the plugin command's execute (and its
+         // `opencode run "/ultrawork ..."` resolves the command client-side, so the plugin command's execute (and its
          // dispatched trace) is not involved; the context hook is what makes the mode a DAG, and its trace carries `dag`.
          const commanding = captured.find((r) => r.instructions.includes('<iolaus-mode-dag template="ultrawork">'))
          assert.ok(commanding, "commanding session's system prompt lacks the mode DAG instruction")
