@@ -144,10 +144,22 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   mode. `opencode run "/iolaus-<mode> ..."` resolves the command client-side, so
   the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
   context hook is what makes the mode a DAG.
-- The DAG sidebar is implemented through the `./tui` export and typed RPC
-  snapshot/events, including approve/reject/cancel/retry RPC methods.
-  Interactive sidebar controls are a planned follow-up. Do not claim a feature
-  as implemented until its runtime QA evidence exists under `.omo/evidence/`.
+- The DAG TUI (`src/tui.tsx`, pure helpers in `src/tui/view.ts`) claims
+  `sidebar.content` and `sidebar.footer`. Per run: coloured status glyphs from
+  the host theme, a progress bar, generation and age; nodes ordered gates →
+  running → rest, indented by dependency depth, with `⚖` for judges and `⏸`
+  for gates. A waiting gate shows its prompt; a running node shows the latest
+  assistant text of its child session (`context.data.session.message`). A
+  keymap layer (active only when runs exist) binds `j`/`k` select, `o` open
+  the selected node's child session (`ui.tabs.focus`, else
+  `ui.router.navigate({type:"session"})`), `a` approve, `r` reject, plus
+  palette-only retry and cancel; mouse down selects, mouse up on the selected
+  row opens. `node.waiting` events call `attention.notify`. The footer shows a
+  one-line summary. RPC output omits undefined fields (host validates JSON
+  before the schema). `script/qa-tui.mjs` drives the real TUI in tmux with a
+  mock model, captures screens, presses the keys and asserts trace
+  `iolaus.tui.action` / `iolaus.tui.open`. Do not claim a feature as
+  implemented until its runtime QA evidence exists under `.omo/evidence/`.
 
 ## Verification
 

@@ -1,0 +1,33 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.16",
+  "tracePath": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/tui/.omo/evidence/20260926-iolaus-dag-tui/trace.ndjson",
+  "tmuxLog": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/tui/.omo/evidence/20260926-iolaus-dag-tui/tmux.log",
+  "nativeTuiLoaded": true,
+  "screens": [
+    "idle",
+    "running",
+    "gate",
+    "completed",
+    "opened"
+  ],
+  "nodeOrder": [
+    "plan",
+    "review",
+    "revise",
+    "rereview",
+    "approve",
+    "execute"
+  ],
+  "requestCount": 12,
+  "realBefore": {
+    "config": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+    "database": "825bd3eb4e56ccf58bee0e3ebe84e7d294ccf08b66bfeb42a70dc70a91afc168"
+  },
+  "realAfter": {
+    "config": "57872cb0a1c6caba284535b6c6eed7489cbdc1497a949f81ade25bfa130fd44b",
+    "database": "825bd3eb4e56ccf58bee0e3ebe84e7d294ccf08b66bfeb42a70dc70a91afc168"
+  },
+  "sandboxRemoved": true,
+  "omitted": "No provider credentials, auth files, prompts, or inherited secret-bearing environment values were recorded."
+}

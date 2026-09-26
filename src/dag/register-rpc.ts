@@ -7,14 +7,16 @@ export function dagView(controller: DagController, sessionID: string): Effect.Ef
   return controller.list(sessionID).pipe(Effect.map((runs) => ({ runs: runs.slice(0, 50).map((run) => ({
     runID: run.runID, name: run.name, generation: run.generation,
     status: run.status, updatedAt: run.updatedAt,
+    // The host validates RPC output as JSON before the zod schema; undefined is not JSON, so optional fields are omitted.
     nodes: run.nodes.map((node) => ({
       id: node.definition.id, status: node.status, attempt: node.attempt,
       kind: node.definition.kind ?? "agent",
       agent: node.definition.agent ?? "", model: node.definition.model ?? "",
-      prompt: node.definition.kind === "gate" ? node.definition.prompt : undefined,
-      dependsOn: [...node.definition.dependsOn], error: node.error,
-      sessionID: node.execution?.sessionID,
-      result: node.result ? JSON.stringify(node.result.payload).slice(0, 16000) : undefined,
+      dependsOn: [...node.definition.dependsOn],
+      ...(node.definition.kind === "gate" ? { prompt: node.definition.prompt } : {}),
+      ...(node.error !== undefined ? { error: node.error } : {}),
+      ...(node.execution?.sessionID !== undefined ? { sessionID: node.execution.sessionID } : {}),
+      ...(node.result ? { result: JSON.stringify(node.result.payload).slice(0, 16000) } : {}),
     })),
   })) })))
 }

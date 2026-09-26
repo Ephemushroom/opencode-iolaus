@@ -49,8 +49,9 @@ pinned model taken from `.iolaus/models.json` or, unconfigured, from OMO's
 requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
-pause the run for a human approve/reject. Interactive panel actions are a
-planned follow-up.
+pause the run for a human approve/reject.
+
+The sidebar shows every run with a progress bar and colour-coded nodes (gates first, then whatever is running), the gate's question, and what each running agent is saying right now. Press `j`/`k` to select a node, `o` to jump into that agent's session, `a`/`r` to approve or reject a waiting gate; retry and cancel are in the command palette. Clicking a node selects it, clicking again opens it. The footer keeps a one-line summary and a waiting gate raises a desktop notification.
 
 Two templates come built in. `{ "action": "create", "template": { "template": "plan-review", "task": "..." } }` has Prometheus write the plan, Momus review it (the reply ends `VERDICT: PASS` or `VERDICT: FAIL`), Prometheus revise on failure, Momus re-review, then pauses at a gate before the executor runs; `goal-review` does the same around Hephaestus doing the work. Use action `template` to see the expanded definition and edit it before creating. Creation is fail-closed: a node whose lane has no configured model is rejected with `model_unavailable` instead of starting a run that would fail later.
 
