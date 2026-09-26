@@ -199,8 +199,6 @@ try {
        code: 'const repo = await tools.gh.repo({ repo: "cli/cli" }); const c = await tools.gh.clone({ repo: "cli/cli", depth: 2 }); const log = await tools.gh.log({ clone: c.path, count: 1 }); return { name: repo.data && repo.data.name, cloned: c.ok, path: c.path, sha: log.commits && log.commits[0] && log.commits[0].sha, tools: Object.keys(tools.gh).sort() }' },
      { name: "gh-explore", enabled: true, agent: "iolaus-explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
      { name: "gh-off", enabled: true, agent: "iolaus-librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
-     // agent-home: a home skill under the sandbox user layer is registered with the host and advertised to the agent.
-     { name: "home-skill", enabled: true, agent: "iolaus-sisyphus", agentPermissions: true, homeSkill: true, code: 'return { tools: Object.keys(tools) }' },
      // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
      { name: "verify-edit", enabled: true, agent: "iolaus-sisyphus", verify: "tsc" },
      { name: "verify-off", enabled: true, agent: "iolaus-sisyphus", verify: "off", verifyOption: false },
@@ -223,10 +221,6 @@ try {
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
     writeFileSync(join(project,"fixture.txt"), "IOLAUS_QA_NATIVE_READ_RESULT\n")
     if (scenario.astGrep) { mkdirSync(join(project, "src")); writeFileSync(join(project, "src", "a.ts"), AST_GREP_FIXTURE) }
-    if (scenario.homeSkill) {
-      mkdirSync(join(home, ".iolaus", "agent", "skills", "qa-skill"), { recursive: true })
-      writeFileSync(join(home, ".iolaus", "agent", "skills", "qa-skill", "SKILL.md"), "---\nname: qa-skill\ndescription: IOLAUS_HOME_SKILL_DESC\n---\nIOLAUS_HOME_SKILL_BODY\n")
-    }
     if (scenario.verify) {
       mkdirSync(join(project, "src")); writeFileSync(join(project, "src", "a.ts"), "const x = 1\nexport default x\n")
       writeFileSync(join(project, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, noEmit: true, types: [] }, include: ["src"] }))
@@ -256,11 +250,11 @@ try {
          assert.ok(ready, "iolaus.home.ready trace missing")
          assert.equal(ready.user, join(home, ".iolaus"), `user layer escaped the sandbox: ${ready.user}`)
          assert.ok(ready.project.startsWith(project), `project layer outside the project: ${ready.project}`)
-         for (const dir of ["agent/plans", "agent/skills"]) assert.ok(existsSync(join(home, ".iolaus", dir)), `user layer missing ${dir}`)
-         assert.ok(!existsSync(join(home, ".iolaus", "agent", "memory")), "Iolaus must not provision a memory directory")
+         assert.ok(existsSync(join(home, ".iolaus", "README.md")), "user layer README missing")
+         assert.ok(!existsSync(join(home, ".iolaus", "agent")), "Iolaus must not provision an agent/ directory (skills and memory are the host's)")
          assert.ok(existsSync(join(project, ".iolaus", "plans")), "project plans dir missing")
          const rendered = requests.filter((r) => r.scenario === scenario.name && r.instructions.includes("<iolaus-native-contract>"))
-         if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>User layer ${join(home, ".iolaus")}`)), "rendered prompt lacks the home contract")
+         if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>Iolaus config: user layer ${join(home, ".iolaus")}`)), "rendered prompt lacks the home contract")
        }
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), Boolean(scenario.mode))
        if (scenario.dag && scenario.template !== "unavailable") {
@@ -351,12 +345,6 @@ try {
            assert.ok(!catalog.includes("- gh ("), "read-only explore must not see the gh namespace")
            assert.ok(!out.includes('"name": "cli"'), `explore executed a gh call despite deny: ${out}`)
            assert.ok(!traces.some((t) => t.event === "iolaus.gh.call" && t.agent === "iolaus-explore" && t.ok), "gh tool ran for explore")
-         }
-         if (scenario.name === "home-skill") {
-           const skills = traces.find((t) => t.event === "iolaus.home.skills")
-           assert.deepEqual(skills?.registered, ["iolaus-home:qa-skill"], `home skill was not registered: ${JSON.stringify(skills)}`)
-           assert.ok(captured.some((r) => r.instructions.includes("qa-skill") && r.instructions.includes("IOLAUS_HOME_SKILL_DESC")), "home skill not advertised in the system prompt skill list")
-           assert.ok(!out.includes('"memory"'), "memory namespace must not exist")
          }
          if (scenario.name === "gh-off") {
            assert.ok(traces.some((t) => t.event === "iolaus.gh.unavailable" && t.enabled === false), "gh: false did not disable registration")

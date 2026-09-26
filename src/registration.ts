@@ -9,7 +9,6 @@ import {
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
-import type { IolausHome } from "./home"
 import { trace } from "./trace"
 
 const READ_ONLY = new Set<AgentName>(["oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
@@ -48,7 +47,6 @@ export function registerAgents(
   ctx: { agent: Pick<Context["agent"], "transform"> },
   options: Options,
   config: ModelsConfig = {},
-  home?: IolausHome,
 ): Effect.Effect<RegistrationPlan, never, Scope.Scope> {
   const plan = planRegistration(options, config)
   return ctx.agent.transform((editor) => {
@@ -82,7 +80,6 @@ export function registerAgents(
         if (name === "prometheus") {
           agent.permissions.push({ action: "edit", resource: "*", effect: "deny" },
             { action: "edit", resource: ".iolaus/plans/*", effect: "allow" },
-            ...(home ? [{ action: "edit", resource: `${home.userPlans}/*`, effect: "allow" as const }, { action: "external_directory", resource: `${home.userPlans}/*`, effect: "allow" as const }] : []),
             { action: "shell", resource: "*", effect: "deny" })
         }
         if (name === "sisyphus-junior") {
