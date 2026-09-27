@@ -15,7 +15,9 @@ mkdirSync(evidence, { recursive: false })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-qa-")))
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"
 const results = [], processes = [], requests = [], errors = []
-let active
+let active, hostVersion
+// The host version gate follows the plugin SDK peer pin, so bumping the SDK moves it with no edit here.
+const SDK_PIN = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).peerDependencies["@opencode/plugin"].match(/\d+\.\d+\.\d+/)[0]
 const digest = (value) => createHash("sha256").update(value).digest("hex")
 function hostState() {
   const home = homedir()
@@ -237,7 +239,15 @@ try {
     const fixture = { project, env }
     writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && k !== "OPENAI_API_KEY" && k !== "GH_TOKEN")), ghTokenPassed: Boolean(env.GH_TOKEN) },null,2))
     if (scenario.name === "native") {
-       await check("host version", async () => { const r = await run("version", ["--version"], fixture); assert.equal(r.code,0); assert.match(r.output,/2\.0\.16/) })
+       // The host updates often: accept any release on the plugin SDK's major line that is not older than the SDK pin.
+       await check("host version", async () => {
+         const r = await run("version", ["--version"], fixture); assert.equal(r.code,0)
+         hostVersion = r.output.match(/(\d+)\.(\d+)\.(\d+)/)?.[0]
+         assert.ok(hostVersion, `no version in: ${r.output}`)
+         const [host, pin] = [hostVersion, SDK_PIN].map((v) => v.split(".").map(Number))
+         assert.equal(host[0], pin[0], `host ${hostVersion} is off the plugin SDK major line ${SDK_PIN}`)
+         assert.ok(host[1] > pin[1] || (host[1] === pin[1] && host[2] >= pin[2]), `host ${hostVersion} is older than the plugin SDK pin ${SDK_PIN}`)
+       })
       await check("run help", async () => { const r = await run("help", ["run","--help"], fixture); assert.equal(r.code,0) })
     }
     await check(`${scenario.name}: live session`, async () => {
@@ -506,7 +516,7 @@ try {
   await check("host state isolation", () => assert.deepEqual(after,before))
   await check("cleanup", () => { assert.ok(processes.every((p) => p.closed)); assert.ok(!server.listening); assert.ok(!existsSync(sandbox)) })
   await check("mock protocol", () => assert.deepEqual(errors,[]))
-  writeFileSync(join(evidence,"receipt.json"),JSON.stringify({binary,results,before,after,processes,sandboxRemoved:!existsSync(sandbox),mockClosed:!server.listening,requestCount:requests.length,omitted:"No user credentials or inherited environment dumps. Local mock only."},null,2))
+  writeFileSync(join(evidence,"receipt.json"),JSON.stringify({binary,hostVersion,sdkPin:SDK_PIN,results,before,after,processes,sandboxRemoved:!existsSync(sandbox),mockClosed:!server.listening,requestCount:requests.length,omitted:"No user credentials or inherited environment dumps. Local mock only."},null,2))
 }
 console.log(JSON.stringify({evidence,results},null,2))
 process.exitCode = results.some((r) => r.verdict === "FAIL") ? 1 : 0
