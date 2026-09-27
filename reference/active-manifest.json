@@ -16,7 +16,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
       "path": "src/omo/agents/dynamic-agent-core-sections.ts",
       "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
-      "activeSha256": "c0227eda2169770e819ed62edb1215f11c6f703f4774c33d2f9f5edafccd5cec"
+      "activeSha256": "eb5aeb8ec28faa358f40fa38e240c4d235d600db94e67fbc46cdeeed4dd5b5bc"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",
@@ -280,7 +280,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/default.ts",
       "path": "src/omo/agents/sisyphus/default.ts",
       "sourceSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4",
-      "activeSha256": "66506eb04520781c3d4bfe14964f6db2fb4f2d44acf6aec1fd171db8529767b9"
+      "activeSha256": "320ce77f6816b7c6e9b70c7651f0e5f406a815896b9c63f7f6c65433f71b2596"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/gemini.ts",

@@ -8,6 +8,7 @@ import { bindNative, renderAgent, renderCategory, renderMode } from "./prompts/r
 import { categorizeTools } from "./omo/agents"
 import { trace } from "./trace"
 import { DAG_CHILD_MARKER, DAG_MODE_TEMPLATES, modeDagInstruction } from "./prompts/mode-dag"
+import { ROLE_CONTRACTS } from "./roles/contract"
 
 export function lastUserText(messages: SessionContext["messages"]): string {
   for (const message of [...messages].reverse()) {
@@ -71,7 +72,8 @@ export function composeContext(
       skills: skills.data.map((skill) => ({ name: skill.id, description: skill.description ?? "", location: "plugin" })),
       tools: categorizeTools(Object.keys(event.tools)),
     })
-    event.system[index] = { type: "text", text: bindNative(prompt, homeText) }
+    const contract = ROLE_CONTRACTS[name]
+    event.system[index] = { type: "text", text: bindNative(contract ? `${prompt}\n\n${contract}` : prompt, homeText) }
     trace("iolaus.agent.rendered", { agent: name, model, sessionID: event.sessionID })
   }
   if (selectedMode) {

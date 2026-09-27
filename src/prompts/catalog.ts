@@ -17,9 +17,9 @@ export const PRIMARY_AGENTS: ReadonlySet<AgentName> = new Set<AgentName>(["sisyp
 
 export const AGENT_DESCRIPTIONS: Record<AgentName, string> = {
   sisyphus: "OMO orchestration prompt with native OpenCode delegation.",
-  hephaestus: "OMO deep implementation prompt for supported GPT models.",
-  prometheus: "OMO planning prompt; writes plans under .iolaus/plans/.",
-  atlas: "OMO plan-execution prompt using native OpenCode tools.",
+  hephaestus: "Autonomous goal loop on any model: keeps working until the session goal is met (/goal).",
+  prometheus: "Plans only: writes spec and tickets under .iolaus/plans/, never implements (/hyperplan).",
+  atlas: "Implements a Prometheus plan through /start-work, one fresh session per ticket; read-only until then.",
   "sisyphus-junior": "Focused OMO implementation prompt without further delegation.",
   oracle: "Read-only architectural advice and difficult debugging.",
   librarian: "Read-only documentation and external source research.",

@@ -187,5 +187,11 @@ test("mode commands register under their short names", async () => {
     command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { names.push(definition.name) } }); return { dispose: Effect.void } }) },
     session: { prompt: () => Effect.succeed(undefined) } as never,
   }, parseOptions({}))))
-  expect(names).toEqual(["ultrawork", "hyperplan", "team"])
+  expect(names).toEqual(["ultrawork", "hyperplan", "team", "goal", "start-work"])
+  const only: string[] = []
+  await Effect.runPromise(Effect.scoped(registerModes({
+    command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { only.push(definition.name) } }); return { dispose: Effect.void } }) },
+    session: { prompt: () => Effect.succeed(undefined) } as never,
+  }, parseOptions({ agents: ["sisyphus"], modes: ["ultrawork"] }))))
+  expect(only).toEqual(["ultrawork"])
 })

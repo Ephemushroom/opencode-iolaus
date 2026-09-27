@@ -1,6 +1,6 @@
 import {
   EXPLORE_PROMPT, MULTIMODAL_LOOKER_PROMPT, buildLibrarianPrompt,
-  buildDynamicHephaestusPrompt, isHephaestusSupportedModel, buildSisyphusJuniorPrompt,
+  buildDynamicHephaestusPrompt, isHephaestusSupportedModel, buildSisyphusJuniorPrompt, buildAgentIdentitySection,
   getMetisPrompt, getMomusPromptSelection, getOraclePromptSelection,
   type AvailableAgent, type AvailableCategory, type AvailableSkill, type AvailableTool,
 } from "../omo/agents"
@@ -11,6 +11,7 @@ import {
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
 import { NATIVE_BINDINGS } from "./native-bindings"
+import { buildHephaestusPrompt } from "../omo/agents/hephaestus/gpt"
 
 export interface PromptContext {
   model: string
@@ -25,9 +26,10 @@ export function renderAgent(name: AgentName, context: PromptContext): string {
   switch (name) {
     case "sisyphus": return buildSisyphusPromptForModel(model, agents, tools, skills, categories, false)
     case "hephaestus":
+      // Any model runs Hephaestus: GPT models get their tuned variant, others the generic GPT body, which names no model.
       return isHephaestusSupportedModel(model)
         ? buildDynamicHephaestusPrompt({ model, availableAgents: agents, availableSkills: skills, availableTools: tools, availableCategories: categories })
-        : buildSisyphusJuniorPrompt(model, false)
+        : `${buildAgentIdentitySection("Hephaestus", "Autonomous deep worker for software engineering from OhMyOpenCode")}\n${buildHephaestusPrompt(agents, tools, skills, categories, false)}`
     case "sisyphus-junior": return buildSisyphusJuniorPrompt(model, false)
     case "explore": return EXPLORE_PROMPT
     case "librarian": return buildLibrarianPrompt()

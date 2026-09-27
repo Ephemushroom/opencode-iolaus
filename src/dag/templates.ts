@@ -2,6 +2,7 @@ import { DagValidationError } from "./graph-error"
 import type { DagDefinition, DagLoop, DagNodeDefinition } from "./types"
 import { modeMarker } from "../prompts/catalog"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
+import { PLAN_FORMAT } from "../roles/plan"
 
 export const DAG_TEMPLATE_NAMES = ["plan-review", "goal-review", "ultrawork", "hyperplan"] as const
 export type DagTemplateName = (typeof DAG_TEMPLATE_NAMES)[number]
@@ -36,7 +37,7 @@ function planReview(input: DagTemplateInput): DagNodeDefinition[] {
   const executor = input.executor ?? "sisyphus"
   const gate = input.gate !== false
   return [
-    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
+    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n${PLAN_FORMAT}\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
     { id: "review", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nA plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
     { id: "revise", agent: "prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
     { id: "rereview", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the revised plan after your earlier review. Apply the same standard.\n\nTASK:\n${input.task}`, dependsOn: ["revise"], inputs: [{ node: "revise" }], when: { node: "revise", exists: true }, maxAttempts: attempts },
@@ -130,6 +131,7 @@ ${input.task}`, dependsOn: attack, inputs: [{ node: "*" }], maxAttempts: attempt
 REQUEST:
 ${input.task}`, dependsOn: defend, inputs: [{ node: "*" }], maxAttempts: attempts },
     { id: "plan", agent: "prometheus", prompt: `Write the work plan for this request into .iolaus/plans/ using the distilled bundle in <iolaus-dag-inputs>. You own sequencing, parallelisation and verification gates. Return the plan text in full.
+${PLAN_FORMAT}
 
 REQUEST:
 ${input.task}`, dependsOn: ["distill"], inputs: [{ node: "distill" }], maxAttempts: attempts },
