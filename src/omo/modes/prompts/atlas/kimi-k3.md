@@ -85,7 +85,7 @@ Every `task()` prompt MUST include ALL 6 sections:
 - [tool]: [what to search/check]
 - lsp_* (PRIMARY for symbols): lsp_goto_definition, lsp_find_references, lsp_symbols, lsp_diagnostics for definitions, callers, and impact. Fall back to Read/Grep/Glob only for plain text.
 - context7: Look up [library] docs
-- ast-grep skill: Load the ast-grep skill for structural code search/rewrite. Use `sg --pattern '[pattern]' --lang [lang]` or `python3 scripts/ast_grep_helper.py search`.
+- ast_grep: Structural code search/rewrite through `execute`: `tools.ast_grep.search({ pattern, language, paths })`, `tools.ast_grep.rewrite(...)` (dry-run first). Text search uses the native grep tool (ripgrep).
 
 ## 4. MUST DO
 - Follow pattern in [reference file:lines]

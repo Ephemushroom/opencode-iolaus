@@ -124,7 +124,7 @@ Every implementation `task()` prompt MUST include all six sections:
 - Read: [files to inspect]
 - Grep/Glob/LSP: [queries or symbols]
 - context7: Use when current library docs affect implementation
-- ast-grep skill: Use for structural search or rewrite
+- ast_grep: Structural code search/rewrite through `execute`: `tools.ast_grep.search({ pattern, language, paths })`, `tools.ast_grep.rewrite(...)` (dry-run first). Text search uses the native grep tool (ripgrep).
 ## 4. MUST DO
 - Follow [reference file or convention]
 - Add or update tests when behavior changes

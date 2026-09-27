@@ -94,8 +94,8 @@ Your response has **FAILED** if:
 
 Use the right tool for the job:
 - **Semantic search** (definitions, references): LSP tools
-- **Structural patterns** (function shapes, class structures): \`tools.ast_grep.search\` through \`execute\` when the Code Mode catalog lists it; otherwise grep
-- **Text patterns** (strings, comments, logs): grep
+- **Structural patterns** (function shapes, class structures): \`tools.ast_grep.search\` through \`execute\` when the Code Mode catalog lists it; otherwise the native grep tool
+- **Text patterns** (strings, comments, logs): the native grep tool (ripgrep), never shell \`grep\`/\`find\`
 - **File patterns** (find by name/extension): glob
 - **History/evolution** (when added, who changed): git commands
 
