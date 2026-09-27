@@ -67,7 +67,7 @@ Before acting, survey the skills available in this system: scan their descriptio
 
 <tool_usage_rules>
 - Prefer tools over internal knowledge for fresh or user-specific data
-- For how/where/what/flow questions and before edits: LSP for symbols, the ast-grep skill for structure, Grep/Read for text.
+- For how/where/what/flow questions and before edits: LSP for symbols, `tools.ast_grep.search` for structure, Grep/Read for text (Grep is ripgrep).
 - Parallelize independent reads (read_file, grep, explore, librarian) to reduce latency
 - After any write/update, briefly restate: What changed, Where (path), Follow-up needed
 </tool_usage_rules>
@@ -78,7 +78,7 @@ Before acting, survey the skills available in this system: scan their descriptio
 
 | Track | Tools | Speed | Purpose |
 |-------|-------|-------|---------|
-| **Direct** | LSP, ast-grep skill (`sg`), Grep, Read | Instant | Quick wins, known locations |
+| **Direct** | LSP, `tools.ast_grep.search`, Grep (ripgrep), Read | Instant | Quick wins, known locations |
 | **Background** | explore, librarian agents | Async | Deep search, external docs |
 
 **ALWAYS run both tracks in parallel:**
