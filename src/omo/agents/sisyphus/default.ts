@@ -32,7 +32,7 @@ export function buildTaskManagementSection(useTaskSystem: boolean): string {
 For user-requested work with multiple steps, independent concerns, or uncertain scope, use \`iolaus_dag\` instead of a todo list.
 
 1. Create explicit nodes with the exact Iolaus Agent ID, model, prompt and \`dependsOn\` edges.
-2. Use Prometheus for planning, specialist Agents for research/review, and Atlas or Hephaestus for implementation when execution is required.
+2. Use specialist Agents for research/review and Sisyphus or Hephaestus nodes for implementation. Prometheus plans and Atlas implements a plan only through the user's /hyperplan and /start-work, so do not use them as DAG nodes.
 3. Snapshot or wait for node results before claiming completion. Do not infer success from prompt acceptance.
 4. Retry failed nodes by generation. Resume interrupted work explicitly. Amend the graph instead of silently changing a running node.
 5. Keep prompts self-contained, and use explicit input bindings when a node consumes an upstream result.

@@ -260,7 +260,10 @@ try {
       assert.equal(result.code,0)
       const traces = existsSync(trace) ? readFileSync(trace,"utf8").trim().split("\n").filter(Boolean).map(JSON.parse) : []
       assert.ok(traces.some((t) => t.event === "iolaus.loaded" && t.enabled === scenario.enabled), "Plugin did not load")
-       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), IOLAUS_AGENT_IDS.has(scenario.agent) || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
+       // /ultrawork and /hyperplan switch the session to their owning agent (Sisyphus, Prometheus), which then renders.
+       const owned = scenario.mode === "ultrawork" || scenario.mode === "hyperplan"
+       assert.equal(traces.some((t) => t.event === "iolaus.agent.rendered"), IOLAUS_AGENT_IDS.has(scenario.agent) || owned || (Boolean(scenario.dag) && scenario.template !== "unavailable"))
+       if (owned && scenario.enabled) assert.ok(traces.some((t) => t.event === "iolaus.command.agent" && t.to === (scenario.mode === "ultrawork" ? "sisyphus" : "prometheus") && t.ok), "mode command did not switch to its owning agent")
        if (scenario.enabled) {
          // Display names drop the namespace; ids keep it; the host's own Explore keeps ours distinguishable.
          const named = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, t.name]))

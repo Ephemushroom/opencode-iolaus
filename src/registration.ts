@@ -9,6 +9,8 @@ import {
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
+import { commandMarker } from "./roles/command"
+import { GOAL_TOOL_NAMES } from "./roles/goal"
 import { trace } from "./trace"
 
 /** Host agents whose id Iolaus takes over: the host registers `explore` itself (plugin `opencode.agent`). */
@@ -99,9 +101,14 @@ export function registerAgents(
           agent.permissions.push({ action: "gh", resource: "*", effect: "allow" },
             { action: "external_directory", resource: `${tmpdir()}/iolaus-gh-*`, effect: "allow" })
         }
+        // Goal tools belong to Hephaestus; every other Iolaus lane has them hidden.
+        if (name !== "hephaestus") for (const tool of GOAL_TOOL_NAMES) agent.permissions.push({ action: tool, resource: "*", effect: "deny" })
         if (name === "prometheus") {
           agent.permissions.push({ action: "edit", resource: "*", effect: "deny" },
             { action: "edit", resource: ".iolaus/plans/*", effect: "allow" },
+            { action: "edit", resource: "CONTEXT.md", effect: "allow" },
+            { action: "edit", resource: "CONTEXT-MAP.md", effect: "allow" },
+            { action: "edit", resource: "docs/adr/*", effect: "allow" },
             { action: "shell", resource: "*", effect: "deny" })
         }
         if (name === "sisyphus-junior") {
@@ -127,7 +134,7 @@ export function registerAgents(
         agent.description = CATEGORY_DESCRIPTIONS[name]
         agent.mode = "subagent"
         agent.system = categoryMarker(name)
-        agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" })
+        agent.permissions.push({ action: "subagent", resource: "*", effect: "deny" }, ...GOAL_TOOL_NAMES.map((action) => ({ action, resource: "*", effect: "deny" as const })))
       })
       trace("iolaus.agent.model", { agent: id, name: String(editor.get(id)?.name ?? id), model: assignment.model, variant: assignment.variant ?? null, source: assignment.source })
     }
@@ -155,6 +162,19 @@ export function registerModes(ctx: {
           text: modeDispatchText(mode, prompt.text ?? ""),
           delivery,
         }).pipe(Effect.tap(() => Effect.sync(() => trace("iolaus.mode.dispatched", { mode, sessionID, dag: DAG_MODE_TEMPLATES[mode] ?? null })))),
+      })
+    }
+    // Role commands: the prompt hook switches the session to the owner and acts on the marker.
+    const roles = [
+      { name: "goal", owner: "hephaestus", description: "Hand the task to Hephaestus as a goal it keeps working on until done." },
+      { name: "start-work", owner: "atlas", description: "Start Atlas on a Prometheus plan: /start-work <plan> runs each ticket in a fresh session." },
+    ] as const
+    for (const role of roles) {
+      if (!options.agents.includes(role.owner)) continue
+      editor.add({
+        name: role.name,
+        description: role.description,
+        execute: ({ sessionID, prompt, delivery }) => ctx.session.prompt({ ...prompt, sessionID, text: `${commandMarker(role.name)}\n${prompt.text ?? ""}`, delivery }).pipe(Effect.asVoid),
       })
     }
   }).pipe(Effect.asVoid)

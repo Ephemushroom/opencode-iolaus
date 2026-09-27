@@ -20,6 +20,7 @@ import { resolveGhBinary } from "./gh/binary"
 import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
 import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
+import { registerRoles } from "./roles/register"
 
 /** Session directory for a call, falling back to the plugin's own location. */
 function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
@@ -69,6 +70,7 @@ export default Plugin.define({
     })
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
+    yield* registerRoles(ctx, options, { controller, directory: (sessionID) => sessionDirectory(ctx, sessionID), stateDirectory: ctx.location.directory, trace })
 
     const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
     trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })

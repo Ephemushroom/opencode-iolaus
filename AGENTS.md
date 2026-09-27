@@ -21,7 +21,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - Preserve native agents and the user's default agent/model. Iolaus agent ids are the bare lane names (`sisyphus`,
   `oracle`, `quick`, `deep-high`) with title-cased display names; the only host agent Iolaus replaces is `explore`
   (registration resets its rules and marks it `iolaus.agent.replaced`). Any other id that already exists is left alone.
-  Commands are `/ultrawork`, `/hyperplan`, `/team`; the old `/iolaus-*` forms are not recognised.
+  Commands are `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`; the old `/iolaus-*` forms are not recognised.
 - Iolaus config has two layers (`src/home.ts`). User layer `IOLAUS_HOME` (default `~/.iolaus`): `models.json`,
   `verify.json`. Project layer `<project>/.iolaus`: `dag/`, `plans/` and overrides of the same files. Project wins.
   `provisionHome` creates missing directories at setup and never overwrites; every rendered prompt ends with
@@ -143,6 +143,28 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
   and `maxAttempts` are overrides. The four primaries orchestrate through the
   same tool, so templates are the shared shape, not agent-specific prompts.
+- `src/roles/` owns the four primaries' roles, enforced in code. `tool.hook("execute.before")`
+  resolves a policy per call (`guard.ts`): Prometheus is `planner` (writes only
+  `.iolaus/plans/`, `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`; no shell; only the
+  `hyperplan` template), a session a planner started is `planning` (same, plus no
+  applied codemods; recorded from the `<iolaus-planning>` notice the guard appends
+  to its subagent and DAG node prompts), Atlas is `atlas-unbound` (read only) until
+  `/start-work` makes it `atlas-orchestrator` (operates the run, changes nothing) or a
+  ticket marker for a plan that still validates makes it a `worker`; other Iolaus
+  lanes are `worker` (anything but writing plans); host agents are untouched.
+  Refusals are `Tool.Error`s prefixed `[iolaus <policy>]`. Session roles persist in
+  `<location>/.iolaus/roles/`. `session.hook("prompt")` switches a command's session
+  to its owner (`COMMAND_OWNERS`: ultrawork → sisyphus, hyperplan → prometheus,
+  goal → hephaestus, start-work → atlas; the model is kept), validates and compiles
+  `/start-work <plan>` (`plan.ts`, `startwork.ts`: one Atlas node per ticket in
+  `Blocked by` order, `review-standards` and `review-spec` on Momus, `fix` when
+  either says FAIL, `accept` gate) and sets Hephaestus goals. The goal loop
+  (`goal.ts`, after OMO's goal hook) continues a top-level Hephaestus session on
+  `session.execution.succeeded` via `session.synthetic` until `update_goal`
+  complete, pausing after 3 tool-less turns or 50 continuations; DAG nodes and
+  subagents never loop. `get_goal`/`create_goal`/`update_goal` are denied by name to
+  every Iolaus lane but Hephaestus. Hephaestus renders its GPT variant on GPT models
+  and the generic GPT body elsewhere. `script/qa-roles.mjs` is the live QA.
 - `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
   session that received `/ultrawork` or `/hyperplan` gets the OMO
   mode prompt plus an `<iolaus-mode-dag>` block telling it to `create` the

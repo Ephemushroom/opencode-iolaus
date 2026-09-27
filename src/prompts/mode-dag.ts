@@ -12,7 +12,7 @@ export function modeDagInstruction(mode: ModeName): string | undefined {
   const template = DAG_MODE_TEMPLATES[mode]
   if (!template) return undefined
   return `<iolaus-mode-dag template="${template}">
-This mode runs as an Iolaus DAG. Your first tool call is iolaus_dag with action "create" and template {"template": "${template}", "task": <the user's task, verbatim>}; do not start the work yourself. Then call action "wait". A run that pauses at a gate is waiting for the user: show them the pending node's result and ask for a decision before you call approve or reject. When the run completes, report the final node results and the verdict of the last review.
+This mode runs as an Iolaus DAG. Your first tool call is iolaus_dag with action "create" and template {"template": "${template}", "task": <the user's task, verbatim>}; do not start the work yourself. Then call action "wait". A run that pauses at a gate is waiting for the user: show them the pending node's result and ask for a decision before you call approve or reject. When the run completes, report the final node results and the verdict of the last review.${template === "hyperplan" ? " The approved plan is in .iolaus/plans/<plan>/; tell the user that /start-work <plan> hands it to Atlas." : ""}
 </iolaus-mode-dag>`
 }
 
