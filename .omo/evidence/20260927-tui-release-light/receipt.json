@@ -1,0 +1,69 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.18",
+  "mode": "light",
+  "colors": [
+    {
+      "label": "Iolaus DAG",
+      "mode": "light",
+      "rgb": [
+        26,
+        26,
+        26
+      ],
+      "luminance": 0.010329823029626936
+    },
+    {
+      "label": "No active DAG runs",
+      "mode": "light",
+      "rgb": [
+        138,
+        138,
+        138
+      ],
+      "luminance": 0.25415209433082675
+    },
+    {
+      "label": "No active DAG runs",
+      "mode": "dark",
+      "rgb": [
+        128,
+        128,
+        128
+      ],
+      "luminance": 0.21586050011389923
+    }
+  ],
+  "tracePath": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/tui-theme/.omo/evidence/20260927-tui-release-light/trace.ndjson",
+  "tmuxLog": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/tui-theme/.omo/evidence/20260927-tui-release-light/tmux.log",
+  "nativeTuiLoaded": true,
+  "screens": [
+    "idle",
+    "agents",
+    "running",
+    "gate",
+    "completed",
+    "opened",
+    "switched",
+    "returned"
+  ],
+  "nodeOrder": [
+    "plan",
+    "review",
+    "revise",
+    "rereview",
+    "approve",
+    "execute"
+  ],
+  "requestCount": 12,
+  "realBefore": {
+    "config": "02ef778cbc8477a00de533177481106bc498df58ea7fe8fed0a0b6283f8f4d5a",
+    "database": "6c862bc64b2d93dc3f599ab0003dc43622ca275e9cef1e08fd7eb19a6a6bb2dd"
+  },
+  "realAfter": {
+    "config": "02ef778cbc8477a00de533177481106bc498df58ea7fe8fed0a0b6283f8f4d5a",
+    "database": "6c862bc64b2d93dc3f599ab0003dc43622ca275e9cef1e08fd7eb19a6a6bb2dd"
+  },
+  "sandboxRemoved": true,
+  "omitted": "No provider credentials, auth files, prompts, or inherited secret-bearing environment values were recorded."
+}
