@@ -1,0 +1,2 @@
+AssertionError [ERR_ASSERTION]: DAG shortcuts swallowed text intended for the composer
+    at file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/tui-focus/script/qa-tui.mjs:170:10
