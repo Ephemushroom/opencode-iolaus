@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, type DagViewRun } from "../src/tui/view"
+import { activityLine, depths, elapsed, nodeResultText, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -38,4 +38,17 @@ test("activity line and elapsed formatting", () => {
   expect(activityLine("  Checking\n scenario 3   now ", 20)).toBe("Checking scenario 3…")
   expect(activityLine("short")).toBe("short"); expect(activityLine("   ")).toBeUndefined(); expect(activityLine(undefined)).toBeUndefined()
   expect(elapsed(1000, 46_000)).toBe("45s"); expect(elapsed(0, 100_000)).toBe(""); expect(elapsed(1, 125_001)).toBe("2m 5s"); expect(elapsed(1, 3_660_001)).toBe("1h 1m")
+})
+
+test("dialog ordering keeps both fan-in parents before their descendant regardless of status", () => {
+  const graph: DagViewRun = { ...run, nodes: [node("join", "running", ["left", "right"]), node("right", "failed", ["root"]), node("root", "completed"), node("left", "completed", ["root"])] }
+  expect(topologyNodes(graph).map((node) => node.id)).toEqual(["root", "right", "left", "join"])
+  expect(topologyNodes(graph).at(-1)?.dependsOn).toEqual(["left", "right"])
+})
+
+test("dialog result excerpts show plain text and preserve structured or truncated data", () => {
+  expect(nodeResultText('{"text":"line one\\nline two"}')).toBe("line one\nline two")
+  expect(nodeResultText('{"decision":"approved"}')).toBe('{"decision":"approved"}')
+  expect(nodeResultText('{"text":"truncated')).toBe('{"text":"truncated')
+  expect(nodeResultText("null")).toBe("null")
 })

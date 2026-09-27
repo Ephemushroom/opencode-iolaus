@@ -74,6 +74,21 @@ export function orderNodes(run: DagViewRun): DagViewNode[] {
   return [...run.nodes].sort((a, b) => rank(a) - rank(b))
 }
 
+export function topologyNodes(run: DagViewRun): DagViewNode[] {
+  const levels = depths(run)
+  return [...run.nodes].sort((a, b) => (levels.get(a.id) ?? 0) - (levels.get(b.id) ?? 0))
+}
+
+export function nodeResultText(result: string): string {
+  try {
+    const value: unknown = JSON.parse(result)
+    return value !== null && typeof value === "object" && "text" in value && typeof value.text === "string" ? value.text : result
+  } catch {
+    // RPC result excerpts can end in the middle of serialized JSON.
+    return result
+  }
+}
+
 export interface Summary {
   readonly runs: number
   readonly active: number
