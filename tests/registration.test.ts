@@ -5,6 +5,7 @@ import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import type { SessionContext } from "@opencode/plugin/effect/session"
 import { Session } from "@opencode/schema/session"
 import { registerAgents, registerModes, agentMarker, modeDispatchText } from "../src/registration"
+import { evaluate } from "../src/ast-grep/permissions"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
@@ -46,16 +47,21 @@ test("registrations keep native agents and user definitions, and take over only 
   expect([...fixture.agents.values()]).toEqual(once)
 })
 
-test("specialists restrict native shell, mutation and nested delegation", async () => {
+test("specialists follow OMO's per-agent deny lists", async () => {
   const fixture = registry()
   await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
-  function permission(name: string, action: string) {
-    return fixture.agents.get(name)?.permissions.filter((rule) => rule.action === "*" || rule.action === action).at(-1)?.effect
+  const permission = (name: string, action: string) => evaluate(action, "*", fixture.agents.get(name)!.permissions)
+  for (const name of ["oracle", "explore", "librarian", "metis", "momus"]) {
+    expect(permission(name, "edit")).toBe("deny")
+    for (const action of ["read", "grep", "shell", "execute", "webfetch"]) expect(permission(name, action)).toBe("allow")
   }
-  for (const name of ["oracle", "explore", "librarian", "metis", "momus", "multimodal-looker"]) {
-    for (const action of ["shell", "edit", "subagent"]) expect(permission(agentID(name as "oracle"), action)).toBe("deny")
-    expect(permission(name, "read")).toBe("allow")
+  for (const name of ["oracle", "explore", "librarian"]) {
+    expect(permission(name, "subagent")).toBe("deny")
+    expect(permission(name, "iolaus_dag")).toBe("deny")
   }
+  for (const name of ["metis", "momus"]) expect(permission(name, "subagent")).toBe("allow")
+  expect(permission("multimodal-looker", "read")).toBe("allow")
+  for (const action of ["shell", "edit", "grep", "subagent"]) expect(permission("multimodal-looker", action)).toBe("deny")
   expect(permission("sisyphus-junior", "subagent")).toBe("deny")
 })
 
@@ -164,10 +170,11 @@ test("ids and display names are the bare lane names; explore replaces the host a
   expect(name("quick")).toBe("Quick")
   expect(name("explore")).toBe("Explore")
   expect([...fixture.agents.keys()].some((id) => id.startsWith("iolaus-"))).toBe(false)
-  // The host's explore rules are dropped, so ours decide: read-only with Code Mode, no host-specific ask on external dirs.
+  // The host's explore rules are dropped: ours start from the host default and add the explore deny list.
   const rules = fixture.agents.get("explore")!.permissions
-  expect(rules[0]).toEqual({ action: "*", resource: "*", effect: "deny" })
-  expect(rules.some((rule) => rule.action === "execute" && rule.effect === "allow")).toBe(true)
+  expect(rules.slice(0, 5)).toEqual(Agent.Info.default(Agent.ID.make("explore")).permissions)
+  expect(evaluate("shell", "*", rules)).toBe("allow")
+  expect(evaluate("edit", "*", rules)).toBe("deny")
   // A second registration pass is a no-op.
   const once = structuredClone([...fixture.agents.values()])
   await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))

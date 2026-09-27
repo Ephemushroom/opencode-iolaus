@@ -70,12 +70,18 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the user already defines. The `mcps` option selects them; `[]` disables both.
   Their tools enter Code Mode as `tools.context7["resolve-library-id"]`,
   `tools.context7["query-docs"]` and `tools.grep_app.searchGitHub`; read-only
-  specialists carry `context7_*` and `grep_app_*` allows. Upstream's
+  specialists may call them. Upstream's
   `websearch` (host has native websearch) and `lsp` are not registered; the
   native binding maps inherited `lsp_*` names to the project's type checker,
   tests and `ast_grep`. Remote servers connect after startup, so the
   system-prompt catalog rendered for the first turn may lag; the runtime
   `search()` catalog is the authority.
+- Specialist permissions follow OMO's agent catalog as per-agent deny lists on
+  top of the host default (`DENIED` in `src/registration.ts`): oracle, explore
+  and librarian deny `edit`, `subagent` and `iolaus_dag`; metis and momus deny
+  only `edit`; multimodal-looker allows only `read`. Shell stays allowed, so
+  read-only is the prompt's contract, as in OMO. Host names: `edit` covers
+  edit/write/patch, `subagent` is OMO's `task`.
 - `src/gh/` registers a read-only `gh` Code Mode namespace when a `gh` binary
   answers `--version` and `gh auth status` shows a login (`IOLAUS_GH_BIN`, then
   PATH, then common prefixes; `gh: false` disables). Twelve tools: searchCode,

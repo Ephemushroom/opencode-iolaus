@@ -155,6 +155,9 @@ const server = http.createServer(async (req, res) => {
        call = done ? undefined : tools.includes("patch")
          ? { name: "patch", args: { patchText: `*** Begin Patch\n*** Update File: src/a.ts\n@@\n-const x = 1\n+${replacement}\n*** End Patch` } }
          : { name: "edit", args: { filePath: "src/a.ts", oldString: "const x = 1", newString: replacement } }
+     } else if (active.shell && tools.includes("shell")) {
+       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
+       call = done ? undefined : { name: "shell", args: { command: "ls && git --version", description: "QA read-only shell" } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
@@ -200,6 +203,9 @@ try {
        code: 'const repo = await tools.gh.repo({ repo: "cli/cli" }); const c = await tools.gh.clone({ repo: "cli/cli", depth: 2 }); const log = await tools.gh.log({ clone: c.path, count: 1 }); return { name: repo.data && repo.data.name, cloned: c.ok, path: c.path, sha: log.commits && log.commits[0] && log.commits[0].sha, tools: Object.keys(tools.gh).sort() }' },
      { name: "gh-explore", enabled: true, agent: "explore", agentPermissions: true, gh: true, code: 'let denied = null; try { const r = await tools.gh.repo({ repo: "cli/cli" }); denied = { ok: r.ok, name: r.data && r.data.name } } catch (e) { denied = { thrown: String(e).slice(0, 200) } }; return { has: Object.keys(tools).includes("gh"), call: denied }' },
      { name: "gh-off", enabled: true, agent: "librarian", agentPermissions: true, gh: false, ghOption: false, code: 'return { has: Object.keys(tools).includes("gh") }' },
+     // Specialist deny lists (OMO): explore runs shell but loses edit and delegation; multimodal-looker keeps only read.
+     { name: "explore-shell", enabled: true, agent: "explore", agentPermissions: true, shell: true },
+     { name: "looker-read-only", enabled: true, agent: "multimodal-looker", agentPermissions: true, nativeRead: true },
      // Post-edit verification: the edit introduces a type error and a request-explaining comment; tsc runs on the fixture project.
      { name: "verify-edit", enabled: true, agent: "sisyphus", verify: "tsc" },
      { name: "verify-off", enabled: true, agent: "sisyphus", verify: "off", verifyOption: false },
@@ -455,6 +461,18 @@ try {
          assert.deepEqual(inputs.map((i) => [i.node, i.provenance.status]), [["ship", "completed"], ["fix", "skipped"]], "Report inputs did not reflect routing")
          assert.equal(inputs[1].value, null, "Skipped branch should bind null")
        }
+      if (scenario.shell) {
+        const offered = captured.find((r) => r.tools.length)?.tools ?? []
+        assert.ok(offered.includes("shell") && offered.includes("read"), `explore lacks shell/read: ${offered}`)
+        for (const denied of ["edit", "write", "patch", "subagent", "iolaus_dag"]) assert.ok(!offered.includes(denied), `explore was offered ${denied}: ${offered}`)
+        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+        assert.ok(outputs.some((o) => o.includes("fixture.txt") && o.includes("git version")), `shell output missing: ${outputs}`)
+      }
+      if (scenario.name === "looker-read-only") {
+        const offered = captured.find((r) => r.tools.length)?.tools ?? []
+        assert.ok(offered.includes("read"), `looker lacks read: ${offered}`)
+        for (const denied of ["shell", "edit", "write", "patch", "grep", "subagent", "execute"]) assert.ok(!offered.includes(denied), `looker was offered ${denied}: ${offered}`)
+      }
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
       if (scenario.verify) {
         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))

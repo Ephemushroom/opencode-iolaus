@@ -49,7 +49,7 @@ test("mcps option selects servers and rejects unknown names", async () => {
   expect(fixture.servers.size).toBe(0)
 })
 
-test("read-only specialists may call context7 and grep_app tools but nothing else new", async () => {
+test("read-only specialists may call context7 and grep_app tools", async () => {
   const agents = new Map<string, ReturnType<AgentEditor["list"]>[number]>()
   const editor: AgentEditor = {
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => {}, remove: (id) => { agents.delete(id) },
@@ -60,6 +60,5 @@ test("read-only specialists may call context7 and grep_app tools but nothing els
   expect(evaluate("context7_resolve-library-id", "*", rules)).toBe("allow")
   expect(evaluate("context7_query-docs", "*", rules)).toBe("allow")
   expect(evaluate("grep_app_searchGitHub", "*", rules)).toBe("allow")
-  expect(evaluate("shell", "*", rules)).toBe("deny")
-  expect(evaluate("github_create_issue", "*", rules)).toBe("deny")
+  expect(evaluate("edit", "*", rules)).toBe("deny")
 })
