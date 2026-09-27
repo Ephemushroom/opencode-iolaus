@@ -1,11 +1,35 @@
 import { Plugin } from "@opencode/plugin/tui"
 import type { Context } from "@opencode/plugin/tui/context"
-import { For, Show, createMemo, createSignal, onCleanup, onMount } from "solid-js"
+import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js"
 import { IOLAUS_DAG_RPC } from "./dag/rpc"
 import { trace } from "./trace"
-import { activityLine, depths, elapsed, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, type DagViewNode, type DagViewRun, type ThemeLike } from "./tui/view"
+import { activityLine, depths, elapsed, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, type DagViewNode, type DagViewRun } from "./tui/view"
+import { createDagQuery, dagTarget, matchesDagEvent, type DagState } from "./tui/data"
 
 type Selection = { readonly runID: string; readonly nodeID: string } | undefined
+
+function useDagData(props: { readonly sessionID: string; readonly context: Context }, notify = false) {
+  const { context } = props
+  const rpc = context.client.rpc(IOLAUS_DAG_RPC)
+  const target = createMemo(() => dagTarget(context, props.sessionID))
+  const [state, setState] = createSignal<DagState>({ status: "loading", runs: [] })
+  const query = createDagQuery((input, options) => rpc.snapshot(input, options), setState)
+  const refresh = () => query.refresh(target())
+  createEffect(on(target, () => { void refresh() }))
+  onCleanup(() => query.dispose())
+  onMount(() => {
+    const off = rpc.events.on("updated", (event) => {
+      if (!matchesDagEvent(target(), event)) return
+      void refresh()
+      if (notify && event.data.type === "node.waiting") {
+        void context.attention.notify({ title: "Iolaus DAG", message: "A gate is waiting for your decision", notification: { when: "always" } })
+          .catch((error) => trace("iolaus.tui.notification.failed", { error: String(error) }))
+      }
+    })
+    onCleanup(off)
+  })
+  return { rpc, target, state, refresh, runs: () => state().runs }
+}
 
 /** Latest assistant text per child session, so the sidebar can show what each agent is doing right now. */
 function useActivity(context: Context) {
@@ -44,19 +68,15 @@ function useActivity(context: Context) {
 
 function DagSidebar(props: { readonly sessionID: string; readonly context: Context }) {
   const { context } = props
-  const theme = (context.theme ?? {}) as unknown as ThemeLike
-  const rpc = context.client.rpc(IOLAUS_DAG_RPC)
-  const [runs, setRuns] = createSignal<readonly DagViewRun[]>([])
+  const theme = () => context.theme
+  const { rpc, target, state, runs, refresh } = useDagData(props, true)
   const [selected, setSelected] = createSignal<Selection>(undefined)
   const [now, setNow] = createSignal(Date.now())
   const [busy, setBusy] = createSignal<string | undefined>(undefined)
   const { activity, watch } = useActivity(context)
   const seenGates = new Set<string>()
 
-  const refresh = async () => {
-    const result = await rpc.snapshot({ sessionID: props.sessionID }) as unknown as { readonly runs?: readonly DagViewRun[] }
-    const next = result.runs ?? []
-    setRuns(next)
+  createEffect(on(runs, (next) => {
     watch(next.flatMap((run) => run.nodes.filter((n) => n.status === "running" && n.sessionID).map((n) => n.sessionID!)))
     // A gate that has just started waiting takes the selection, so `a`/`r` act on it without the user hunting for it.
     const waiting = next.flatMap((r) => r.nodes.filter((n) => n.status === "waiting_approval").map((n) => ({ runID: r.runID, nodeID: n.id, key: `${r.runID}:${n.id}:${n.attempt}` })))
@@ -71,19 +91,11 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
       const running = next.flatMap((r) => r.nodes.filter((n) => n.status === "running").map((n) => ({ runID: r.runID, nodeID: n.id })))[0]
       setSelected(gate ?? running ?? (next[0]?.nodes[0] ? { runID: next[0].runID, nodeID: next[0].nodes[0].id } : undefined))
     }
-  }
+  }))
 
   onMount(() => {
-    void refresh()
-    const off = rpc.events.on("updated", (event) => {
-      void refresh()
-      const detail = event as unknown as { type?: string; runID?: string }
-      if (detail.type === "node.waiting") {
-        void context.attention.notify({ title: "Iolaus DAG", message: "A gate is waiting for your decision", notification: "always" as never }).catch(() => undefined)
-      }
-    })
     const tick = setInterval(() => setNow(Date.now()), 1000)
-    onCleanup(() => { off(); clearInterval(tick) })
+    onCleanup(() => clearInterval(tick))
   })
 
   const flat = createMemo(() => runs().flatMap((run) => orderNodes(run).map((node) => ({ run, node }))))
@@ -99,8 +111,9 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
     const entry = current(); if (!entry) return
     if ((action === "approve" || action === "reject") && entry.node.status !== "waiting_approval") { context.ui.toast.show({ variant: "warning", title: "Iolaus DAG", message: "Selected node is not a waiting gate" }); return }
     setBusy(action)
+    const destination = target()
     try {
-      await rpc.action({ sessionID: props.sessionID, action, runID: entry.run.runID, generation: entry.run.generation, ...(action === "cancel" ? {} : { nodeID: entry.node.id }) })
+      await rpc.action({ sessionID: destination.sessionID, action, runID: entry.run.runID, generation: entry.run.generation, ...(action === "cancel" ? {} : { nodeID: entry.node.id }) }, { location: { directory: destination.directory } })
       trace("iolaus.tui.action", { action, runID: entry.run.runID, nodeID: entry.node.id })
       context.ui.toast.show({ variant: "success", title: "Iolaus DAG", message: `${action} · ${entry.node.id}` })
     } catch (error) {
@@ -130,7 +143,6 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
 
   const nodeRow = (run: DagViewRun, node: DagViewNode, depth: number) => {
     const isSelected = () => { const s = selected(); return !!s && s.runID === run.runID && s.nodeID === node.id }
-    const color = statusColor(node.status, theme)
     const line = () => `${isSelected() ? "›" : " "} ${"  ".repeat(depth)}${statusGlyph(node.status)} ${node.id}${node.kind === "judge" ? " ⚖" : node.kind === "gate" ? " ⏸" : ""}${node.attempt > 1 ? ` ×${node.attempt}` : ""}`
     const detail = () => node.status === "waiting_approval" && node.prompt ? `gate: ${node.prompt}`
       : (node.status === "running" && node.sessionID && activity()[node.sessionID]) ? activity()[node.sessionID]
@@ -138,53 +150,49 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
       : undefined
     return (
       <box flexDirection="column" onMouseDown={() => { setSelected({ runID: run.runID, nodeID: node.id }); }} onMouseUp={() => { if (isSelected()) open() }}>
-        <text fg={color} attributes={isSelected() ? 1 : 0}>{line()}</text>
-        <Show when={detail()}>{(d) => <text fg={node.status === "waiting_approval" ? theme.accent : theme.textMuted}>{"    "}{"  ".repeat(depth)}{d()}</text>}</Show>
+        <text fg={statusColor(node.status, theme())} attributes={isSelected() ? 1 : 0}>{line()}</text>
+        <Show when={detail()}>{(d) => <text fg={node.status === "waiting_approval" ? theme().text.action.primary.base : theme().text.muted}>{"    "}{"  ".repeat(depth)}{d()}</text>}</Show>
       </box>
     )
   }
 
   return (
     <box flexDirection="column" paddingLeft={1} paddingRight={1}>
-      <text fg={theme.primary} attributes={1}>Iolaus DAG</text>
-      <Show when={runs().length === 0}><text fg={theme.textMuted}>No active DAG runs</text></Show>
+      <text fg={theme().text.base} attributes={1}>Iolaus DAG</text>
+      <Show when={state().status === "loading"}><text fg={theme().text.muted}>Loading DAG runs...</text></Show>
+      <Show when={state().status === "error"}><text fg={theme().text.feedback.error.base}>DAG unavailable: {state().error}</text></Show>
+      <Show when={state().status === "ready" && runs().length === 0}><text fg={theme().text.muted}>No active DAG runs</text></Show>
       <For each={runs()}>{(run) => {
         const depthMap = depths(run)
         return (
           <box flexDirection="column" marginTop={1}>
-            <text fg={statusColor(run.status, theme)}>{statusGlyph(run.status)} {run.name.length > 40 ? `${run.name.slice(0, 39)}…` : run.name}</text>
-            <text fg={theme.textMuted}>{progressBar(settledCount(run), run.nodes.length)} · gen {run.generation} · {elapsed(run.updatedAt, now())} ago</text>
+            <text fg={statusColor(run.status, theme())}>{statusGlyph(run.status)} {run.name.length > 40 ? `${run.name.slice(0, 39)}…` : run.name}</text>
+            <text fg={theme().text.muted}>{progressBar(settledCount(run), run.nodes.length)} · gen {run.generation} · {elapsed(run.updatedAt, now())} ago</text>
             <For each={orderNodes(run)}>{(node) => nodeRow(run, node, depthMap.get(node.id) ?? 0)}</For>
           </box>
         )
       }}</For>
       <Show when={runs().length > 0}>
-        <text fg={theme.textMuted}> </text>
-        <text fg={theme.textMuted}>{busy() ? `${busy()}…` : "j/k select · o open agent · a approve · r reject"}</text>
+        <text fg={theme().text.muted}> </text>
+        <text fg={theme().text.muted}>{busy() ? `${busy()}…` : "j/k select · o open agent · a approve · r reject"}</text>
       </Show>
     </box>
   )
 }
 
 function DagFooter(props: { readonly sessionID: string; readonly context: Context }) {
-  const theme = (props.context.theme ?? {}) as unknown as ThemeLike
-  const rpc = props.context.client.rpc(IOLAUS_DAG_RPC)
-  const [runs, setRuns] = createSignal<readonly DagViewRun[]>([])
-  const refresh = async () => {
-    const result = await rpc.snapshot({ sessionID: props.sessionID }) as unknown as { readonly runs?: readonly DagViewRun[] }
-    setRuns(result.runs ?? [])
-  }
-  onMount(() => { void refresh(); const off = rpc.events.on("updated", () => void refresh()); onCleanup(off) })
+  const theme = () => props.context.theme
+  const { runs, state } = useDagData(props)
   const summary = createMemo(() => summarize(runs()))
-  return <text fg={summary().waiting ? theme.accent : summary().failed ? theme.error : theme.textMuted}>{summary().text}</text>
+  return <text fg={state().status === "error" || summary().failed ? theme().text.feedback.error.base : summary().waiting ? theme().text.action.primary.base : theme().text.muted}>{state().status === "loading" ? "DAG · loading" : state().status === "error" ? "DAG · unavailable" : summary().text}</text>
 }
 
 export default Plugin.define({
   id: "iolaus.tui",
   setup(context) {
     trace("iolaus.tui.loaded", { host: context.app.version })
-    const unregisterSidebar = context.ui.slot({ append: "sidebar.content", render: ({ sessionID }) => <DagSidebar sessionID={sessionID} context={context} /> })
-    const unregisterFooter = context.ui.slot({ append: "sidebar.footer", render: ({ sessionID }) => <DagFooter sessionID={sessionID} context={context} /> })
+    const unregisterSidebar = context.ui.slot({ append: "sidebar.content", render: (props) => <DagSidebar sessionID={props.sessionID} context={context} /> })
+    const unregisterFooter = context.ui.slot({ append: "sidebar.footer", render: (props) => <DagFooter sessionID={props.sessionID} context={context} /> })
     return () => { unregisterSidebar(); unregisterFooter(); trace("iolaus.tui.closed") }
   },
 })

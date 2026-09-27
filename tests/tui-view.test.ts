@@ -1,7 +1,12 @@
 import { expect, test } from "bun:test"
+import { RGBA } from "@opentui/core"
 import { activityLine, depths, elapsed, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, type DagViewRun } from "../src/tui/view"
 
-const theme = { success: "green", warning: "yellow", accent: "purple", error: "red", textMuted: "gray", text: "white" }
+const theme = { text: {
+  base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
+  action: { primary: { base: RGBA.fromHex("#0055aa") } },
+  feedback: { success: { base: RGBA.fromHex("#008800") }, warning: { base: RGBA.fromHex("#886600") }, error: { base: RGBA.fromHex("#cc0000") } },
+} }
 const node = (id: string, status: string, dependsOn: string[] = [], extra: Partial<DagViewRun["nodes"][number]> = {}) =>
   ({ id, status, kind: "agent", agent: "sisyphus", model: "openai/gpt-5.5", attempt: 1, dependsOn, ...extra })
 const run: DagViewRun = { runID: "r1", name: "plan-review: task", generation: 2, status: "paused", updatedAt: 0, nodes: [
@@ -12,9 +17,9 @@ const run: DagViewRun = { runID: "r1", name: "plan-review: task", generation: 2,
 test("glyphs and colours map every status; unknown falls back to text", () => {
   expect(statusGlyph("completed")).toBe("✓"); expect(statusGlyph("running")).toBe("▶"); expect(statusGlyph("waiting_approval")).toBe("⏸")
   expect(statusGlyph("failed")).toBe("✗"); expect(statusGlyph("skipped")).toBe("↷"); expect(statusGlyph("weird")).toBe("·")
-  expect(statusColor("completed", theme)).toBe("green"); expect(statusColor("running", theme)).toBe("yellow")
-  expect(statusColor("waiting_approval", theme)).toBe("purple"); expect(statusColor("failed", theme)).toBe("red")
-  expect(statusColor("pending", theme)).toBe("gray"); expect(statusColor("weird", theme)).toBe("white")
+  expect(statusColor("completed", theme)).toBe(theme.text.feedback.success.base); expect(statusColor("running", theme)).toBe(theme.text.feedback.warning.base)
+  expect(statusColor("waiting_approval", theme)).toBe(theme.text.action.primary.base); expect(statusColor("failed", theme)).toBe(theme.text.feedback.error.base)
+  expect(statusColor("pending", theme)).toBe(theme.text.muted); expect(statusColor("weird", theme)).toBe(theme.text.base)
 })
 
 test("progress, depth, ordering and summary are derived from the run", () => {

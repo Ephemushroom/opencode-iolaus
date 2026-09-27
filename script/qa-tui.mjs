@@ -8,6 +8,9 @@ import http from "node:http"
 import { once } from "node:events"
 
 const root = resolve(new URL("..", import.meta.url).pathname)
+const packageRoot = resolve(process.env.IOLAUS_QA_PACKAGE_ROOT ?? root)
+const mode = process.env.IOLAUS_QA_THEME ?? "light"
+assert.ok(mode === "light" || mode === "dark")
 const evidence = resolve(process.argv[2] ?? join(root, ".omo/evidence/20260924-iolaus-dag-tui"))
 assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
 mkdirSync(evidence, { recursive: false })
@@ -27,7 +30,7 @@ mkdirSync(home, { recursive: true })
 mkdirSync(join(project, "node_modules"), { recursive: true })
 mkdirSync(join(config, "opencode/plugins/iolaus"), { recursive: true })
 symlinkSync(root, join(project, "node_modules/opencode-iolaus"), "dir")
-symlinkSync(join(root, "dist"), join(localPackage, "dist"), "dir")
+symlinkSync(join(packageRoot, "dist"), join(localPackage, "dist"), "dir")
 writeFileSync(join(localPackage, "package.json"), JSON.stringify({ name: "opencode-iolaus", type: "module", main: "./dist/index.js", exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } }))
 
 const realHome = homedir()
@@ -89,16 +92,16 @@ mock.listen(0, "127.0.0.1"); await once(mock, "listening")
 const mockURL = `http://127.0.0.1:${mock.address().port}/v1`
 
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
-  plugins: [{ package: join(root, "dist"), options: { enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } } }],
+  plugins: [{ package: join(packageRoot, "dist"), options: { enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } } }],
   model: "openai/gpt-5.5",
   permissions: [{ action: "*", resource: "*", effect: "allow" }],
   provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: {
     "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } },
   } } },
 }))
-writeFileSync(join(config, "opencode/cli.json"), JSON.stringify({ plugins: [localPackage] }))
+writeFileSync(join(config, "opencode/cli.json"), JSON.stringify({ plugins: [localPackage], theme: { name: "opencode", mode } }))
 writeFileSync(join(config, "opencode/plugins/iolaus/package.json"), JSON.stringify({ type: "module", exports: { "./tui": "./tui.ts" } }))
-writeFileSync(join(config, "opencode/plugins/iolaus/tui.ts"), `export { default } from ${JSON.stringify(join(root, "dist/tui.js"))}\n`)
+writeFileSync(join(config, "opencode/plugins/iolaus/tui.ts"), `export { default } from ${JSON.stringify(join(packageRoot, "dist/tui.js"))}\n`)
 
 const env = {
   ...process.env,
@@ -113,23 +116,32 @@ const env = {
   OPENCODE_DISABLE_AUTOUPDATE: "1",
   OPENCODE_DISABLE_MODELS_FETCH: "1",
   IOLAUS_TRACE: tracePath,
-  OPENCODE_CLI_CONFIG_CONTENT: JSON.stringify({ plugins: [localPackage] }),
+  IOLAUS_HOME: join(home, ".iolaus"),
+  IOLAUS_DAG_DB: join(project, ".iolaus/dag/state.db"),
+  OPENCODE_CLI_CONFIG_CONTENT: JSON.stringify({ plugins: [localPackage], keybinds: { "theme.switch_mode": "f6" } }),
 }
 
 const session = `iolaus-tui-${process.pid}`
-const start = spawnSync("tmux", ["new-session", "-d", "-s", session, "-c", project, `${binary} --standalone`], { env, encoding: "utf8" })
+const tmux = (...args) => spawnSync("tmux", ["-L", session, ...args], { env, encoding: "utf8" })
+const start = tmux("new-session", "-d", "-s", session, "-c", project, `${binary} --standalone`)
 assert.equal(start.status, 0, start.stderr)
-spawnSync("tmux", ["pipe-pane", "-t", `${session}:0.0`, "-o", `cat >> ${tmuxLog}`], { env, encoding: "utf8" })
+tmux("pipe-pane", "-t", `${session}:0.0`, "-o", `cat >> ${tmuxLog}`)
 
 const target = `${session}:0.0`
-const keys = (...args) => spawnSync("tmux", ["send-keys", "-t", target, ...args], { env, encoding: "utf8" })
-const capture = (name) => { const out = spawnSync("tmux", ["capture-pane", "-p", "-t", target], { env, encoding: "utf8" }).stdout ?? ""; writeFileSync(join(evidence, `${name}.txt`), out); return out }
+const keys = (...args) => tmux("send-keys", "-t", target, ...args)
+const capture = (name) => {
+  const out = tmux("capture-pane", "-p", "-t", target).stdout ?? ""
+  const ansi = tmux("capture-pane", "-p", "-e", "-t", target).stdout ?? ""
+  writeFileSync(join(evidence, `${name}.txt`), out)
+  writeFileSync(join(evidence, `${name}.ansi`), ansi)
+  return out
+}
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 const traceHas = (pattern) => existsSync(tracePath) && pattern.test(readFileSync(tracePath, "utf8"))
 const waitFor = async (pattern, timeoutMs, label) => { const until = Date.now() + timeoutMs; while (Date.now() < until) { if (traceHas(pattern)) return; await sleep(300) } throw new Error(`timed out waiting for ${label}`) }
 const screens = {}
 const strip = (text) => text.replace(/\x1b\[[0-9;]*m/g, "")
-spawnSync("tmux", ["resize-window", "-t", session, "-x", "160", "-y", "45"], { env, encoding: "utf8" })
+tmux("resize-window", "-t", session, "-x", "160", "-y", "45")
 try {
   await waitFor(/iolaus\.tui\.loaded/, 20000, "tui load")
   await sleep(1500)
@@ -161,12 +173,17 @@ try {
   for (let i = 0; i < 6 && !traceHas(/iolaus\.tui\.open/); i++) { keys("j"); await sleep(150); keys("o"); await sleep(400) }
   await sleep(1200)
   screens.opened = capture("05-opened-child")
+  keys("F6"); await sleep(1200)
+  screens.switched = capture("05-theme-switched")
+  // A child has no directly owned DAG. Returning to the owner must restore its view without a new DAG event.
+  keys("M-Up"); await sleep(1200)
+  screens.returned = capture("06-returned-owner")
   keys("C-c"); await sleep(500)
 } catch (error) {
   capture("99-failure"); writeFileSync(join(evidence, "failure.txt"), String(error?.stack ?? error))
   throw error
 } finally {
-  spawnSync("tmux", ["kill-session", "-t", session], { env, encoding: "utf8" })
+  tmux("kill-session", "-t", session)
   mock.closeAllConnections(); await new Promise((done) => mock.close(done))
   rmSync(sandbox, { recursive: true, force: true })
 }
@@ -190,6 +207,36 @@ assert.match(strip(screens.gate).replace(/\s+/g, " "), /o open agent · a approv
 assert.match(trace, /iolaus\.tui\.action.*"action":"approve".*"nodeID":"approve"/, "approve keybind did not reach the RPC")
 assert.match(strip(screens.completed), /✓ execute/, "execute node not shown completed")
 assert.match(trace, /iolaus\.tui\.open.*"sessionID":"ses_/, "open keybind did not target a child session")
+assert.match(strip(screens.opened), /No active DAG runs/, "child session must not inherit another session's ownership")
+assert.match(strip(screens.returned), /DAG · 1 run/, "switching back must reload the owner DAG without an event")
+const colors = []
+for (const [file, label, expectedMode] of [["02-running.ansi", "Iolaus DAG", mode], ["05-opened-child.ansi", "No active DAG runs", mode], ["05-theme-switched.ansi", "No active DAG runs", mode === "light" ? "dark" : "light"]]) {
+  const line = readFileSync(join(evidence, file), "utf8").split("\n").find((line) => strip(line).includes(label))
+  assert.ok(line, `missing ${label}`)
+  let fg
+  let text = ""
+  let color
+  for (const part of line.split(/(\x1b\[[0-9;]*m)/)) {
+    if (part.startsWith("\x1b[")) {
+      const codes = part.slice(2, -1).split(";").map(Number)
+      for (let i = 0; i < codes.length; i++) {
+        if (codes[i] === 0 || codes[i] === 39) fg = undefined
+        if (codes[i] === 38 && codes[i + 1] === 2) { fg = codes.slice(i + 2, i + 5); i += 4 }
+      }
+    } else {
+      text += part
+      if (text.includes(label)) { color = fg; break }
+    }
+  }
+  assert.ok(color, `${label} has no explicit RGB foreground (the original flat-theme bug)`)
+  const luminance = color.reduce((sum, channel, i) => {
+    const value = channel / 255
+    return sum + (value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4) * [0.2126, 0.7152, 0.0722][i]
+  }, 0)
+  assert.ok(expectedMode === "light" ? luminance < 0.5 : luminance > 0.1, `${label} unreadable in ${expectedMode}: ${color}`)
+  colors.push({ label, mode: expectedMode, rgb: color, luminance })
+}
+assert.notDeepEqual(colors[1].rgb, colors[2].rgb, "live theme switch must update the mounted sidebar")
 const nodeOrder = [...trace.matchAll(/iolaus\.dag\.node\.(?:completed|approved)[^\n]*"nodeID":"([a-z]+)"/g)].map((m) => m[1])
 assert.deepEqual(nodeOrder, ["plan", "review", "revise", "rereview", "approve", "execute"], `unexpected node order ${nodeOrder}`)
 assert.ok(!/iolaus\.agent\.rendered[^\n]*"agent":"momus"/.test(trace), "judge review opened a momus child session")
@@ -198,6 +245,8 @@ assert.deepEqual(realAfter, realBefore)
 writeFileSync(join(evidence, "receipt.json"), JSON.stringify({
   binary,
   version: execFileSync(binary, ["--version"], { encoding: "utf8" }).trim(),
+  mode,
+  colors,
   tracePath,
   tmuxLog,
   nativeTuiLoaded: true,

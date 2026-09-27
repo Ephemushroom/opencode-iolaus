@@ -1,10 +1,18 @@
+import type { RGBA } from "@opentui/core"
 import type { DagView } from "../dag/rpc"
 
 export type DagViewRun = DagView["runs"][number]
 export type DagViewNode = DagViewRun["nodes"][number]
 
-/** Theme keys the host exposes; the sidebar never hardcodes a colour. */
-export type ThemeLike = Partial<Record<"primary" | "secondary" | "accent" | "error" | "warning" | "success" | "info" | "text" | "textMuted" | "border", string>>
+/** The semantic tokens consumed from the host's resolved theme. */
+export interface DagTheme {
+  readonly text: {
+    readonly base: RGBA
+    readonly muted: RGBA
+    readonly action: { readonly primary: { readonly base: RGBA } }
+    readonly feedback: Readonly<Record<"success" | "warning" | "error", { readonly base: RGBA }>>
+  }
+}
 
 export function statusGlyph(status: string): string {
   switch (status) {
@@ -20,14 +28,14 @@ export function statusGlyph(status: string): string {
   }
 }
 
-export function statusColor(status: string, theme: ThemeLike): string | undefined {
+export function statusColor(status: string, theme: DagTheme): RGBA {
   switch (status) {
-    case "completed": case "reused": return theme.success
-    case "running": case "starting": case "ready": return theme.warning
-    case "waiting_approval": case "paused": return theme.accent
-    case "failed": case "blocked": case "rejected": case "cancelled": return theme.error
-    case "skipped": case "pending": return theme.textMuted
-    default: return theme.text
+    case "completed": case "reused": return theme.text.feedback.success.base
+    case "running": case "starting": case "ready": return theme.text.feedback.warning.base
+    case "waiting_approval": case "paused": return theme.text.action.primary.base
+    case "failed": case "blocked": case "rejected": case "cancelled": return theme.text.feedback.error.base
+    case "skipped": case "pending": return theme.text.muted
+    default: return theme.text.base
   }
 }
 
