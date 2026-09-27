@@ -35,8 +35,7 @@ test("gh tools carry the gh permission, and only librarian is allowed it", async
   const rules = (id: string) => agents.get(id)!.permissions as readonly PermissionRule[]
   expect(evaluate("gh", "*", rules("librarian"))).toBe("allow")
   expect(evaluate("external_directory", `${tmpdir()}/iolaus-gh-abc/react`, rules("librarian"))).toBe("allow")
-  expect(evaluate("external_directory", `${tmpdir()}/other`, rules("librarian"))).toBe("deny")
-  expect(evaluate("shell", "*", rules("librarian"))).toBe("deny")
+  expect(evaluate("external_directory", `${tmpdir()}/other`, rules("librarian"))).toBe("ask")
   expect(evaluate("gh", "*", rules("explore"))).toBe("deny")
   expect(evaluate("gh", "*", rules("oracle"))).toBe("deny")
   expect(parseOptions({ gh: false }).gh).toBe(false)

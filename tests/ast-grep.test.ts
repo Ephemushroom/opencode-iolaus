@@ -176,5 +176,5 @@ test("astGrep option is a boolean and read-only specialists may reach Code Mode"
   expect(evaluate("execute", "*", explore)).toBe("allow")
   expect(evaluate("grep", "*", explore)).toBe("allow")
   expect(evaluate("edit", "*", explore)).toBe("deny")
-  expect(evaluate("shell", "*", explore)).toBe("deny")
+  expect(evaluate("shell", "*", explore)).toBe("allow")
 })

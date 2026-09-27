@@ -14,7 +14,22 @@ import { trace } from "./trace"
 /** Host agents whose id Iolaus takes over: the host registers `explore` itself (plugin `opencode.agent`). */
 const REPLACES_HOST = new Set<AgentName>(["explore"])
 
-const READ_ONLY = new Set<AgentName>(["oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"])
+/**
+ * Per-specialist deny lists, after OMO's agent catalog: everything else (shell included) keeps the host default.
+ * Host permission names: `edit` covers edit/write/patch, `subagent` is OMO's `task`, `iolaus_dag` is the DAG tool.
+ * `gh` stays librarian-only.
+ */
+const DENIED: Partial<Record<AgentName, readonly string[]>> = {
+  oracle: ["edit", "subagent", "iolaus_dag", "gh"],
+  librarian: ["edit", "subagent", "iolaus_dag"],
+  explore: ["edit", "subagent", "iolaus_dag", "gh"],
+  metis: ["edit", "gh"],
+  momus: ["edit", "gh"],
+}
+/** OMO's `allowOnlyTools`: everything denied except these. */
+const ALLOWED_ONLY: Partial<Record<AgentName, readonly string[]>> = {
+  "multimodal-looker": ["read"],
+}
 
 export function agentMarker(name: AgentName): string {
   return `<iolaus-agent:${name}>`
@@ -67,17 +82,17 @@ export function registerAgents(
       editor.update(id, (agent) => {
         applyModel(agent, assignment)
         if (existing && !takeover) return
-        // The host's explore rules would otherwise stay ahead of ours; start from an empty rule list.
-        if (takeover) agent.permissions.length = 0
+        // The host's explore rules would otherwise stay ahead of ours; start from the host's default rule list.
+        if (takeover) agent.permissions.splice(0, agent.permissions.length, ...Agent.Info.default(Agent.ID.make(id)).permissions)
         agent.name = Agent.Name.make(displayName(name))
         agent.description = AGENT_DESCRIPTIONS[name]
         agent.mode = PRIMARY_AGENTS.has(name) ? "primary" : "subagent"
         agent.system = agentMarker(name)
-        if (READ_ONLY.has(name)) {
+        for (const action of DENIED[name] ?? []) agent.permissions.push({ action, resource: "*", effect: "deny" })
+        const only = ALLOWED_ONLY[name]
+        if (only) {
           agent.permissions.push({ action: "*", resource: "*", effect: "deny" })
-          for (const action of ["read", "glob", "grep", "webfetch", "websearch", "skill", "execute", "context7_*", "grep_app_*"]) {
-            agent.permissions.push({ action, resource: "*", effect: "allow" })
-          }
+          for (const action of only) agent.permissions.push({ action, resource: "*", effect: "allow" })
         }
         if (name === "librarian") {
           // gh clones land under the OS temp dir; native read/grep there need external_directory.
