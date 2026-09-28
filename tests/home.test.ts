@@ -44,6 +44,18 @@ test("global file validates all sections before plugin setup", () => {
   rmSync(root, { recursive: true, force: true })
 })
 
+test("global model objects require both provider and model even when disabled", () => {
+  const user = mkdtempSync(join(tmpdir(), "iolaus-global-model-"))
+  try {
+    for (const enabled of [true, false]) {
+      for (const model of ["/deepseek-v4-flash", "ds-bryan/"]) {
+        writeFileSync(join(user, "iolaus.json"), JSON.stringify({ enabled, models: { agents: { explore: { model } } } }))
+        expect(() => loadGlobalConfig(user)).toThrow('explore.model must be "provider/model"')
+      }
+    }
+  } finally { rmSync(user, { recursive: true, force: true }) }
+})
+
 test("only global iolaus.json supplies models and verify despite old files in either layer", () => {
   const root = mkdtempSync(join(tmpdir(), "iolaus-home-"))
   const user = join(root, "user"); const project = join(root, "project")

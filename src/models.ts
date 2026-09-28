@@ -44,7 +44,7 @@ export function parseModelOverride(value: unknown, path: string): ModelChoice {
     const record = value as Record<string, unknown>
     const unknown = Object.keys(record).filter((key) => key !== "model" && key !== "variant")
     if (unknown.length) throw new TypeError(`Unknown ${path} keys: ${unknown.join(", ")}`)
-    if (typeof record.model !== "string" || !record.model.includes("/")) throw new TypeError(`${path}.model must be "provider/model"`)
+    if (typeof record.model !== "string" || !record.model.includes("/") || record.model.startsWith("/") || record.model.endsWith("/")) throw new TypeError(`${path}.model must be "provider/model"`)
     if (record.variant !== undefined && (typeof record.variant !== "string" || record.variant === "")) throw new TypeError(`${path}.variant must be a nonempty string`)
     return record.variant === undefined ? { model: record.model } : { model: record.model, variant: record.variant as string }
   }
