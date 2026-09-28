@@ -224,7 +224,11 @@ try {
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1", IOLAUS_TRACE: trace, OPENAI_API_KEY: "fake-key",
       // gh scenarios only: the sandbox HOME has no gh login, so pass the user's token through the environment (never written to disk).
       ...(scenario.gh && GH_TOKEN ? { GH_TOKEN } : {}) }
-    const settings = { plugins: [{ package: join(root,"dist"), options: { enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) } }],
+    const iolausHome = join(home, ".iolaus")
+    mkdirSync(iolausHome, { recursive: true })
+    env.IOLAUS_HOME = iolausHome
+    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) }))
+    const settings = { plugins: [{ package: join(root,"dist") }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
     writeFileSync(join(config,"opencode/opencode.json"), JSON.stringify(settings))
@@ -280,7 +284,7 @@ try {
          assert.ok(!existsSync(join(home, ".iolaus", "agent")), "Iolaus must not provision an agent/ directory (skills and memory are the host's)")
          assert.ok(existsSync(join(project, ".iolaus", "plans")), "project plans dir missing")
          const rendered = requests.filter((r) => r.scenario === scenario.name && r.instructions.includes("<iolaus-native-contract>"))
-         if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>Iolaus config: user layer ${join(home, ".iolaus")}`)), "rendered prompt lacks the home contract")
+         if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>Iolaus config: ${join(home, ".iolaus", "iolaus.json")}`)), "rendered prompt lacks the home contract")
        }
        assert.equal(traces.some((t) => t.event === "iolaus.mode.rendered"), Boolean(scenario.mode))
        if (scenario.dag && scenario.template !== "unavailable") {

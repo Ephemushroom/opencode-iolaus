@@ -1,6 +1,3 @@
-import { existsSync, readFileSync } from "node:fs"
-import { homedir } from "node:os"
-import { dirname, join, resolve } from "node:path"
 import {
   AGENT_MODEL_REQUIREMENTS,
   CATEGORY_MODEL_REQUIREMENTS,
@@ -25,23 +22,13 @@ export interface LaneAssignment extends ModelChoice {
 export type ModelOverride = string | { readonly model: string; readonly variant?: string }
 
 /**
- * `.iolaus/models.json` (project, walking up to the home boundary) and
- * `~/.iolaus/models.json` (user). Project layers override user layers; later
- * project directories override earlier ones. Keys are agent or category names.
+ * Model overrides from the global iolaus.json file.
  * Values are "provider/model", "provider/model#variant" or {model, variant}.
  */
 export interface ModelsConfig {
   readonly agents?: Readonly<Record<string, ModelOverride>>
   readonly categories?: Readonly<Record<string, ModelOverride>>
 }
-
-export interface LoadedModelsConfig {
-  readonly config: ModelsConfig
-  readonly sources: readonly string[]
-  readonly diagnostics: readonly string[]
-}
-
-export const MODELS_CONFIG_FILE = "models.json"
 
 export function parseModelOverride(value: unknown, path: string): ModelChoice {
   if (typeof value === "string") {
@@ -55,7 +42,9 @@ export function parseModelOverride(value: unknown, path: string): ModelChoice {
   }
   if (typeof value === "object" && value !== null && !Array.isArray(value)) {
     const record = value as Record<string, unknown>
-    if (typeof record.model !== "string" || !record.model.includes("/")) throw new TypeError(`${path}.model must be "provider/model"`)
+    const unknown = Object.keys(record).filter((key) => key !== "model" && key !== "variant")
+    if (unknown.length) throw new TypeError(`Unknown ${path} keys: ${unknown.join(", ")}`)
+    if (typeof record.model !== "string" || !record.model.includes("/") || record.model.startsWith("/") || record.model.endsWith("/")) throw new TypeError(`${path}.model must be "provider/model"`)
     if (record.variant !== undefined && (typeof record.variant !== "string" || record.variant === "")) throw new TypeError(`${path}.variant must be a nonempty string`)
     return record.variant === undefined ? { model: record.model } : { model: record.model, variant: record.variant as string }
   }
@@ -85,53 +74,10 @@ export function parseModelsConfig(input: unknown): ModelsConfig {
   }
 }
 
-function mergeConfigs(layers: readonly ModelsConfig[]): ModelsConfig {
-  const agents: Record<string, ModelOverride> = {}
-  const categories: Record<string, ModelOverride> = {}
-  for (const layer of layers) {
-    Object.assign(agents, layer.agents ?? {})
-    Object.assign(categories, layer.categories ?? {})
-  }
-  return { agents, categories }
-}
-
-export function loadModelsConfig(directory: string, options: { readonly home?: string; readonly inline?: unknown } = {}): LoadedModelsConfig {
-  // User layer: IOLAUS_HOME (default ~/.iolaus)/models.json; `home` overrides the OS home for tests.
-  const userLayer = options.home ? join(resolve(options.home), ".iolaus") : resolve(process.env.IOLAUS_HOME ?? join(homedir(), ".iolaus"))
-  const stop = options.home ? resolve(options.home) : homedir()
-  const candidates: string[] = [join(userLayer, MODELS_CONFIG_FILE)]
-  const project: string[] = []
-  let current = resolve(directory)
-  for (let depth = 0; depth < 64 && current !== stop; depth++) {
-    project.push(join(current, ".iolaus", MODELS_CONFIG_FILE))
-    const parent = dirname(current)
-    if (parent === current) break
-    current = parent
-  }
-  candidates.push(...project.reverse())
-  const layers: ModelsConfig[] = []
-  const sources: string[] = []
-  const diagnostics: string[] = []
-  for (const path of candidates) {
-    if (!existsSync(path)) continue
-    try {
-      layers.push(parseModelsConfig(JSON.parse(readFileSync(path, "utf8"))))
-      sources.push(path)
-    } catch (error) {
-      diagnostics.push(`${path}: ${error instanceof Error ? error.message : String(error)}`)
-    }
-  }
-  if (options.inline !== undefined) {
-    layers.push(parseModelsConfig(options.inline))
-    sources.push("plugin options")
-  }
-  return { config: mergeConfigs(layers), sources, diagnostics }
-}
-
 /**
  * Iolaus follows the configured chain without checking provider connectivity
- * or subscription: the first chain entry is the lane's model. `~/.iolaus` or
- * `.iolaus/models.json` overrides it per agent or category.
+ * or subscription: the first chain entry is the lane's model. Global
+ * iolaus.json overrides it per agent or category.
  */
 export function firstChainChoice(requirement: ModelRequirement | undefined): ModelChoice | undefined {
   const entry: FallbackEntry | undefined = requirement?.fallbackChain[0]

@@ -50,8 +50,10 @@ const mock = http.createServer(async (req, res) => {
   res.end("data: [DONE]\n\n")
 })
 mock.listen(0, "127.0.0.1"); await once(mock, "listening")
+mkdirSync(join(home, ".iolaus"), { recursive: true })
+writeFileSync(join(home, ".iolaus", "iolaus.json"), JSON.stringify({ mcps: [], gh: false, verify: false }))
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
-  plugins: [{ package: join(root, "dist"), options: { mcps: [], gh: false, verify: false } }],
+  plugins: [{ package: join(root, "dist") }],
   model: "openai/gpt-5.5", permissions: [{ action: "*", resource: "*", effect: "allow" }],
   provider: { openai: { options: { apiKey: "fake-key", baseURL: `http://127.0.0.1:${mock.address().port}/v1` }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } },
 }))
