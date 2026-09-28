@@ -1,38 +1,40 @@
  ⠙ IOLAUS_TUI_QA_DONE            +
 
-  ┃
 
 
-  DAG details · 37a0fe33                                                                 Esc close
+  DAG details · 395a934b                                                                 Esc close
   ⏸ plan-review: IOLAUS_TUI_TASK
   Paused · Done 4/6 [████████░░░░] · gen 1 · waiting 2s
 
-                                   ╭────────────────────────────╮                                █
-                                   │   plan                     │                                █
-                                   │ ✓ Done                     │                                ▀
-                                   │ Write the plan             │
-                                   ╰────────────────────────────╯
+                                     │ Revise the plan        │
+                                     ╰────────────────────────╯
                                                  │
                                                  ▼
-                                   ╭────────────────────────────╮
-                                   │   review ⚖                 │
-                                   │ ✓ Done                     │
-                                   │ Review the plan            │
+                                     ╭────────────────────────╮
+                                     │   rereview ⚖           │
+                                     │ ✓ Done                 │
+                                     │ Re-review...vised plan │                                  █
+                                     ╰────────────────────────╯                                  █
+                                                 │                                               █
+                                                 ▼                                               █
+                                     ┏━━━━━━━━━━━━━━━━━━━━━━━━┓                                  █
+                                     ┃ › approve ⏸            ┃                                  █
+                                     ┃ ⏸ Waiting approval     ┃
+                                     ┃ Approve the plan       ┃
+                                     ┗━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+  ╭─ Node details ───────────────────────────────────────────────────────────────────────────────╮
+  │ ⏸ approve · Approve the plan                                                                 │
+  │ Status: Waiting approval · gate                                                              │
+  │ Agent: human · Model: none · Attempt: 1                                                      │
+  │ Depends on: review, rereview                                                                 │
+  │ Unblocks: execute                                                                            │
+  │                                                                                              │
+  │ Approval request                                                                             │
+  │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject to stop.      │
+  │ [Cancel run]                                                                                 │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────╯
 
-  Node details
-  ╭─────────────────────────────────────────────────────────────────────────────────────────────╮
-  │ ⏸ approve · Approve the plan                                                                │
-  │ Status: Waiting approval · gate                                                             │
-  │ Agent: human                                                                                │
-  │ Model: none                                                                                 │
-  │ Attempt: 1                                                                                  │
-  │ Depends on: review, rereview                                                                │
-  │                                                                                             │
-  │ Approval request                                                                            │
-  │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject to stop.     │
-  │ [Cancel run]                                                                                │
-  ╰─────────────────────────────────────────────────────────────────────────────────────────────╯
 
 
 
@@ -40,6 +42,4 @@
 
   ↑/↓ j/k select · a approve · r reject · PgUp/PgDn details · Esc close
 
-  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                         15 (0%) · $0.00  ctrl+p commands
 

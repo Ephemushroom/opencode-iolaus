@@ -1,45 +1,45 @@
    IOLAUS_TUI_QA_DONE              Iolaus DAG · execute          +
 
-  ┃                                                                                                                     IOLAUS_TUI_QA_DONE
-  ┃  Run a plan-review
   ┃
-                       DAG details · 37a0fe33                                                                                   Esc close
-     ✓ iolaus_dag [act ✓ plan-review: IOLAUS_TUI_TASK
-                       Done · Done 6/6 [████████████] · gen 1 · done in 12s
-     ✓ iolaus_dag [act
-                           ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓     █  Dependencies
-     ✓ iolaus_dag [act     ┃ › plan                     ┃     █    plan → review
-                           ┃ ✓ Done                     ┃     █    review → revise
-     ✓ iolaus_dag [act     ┃ Write the plan             ┃     █    revise → rereview                                                      LAUS_TUI_TASK
-                           ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛     █    review → approve                                                       2s
-     ✓ iolaus_dag [act                   │                    █    rereview → approve
-                                         ▼                    █    approve → execute                                                       · ctrl+x d
-     ✓ iolaus_dag [act     ╭────────────────────────────╮     █
-                           │   review ⚖                 │     █  Node details
-     IOLAUS_TUI_QA_DON     │ ✓ Done                     │     █  ╭─────────────────────────────────────────────────────────────────────╮
-                           │ Review the plan            │     █  │ ✓ plan · Write the plan                                             │
-     Build · GPT-5.5 ·     ╰────────────────────────────╯     █  │ Status: Done · agent                                                │
-                                         │                    █  │ Agent: prometheus                                                   │
-                                         ▼                    █  │ Model: openai/gpt-5.5                                               │
-                           ╭────────────────────────────╮     █  │ Attempt: 1                                                          │
-                           │   revise                   │     ▀  │ Depends on: none (root)                                             │
-                           │ ✓ Done                     │        │                                                                     │
-                           │ Revise the plan            │        │ Result · snapshot excerpt                                           │
-                           ╰────────────────────────────╯        │ IOLAUS_TUI_PLAN_V1                                                  │
-                                         │                       ╰─────────────────────────────────────────────────────────────────────╯
-                                         ▼
-                           ╭────────────────────────────╮
-                           │   rereview ⚖               │
-                           │ ✓ Done                     │
-                           │ Re-review the revised plan │
-                           ╰────────────────────────────╯
-                                         │
-                                         ▼
-                           ╭────────────────────────────╮
-  ┃                        │   approve ⏸                │
+  ┃  Run a plan-review
+  ┃                    DAG details · 395a934b                                                                                   Esc close
+                       ✓ plan-review: IOLAUS_TUI_TASK
+     ✓ iolaus_dag [act Done · Done 6/6 [████████████] · gen 1 · done in 12s
+
+     ✓ iolaus_dag [act                                           ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                         █
+                                                                 ┃ › plan                     ┃                                         █
+     ✓ iolaus_dag [act                                           ┃ ✓ Done                     ┃                                         █
+                                                                 ┃ Write the plan             ┃                                         █
+     ✓ iolaus_dag [act                                           ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                         █ LAUS_TUI_TASK
+                                                                               │                                                        █ 2s
+     ✓ iolaus_dag [act                                                         ▼
+                                                                 ╭────────────────────────────╮                                            · ctrl+x d
+     ✓ iolaus_dag [act                                           │   review ⚖                 │
+                                                                 │ ✓ Done                     │
+     IOLAUS_TUI_QA_DON                                           │ Review the plan            │
+                                                                 ╰────────────────────────────╯
+     Build · GPT-5.5 ·                                                         │
+                                                                               ▼
+                                                                 ╭────────────────────────────╮
+                                                                 │   revise                   │
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ✓ plan · Write the plan                                                                                        │
+                       │ Status: Done · agent                                                                                           │
+                       │ Agent: prometheus · Model: openai/gpt-5.5 · Attempt: 1                                                         │
+                       │ Depends on: none (start node)                                                                                  │
+                       │ Unblocks: review                                                                                               │
+                       │                                                                                                                │
+                       │ Result                                                                                                         │
+                       │ IOLAUS_TUI_PLAN_V1                                                                                             │
+                       ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+
+
+  ┃
   ┃  jkoar
-  ┃                    ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
-  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-c76uAE/project
-  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-  /…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-c76uAE/project   15 (0%) · $0.00  ctrl+p commands    DAG · 1 run
+  ┃
+  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-ZjxHNB/project
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+  /…/var/folders/cy/qc
 
