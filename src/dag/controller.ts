@@ -7,7 +7,7 @@ import { growLoop } from "./loop"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
-import type { DagDefinition, DagEvent, DagNodeRecord, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
+import type { DagDefinition, DagEvent, DagNodeDefinition, DagNodeRecord, DagObservedStart, DagObservedUpdate, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
 
 export { DagValidationError }
 
@@ -27,6 +27,10 @@ export interface DagController {
   readonly approve: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Effect.Effect<DagRunRecord, DagValidationError>
   readonly reject: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Effect.Effect<DagRunRecord, DagValidationError>
   readonly amend: (runID: string, ownerSessionID: string, definition: DagDefinition) => Effect.Effect<DagRunRecord, DagValidationError>
+  /** Appends a native subagent call to its owner's observed run, creating the run on first use. */
+  readonly observe: (input: DagObservedStart) => Effect.Effect<{ readonly runID: string; readonly nodeID: string }>
+  /** Moves an observed node to running again (a follow-up), or settles it. */
+  readonly observed: (runID: string, nodeID: string, update: DagObservedUpdate) => Effect.Effect<void>
   readonly close: Effect.Effect<void>
 }
 
@@ -312,6 +316,12 @@ export function createDagController(options: DagControllerOptions): DagControlle
 
   const current = (runID: string): Effect.Effect<DagRunRecord> => Effect.sync(() => store.getRun(runID)!)
 
+  const schedulable = (run: DagRunRecord): Effect.Effect<void, DagValidationError> => run.definition.observed
+    ? Effect.fail(new DagValidationError("This run records native subagent calls; it cannot be retried, resumed or amended. Call the subagent again, or build an iolaus_dag definition when the work needs scheduling."))
+    : Effect.void
+
+  const slug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32) || "subagent"
+
   const controller: DagController = {
     create: (input, ownerSessionID) => Effect.gen(function* () {
       const definition = yield* validated(() => { const d = applyDefaultModels(input, options.defaultModel); validateDefinition(d); return d })
@@ -350,6 +360,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
     }),
     retry: (runID, ownerSessionID, nodeID, expectedGeneration) => Effect.gen(function* () {
       let run = yield* owned(runID, ownerSessionID)
+      yield* schedulable(run)
       yield* checkGeneration(run, expectedGeneration)
       if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry")) return yield* Effect.fail(new DagValidationError("Retry requires a terminal run or a node needing retry"))
       const selected = nodeID ? new Set([nodeID]) : new Set(run.nodes.filter((node) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry").map((node) => node.definition.id))
@@ -390,8 +401,9 @@ export function createDagController(options: DagControllerOptions): DagControlle
       return save(updateRunStatus(updated))
     })),
     amend: (runID, ownerSessionID, input) => Effect.gen(function* () {
-      const definition = yield* validated(() => { const d = applyDefaultModels(input, options.defaultModel); validateDefinition(d); return d })
       const previous = yield* owned(runID, ownerSessionID)
+      yield* schedulable(previous)
+      const definition = yield* validated(() => { const d = applyDefaultModels(input, options.defaultModel); validateDefinition(d); return d })
       const previousByID = new Map(previous.nodes.map((node) => [node.definition.id, node]))
       const fingerprints = fingerprintNodes(definition)
       const nextNodes = definition.nodes.map((node) => {
@@ -403,6 +415,67 @@ export function createDagController(options: DagControllerOptions): DagControlle
       save(next)
       yield* schedule(runID)
       return yield* current(runID)
+    }),
+    // Both bodies are synchronous against the store, so they never interleave with other controller state transitions.
+    observe: (input) => Effect.sync(() => {
+      const at = now()
+      const run = store.listRuns(input.ownerSessionID).find((candidate) => candidate.definition.observed)
+      const nodeID = `${(run?.nodes.length ?? 0) + 1}-${slug(input.title)}`
+      const definition: DagNodeDefinition = { id: nodeID, agent: input.agent, ...(input.model ? { model: input.model } : {}), prompt: input.prompt, dependsOn: input.parentNodeID ? [input.parentNodeID] : [] }
+      const record: DagNodeRecord = { definition, fingerprint: nodeFingerprint(definition), status: "running", attempt: 1, ...(input.sessionID ? { execution: { nodeID, attempt: 1, sessionID: input.sessionID } } : {}), createdAt: at, updatedAt: at }
+      if (!run) {
+        const created: DagDefinition = { schemaVersion: 1, name: "Subagent calls", observed: true, nodes: [definition] }
+        const next: DagRunRecord = { runID: randomUUID(), ownerSessionID: input.ownerSessionID, name: created.name, definition: created, fingerprint: graphFingerprint(created), generation: 1, status: "running", nodes: [record], createdAt: at, updatedAt: at }
+        store.createRun(next); event(next, "run.started"); event(next, "node.started", nodeID)
+        return { runID: next.runID, nodeID }
+      }
+      const grown: DagDefinition = { ...run.definition, nodes: [...run.definition.nodes, definition] }
+      const next: DagRunRecord = { ...run, definition: grown, fingerprint: graphFingerprint(grown), status: "running", nodes: [...run.nodes, record], updatedAt: at }
+      save(next); event(next, "node.started", nodeID)
+      return { runID: run.runID, nodeID }
+    }),
+    observed: (runID, nodeID, update) => Effect.sync(() => {
+      const run = store.getRun(runID)
+      const node = run?.nodes.find((candidate) => candidate.definition.id === nodeID)
+      if (!run || !node || !run.definition.observed) return
+      const at = now()
+      // A child's settle can arrive twice (its idle event and the tool result); the first one wins, a later one only fills a missing model.
+      if (update.status !== "running" && node.status !== "running") {
+        if (update.status !== "completed" || !update.model || node.definition.model) return
+        const definition = { ...node.definition, model: update.model }
+        const patched: DagRunRecord = { ...run, definition: { ...run.definition, nodes: run.definition.nodes.map((candidate) => candidate.id === nodeID ? definition : candidate) },
+          nodes: run.nodes.map((candidate) => candidate.definition.id === nodeID ? { ...candidate, definition, updatedAt: at } : candidate), updatedAt: at }
+        save(patched)
+        return
+      }
+      let next: DagNodeRecord
+      if (update.status === "running") {
+        const execution = update.sessionID ? { nodeID, attempt: node.attempt, sessionID: update.sessionID } : node.execution
+        const definition = update.model && !node.definition.model ? { ...node.definition, model: update.model } : node.definition
+        if (node.status === "running") {
+          if (execution === node.execution && definition === node.definition) return
+          next = { ...node, definition, ...(execution ? { execution } : {}), updatedAt: at }
+        } else {
+          const attempt = node.attempt + 1
+          next = { ...node, definition, status: "running", attempt, error: undefined, ...(execution ? { execution: { ...execution, attempt } } : {}), updatedAt: at }
+        }
+      } else if (update.status === "completed") {
+        const model = node.definition.model ?? update.model
+        const result: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: run.generation, attempt: node.attempt, status: "completed", payload: { text: update.text }, provenance: { parentNodeIDs: node.definition.dependsOn, ...(node.execution ? { execution: node.execution } : {}), agent: node.definition.agent ?? "", model: model ?? "" }, createdAt: at }
+        next = { ...node, ...(model && !node.definition.model ? { definition: { ...node.definition, model } } : {}), status: "completed", result, error: undefined, updatedAt: at }
+      } else next = { ...node, status: update.status, error: update.error, updatedAt: at }
+      const nodes = run.nodes.map((candidate) => candidate.definition.id === nodeID ? next : candidate)
+      const definitionNodes = next.definition === node.definition ? run.definition.nodes : run.definition.nodes.map((candidate) => candidate.id === nodeID ? next.definition : candidate)
+      const active = nodes.some((candidate) => candidate.status === "running")
+      const status: DagRunRecord["status"] = active ? "running" : run.status === "cancelled" ? "cancelled"
+        : nodes.some((candidate) => candidate.status === "failed" || candidate.status === "interrupted") ? "failed" : "completed"
+      const definition = definitionNodes === run.definition.nodes ? run.definition : { ...run.definition, nodes: definitionNodes }
+      const updated: DagRunRecord = { ...run, definition, nodes, status, updatedAt: at }
+      save(updated)
+      event(updated, update.status === "running" ? "node.started" : update.status === "completed" ? "node.completed" : "node.failed", nodeID,
+        update.status === "completed" ? { text: update.text } : update.status === "running" ? undefined : { message: update.error, status: update.status })
+      if (status !== run.status && (status === "completed" || status === "failed")) event(updated, status === "completed" ? "run.completed" : "run.failed")
+      notify(updated)
     }),
     close: Effect.sync(() => {
       closed = true

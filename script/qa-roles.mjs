@@ -56,6 +56,25 @@ async function reply(body, instructions, input) {
   if (first.includes("<iolaus-planning>") && !instructions.includes("<iolaus-planner>")) {
     return outs.length ? { text: "CONSULT_DONE" } : { call: { name: "shell", args: { command: "ls", description: "consult" } } }
   }
+  if (active === "observe") {
+    const lastUser = JSON.stringify([...items].reverse().find((item) => item?.type === "message" && item.role === "user") ?? "")
+    if (first.includes("OBS_NESTED")) return { text: "OBS_NESTED_DONE" }
+    if (first.includes("OBS_BG")) { await sleep(1500); return { text: "OBS_BG_DONE" } }
+    if (first.includes("OBS_FG")) {
+      if (lastUser.includes("OBS_FOLLOW")) return { text: "OBS_FOLLOW_DONE" }
+      return outs.length ? { text: "OBS_FG_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "nested", prompt: "OBS_NESTED" } } }
+    }
+    if (first.includes("OBS_REFUSED")) {
+      return outs.length ? { text: "OBS_REFUSED_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "no tool", prompt: "OBS_NEVER" } } }
+    }
+    const fg = outs[1] ? String(outs[1].output).match(/sessionID="(ses_\w+)"/)?.[1] : undefined
+    if (outs.length === 0) return { call: { name: "subagent", args: { agent: "general", description: "bg scan", prompt: "OBS_BG", background: true } } }
+    if (outs.length === 1) return { call: { name: "subagent", args: { agent: "metis", description: "fg check", prompt: "OBS_FG" } } }
+    if (outs.length === 2) return fg ? { call: { name: "subagent", args: { agent: "metis", description: "fg check", sessionID: fg, prompt: "OBS_FOLLOW" } } } : { text: "NO_FG" }
+    if (outs.length === 3) return { call: { name: "subagent", args: { agent: "general", description: "refused nest", prompt: "OBS_REFUSED" } } }
+    await sleep(2500)
+    return { text: "OBS_PARENT_DONE" }
+  }
   switch (active) {
     case "planner": return [
       { call: { name: "patch", args: { patchText: PLAN } } },
@@ -63,8 +82,11 @@ async function reply(body, instructions, input) {
       { call: { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "implement it" } } } },
       { call: { name: "subagent", args: { agent: "explore", description: "consult", prompt: "IOLAUS_CONSULT look at src" } } },
     ][outs.length] ?? { text: "PLANNED" }
-    case "atlas-unbound":
-    case "worker-plans": return outs.length ? { text: "REFUSED" } : { call: { name: "patch", args: { patchText: active === "worker-plans" ? "*** Begin Patch\n*** Update File: .iolaus/plans/cache/spec.md\n@@\n-# Cache\n+# Hacked\n*** End Patch" : updateA(4) } } }
+    case "atlas-unbound": return [
+      { call: { name: "patch", args: { patchText: updateA(4) } } },
+      { call: { name: "subagent", args: { agent: "general", description: "refused", prompt: "IOLAUS_REFUSED" } } },
+    ][outs.length] ?? { text: "REFUSED" }
+    case "worker-plans": return outs.length ? { text: "REFUSED" } : { call: { name: "patch", args: { patchText: "*** Begin Patch\n*** Update File: .iolaus/plans/cache/spec.md\n@@\n-# Cache\n+# Hacked\n*** End Patch" } } }
     case "start-work": {
       const runID = input.match(/started run ([0-9a-f-]{36})/)?.[1]
       if (!runID) return { text: "NO_RUN" }
@@ -126,9 +148,9 @@ mock.listen(0, "127.0.0.1"); await once(mock, "listening")
 const model = "openai/gpt-5.5"
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
   plugins: [{ package: join(root, "dist"), options: { mcps: [], gh: false, verify: false, models: {
-    agents: { sisyphus: model, prometheus: model, atlas: model, momus: model, explore: model, hephaestus: model } } } }],
+    agents: { sisyphus: model, prometheus: model, atlas: model, momus: model, explore: model, hephaestus: model, metis: model } } } }],
   // No global allow-all: it would override the per-agent deny rules this QA checks (tool visibility).
-  model, default_agent: "build",
+  model, default_agent: "build", experimental: { subagent_depth: 2 },
   provider: { openai: { options: { apiKey: "fake-key", baseURL: `http://127.0.0.1:${mock.address().port}/v1` }, models: {
     "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } }, "claude-opus-5-5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } },
 }))
@@ -194,7 +216,8 @@ try {
     assert.equal(readFileSync(join(project, "src/a.ts"), "utf8"), "const x = 1\nexport default x\n", "planner edited source")
     const outs = of(id).at(-1).outputs
     assert.match(outs[2], /\[iolaus planner\].*only planning runs/, `ultrawork create was not refused: ${outs[2]}`)
-    assert.ok(!traces().some((t) => t.event === "iolaus.dag.run.started"), "a run was started by the planner")
+    // Scheduled runs emit node.ready; the observed run recording the planner's consult does not.
+    assert.ok(!traces().some((t) => t.event === "iolaus.dag.node.ready"), "a run was scheduled by the planner")
     const child = await until(() => requests.find((r) => r.session !== id && r.scenario === "planner" && r.text === "CONSULT_DONE"), "consult child")
     assert.ok(child.input.includes("<iolaus-planning>"), "subagent prompt lacks the inherited planning notice")
     assert.match(child.outputs[0], /\[iolaus planning\].*no shell/, `consult shell was not refused: ${child.outputs[0]}`)
@@ -209,16 +232,52 @@ try {
     await api("POST", `/api/session/${id}/prompt`, { text: "Fix src/a.ts" })
     await finished(id, "REFUSED")
     assert.match(of(id).at(-1).outputs[0], /\[iolaus atlas-unbound\].*\/start-work/)
+    assert.match(of(id).at(-1).outputs[1], /\[iolaus atlas-unbound\]/, "Atlas subagent call was not refused")
+    assert.ok(!traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id), "a refused subagent call was recorded")
     assert.equal(readFileSync(join(project, "src/a.ts"), "utf8"), "const x = 1\nexport default x\n")
   })
 
-  await check("other lanes cannot rewrite a plan", async () => {
+  await check("native subagent calls appear as an observed DAG run: background, foreground, nested and a follow-up", async () => {
+    active = "observe"
+    const id = await create("sisyphus")
+    await api("POST", `/api/session/${id}/prompt`, { text: "OBS_PARENT" })
+    await finished(id, "OBS_PARENT_DONE")
+    const snapshot = async () => (await api("POST", `/api/rpc/iolaus-dag/snapshot?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID: id } })).output
+    const run = await until(async () => (await snapshot()).runs.find((r) => r.name === "Subagent calls" && !r.nodes.some((n) => n.status === "running")), "observed run to settle", 30000)
+    const nodes = Object.fromEntries(run.nodes.map((n) => [n.id, n]))
+    assert.deepEqual(Object.keys(nodes).sort(), ["1-bg-scan", "2-fg-check", "3-nested", "4-refused-nest", "5-no-tool"], `observed nodes: ${Object.keys(nodes)}`)
+    const ran = ["1-bg-scan", "2-fg-check", "3-nested", "4-refused-nest"].map((n) => nodes[n])
+    assert.ok(ran.every((n) => n.status === "completed" && n.sessionID?.startsWith("ses_") && n.model === model), JSON.stringify(run.nodes.map((n) => [n.id, n.status, n.sessionID, n.model])))
+    // `general` has no subagent tool here, so the host refuses its nested call before running it: recorded as failed, not left running.
+    assert.equal(nodes["5-no-tool"].status, "failed", `refused call: ${JSON.stringify(nodes["5-no-tool"])}`)
+    assert.deepEqual(nodes["5-no-tool"].dependsOn, ["4-refused-nest"])
+    assert.equal(run.status, "failed")
+    assert.deepEqual(nodes["3-nested"].dependsOn, ["2-fg-check"], "nested call is not under its caller")
+    assert.equal(nodes["2-fg-check"].attempt, 2, "follow-up did not reopen the node")
+    assert.match(nodes["2-fg-check"].result, /OBS_FOLLOW_DONE/)
+    assert.match(nodes["1-bg-scan"].result, /OBS_BG_DONE/, "background child's result was not recorded")
+    assert.match(nodes["3-nested"].result, /OBS_NESTED_DONE/)
+    assert.ok(traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id && t.nested), "nested call trace missing")
+    assert.ok(traces().some((t) => t.event === "iolaus.subagent.followed" && t.owner === id), "follow-up trace missing")
+    // Native behaviour is untouched: the follow-up reached the same child, the background call returned at once.
+    const parentOutputs = of(id).at(-1).outputs
+    assert.match(parentOutputs[0], /working in the background/)
+    assert.match(parentOutputs[3], /OBS_REFUSED_DONE/)
+    assert.equal(parentOutputs[2].match(/sessionID="(ses_\w+)"/)?.[1], nodes["2-fg-check"].sessionID)
+    // An observed run cannot be scheduled.
+    const retry = await fetch(`${base}/api/rpc/iolaus-dag/action?location[directory]=${encodeURIComponent(project)}`, { method: "POST", headers: { "content-type": "application/json", authorization }, body: JSON.stringify({ input: { sessionID: id, action: "retry", runID: run.runID, generation: run.generation } }) })
+    assert.match(await retry.text(), /records native subagent calls/)
+  })
+
+  await check("other lanes may write plans", async () => {
     active = "worker-plans"
     const id = await create("sisyphus")
     await api("POST", `/api/session/${id}/prompt`, { text: "Edit the plan" })
     await finished(id, "REFUSED")
-    assert.match(of(id).at(-1).outputs[0], /\[iolaus worker\].*only planning sessions/)
-    assert.ok(readFileSync(join(project, ".iolaus/plans/cache/spec.md"), "utf8").startsWith("# Cache"))
+    assert.ok(!of(id).at(-1).outputs[0].includes("[iolaus"), `worker plan edit was refused: ${of(id).at(-1).outputs[0]}`)
+    assert.ok(readFileSync(join(project, ".iolaus/plans/cache/spec.md"), "utf8").startsWith("# Hacked"), "worker plan edit did not apply")
+    // Restore the planner's spec for the start-work scenarios below.
+    writeFileSync(join(project, ".iolaus/plans/cache/spec.md"), "# Cache\nProblem: x is wrong. Solution: set x to 2 and add b.\n")
   })
 
   await check("start-work with an unknown plan starts nothing", async () => {

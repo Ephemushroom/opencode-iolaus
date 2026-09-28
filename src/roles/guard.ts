@@ -15,7 +15,7 @@ import { PLANNING_MARKER, PLANNING_NOTICE, PLANS_DIR } from "./plan"
  * - `atlas-unbound`: Atlas outside a /start-work plan. Read only.
  * - `atlas-orchestrator`: the Atlas session that ran /start-work. Operates the run,
  *   changes nothing itself; its tickets run in their own sessions.
- * - `worker`: every other Iolaus session. Anything, except rewriting plans.
+ * - `worker`: every other Iolaus session. Unrestricted by role.
  * - `native`: host and user agents. Untouched.
  */
 export type Policy = "planner" | "planning" | "atlas-unbound" | "atlas-orchestrator" | "worker" | "native"
@@ -50,10 +50,6 @@ export function plannerWritable(directory: string, path: string): boolean {
     || rel.startsWith("docs/adr/") || rel.includes("/docs/adr/")
 }
 
-function inPlans(directory: string, path: string): boolean {
-  return relative(directory, resolve(directory, path)).split(sep).join("/").startsWith(`${PLANS_DIR}/`)
-}
-
 function record(input: unknown): Record<string, unknown> | undefined {
   return typeof input === "object" && input !== null && !Array.isArray(input) ? input as Record<string, unknown> : undefined
 }
@@ -64,12 +60,11 @@ const changes = (tool: string, input: unknown) => MUTATION_TOOLS.has(tool) || to
 
 export const ATLAS_UNBOUND = "Atlas works only on a plan Prometheus wrote: plan with Prometheus into .iolaus/plans/<plan>/, then run /start-work <plan>. Until then Atlas may read but not edit, run shell, delegate or start DAG runs."
 export const ATLAS_ORCHESTRATOR = "This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the run with iolaus_dag (wait, snapshot, node, retry; approve or reject only on the user's word) instead of changing files here."
-export const PLANS_PROTECTED = `${PLANS_DIR}/ holds plans Prometheus wrote, which /start-work trusts; only planning sessions write there. Switch to Prometheus (or run /hyperplan) to change a plan.`
 
 export function denial(policy: Policy, tool: string, input: unknown, directory: string): string | undefined {
   switch (policy) {
-    case "native": return undefined
-    case "worker": return MUTATION_TOOLS.has(tool) && mutatedPaths(input, directory).some((path) => inPlans(directory, path)) ? PLANS_PROTECTED : undefined
+    case "native":
+    case "worker": return undefined
     case "atlas-unbound": return changes(tool, input) || (tool === "iolaus_dag" && startsWork(input)) ? ATLAS_UNBOUND : undefined
     case "atlas-orchestrator": return changes(tool, input) || (tool === "iolaus_dag" && startsWork(input)) ? ATLAS_ORCHESTRATOR : undefined
   }

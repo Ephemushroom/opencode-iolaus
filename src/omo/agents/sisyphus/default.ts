@@ -37,7 +37,7 @@ For user-requested work with multiple steps, independent concerns, or uncertain 
 4. Retry failed nodes by generation. Resume interrupted work explicitly. Amend the graph instead of silently changing a running node.
 5. Keep prompts self-contained, and use explicit input bindings when a node consumes an upstream result.
 
-The DAG is the source of truth for progress, dependencies and recovery. Native subagent remains appropriate for one-off consultation outside a durable implementation graph.
+The DAG is the source of truth for progress, dependencies and recovery. A simple delegation that needs none of that is a direct native subagent call; Iolaus shows it in the DAG view.
 </Iolaus_DAG_Management>`;
 
   if (useTaskSystem) {
