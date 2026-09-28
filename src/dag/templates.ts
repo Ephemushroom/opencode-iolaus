@@ -37,12 +37,12 @@ function planReview(input: DagTemplateInput): DagNodeDefinition[] {
   const executor = input.executor ?? "sisyphus"
   const gate = input.gate !== false
   return [
-    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n${PLAN_FORMAT}\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
-    { id: "review", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nA plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
-    { id: "revise", agent: "prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
-    { id: "rereview", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the revised plan after your earlier review. Apply the same standard.\n\nTASK:\n${input.task}`, dependsOn: ["revise"], inputs: [{ node: "revise" }], when: { node: "revise", exists: true }, maxAttempts: attempts },
-    ...(gate ? [{ id: "approve", kind: "gate" as const, prompt: `Plan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to start execution or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
-    { id: "execute", agent: executor, prompt: `Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>; prefer the revised plan when present. Report what was done and how it was verified.\n\nTASK:\n${input.task}`, dependsOn: gate ? ["approve"] : ["review", "rereview"], inputs: [{ node: "plan" }, { node: "revise" }], ...(gate ? {} : { when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }) },
+    { id: "plan", title: "Write the plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n${PLAN_FORMAT}\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
+    { id: "review", title: "Review the plan", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nA plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
+    { id: "revise", title: "Revise the plan", agent: "prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
+    { id: "rereview", title: "Re-review the revised plan", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the revised plan after your earlier review. Apply the same standard.\n\nTASK:\n${input.task}`, dependsOn: ["revise"], inputs: [{ node: "revise" }], when: { node: "revise", exists: true }, maxAttempts: attempts },
+    ...(gate ? [{ id: "approve", title: "Approve the plan", kind: "gate" as const, prompt: `Plan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to start execution or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
+    { id: "execute", title: "Execute the approved plan", agent: executor, prompt: `Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>; prefer the revised plan when present. Report what was done and how it was verified.\n\nTASK:\n${input.task}`, dependsOn: gate ? ["approve"] : ["review", "rereview"], inputs: [{ node: "plan" }, { node: "revise" }], ...(gate ? {} : { when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }) },
   ]
 }
 
@@ -52,11 +52,11 @@ function goalReview(input: DagTemplateInput): DagNodeDefinition[] {
   const executor = input.executor ?? "hephaestus"
   const gate = input.gate !== false
   return [
-    { id: "work", agent: executor, prompt: `Achieve this goal end to end and report what changed and how you verified it.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
-    { id: "review", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThe work passes only if the goal is met, the reported verification is real (commands and outputs, not claims), and nothing out of scope was changed.\n\nGOAL:\n${input.task}`, dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
-    { id: "fix", agent: executor, prompt: `The reviewer rejected the work. Fix every defect named in the review and report the verification again.\n\nGOAL:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "work" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
-    { id: "rereview", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the fixed work after your earlier review. Apply the same standard.\n\nGOAL:\n${input.task}`, dependsOn: ["fix"], inputs: [{ node: "fix" }], when: { node: "fix", exists: true }, maxAttempts: attempts },
-    ...(gate ? [{ id: "accept", kind: "gate" as const, prompt: `Work for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
+    { id: "work", title: "Do the work", agent: executor, prompt: `Achieve this goal end to end and report what changed and how you verified it.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
+    { id: "review", title: "Review the work", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThe work passes only if the goal is met, the reported verification is real (commands and outputs, not claims), and nothing out of scope was changed.\n\nGOAL:\n${input.task}`, dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
+    { id: "fix", title: "Fix the review findings", agent: executor, prompt: `The reviewer rejected the work. Fix every defect named in the review and report the verification again.\n\nGOAL:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "work" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
+    { id: "rereview", title: "Re-review the fix", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the fixed work after your earlier review. Apply the same standard.\n\nGOAL:\n${input.task}`, dependsOn: ["fix"], inputs: [{ node: "fix" }], when: { node: "fix", exists: true }, maxAttempts: attempts },
+    ...(gate ? [{ id: "accept", title: "Accept the work", kind: "gate" as const, prompt: `Work for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
   ]
 }
 
@@ -86,9 +86,9 @@ function ultrawork(input: DagTemplateInput): { readonly nodes: DagNodeDefinition
   const standard = `The work passes only if every scenario in the contract is met with real evidence (commands and outputs, not claims), the real-surface artifact is present, and nothing out of scope was changed.`
   const reviewerPrompt = (intro: string) => `${REVIEW_INSTRUCTIONS}\n\n${intro}${standard}\n\nGOAL:\n${input.task}`
   const nodes: DagNodeDefinition[] = [
-    { id: "work", agent: executor, prompt: `${marker}\nAchieve this goal end to end. Report the scenario contract, what changed, and the verification evidence for each scenario.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
-    { id: "review", kind: "judge", agent: reviewer, prompt: reviewerPrompt(""), dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
-    ...(gate ? [{ id: "accept", kind: "gate" as const, prompt: `Ultrawork for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review"], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
+    { id: "work", title: "Do the work", agent: executor, prompt: `${marker}\nAchieve this goal end to end. Report the scenario contract, what changed, and the verification evidence for each scenario.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
+    { id: "review", title: "Review the work", kind: "judge", agent: reviewer, prompt: reviewerPrompt(""), dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
+    ...(gate ? [{ id: "accept", title: "Accept the work", kind: "gate" as const, prompt: `Ultrawork for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review"], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
   ]
   const loop: DagLoop = {
     review: "review", fix: "work",
@@ -114,34 +114,34 @@ function hyperplan(input: DagTemplateInput): DagNodeDefinition[] {
   const attack = members.map((lane) => `attack-${short(lane)}`)
   const defend = members.map((lane) => `defend-${short(lane)}`)
   return [
-    ...members.map((lane, i) => ({ id: analyze[i], agent: lane, prompt: `Round 1 of an adversarial planning session. Independently analyse this planning request: constraints, risks, hidden assumptions, and the approach you would take. Do not write the plan. Be specific and cite evidence from the codebase where relevant.
+    ...members.map((lane, i) => ({ id: analyze[i], title: `Analyse (${short(lane)})`, agent: lane, prompt: `Round 1 of an adversarial planning session. Independently analyse this planning request: constraints, risks, hidden assumptions, and the approach you would take. Do not write the plan. Be specific and cite evidence from the codebase where relevant.
 
 REQUEST:
 ${input.task}`, dependsOn: [], maxAttempts: attempts })),
-    ...members.map((lane, i) => ({ id: attack[i], agent: lane, prompt: `Round 2. The other members' analyses are in <iolaus-dag-inputs>. Attack them ruthlessly: name every weak claim, missing risk, and unverified assumption, with the reason. Do not defend your own analysis here.
+    ...members.map((lane, i) => ({ id: attack[i], title: `Attack the others (${short(lane)})`, agent: lane, prompt: `Round 2. The other members' analyses are in <iolaus-dag-inputs>. Attack them ruthlessly: name every weak claim, missing risk, and unverified assumption, with the reason. Do not defend your own analysis here.
 
 REQUEST:
 ${input.task}`, dependsOn: analyze, inputs: [{ node: "*" }], maxAttempts: attempts })),
-    ...members.map((lane, i) => ({ id: defend[i], agent: lane, prompt: `Round 3. The attacks are in <iolaus-dag-inputs>. For each attack on your position: defend it with evidence, refine it, or concede. End with the claims you still stand behind.
+    ...members.map((lane, i) => ({ id: defend[i], title: `Defend the position (${short(lane)})`, agent: lane, prompt: `Round 3. The attacks are in <iolaus-dag-inputs>. For each attack on your position: defend it with evidence, refine it, or concede. End with the claims you still stand behind.
 
 REQUEST:
 ${input.task}`, dependsOn: attack, inputs: [{ node: "*" }], maxAttempts: attempts })),
-    { id: "distill", agent: "metis", prompt: `Distill the defended positions in <iolaus-dag-inputs> into a structured bundle for the planner: agreed facts, surviving risks, rejected approaches with reasons, open questions. Do not write the plan.
+    { id: "distill", title: "Distill the positions", agent: "metis", prompt: `Distill the defended positions in <iolaus-dag-inputs> into a structured bundle for the planner: agreed facts, surviving risks, rejected approaches with reasons, open questions. Do not write the plan.
 
 REQUEST:
 ${input.task}`, dependsOn: defend, inputs: [{ node: "*" }], maxAttempts: attempts },
-    { id: "plan", agent: "prometheus", prompt: `Write the work plan for this request into .iolaus/plans/ using the distilled bundle in <iolaus-dag-inputs>. You own sequencing, parallelisation and verification gates. Return the plan text in full.
+    { id: "plan", title: "Write the plan", agent: "prometheus", prompt: `Write the work plan for this request into .iolaus/plans/ using the distilled bundle in <iolaus-dag-inputs>. You own sequencing, parallelisation and verification gates. Return the plan text in full.
 ${PLAN_FORMAT}
 
 REQUEST:
 ${input.task}`, dependsOn: ["distill"], inputs: [{ node: "distill" }], maxAttempts: attempts },
-    { id: "review", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}
+    { id: "review", title: "Review the plan", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}
 
 A plan passes only if every step is verifiable, the surviving risks from the bundle are addressed, and the plan covers the whole request.
 
 REQUEST:
 ${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }, { node: "distill" }], maxAttempts: attempts },
-    ...(gate ? [{ id: "approve", kind: "gate" as const, prompt: `Hyperplan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept the plan or reject to stop.`, dependsOn: ["review"], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
+    ...(gate ? [{ id: "approve", title: "Approve the plan", kind: "gate" as const, prompt: `Hyperplan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept the plan or reject to stop.`, dependsOn: ["review"], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
   ]
 }
 

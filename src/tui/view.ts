@@ -39,6 +39,49 @@ export function statusColor(status: string, theme: DagTheme): RGBA {
   }
 }
 
+/** Running and paused runs still need attention; everything else is history. */
+export function isActiveRun(run: DagViewRun): boolean {
+  return run.status === "running" || run.status === "paused"
+}
+
+/** Active runs first (newest first), then at most `history` finished runs; `hidden` counts the rest. */
+export function partitionRuns(runs: readonly DagViewRun[], history = 3): { readonly active: DagViewRun[]; readonly finished: DagViewRun[]; readonly hidden: number } {
+  const active = runs.filter(isActiveRun)
+  const done = runs.filter((run) => !isActiveRun(run))
+  return { active, finished: done.slice(0, history), hidden: Math.max(0, done.length - history) }
+}
+
+/** A live clock only while the run is active; a finished run shows its fixed duration. */
+export function runClock(run: DagViewRun, now: number): string {
+  if (run.status === "running") return `running ${elapsed(run.createdAt, now) || "0s"}`
+  if (run.status === "paused") return `waiting ${elapsed(run.updatedAt, now) || "0s"}`
+  const duration = elapsed(run.createdAt, run.updatedAt) || "0s"
+  return `${run.status === "completed" ? "done" : run.status} in ${duration}`
+}
+
+/** Dashed rounded frame drawn around runs that are still in flight. */
+export const DASHED_BORDER = {
+  topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯", horizontal: "╌", vertical: "╎",
+  topT: "┬", bottomT: "┴", leftT: "├", rightT: "┤", cross: "┼",
+} as const
+
+const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+/** Glyph for a node; in-flight nodes animate with the frame counter. */
+export function liveGlyph(status: string, frame: number): string {
+  return status === "running" || status === "starting" ? SPINNER[frame % SPINNER.length] : statusGlyph(status)
+}
+
+/** What a run is doing right now, for the one-line status above the composer. */
+export function runActivity(run: DagViewRun): string {
+  const gates = run.nodes.filter((node) => node.status === "waiting_approval")
+  if (gates.length) return `awaiting approval: ${gates.map((node) => node.id).join(", ")}`
+  const live = run.nodes.filter((node) => node.status === "running" || node.status === "starting")
+  if (live.length === 1) return `${live[0].id}${live[0].title ? ` · ${live[0].title}` : ""}`
+  if (live.length) return live.map((node) => node.id).join(", ")
+  return "queued"
+}
+
 export function settledCount(run: DagViewRun): number {
   return run.nodes.filter((n) => n.status === "completed" || n.status === "reused" || n.status === "skipped").length
 }
@@ -71,7 +114,28 @@ export function depths(run: DagViewRun): Map<string, number> {
 /** Gates first (they need the user), then running, then the rest in graph order. */
 export function orderNodes(run: DagViewRun): DagViewNode[] {
   const rank = (n: DagViewNode) => n.status === "waiting_approval" ? 0 : n.status === "running" || n.status === "starting" ? 1 : 2
-  return [...run.nodes].sort((a, b) => rank(a) - rank(b))
+  return topologyNodes(run).sort((a, b) => rank(a) - rank(b))
+}
+
+/** Nodes grouped by dependency depth: every node in a wave can run once the waves above it settle. */
+export function waves(run: DagViewRun): DagViewNode[][] {
+  const levels = depths(run)
+  const grouped: DagViewNode[][] = []
+  for (const node of run.nodes) (grouped[levels.get(node.id) ?? 0] ??= []).push(node)
+  return grouped.filter((wave) => wave !== undefined)
+}
+
+export function statusLabel(status: string): string {
+  switch (status) {
+    case "completed": return "Done"
+    case "reused": return "Reused"
+    case "running": return "Running"
+    case "starting": return "Starting"
+    case "ready": case "pending": return "Pending"
+    case "waiting_approval": return "Waiting approval"
+    case "needs_retry": return "Needs retry"
+    default: return status.charAt(0).toUpperCase() + status.slice(1).replaceAll("_", " ")
+  }
 }
 
 export function topologyNodes(run: DagViewRun): DagViewNode[] {

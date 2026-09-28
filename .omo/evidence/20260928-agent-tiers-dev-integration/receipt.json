@@ -1,0 +1,208 @@
+{
+  "verdict": "PASS",
+  "command": "node script/qa-roles.mjs /Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/agent-tier-boundaries/.omo/evidence/20260928-agent-tiers-dev-integration",
+  "version": "opencode v2.0.18",
+  "results": [
+    {
+      "name": "ultrawork from build switches the session to Sisyphus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hyperplan switches to Prometheus; planner writes the plan, is refused code edits and implementing runs, and its consult is read-only",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Atlas without a plan is read-only",
+      "verdict": "PASS"
+    },
+    {
+      "name": "native subagent calls appear as an observed DAG run: background, foreground, nested and a follow-up",
+      "verdict": "PASS"
+    },
+    {
+      "name": "other lanes may write plans",
+      "verdict": "PASS"
+    },
+    {
+      "name": "start-work with an unknown plan starts nothing",
+      "verdict": "PASS"
+    },
+    {
+      "name": "start-work switches to Atlas and runs each ticket in a fresh Atlas session, then both reviews and the accept gate",
+      "verdict": "PASS"
+    },
+    {
+      "name": "/goal switches to Hephaestus, keeps the session's non-GPT model, and loops until update_goal complete",
+      "verdict": "PASS"
+    },
+    {
+      "name": "a goal that makes no progress pauses after three idle turns",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: allowed",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: nested",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: nested same-primary DAG worker completes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-lower",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: DAG lower worker cannot launch a primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-prometheus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-prometheus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-atlas",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-atlas",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: model",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: judge",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: executor",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: reviewer",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: member",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-sisyphus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: lower",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: lower child cannot launch a primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: command",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: command-goal",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: child command cannot switch or start work",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: forge",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: forged ticket marker leaves Atlas read-only",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: real continuation rejects stored primary and supplied primary mismatch",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native lower to general cannot launder a primary DAG",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag lower to general cannot launder a primary DAG",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: Prometheus hyperplan runs planning nodes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: amendment cannot insert a forbidden primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cleanup",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mock protocol",
+      "verdict": "PASS"
+    }
+  ],
+  "requestCount": 139,
+  "before": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "7cac76b8d1b441a7fa11867a0d7427eebb179d05fc340fba500bedb0e82b3bdc",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2"
+    },
+    "sessions": {
+      "session": "2709",
+      "session_v2": "2560"
+    }
+  },
+  "after": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "7cac76b8d1b441a7fa11867a0d7427eebb179d05fc340fba500bedb0e82b3bdc",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2"
+    },
+    "sessions": {
+      "session": "2709",
+      "session_v2": "2560"
+    }
+  },
+  "sandboxRemoved": true,
+  "serverExit": {
+    "code": 130,
+    "signal": null
+  },
+  "mockClosed": true
+}

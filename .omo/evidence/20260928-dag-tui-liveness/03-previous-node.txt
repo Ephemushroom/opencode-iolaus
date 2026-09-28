@@ -1,0 +1,45 @@
+ ⠇ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    DAG details · 395a934b                                                                                   Esc close
+                       ⏸ plan-review: IOLAUS_TUI_TASK
+     ✓ iolaus_dag [act Paused · Done 4/6 [████████░░░░] · gen 1 · waiting 4s
+
+     ✓ iolaus_dag [act                                           │ Revise the plan            │
+                                                                 ╰────────────────────────────╯
+     ✓ iolaus_dag [act                                                         │
+                                                                               ▼                                                          al ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     ✓ iolaus_dag [act                                           ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                           IOLAUS_TUI_TASK  ╎
+                                                                 ┃ › rereview ⚖               ┃                                           4/6 · gen 1 ·    ╎
+                                                                 ┃ ✓ Done                     ┃                                                            ╎
+                                                                 ┃ Re-review the revised plan ┃                                         █ oval             ╎
+                                                                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                         █                  ╎
+                                                                               │                                                        █  plan            ╎
+                                                                               ▼                                                        █                  ╎
+                                                                 ╭────────────────────────────╮                                         █ lan              ╎
+                                                                 │   approve ⏸                │                                         █                  ╎
+                                                                 │ ⏸ Waiting approval         │                                           plan             ╎
+                                                                 │ Approve the plan           │                                                            ╎
+                                                                 ╰────────────────────────────╯                                           plan             ╎
+                                                                                                                                                           ╎
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮ he revised plan  ╎
+                       │ ✓ rereview · Re-review the revised plan                                                                        │                  ╎
+                       │ Status: Done · judge                                                                                           │  approved plan   ╎
+                       │ Agent: momus · Model: openai/gpt-5.5 · Attempt: 1                                                              │ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                       │ Depends on: revise                                                                                             │
+                       │ Unblocks: approve                                                                                              │  · ctrl+x d
+                       │                                                                                                                │
+                       │ Result                                                                                                         │
+                       │ Looks right.                                                                                                   │
+                       │ VERDICT: PASS                                                                                                  │
+                       │ [Cancel run]                                                                                                   │
+                       ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+    ⏸ DAG plan-review:
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-ZjxHNB/project
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · PgUp/PgDn details · Esc close
+   ■■■■■⬝⬝⬝ esc interr                                                                                                                    iting approval
+

@@ -1,0 +1,121 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.0.18",
+  "continuation": {
+    "callers": {
+      "stored": {
+        "id": "ses_f17e3a3cbffeTckuMCJc0iJi9z",
+        "agent": "metis"
+      },
+      "supplied": {
+        "id": "ses_f17e3a2c5ffe6ZH3PmQYD5P6Yy",
+        "agent": "metis"
+      }
+    },
+    "calls": {
+      "stored": {
+        "name": "subagent",
+        "args": {
+          "agent": "quick",
+          "sessionID": "ses_f17e3a3d4ffezLE2C6IfbhijqJ",
+          "description": "mismatched continuation",
+          "prompt": "TIER_FORBIDDEN_WORK"
+        }
+      },
+      "supplied": {
+        "name": "subagent",
+        "args": {
+          "agent": "sisyphus",
+          "sessionID": "ses_f17e3a3d1ffeJDbQbZeNw8t7uZ",
+          "description": "mismatched continuation",
+          "prompt": "TIER_FORBIDDEN_WORK"
+        }
+      }
+    },
+    "targets": [
+      {
+        "id": "ses_f17e3a3d4ffezLE2C6IfbhijqJ",
+        "agent": "sisyphus"
+      },
+      {
+        "id": "ses_f17e3a3d1ffeJDbQbZeNw8t7uZ",
+        "agent": "quick"
+      }
+    ],
+    "outputs": {
+      "stored": "{\"error\":{\"type\":\"unknown\",\"message\":\"[iolaus tier] Agent tier boundary: metis cannot delegate to primary sisyphus\"},\"content\":[]}",
+      "supplied": "{\"error\":{\"type\":\"unknown\",\"message\":\"[iolaus tier] Agent tier boundary: metis cannot delegate to primary sisyphus\"},\"content\":[]}"
+    },
+    "targetRequestsBefore": {
+      "ses_f17e3a3d4ffezLE2C6IfbhijqJ": 0,
+      "ses_f17e3a3d1ffeJDbQbZeNw8t7uZ": 0
+    },
+    "targetRequestsAfter": {
+      "ses_f17e3a3d4ffezLE2C6IfbhijqJ": 0,
+      "ses_f17e3a3d1ffeJDbQbZeNw8t7uZ": 0
+    }
+  },
+  "bridges": {
+    "native": {
+      "sessions": [
+        {
+          "id": "ses_f17e3a1b2ffeqsplzc50NNz590",
+          "agent": "sisyphus"
+        },
+        {
+          "id": "ses_f17e3a18bffdBfqlqvFkIF0Dd2",
+          "agent": "metis",
+          "parentID": "ses_f17e3a1b2ffeqsplzc50NNz590"
+        },
+        {
+          "id": "ses_f17e3a174ffexP6JuRwIesmRVK",
+          "agent": "general",
+          "parentID": "ses_f17e3a18bffdBfqlqvFkIF0Dd2"
+        }
+      ],
+      "output": "{\"error\":\"Agent tier boundary: general cannot delegate to primary sisyphus\"}",
+      "forbiddenModelRequests": 0,
+      "nodeReady": []
+    },
+    "dag": {
+      "sessions": [
+        {
+          "id": "ses_f17e3a0a6ffe61h1T982043Nva",
+          "agent": "sisyphus"
+        },
+        {
+          "id": "ses_f17e3a078ffeChmmxpkOw3qJ6G",
+          "agent": "metis",
+          "metadata": {
+            "iolaus_dag_node": "work",
+            "iolaus_dag_attempt": 1,
+            "iolaus_dag_run": "b132854c-9fce-4a79-aae0-13202e135502"
+          }
+        },
+        {
+          "id": "ses_f17e3a05effeWUgbSF3UZbhYxP",
+          "agent": "general",
+          "parentID": "ses_f17e3a078ffeChmmxpkOw3qJ6G",
+          "metadata": {
+            "iolaus_dag_node": "work",
+            "iolaus_dag_attempt": 1,
+            "iolaus_dag_run": "b132854c-9fce-4a79-aae0-13202e135502"
+          }
+        }
+      ],
+      "output": "{\"error\":\"Agent tier boundary: general cannot delegate to primary sisyphus\"}",
+      "forbiddenModelRequests": 0,
+      "nodeReady": [
+        {
+          "event": "iolaus.dag.node.ready",
+          "runID": "b132854c-9fce-4a79-aae0-13202e135502",
+          "generation": 1,
+          "nodeID": "work",
+          "sequence": 2
+        }
+      ]
+    }
+  },
+  "hostStateIsolated": true,
+  "sandboxRemoved": true
+}
