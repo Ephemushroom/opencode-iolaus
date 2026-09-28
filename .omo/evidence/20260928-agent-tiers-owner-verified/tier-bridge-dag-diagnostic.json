@@ -1,0 +1,38 @@
+{
+  "sessions": [
+    {
+      "id": "ses_f17ee8e92ffeV0HCto9ZMACHlc",
+      "agent": "sisyphus"
+    },
+    {
+      "id": "ses_f17ee8e6fffej9f8kTCjjh4Jku",
+      "agent": "metis",
+      "metadata": {
+        "iolaus_dag_node": "work",
+        "iolaus_dag_attempt": 1,
+        "iolaus_dag_run": "62a468e7-3d65-4d44-908d-b604a237688d"
+      }
+    },
+    {
+      "id": "ses_f17ee8e55ffe5CTdNhR3k5KANx",
+      "agent": "general",
+      "parentID": "ses_f17ee8e6fffej9f8kTCjjh4Jku",
+      "metadata": {
+        "iolaus_dag_node": "work",
+        "iolaus_dag_attempt": 1,
+        "iolaus_dag_run": "62a468e7-3d65-4d44-908d-b604a237688d"
+      }
+    }
+  ],
+  "output": "{\"error\":\"Agent tier boundary: general cannot delegate to primary sisyphus\"}",
+  "forbiddenModelRequests": 0,
+  "nodeReady": [
+    {
+      "event": "iolaus.dag.node.ready",
+      "runID": "62a468e7-3d65-4d44-908d-b604a237688d",
+      "generation": 1,
+      "nodeID": "work",
+      "sequence": 2
+    }
+  ]
+}

@@ -18,15 +18,13 @@ export const PLAN_FORMAT = `Iolaus plan format (checked by the plugin before /st
 - <plan> is lowercase letters, digits, ".", "_" or "-".`
 
 /**
- * Prompt markers the plugin reads back in the prompt hook. A session whose prompt
- * carries the planning marker is read-only; one that carries a ticket marker for a
- * valid plan may run Atlas. Markers are trusted only for what they unlock: a valid
- * plan still has to exist on disk.
+ * Planning markers only restrict child sessions. A ticket marker identifies a
+ * plan for the worker; ticket authority comes from the /start-work run and host
+ * session ancestry, never from prompt text.
  */
 export const PLANNING_MARKER = "<iolaus-planning>"
 export const PLANNING_NOTICE = `${PLANNING_MARKER}
 This session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement.`
-export const TICKET_MARKER = /<iolaus-plan-ticket plan="([a-z0-9][a-z0-9._-]{0,63})"/
 
 export function ticketMarker(plan: string, ticket: string): string {
   return `<iolaus-plan-ticket plan="${plan}" ticket="${ticket}">`

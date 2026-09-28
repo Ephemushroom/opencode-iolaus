@@ -194,8 +194,8 @@ export function buildNonClaudePlannerSection(model: string): string {
   return `### Iolaus DAG Planning (Non-Claude)
 
 For multi-step work, create an \`iolaus_dag\` graph before implementation. Use
-explicit dependencies for execution nodes and \`sisyphus\` or
-\`hephaestus\` for implementation; Prometheus planning and Atlas plan
+explicit dependencies for execution nodes and use only your own primary
+as an internal worker, or a lower-tier agent. Prometheus planning and Atlas plan
 execution belong to the user's /hyperplan and /start-work. Read the
 graph snapshot and wait for the node result before reporting completion.`
 }

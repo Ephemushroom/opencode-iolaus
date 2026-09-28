@@ -1,0 +1,54 @@
+{
+  "callers": {
+    "stored": {
+      "id": "ses_f17ee91a9ffeLMTzBUyYNgHAqL",
+      "agent": "metis"
+    },
+    "supplied": {
+      "id": "ses_f17ee90a3ffevi8DQPiEaCwNbq",
+      "agent": "metis"
+    }
+  },
+  "calls": {
+    "stored": {
+      "name": "subagent",
+      "args": {
+        "agent": "quick",
+        "sessionID": "ses_f17ee91b3ffewFVZ96wOuXQ0VT",
+        "description": "mismatched continuation",
+        "prompt": "TIER_FORBIDDEN_WORK"
+      }
+    },
+    "supplied": {
+      "name": "subagent",
+      "args": {
+        "agent": "sisyphus",
+        "sessionID": "ses_f17ee91aeffemRn8RWv4IocR3O",
+        "description": "mismatched continuation",
+        "prompt": "TIER_FORBIDDEN_WORK"
+      }
+    }
+  },
+  "targets": [
+    {
+      "id": "ses_f17ee91b3ffewFVZ96wOuXQ0VT",
+      "agent": "sisyphus"
+    },
+    {
+      "id": "ses_f17ee91aeffemRn8RWv4IocR3O",
+      "agent": "quick"
+    }
+  ],
+  "outputs": {
+    "stored": "{\"error\":{\"type\":\"unknown\",\"message\":\"[iolaus tier] Agent tier boundary: metis cannot delegate to primary sisyphus\"},\"content\":[]}",
+    "supplied": "{\"error\":{\"type\":\"unknown\",\"message\":\"[iolaus tier] Agent tier boundary: metis cannot delegate to primary sisyphus\"},\"content\":[]}"
+  },
+  "targetRequestsBefore": {
+    "ses_f17ee91b3ffewFVZ96wOuXQ0VT": 0,
+    "ses_f17ee91aeffemRn8RWv4IocR3O": 0
+  },
+  "targetRequestsAfter": {
+    "ses_f17ee91b3ffewFVZ96wOuXQ0VT": 0,
+    "ses_f17ee91aeffemRn8RWv4IocR3O": 0
+  }
+}

@@ -12,13 +12,16 @@ import { agentName, categoryName } from "../prompts/catalog"
 import { COMMAND_OWNERS, commandMarker, parseCommand } from "./command"
 import { createGoalRuntime, createGoalTools, extendGoal, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
 import { denial, inheritPlanning, resolvePolicy, type RoleRecord } from "./guard"
-import { loadPlan, PLANNING_MARKER, resolvePlan, TICKET_MARKER } from "./plan"
+import { loadPlan, PLANNING_MARKER, resolvePlan } from "./plan"
 import { compilePlan, gitHead } from "./startwork"
+import { isTopLevel, subagentTargets, tierDenial, type TierSource } from "./tier"
+import { DagValidationError } from "../dag/errors"
 
 type Trace = (event: string, data?: Record<string, unknown>) => void
 
 export interface RoleHost {
   readonly controller: DagController
+  readonly source: (sessionID: string) => Effect.Effect<TierSource, DagValidationError>
   /** Where plans are read: the session's directory. */
   readonly directory: (sessionID: string) => Effect.Effect<string>
   /** Where role and goal state live: the plugin location, like DAG state. */
@@ -56,7 +59,7 @@ export function isGoalSessionInfo(session: SessionInfo): boolean {
 
 /**
  * Wires the role policy into the host: the prompt hook switches a command's session
- * to its owning agent, records planning and ticket roles, starts /start-work runs and
+ * to its owning agent only at the top level, records planning and trusted ticket roles, starts /start-work runs and
  * sets Hephaestus goals; the tool hook enforces the policy before every tool call;
  * the event stream drives the goal loop.
  */
@@ -73,19 +76,20 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
     yield* ctx.session.hook("prompt", (event) => Effect.gen(function* () {
       const text = event.prompt.text ?? ""
       const sessionID = String(event.sessionID)
-      if (text.includes(PLANNING_MARKER)) {
+      const session = yield* sessionInfo(sessionID)
+      if (!session) return
+      if (text.includes(PLANNING_MARKER) && !isTopLevel(session)) {
         saveRole(state, sessionID, { role: "planning" })
         trace("iolaus.role.recorded", { sessionID, role: "planning" })
       }
-      const ticket = text.match(TICKET_MARKER)?.[1]
+      const ticket = String(session.agent ?? "") === "atlas" && !isTopLevel(session)
+        ? (yield* host.source(sessionID).pipe(Effect.catch(() => Effect.succeed(undefined))))?.atlasPlan : undefined
       if (ticket) {
         saveRole(state, sessionID, { role: "ticket", plan: ticket })
         trace("iolaus.role.recorded", { sessionID, role: "ticket", plan: ticket })
       }
       // DAG workers and planning consults carry markers of their own; their text is never a user command.
-      if (ticket || text.includes(PLANNING_MARKER) || text.includes(DAG_CHILD_MARKER)) return
-      const session = yield* sessionInfo(sessionID)
-      if (!session) return
+      if (!isTopLevel(session) || ticket || text.includes(PLANNING_MARKER) || text.includes(DAG_CHILD_MARKER)) return
       let agent = String(session.agent ?? "")
       const command = parseCommand(text)
       const owner = command && command.name in COMMAND_OWNERS ? COMMAND_OWNERS[command.name as keyof typeof COMMAND_OWNERS] : undefined
@@ -103,7 +107,7 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
           trace("iolaus.startwork.rejected", { sessionID, errors: result.errors })
           return
         }
-        const created = yield* Effect.exit(host.controller.create(compilePlan(result.plan, gitHead(directory)), sessionID))
+        const created = yield* Effect.exit(host.controller.create(compilePlan(result.plan, gitHead(directory)), sessionID, result.plan.slug))
         if (Exit.isFailure(created)) {
           const message = Cause.squash(created.cause) instanceof Error ? (Cause.squash(created.cause) as Error).message : "the run could not be created"
           event.prompt.text = `${commandMarker("start-work")}\n/start-work did not start: ${message}. Tell the user; do not implement anything.`
@@ -141,9 +145,21 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
       runtime.toolCalled(sessionID)
       const agent = String(event.agent)
       const role = readRole(state, sessionID)
+      if (event.tool === "subagent") {
+        const input = event.input as { agent?: unknown; sessionID?: unknown }
+        const targets = yield* subagentTargets(input, (id) => ctx.session.get({ sessionID: id as never }).pipe(
+          Effect.map((session) => session as SessionInfo), Effect.mapError(() => new DagValidationError("Subagent continuation target is unavailable")))).pipe(
+          Effect.catch(() => Effect.fail(new Tool.Error({ message: "[iolaus tier] Subagent continuation target is unavailable" }))))
+        const caller = yield* host.source(sessionID).pipe(Effect.catch(() => Effect.fail(new Tool.Error({ message: "[iolaus tier] Caller ancestry is unavailable" }))))
+        if (targets.every((target) => !target) && !caller.native) return yield* Effect.fail(new Tool.Error({ message: "[iolaus tier] Subagent target agent is required" }))
+        const reason = targets.map((target) => tierDenial(caller, target)).find(Boolean)
+        if (reason) return yield* Effect.fail(new Tool.Error({ message: `[iolaus tier] ${reason}` }))
+      }
       if (role?.role !== "planning" && !agentName(agent) && !categoryName(agent)) return
       const directory = yield* host.directory(sessionID)
-      const policy = resolvePolicy(agent, role, role?.role === "ticket" && role.plan !== undefined && loadPlan(directory, role.plan).ok)
+      const ticket = role?.role === "ticket" && role.plan !== undefined
+        && (yield* host.source(sessionID).pipe(Effect.map((source) => source.atlasPlan === role.plan), Effect.catch(() => Effect.succeed(false))))
+      const policy = resolvePolicy(agent, role, Boolean(ticket) && role?.plan !== undefined && loadPlan(directory, role.plan).ok)
       const reason = denial(policy, event.tool, event.input, directory)
       if (reason) {
         trace("iolaus.role.blocked", { sessionID, agent, policy, tool: event.tool })

@@ -129,7 +129,29 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   Iolaus Agent IDs: `sisyphus`, `hephaestus`, `prometheus`,
   `atlas`, the specialists, or a category lane named after the category
   (`quick`, `deep-low`, `deep-high`, `ultrabrain`, `visual-engineering`,
-  `artistry`, `writing`, `unspecified-low`, `unspecified-high`).
+  `artistry`, `writing`, `unspecified-low`, `unspecified-high`), subject to the
+  tier rule below. OpenCode 2.0.18 ignores `parentID` on session creation;
+  the runner stores the child execution ref before prompting it and records
+  metadata `iolaus_dag_node`, `iolaus_dag_attempt`, `iolaus_dag_run`.
+- Agent tiers (`src/roles/tier.ts`). Three top-level workflows, four primaries
+  (`PRIMARY_AGENTS`): Sisyphus, Hephaestus, Prometheus → Atlas. Every other
+  Iolaus agent and category lane is a shared lower worker. Rule: a primary may
+  target lower workers and its own primary (same-primary internal worker), never
+  another primary; a session with a lower or foreign-primary Iolaus ancestor may
+  target no primary; Atlas is a target only for a top-level Atlas `/start-work`
+  create (`authorizedPlan`) or an Atlas session descended from that run's Atlas
+  node. `tierSource` derives this from native host session ancestry (`parentID`)
+  and DAG metadata matched to a stored execution session ID and run owner, never
+  from prompt markers or models; sessions with
+  no Iolaus agent in their chain are `native` and unrestricted. One check,
+  `tierDenial`, gates both paths: the `execute.before` hook on `subagent` (a
+  `sessionID` follow-up checks the stored and supplied agents;
+  refusals are `[iolaus tier] ...`), and the controller's `admit` on the
+  expanded definition at create, amend, retry, loop growth and every launch
+  (owner drift after a gate fails the node; refused growth fails the run). Gates
+  are exempt; `judge` nodes are not. The DAG is scheduling, not privilege.
+  `/start-work` runs persist `authorizedPlan` and Atlas node fingerprints in
+  `dag_authorizations`; `checkAtlas` rejects amended Atlas nodes.
 - Every Iolaus Agent and category lane is registered with a pinned model. The
   model comes from `.iolaus/models.json` (user `~/.iolaus/`, then project
   directories outward-in, then plugin `models` option) or, when unconfigured,
@@ -156,19 +178,25 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   ends `VERDICT: FAIL` → `rereview` → `approve` gate → `execute` (default
   sisyphus). `goal-review`: `work` (default hephaestus) → `review`
   → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
-  and `maxAttempts` are overrides. The four primaries orchestrate through the
-  same tool, so templates are the shared shape, not agent-specific prompts.
+  and `maxAttempts` are overrides. Templates have no tier exemption: admission
+  checks the expanded nodes, overrides included. `ultrawork` fits Sisyphus,
+  `goal-review` Hephaestus, `hyperplan` Prometheus; `plan-review` mixes
+  Prometheus and Sisyphus, so every Iolaus primary is refused it.
 - `src/roles/` owns the four primaries' roles, enforced in code. `tool.hook("execute.before")`
   resolves a policy per call (`guard.ts`): Prometheus is `planner` (writes only
   `.iolaus/plans/`, `CONTEXT.md`, `CONTEXT-MAP.md`, `docs/adr/`; no shell; only the
   `hyperplan` template), a session a planner started is `planning` (same, plus no
   applied codemods; recorded from the `<iolaus-planning>` notice the guard appends
   to its subagent and DAG node prompts), Atlas is `atlas-unbound` (read only) until
-  `/start-work` makes it `atlas-orchestrator` (operates the run, changes nothing) or a
-  ticket marker for a plan that still validates makes it a `worker`; other Iolaus
+  `/start-work` makes it `atlas-orchestrator` (operates the run, changes nothing) or it
+  descends from an authorized `/start-work` Atlas node (`atlasPlan`) whose plan still
+  validates, which makes it a `worker`; the `<iolaus-plan-ticket>` marker is
+  informational only. Other Iolaus
   lanes are `worker` (unrestricted by role); host agents are untouched.
   Refusals are `Tool.Error`s prefixed `[iolaus <policy>]`. Session roles persist in
-  `<location>/.iolaus/roles/`. `session.hook("prompt")` switches a command's session
+  `<location>/.iolaus/roles/`. `session.hook("prompt")` acts on commands only in
+  top-level sessions (no `parentID`, no DAG node metadata); in a child, command text is
+  plain prompt text. It switches a command's session
   to its owner (`COMMAND_OWNERS`: ultrawork → sisyphus, hyperplan → prometheus,
   goal → hephaestus, start-work → atlas; the model is kept), validates and compiles
   `/start-work <plan>` (`plan.ts`, `startwork.ts`: one Atlas node per ticket in
