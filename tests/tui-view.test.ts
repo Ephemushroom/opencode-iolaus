@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runActivity, runClock, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runActivity, runClock, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -78,4 +78,9 @@ test("composer status names the gate, the running node, or the queue", () => {
   expect(runActivity(live)).toBe("plan · Write the plan")
   expect(runActivity({ ...live, nodes: [node("a", "running"), node("b", "starting")] })).toBe("a, b")
   expect(runActivity({ ...live, nodes: [node("a", "pending")] })).toBe("queued")
+})
+
+test("dialog waves group nodes by dependency depth and label statuses for people", () => {
+  expect(waves(run).map((wave) => wave.map((n) => n.id))).toEqual([["plan"], ["review"], ["revise", "approve"], ["execute"]])
+  expect(statusLabel("waiting_approval")).toBe("Waiting approval"); expect(statusLabel("completed")).toBe("Done"); expect(statusLabel("cancelled")).toBe("Cancelled")
 })

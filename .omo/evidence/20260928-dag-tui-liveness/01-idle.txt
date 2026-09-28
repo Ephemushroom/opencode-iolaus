@@ -22,11 +22,11 @@
 
 
                                            ┃
-                                           ┃  Ask anything… "Fix broken tests"
+                                           ┃  Ask anything… "Fix a TODO in the codebase"
                                            ┃
                                            ┃  Build · GPT-5.5 OpenAI
                                            ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-                                           /…/qc1d9…/T/iolaus-tui-qa-Tq7Puy/project  shift+tab agents  ctrl+p commands
+                                           /…/qc1d9…/T/iolaus-tui-qa-c76uAE/project  shift+tab agents  ctrl+p commands
 
 
 

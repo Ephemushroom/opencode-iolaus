@@ -6,11 +6,11 @@
                                                                                                                         15 tokens
      ✓ iolaus_dag [action=create]                                                                                       0% used
                                                                                                                         $0.00 spent
-     ✓ iolaus_dag [action=snapshot, run_id=75bfe148-9e58-4f3d-8211-bbb7ae662e81]
+     ✓ iolaus_dag [action=snapshot, run_id=37a0fe33-c3c2-4217-a5f6-de83fbe9e247]
                                                                                                                          Iolaus
-     ✓ iolaus_dag [action=snapshot, run_id=75bfe148-9e58-4f3d-8211-bbb7ae662e81]
+     ✓ iolaus_dag [action=snapshot, run_id=37a0fe33-c3c2-4217-a5f6-de83fbe9e247]
                                                                                                                          ╭╌ waiting approval ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-     ✓ iolaus_dag [action=snapshot, run_id=75bfe148-9e58-4f3d-8211-bbb7ae662e81]                                         ╎ ⏸ plan-review: IOLAUS_TUI_TASK  ╎
+     ✓ iolaus_dag [action=snapshot, run_id=37a0fe33-c3c2-4217-a5f6-de83fbe9e247]                                         ╎ ⏸ plan-review: IOLAUS_TUI_TASK  ╎
                                                                                                                          ╎ [████████░░░░] 4/6 · gen 1 ·    ╎
                                                                                                                          ╎ waiting 1s                      ╎
                                                                                                                          ╎ 1 awaiting approval             ╎
@@ -39,7 +39,7 @@
   ┃
   ┃  jkoar
   ┃
-  ┃  Build · GPT-5.5 OpenAI                                                                                             /…/qc1…/T/iolaus-tui-qa-Tq7Puy/project
+  ┃  Build · GPT-5.5 OpenAI                                                                                             /…/qc1…/T/iolaus-tui-qa-c76uAE/project
   ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
    ■■■■■■⬝⬝ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    DAG · 1 run · 1 waiting approval
 

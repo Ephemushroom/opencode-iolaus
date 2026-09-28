@@ -3,43 +3,43 @@
   ┃                                                                                                                     IOLAUS_TUI_QA_DONE
   ┃  Run a plan-review
   ┃
-                       DAG details                                                                                              Esc close
+                       DAG details · 37a0fe33                                                                                   Esc close
      ✓ iolaus_dag [act ⏸ plan-review: IOLAUS_TUI_TASK
-                       [████████░░░░] 4/6 · gen 1 · waiting 4s
+                       Paused · Done 4/6 [████████░░░░] · gen 1 · waiting 4s
      ✓ iolaus_dag [act
-                       NODES · dependency order          approve
-     ✓ iolaus_dag [act   ✓ plan                          Approve the plan
-                           ✓ review                      Status: waiting_approval · gate                                                  al ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
-     ✓ iolaus_dag [act       ✓ revise                    Agent: human                                                                     IOLAUS_TUI_TASK  ╎
-                               ✓ rereview                Model: none                                                                      4/6 · gen 1 ·    ╎
-                       ›         ⏸ approve               Attempt: 1                                                                                        ╎
-                                 · execute               Depends on: review, rereview                                                     oval             ╎
-                                                                                                                                                           ╎
-                                                         Approval request                                                                  plan            ╎
-                                                         Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject                    ╎
-                                                         to stop.                                                                         lan              ╎
-                                                         [Cancel run]                                                                                      ╎
-                                                                                                                                          plan             ╎
-                                                                                                                                                           ╎
-                                                                                                                                          plan             ╎
-                                                                                                                                                           ╎
-                                                                                                                                          he revised plan  ╎
-                                                                                                                                                           ╎
-                                                                                                                                           approved plan   ╎
-                                                                                                                                          ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
-
-                                                                                                                                           · ctrl+x d
-
-
-
-
-
-
-    ⏸ DAG plan-review:
-  ┃
+                           ╭────────────────────────────╮     █  Dependencies
+     ✓ iolaus_dag [act     │   plan                     │     █    plan → review
+                           │ ✓ Done                     │     █    review → revise                                                        al ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     ✓ iolaus_dag [act     │ Write the plan             │     █    revise → rereview                                                      IOLAUS_TUI_TASK  ╎
+                           ╰────────────────────────────╯     █    review → approve                                                       4/6 · gen 1 ·    ╎
+                                         │                    █    rereview → approve                                                                      ╎
+                                         ▼                    █    approve → execute                                                      oval             ╎
+                           ╭────────────────────────────╮     █                                                                                            ╎
+                           │   review ⚖                 │     █  Node details                                                              plan            ╎
+                           │ ✓ Done                     │     █  ╭─────────────────────────────────────────────────────────────────────╮                   ╎
+                           │ Review the plan            │     █  │ ⏸ approve · Approve the plan                                        │  lan              ╎
+                           ╰────────────────────────────╯     █  │ Status: Waiting approval · gate                                     │                   ╎
+                                         │                    █  │ Agent: human                                                        │  plan             ╎
+                                         ▼                    █  │ Model: none                                                         │                   ╎
+                           ╭────────────────────────────╮     █  │ Attempt: 1                                                          │  plan             ╎
+                           │   revise                   │     ▀  │ Depends on: review, rereview                                        │                   ╎
+                           │ ✓ Done                     │        │                                                                     │  he revised plan  ╎
+                           │ Revise the plan            │        │ Approval request                                                    │                   ╎
+                           ╰────────────────────────────╯        │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution│   approved plan   ╎
+                                         │                       │ or reject to stop.                                                  │  ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                         ▼                       │ [Cancel run]                                                        │
+                           ╭────────────────────────────╮        ╰─────────────────────────────────────────────────────────────────────╯   · ctrl+x d
+                           │   rereview ⚖               │
+                           │ ✓ Done                     │
+                           │ Re-review the revised plan │
+                           ╰────────────────────────────╯
+                                         │
+                                         ▼
+    ⏸ DAG plan-review:     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+  ┃                        ┃ › approve ⏸                ┃
   ┃
   ┃                    ↑/↓ j/k select · a approve · r reject · PgUp/PgDn details · Esc close
-  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-Tq7Puy/project
+  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-c76uAE/project
   ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-   ⬝⬝⬝■■■■■ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    DAG · 1 run · 1 waiting approval
+   ⬝⬝■■■■■■ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    DAG · 1 run · 1 waiting approval
 

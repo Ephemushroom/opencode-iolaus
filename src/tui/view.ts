@@ -117,6 +117,27 @@ export function orderNodes(run: DagViewRun): DagViewNode[] {
   return topologyNodes(run).sort((a, b) => rank(a) - rank(b))
 }
 
+/** Nodes grouped by dependency depth: every node in a wave can run once the waves above it settle. */
+export function waves(run: DagViewRun): DagViewNode[][] {
+  const levels = depths(run)
+  const grouped: DagViewNode[][] = []
+  for (const node of run.nodes) (grouped[levels.get(node.id) ?? 0] ??= []).push(node)
+  return grouped.filter((wave) => wave !== undefined)
+}
+
+export function statusLabel(status: string): string {
+  switch (status) {
+    case "completed": return "Done"
+    case "reused": return "Reused"
+    case "running": return "Running"
+    case "starting": return "Starting"
+    case "ready": case "pending": return "Pending"
+    case "waiting_approval": return "Waiting approval"
+    case "needs_retry": return "Needs retry"
+    default: return status.charAt(0).toUpperCase() + status.slice(1).replaceAll("_", " ")
+  }
+}
+
 export function topologyNodes(run: DagViewRun): DagViewNode[] {
   const levels = depths(run)
   return [...run.nodes].sort((a, b) => (levels.get(a.id) ?? 0) - (levels.get(b.id) ?? 0))
