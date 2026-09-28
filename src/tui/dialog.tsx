@@ -4,7 +4,7 @@ import type { BoxRenderable, ScrollBoxRenderable } from "@opentui/core"
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js"
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
-import { depths, elapsed, nodeResultText, progressBar, settledCount, statusColor, statusGlyph, topologyNodes } from "./view"
+import { liveGlyph, nodeResultText, progressBar, runClock, settledCount, statusColor, statusLabel, topologyNodes, waves } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
   trace("iolaus.tui.dialog.open", { sessionID, runID, nodeID })
@@ -17,30 +17,41 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   const { rpc, target, state, refresh, runs } = useDagData({ context, sessionID: props.sessionID })
   const run = createMemo(() => runs().find((run) => run.runID === props.runID))
   const nodes = createMemo(() => { const value = run(); return value ? topologyNodes(value) : [] })
-  const levels = createMemo(() => { const value = run(); return value ? depths(value) : new Map<string, number>() })
+  const layers = createMemo(() => { const value = run(); return value ? waves(value) : [] })
+  const downstream = (id: string) => nodes().filter((node) => node.dependsOn.includes(id)).map((node) => node.id)
   const [selected, setSelected] = createSignal(props.nodeID)
   const current = createMemo(() => nodes().find((node) => node.id === selected()))
   const [busy, setBusy] = createSignal<string>()
   const [focused, setFocused] = createSignal(false)
   const [width, setWidth] = createSignal(context.renderer.width)
   const [height, setHeight] = createSignal(context.renderer.height)
-  const now = useNow()
+  const now = useNow(200)
+  const frame = () => Math.floor(now() / 200)
   let panel: BoxRenderable | undefined
   let list: ScrollBoxRenderable | undefined
   let detail: ScrollBoxRenderable | undefined
   let alive = true
   const compact = () => width() < 110
-  const bodyHeight = () => Math.max(8, Math.min(30, height() - 12))
+  const bodyHeight = () => Math.max(12, height() - 12)
+  // The graph takes the top half; the selected node's details fill the rest.
+  const graphHeight = () => Math.max(6, Math.floor(bodyHeight() * 0.5))
   const close = () => context.ui.dialog.clear()
 
   createEffect(on(nodes, (items) => {
     if (items.some((node) => node.id === selected())) return
     setSelected((items.find((node) => node.status === "waiting_approval") ?? items.find((node) => node.status === "running" || node.status === "starting") ?? items[0])?.id)
   }))
-  createEffect(on(selected, (id) => {
-    if (id) list?.scrollChildIntoView(`dag-dialog-node-${id}`)
-    detail?.scrollTo(0)
+  // Scroll after the cards are laid out, including on first open. The wave count is a memo so a refresh that
+  // rebuilds the same graph does not cancel the pending scroll; the renderer is never idle while a spinner runs.
+  const waveCount = createMemo(() => layers().length)
+  createEffect(on([selected, waveCount], ([id]) => {
+    const timer = setTimeout(() => {
+      const wave = layers().findIndex((items) => items.some((node) => node.id === id))
+      if (wave >= 0) list?.scrollChildIntoView(`dag-dialog-wave-${wave}`)
+    }, 50)
+    onCleanup(() => clearTimeout(timer))
   }))
+  createEffect(on(selected, () => detail?.scrollTo(0)))
   onMount(() => {
     context.ui.dialog.set({ size: "xlarge", centered: true })
     panel?.focus()
@@ -103,41 +114,53 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       on:focused={() => setFocused(true)} on:blurred={() => setFocused(false)}
       onMouseDown={(event) => { if (event.button === 0) { panel?.focus(); event.preventDefault() } }}>
       <box flexDirection="row" justifyContent="space-between">
-        <text fg={theme().text.base} attributes={1}>DAG details</text>
+        <text fg={theme().text.base} attributes={1}>DAG details <span>· {props.runID.slice(0, 8)}</span></text>
         <text fg={theme().text.muted} onMouseUp={(event) => { if (event.button === 0) close() }}>Esc close</text>
       </box>
       <Show when={state().status === "loading"}><text fg={theme().text.muted}>Loading DAG...</text></Show>
       <Show when={state().status === "error"}><text fg={theme().text.feedback.error.base}>{state().error}</text></Show>
       <Show when={state().status === "ready" && !run()}><text fg={theme().text.muted}>This DAG is no longer available.</text></Show>
       <Show when={run()}>{(value) => <>
-        <text fg={statusColor(value().status, theme())}>{statusGlyph(value().status)} {value().name}</text>
-        <text fg={theme().text.muted}>{progressBar(settledCount(value()), value().nodes.length)} · {value().status} · gen {value().generation} · updated {elapsed(value().updatedAt, now())} ago</text>
-        <box flexDirection={compact() ? "column" : "row"} height={bodyHeight()} marginTop={1} gap={2}>
-          <scrollbox ref={(value) => { list = value }} width={compact() ? "100%" : "40%"} height={compact() ? "40%" : "100%"} scrollX={false} contentOptions={{ flexDirection: "column" }}>
-            <text fg={theme().text.muted}>NODES · dependency order</text>
-            <For each={nodes()}>{(node) => <box id={`dag-dialog-node-${node.id}`} flexDirection="column"
-              backgroundColor={selected() === node.id ? theme().background.action.primary.state({ selected: true }) : undefined}
-              onMouseDown={(event) => { if (event.button === 0) setSelected(node.id) }}>
-              <text fg={selected() === node.id ? theme().text.action.primary.state({ selected: true }) : statusColor(node.status, theme())} attributes={selected() === node.id ? 1 : 0}>
-                {selected() === node.id ? "›" : " "} {"  ".repeat(Math.min(levels().get(node.id) ?? 0, 4))}{statusGlyph(node.status)} {node.id}
-              </text>
+        <text fg={statusColor(value().status, theme())} attributes={1}>{liveGlyph(value().status, frame())} {value().name}</text>
+        <text fg={theme().text.muted}>{statusLabel(value().status)} · Done {settledCount(value())}/{value().nodes.length} {progressBar(settledCount(value()), value().nodes.length).split("]")[0]}] · gen {value().generation} · {runClock(value(), now())}</text>
+        <box flexDirection="column" height={bodyHeight()} marginTop={1} gap={1}>
+          <scrollbox ref={(value) => { list = value }} width="100%" height={graphHeight()} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+            <For each={layers()}>{(wave, index) => <box id={`dag-dialog-wave-${index()}`} flexDirection="column" alignItems="center">
+              <Show when={index() > 0}><text fg={theme().text.muted}>│</text><text fg={theme().text.muted}>▼</text></Show>
+              <box flexDirection="row" flexWrap="wrap" justifyContent="center" gap={1}>
+                <For each={wave}>{(node) => {
+                  const chosen = () => selected() === node.id
+                  const live = () => node.status === "running" || node.status === "starting"
+                  return <box id={`dag-dialog-node-${node.id}`} width={compact() ? 26 : 30} flexDirection="column" paddingLeft={1} paddingRight={1}
+                    border borderStyle={chosen() ? "heavy" : "rounded"}
+                    borderColor={chosen() ? theme().text.action.primary.base : live() ? statusColor(node.status, theme()) : theme().border.base}
+                    onMouseDown={(event) => { if (event.button === 0) setSelected(node.id) }}>
+                    <text wrapMode="none" truncate fg={chosen() ? theme().text.action.primary.base : theme().text.base} attributes={chosen() ? 1 : 0}>
+                      {chosen() ? "›" : " "} {node.id}{node.kind === "judge" ? " ⚖" : node.kind === "gate" ? " ⏸" : ""}
+                    </text>
+                    <text wrapMode="none" truncate fg={statusColor(node.status, theme())}>{liveGlyph(node.status, frame())} {statusLabel(node.status)}{node.attempt > 1 ? ` · attempt ${node.attempt}` : ""}</text>
+                    <text wrapMode="none" truncate fg={theme().text.muted}>{node.title ?? (node.dependsOn.length ? `← ${node.dependsOn.join(", ")}` : "Start node")}</text>
+                  </box>
+                }}</For>
+              </box>
+              <Show when={wave.length > 1}><text fg={theme().text.muted}>· {wave.length} in parallel</text></Show>
             </box>}</For>
           </scrollbox>
-          <scrollbox ref={(value) => { detail = value }} flexGrow={1} height={compact() ? "60%" : "100%"} scrollX={false} contentOptions={{ flexDirection: "column", paddingRight: 1 }}>
-            <Show when={current()}>{(node) => <>
-              <text fg={theme().text.base} attributes={1}>{node().id}</text>
-              <text fg={statusColor(node().status, theme())}>Status: {node().status} · {node().kind}</text>
-              <text fg={theme().text.base}>Agent: {node().agent || "human"}</text>
-              <text fg={theme().text.base}>Model: {node().model || "none"}</text>
-              <text fg={theme().text.base}>Attempt: {node().attempt}</text>
-              <text fg={theme().text.base}>Depends on: {node().dependsOn.join(", ") || "none (root)"}</text>
+          <scrollbox ref={(value) => { detail = value }} width="100%" flexGrow={1} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+            <Show when={current()}>{(node) => <box flexDirection="column" border borderStyle="rounded" borderColor={theme().text.action.primary.base} paddingLeft={1} paddingRight={1}
+              title={" Node details "} titleColor={theme().text.action.primary.base}>
+              <text fg={statusColor(node().status, theme())} attributes={1}>{liveGlyph(node().status, frame())} {node().id}{node().title ? ` · ${node().title}` : ""}</text>
+              <text fg={statusColor(node().status, theme())}>Status: {statusLabel(node().status)} · {node().kind}</text>
+              <text fg={theme().text.base}>Agent: {node().agent || "human"} · Model: {node().model || "none"} · Attempt: {node().attempt}</text>
+              <text fg={theme().text.base}>Depends on: {node().dependsOn.join(", ") || "none (start node)"}</text>
+              <text fg={theme().text.base}>Unblocks: {downstream(node().id).join(", ") || "none (final node)"}</text>
               <Show when={node().prompt}><text marginTop={1} fg={theme().text.action.primary.base}>Approval request</text><text fg={theme().text.base}>{node().prompt}</text></Show>
               <Show when={node().error}><text marginTop={1} fg={theme().text.feedback.error.base}>Error</text><text fg={theme().text.base}>{node().error}</text></Show>
-              <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>Result · snapshot excerpt</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
+              <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>Result</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
               <Show when={!node().result && !node().error && !node().prompt}><text marginTop={1} fg={theme().text.muted}>No result yet.</text></Show>
               <Show when={retryable()}><text marginTop={1} fg={theme().text.action.primary.base} onMouseUp={(event) => { if (event.button === 0) void decide("retry") }}>[Retry node]</text></Show>
               <Show when={cancellable()}><text fg={theme().text.feedback.error.base} onMouseUp={(event) => { if (event.button === 0) void decide("cancel") }}>[Cancel run]</text></Show>
-            </>}</Show>
+            </box>}</Show>
           </scrollbox>
         </box>
         <text marginTop={1} fg={theme().text.muted}>{busy() ? `${busy()}...` : `↑/↓ j/k select · ${hasSession() ? "Enter/o open · " : ""}${waiting() ? "a approve · r reject · " : ""}PgUp/PgDn details · Esc close`}</text>

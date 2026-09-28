@@ -19,6 +19,7 @@ export function validateDefinition(definition: DagDefinition): void {
   const nodes = new Map<string, DagNodeDefinition>()
   for (const node of definition.nodes) {
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")
+    if (node.title !== undefined && typeof node.title !== "string") throw new DagValidationError(`DAG node title must be a string: ${node.id}`)
     if (nodes.has(node.id)) throw new DagValidationError(`Duplicate DAG node: ${node.id}`)
     if (node.kind !== undefined && node.kind !== "agent" && node.kind !== "judge" && node.kind !== "gate") throw new DagValidationError(`Unsupported node kind: ${node.id}`)
     if (isGate(node)) {

@@ -72,6 +72,8 @@ export interface DagResolvedInput {
  */
 export interface DagNodeDefinition {
   readonly id: string
+  /** One-line summary of what the node does, shown next to its id in the TUI. Not part of the fingerprint. */
+  readonly title?: string
   readonly kind?: DagNodeKind
   readonly agent?: string
   readonly model?: string
