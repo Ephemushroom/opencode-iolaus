@@ -1,0 +1,45 @@
+ ⠦ IOLAUS_TUI_QA_DONE            +
+
+  ┃                                                                                                                     IOLAUS_TUI_QA_DONE
+  ┃  Run a plan-review
+  ┃
+                       DAG details                                                                                              Esc close
+     ✓ iolaus_dag [act ⏸ plan-review: IOLAUS_TUI_TASK
+                       [████████░░░░] 4/6 · gen 1 · waiting 2s
+     ✓ iolaus_dag [act
+                       NODES · dependency order          approve
+     ✓ iolaus_dag [act   ✓ plan                          Approve the plan
+                           ✓ review                      Status: waiting_approval · gate                                                  al ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     ✓ iolaus_dag [act       ✓ revise                    Agent: human                                                                     IOLAUS_TUI_TASK  ╎
+                               ✓ rereview                Model: none                                                                      4/6 · gen 1 ·    ╎
+                       ›         ⏸ approve               Attempt: 1                                                                                        ╎
+                                 · execute               Depends on: review, rereview                                                     oval             ╎
+                                                                                                                                                           ╎
+                                                         Approval request                                                                  plan            ╎
+                                                         Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject                    ╎
+                                                         to stop.                                                                         lan              ╎
+                                                         [Cancel run]                                                                                      ╎
+                                                                                                                                          plan             ╎
+                                                                                                                                                           ╎
+                                                                                                                                          plan             ╎
+                                                                                                                                                           ╎
+                                                                                                                                          he revised plan  ╎
+                                                                                                                                                           ╎
+                                                                                                                                           approved plan   ╎
+                                                                                                                                          ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+                                                                                                                                           · ctrl+x d
+
+
+
+
+
+
+
+  ┃
+  ┃  jkoar
+  ┃                    ↑/↓ j/k select · a approve · r reject · PgUp/PgDn details · Esc close
+  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-kyxSni/project
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    DAG · 1 run · 1 waiting approval
+

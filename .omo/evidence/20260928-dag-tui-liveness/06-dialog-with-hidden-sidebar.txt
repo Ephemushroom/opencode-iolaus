@@ -1,0 +1,45 @@
+   IOLAUS_TUI_QA_DONE              Iolaus DAG · execute          +
+
+  ┃
+
+
+  DAG details                                                                            Esc close
+  ✓ plan-review: IOLAUS_TUI_TASK
+  [████████████] 6/6 · gen 1 · done in 12s
+
+  NODES · dependency order
+  › ✓ plan
+      ✓ review
+        ✓ revise
+          ✓ rereview
+            ✓ approve
+            ✓ execute
+
+
+
+
+
+
+  plan
+  Write the plan
+  Status: completed · agent
+  Agent: prometheus
+  Model: openai/gpt-5.5
+  Attempt: 1
+  Depends on: none (root)
+
+  Result · snapshot excerpt
+  IOLAUS_TUI_PLAN_V1
+
+
+
+
+
+
+
+
+  ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/qc1d9pgd1hq599hhhw_z2l2w000…/T/iolaus-tui-qa-kyxSni/project  15 (0%) · $0.00  ctrl+p commands
+

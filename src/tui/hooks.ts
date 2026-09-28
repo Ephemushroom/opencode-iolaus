@@ -14,8 +14,19 @@ export function useDagData(props: { readonly sessionID: string; readonly context
   createEffect(on(target, () => { void refresh() }))
   onCleanup(() => query.dispose())
   onMount(() => {
+    // Events only reach this TUI from its own server; runs written by other processes sharing the store, or events
+    // dropped before the RPC existed, are picked up by polling. Active runs poll fast, idle views slowly.
+    let last = 0
+    const poll = setInterval(() => {
+      const interval = state().runs.some((run) => run.status === "running" || run.status === "paused") ? 3000 : 15000
+      if (Date.now() - last < interval) return
+      last = Date.now()
+      void refresh()
+    }, 1000)
+    onCleanup(() => clearInterval(poll))
     const off = rpc.events.on("updated", (event) => {
       if (!matchesDagEvent(target(), event)) return
+      last = Date.now()
       void refresh()
       if (notify && event.data.type === "node.waiting") {
         void context.attention.notify({ title: "Iolaus DAG", message: "A gate is waiting for your decision", notification: { when: "always" } })
@@ -27,10 +38,10 @@ export function useDagData(props: { readonly sessionID: string; readonly context
   return { rpc, target, state, refresh, runs: () => state().runs }
 }
 
-export function useNow() {
+export function useNow(interval = 1000) {
   const [now, setNow] = createSignal(Date.now())
   onMount(() => {
-    const tick = setInterval(() => setNow(Date.now()), 1000)
+    const tick = setInterval(() => setNow(Date.now()), interval)
     onCleanup(() => clearInterval(tick))
   })
   return now

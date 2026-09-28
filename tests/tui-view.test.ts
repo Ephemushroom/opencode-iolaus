@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, nodeResultText, orderNodes, progressBar, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runClock, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -9,7 +9,7 @@ const theme = { text: {
 } }
 const node = (id: string, status: string, dependsOn: string[] = [], extra: Partial<DagViewRun["nodes"][number]> = {}) =>
   ({ id, status, kind: "agent", agent: "sisyphus", model: "openai/gpt-5.5", attempt: 1, dependsOn, ...extra })
-const run: DagViewRun = { runID: "r1", name: "plan-review: task", generation: 2, status: "paused", updatedAt: 0, nodes: [
+const run: DagViewRun = { runID: "r1", name: "plan-review: task", generation: 2, status: "paused", createdAt: 0, updatedAt: 0, nodes: [
   node("plan", "completed"), node("review", "completed", ["plan"], { kind: "judge" }), node("revise", "skipped", ["review"]),
   node("approve", "waiting_approval", ["review", "rereview"], { kind: "gate", prompt: "Approve?" }), node("execute", "pending", ["approve"]),
 ] }
@@ -51,4 +51,23 @@ test("dialog result excerpts show plain text and preserve structured or truncate
   expect(nodeResultText('{"decision":"approved"}')).toBe('{"decision":"approved"}')
   expect(nodeResultText('{"text":"truncated')).toBe('{"text":"truncated')
   expect(nodeResultText("null")).toBe("null")
+})
+
+test("a finished run shows a fixed duration while an active run keeps a live clock", () => {
+  const done = { ...run, status: "completed", createdAt: 1_000, updatedAt: 101_000 }
+  expect(runClock(done, 200_000)).toBe("done in 1m 40s")
+  expect(runClock(done, 900_000)).toBe("done in 1m 40s")
+  expect(runClock({ ...done, status: "cancelled" }, 900_000)).toBe("cancelled in 1m 40s")
+  expect(runClock({ ...done, status: "running" }, 31_000)).toBe("running 30s")
+  expect(runClock({ ...done, status: "paused", updatedAt: 21_000 }, 31_000)).toBe("waiting 10s")
+})
+
+test("sidebar lists active runs first and keeps only recent history; running glyphs animate", () => {
+  const at = (runID: string, status: string) => ({ ...run, runID, status })
+  const groups = partitionRuns([at("f1", "failed"), at("r1", "running"), at("c1", "completed"), at("p1", "paused"), at("c2", "cancelled"), at("c3", "completed")], 2)
+  expect(groups.active.map((r) => r.runID)).toEqual(["r1", "p1"])
+  expect(groups.finished.map((r) => r.runID)).toEqual(["f1", "c1"])
+  expect(groups.hidden).toBe(2)
+  expect(liveGlyph("running", 0)).not.toBe(liveGlyph("running", 1))
+  expect(liveGlyph("completed", 3)).toBe(statusGlyph("completed"))
 })

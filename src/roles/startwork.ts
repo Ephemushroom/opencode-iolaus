@@ -32,6 +32,7 @@ export function compilePlan(plan: Plan, base?: string): DagDefinition {
   const diff = base ? `git diff ${base}` : "git diff HEAD (and git status for new files)"
   const tickets: DagNodeDefinition[] = plan.tickets.map((ticket) => ({
     id: ticketNode(ticket.id),
+    title: ticket.title,
     agent: "atlas",
     prompt: `${ticketMarker(plan.slug, ticket.id)}
 Implement ticket ${ticket.id} of the approved plan "${plan.slug}" in this session, and only that ticket.
@@ -50,16 +51,16 @@ Report the files you changed and, for every acceptance criterion in the ticket, 
     maxParallel: 1,
     nodes: [
       ...tickets,
-      { id: "review-standards", agent: "momus", dependsOn: all, inputs: [{ node: "*" }], maxAttempts: 2, prompt: `Review the implementation of plan "${plan.slug}" on the Standards axis only: does the code follow this repository's documented standards (AGENTS.md, CLAUDE.md, CONTRIBUTING.md and similar, where present)? Read the change with ${diff}. The ticket reports are in <iolaus-dag-inputs>.
+      { id: "review-standards", title: "Review against the standards", agent: "momus", dependsOn: all, inputs: [{ node: "*" }], maxAttempts: 2, prompt: `Review the implementation of plan "${plan.slug}" on the Standards axis only: does the code follow this repository's documented standards (AGENTS.md, CLAUDE.md, CONTRIBUTING.md and similar, where present)? Read the change with ${diff}. The ticket reports are in <iolaus-dag-inputs>.
 Report each violation with file, hunk and the rule it breaks; name baseline smells as judgement calls. Skip anything tooling already enforces. Do not judge whether the spec was met.
 ${SMELL_BASELINE}
 ${VERDICT}` },
-      { id: "review-spec", agent: "momus", dependsOn: all, inputs: [{ node: "*" }], maxAttempts: 2, prompt: `Review the implementation of plan "${plan.slug}" on the Spec axis only: does the change do what ${plan.spec} and the tickets (${plan.tickets.map((ticket) => ticket.path).join(", ")}) ask? Read the change with ${diff}. The ticket reports are in <iolaus-dag-inputs>.
+      { id: "review-spec", title: "Review against the spec", agent: "momus", dependsOn: all, inputs: [{ node: "*" }], maxAttempts: 2, prompt: `Review the implementation of plan "${plan.slug}" on the Spec axis only: does the change do what ${plan.spec} and the tickets (${plan.tickets.map((ticket) => ticket.path).join(", ")}) ask? Read the change with ${diff}. The ticket reports are in <iolaus-dag-inputs>.
 Report (a) requirements missing or partial, (b) behaviour that was not asked for, (c) requirements that look implemented but wrong, quoting the spec or ticket line for each. Do not judge code style.
 ${VERDICT}` },
-      { id: "fix", agent: "atlas", dependsOn: ["review-standards", "review-spec"], inputs: [{ node: "review-standards" }, { node: "review-spec" }], when: failed, maxAttempts: 2, prompt: `${ticketMarker(plan.slug, "review")}
+      { id: "fix", title: "Fix the review findings", agent: "atlas", dependsOn: ["review-standards", "review-spec"], inputs: [{ node: "review-standards" }, { node: "review-spec" }], when: failed, maxAttempts: 2, prompt: `${ticketMarker(plan.slug, "review")}
 The reviews of plan "${plan.slug}" are in <iolaus-dag-inputs>. Fix every finding marked as blocking, within the plan's scope (${plan.spec}), then re-run the affected tests and the full suite. Report each finding with what you changed and the evidence.` },
-      { id: "accept", kind: "gate", dependsOn: ["review-standards", "review-spec", "fix"], inputs: [{ node: "review-standards" }, { node: "review-spec" }, { node: "fix" }], prompt: `Plan "${plan.slug}" is implemented (${plan.tickets.length} tickets) and reviewed on the Standards and Spec axes. Approve to accept the work or reject to stop.` },
+      { id: "accept", title: "Accept the plan's work", kind: "gate", dependsOn: ["review-standards", "review-spec", "fix"], inputs: [{ node: "review-standards" }, { node: "review-spec" }, { node: "fix" }], prompt: `Plan "${plan.slug}" is implemented (${plan.tickets.length} tickets) and reviewed on the Standards and Spec axes. Approve to accept the work or reject to stop.` },
     ],
   }
 }

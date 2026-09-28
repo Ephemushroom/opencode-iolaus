@@ -237,7 +237,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const settle = (runID: string, nodeID: string, node: DagNodeRecord, outcome: Exit.Exit<{ ref: import("./types").DagExecutionRef; payload: JsonValue }, DagRunnerError>): Effect.Effect<void> =>
     locked(runID, Effect.sync(() => {
       const current = store.getRun(runID)
-      if (!current) return
+      // A cancelled run already settled its nodes; the interrupted child's late outcome must not reopen them.
+      if (!current || current.status === "cancelled") return
       if (Exit.isSuccess(outcome)) {
         const { ref, payload } = outcome.value
         const envelope: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: current.generation, attempt: node.attempt, status: "completed", payload, provenance: { parentNodeIDs: node.definition.dependsOn, execution: ref, agent: node.definition.agent ?? "", model: node.definition.model ?? "" }, createdAt: now() }
@@ -263,7 +264,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const ref = yield* runner.start({ node: node.definition, prompt: buildPrompt(node, run), attempt: node.attempt })
       yield* locked(runID, Effect.sync(() => {
         const current = store.getRun(runID)
-        if (!current) return
+        if (!current || current.status === "cancelled") return
         const updated = updateNode(current, nodeID, (value) => ({ ...value, status: "running", execution: ref, updatedAt: now() }))
         save(updated); event(updated, "node.started", nodeID)
       }))
@@ -352,7 +353,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       yield* checkGeneration(run, expectedGeneration)
       if (terminal(run.status)) return run
       const refs = run.nodes.filter((node) => node.execution && (node.status === "starting" || node.status === "running")).map((node) => node.execution!)
-      run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "needs_retry" || node.status === "waiting_approval" ? { ...node, status: "cancelled", updatedAt: now() } : node) }
+      run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "starting" || node.status === "running" || node.status === "needs_retry" || node.status === "waiting_approval" ? { ...node, status: "cancelled", updatedAt: now() } : node) }
       save(run); event(run, "run.cancelled")
       yield* Effect.forEach(refs, (ref) => Effect.ignore(runner.cancel(ref)), { discard: true })
       notify(run)
@@ -421,7 +422,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const at = now()
       const run = store.listRuns(input.ownerSessionID).find((candidate) => candidate.definition.observed)
       const nodeID = `${(run?.nodes.length ?? 0) + 1}-${slug(input.title)}`
-      const definition: DagNodeDefinition = { id: nodeID, agent: input.agent, ...(input.model ? { model: input.model } : {}), prompt: input.prompt, dependsOn: input.parentNodeID ? [input.parentNodeID] : [] }
+      const definition: DagNodeDefinition = { id: nodeID, title: input.title, agent: input.agent, ...(input.model ? { model: input.model } : {}), prompt: input.prompt, dependsOn: input.parentNodeID ? [input.parentNodeID] : [] }
       const record: DagNodeRecord = { definition, fingerprint: nodeFingerprint(definition), status: "running", attempt: 1, ...(input.sessionID ? { execution: { nodeID, attempt: 1, sessionID: input.sessionID } } : {}), createdAt: at, updatedAt: at }
       if (!run) {
         const created: DagDefinition = { schemaVersion: 1, name: "Subagent calls", observed: true, nodes: [definition] }

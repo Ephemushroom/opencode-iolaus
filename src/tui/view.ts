@@ -39,6 +39,39 @@ export function statusColor(status: string, theme: DagTheme): RGBA {
   }
 }
 
+/** Running and paused runs still need attention; everything else is history. */
+export function isActiveRun(run: DagViewRun): boolean {
+  return run.status === "running" || run.status === "paused"
+}
+
+/** Active runs first (newest first), then at most `history` finished runs; `hidden` counts the rest. */
+export function partitionRuns(runs: readonly DagViewRun[], history = 3): { readonly active: DagViewRun[]; readonly finished: DagViewRun[]; readonly hidden: number } {
+  const active = runs.filter(isActiveRun)
+  const done = runs.filter((run) => !isActiveRun(run))
+  return { active, finished: done.slice(0, history), hidden: Math.max(0, done.length - history) }
+}
+
+/** A live clock only while the run is active; a finished run shows its fixed duration. */
+export function runClock(run: DagViewRun, now: number): string {
+  if (run.status === "running") return `running ${elapsed(run.createdAt, now) || "0s"}`
+  if (run.status === "paused") return `waiting ${elapsed(run.updatedAt, now) || "0s"}`
+  const duration = elapsed(run.createdAt, run.updatedAt) || "0s"
+  return `${run.status === "completed" ? "done" : run.status} in ${duration}`
+}
+
+/** Dashed rounded frame drawn around runs that are still in flight. */
+export const DASHED_BORDER = {
+  topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯", horizontal: "╌", vertical: "╎",
+  topT: "┬", bottomT: "┴", leftT: "├", rightT: "┤", cross: "┼",
+} as const
+
+const SPINNER = ["⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"]
+
+/** Glyph for a node; in-flight nodes animate with the frame counter. */
+export function liveGlyph(status: string, frame: number): string {
+  return status === "running" || status === "starting" ? SPINNER[frame % SPINNER.length] : statusGlyph(status)
+}
+
 export function settledCount(run: DagViewRun): number {
   return run.nodes.filter((n) => n.status === "completed" || n.status === "reused" || n.status === "skipped").length
 }
@@ -71,7 +104,7 @@ export function depths(run: DagViewRun): Map<string, number> {
 /** Gates first (they need the user), then running, then the rest in graph order. */
 export function orderNodes(run: DagViewRun): DagViewNode[] {
   const rank = (n: DagViewNode) => n.status === "waiting_approval" ? 0 : n.status === "running" || n.status === "starting" ? 1 : 2
-  return [...run.nodes].sort((a, b) => rank(a) - rank(b))
+  return topologyNodes(run).sort((a, b) => rank(a) - rank(b))
 }
 
 export function topologyNodes(run: DagViewRun): DagViewNode[] {

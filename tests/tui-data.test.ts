@@ -4,7 +4,7 @@ import type { DagView } from "../src/dag/rpc"
 
 const a = { sessionID: "session-a", directory: "/project-a" }
 const b = { sessionID: "session-b", directory: "/project-b" }
-const view = (name: string): DagView => ({ runs: [{ runID: name, name, generation: 1, status: "running", updatedAt: 1, nodes: [] }] })
+const view = (name: string): DagView => ({ runs: [{ runID: name, name, generation: 1, status: "running", createdAt: 1, updatedAt: 1, nodes: [] }] })
 
 test("the viewed session location wins over plugin and server defaults without changing ownership", () => {
   const context = { location: { directory: "/plugin" }, data: {

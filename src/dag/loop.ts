@@ -47,8 +47,8 @@ export function growLoop(run: DagRunRecord, settled: string): DagDefinition | un
   const reviewer = run.definition.nodes.find((node) => node.id === loop.review)!
   const executor = run.definition.nodes.find((node) => node.id === loop.fix)!
   const previousWork = round === 1 ? loop.fix : `${loop.fix}${round - 1}`
-  const fix: DagNodeDefinition = { ...executor, id: fixID, prompt: loop.executorPrompt.replaceAll("{round}", String(round)), dependsOn: [settled], inputs: [{ node: previousWork }, { node: settled }], when: undefined }
-  const review: DagNodeDefinition = { ...reviewer, id: reviewID, prompt: loop.reviewerPrompt.replaceAll("{round}", String(round)), dependsOn: [fixID], inputs: [{ node: fixID }], when: undefined }
+  const fix: DagNodeDefinition = { ...executor, id: fixID, title: `Fix round ${round}`, prompt: loop.executorPrompt.replaceAll("{round}", String(round)), dependsOn: [settled], inputs: [{ node: previousWork }, { node: settled }], when: undefined }
+  const review: DagNodeDefinition = { ...reviewer, id: reviewID, title: `Review round ${round}`, prompt: loop.reviewerPrompt.replaceAll("{round}", String(round)), dependsOn: [fixID], inputs: [{ node: fixID }], when: undefined }
   const tail = new Set(loop.tail ?? [])
   const nodes = run.definition.nodes.map((node) => tail.has(node.id)
     ? { ...node, dependsOn: node.dependsOn.map((d) => d === settled ? reviewID : d), when: { node: reviewID, field: "text", includes: loop.passIncludes } }

@@ -4,14 +4,14 @@ import { z } from "zod"
 const id = z.string().min(1).max(256)
 const session = z.object({ sessionID: id }).strict()
 const node = z.object({
-  id, status: z.string(), kind: z.string(), agent: z.string(), model: z.string(), attempt: z.number(),
+  id, title: z.string().optional(), status: z.string(), kind: z.string(), agent: z.string(), model: z.string(), attempt: z.number(),
   dependsOn: z.array(z.string()), error: z.string().optional(), prompt: z.string().optional(),
   sessionID: z.string().optional(), result: z.string().optional(),
 })
 export const DagViewSchema = z.object({
   runs: z.array(z.object({
     runID: id, name: z.string(), generation: z.number(), status: z.string(),
-    updatedAt: z.number(), nodes: z.array(node),
+    createdAt: z.number(), updatedAt: z.number(), nodes: z.array(node),
   })),
 })
 export type DagView = z.infer<typeof DagViewSchema>

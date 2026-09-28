@@ -4,7 +4,7 @@ import type { BoxRenderable, ScrollBoxRenderable } from "@opentui/core"
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js"
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
-import { depths, elapsed, nodeResultText, progressBar, settledCount, statusColor, statusGlyph, topologyNodes } from "./view"
+import { depths, liveGlyph, nodeResultText, progressBar, runClock, settledCount, statusColor, topologyNodes } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
   trace("iolaus.tui.dialog.open", { sessionID, runID, nodeID })
@@ -24,7 +24,8 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   const [focused, setFocused] = createSignal(false)
   const [width, setWidth] = createSignal(context.renderer.width)
   const [height, setHeight] = createSignal(context.renderer.height)
-  const now = useNow()
+  const now = useNow(200)
+  const frame = () => Math.floor(now() / 200)
   let panel: BoxRenderable | undefined
   let list: ScrollBoxRenderable | undefined
   let detail: ScrollBoxRenderable | undefined
@@ -110,8 +111,8 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       <Show when={state().status === "error"}><text fg={theme().text.feedback.error.base}>{state().error}</text></Show>
       <Show when={state().status === "ready" && !run()}><text fg={theme().text.muted}>This DAG is no longer available.</text></Show>
       <Show when={run()}>{(value) => <>
-        <text fg={statusColor(value().status, theme())}>{statusGlyph(value().status)} {value().name}</text>
-        <text fg={theme().text.muted}>{progressBar(settledCount(value()), value().nodes.length)} · {value().status} · gen {value().generation} · updated {elapsed(value().updatedAt, now())} ago</text>
+        <text fg={statusColor(value().status, theme())}>{liveGlyph(value().status, frame())} {value().name}</text>
+        <text fg={theme().text.muted}>{progressBar(settledCount(value()), value().nodes.length)} · gen {value().generation} · {runClock(value(), now())}</text>
         <box flexDirection={compact() ? "column" : "row"} height={bodyHeight()} marginTop={1} gap={2}>
           <scrollbox ref={(value) => { list = value }} width={compact() ? "100%" : "40%"} height={compact() ? "40%" : "100%"} scrollX={false} contentOptions={{ flexDirection: "column" }}>
             <text fg={theme().text.muted}>NODES · dependency order</text>
@@ -119,13 +120,14 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               backgroundColor={selected() === node.id ? theme().background.action.primary.state({ selected: true }) : undefined}
               onMouseDown={(event) => { if (event.button === 0) setSelected(node.id) }}>
               <text fg={selected() === node.id ? theme().text.action.primary.state({ selected: true }) : statusColor(node.status, theme())} attributes={selected() === node.id ? 1 : 0}>
-                {selected() === node.id ? "›" : " "} {"  ".repeat(Math.min(levels().get(node.id) ?? 0, 4))}{statusGlyph(node.status)} {node.id}
+                {selected() === node.id ? "›" : " "} {"  ".repeat(Math.min(levels().get(node.id) ?? 0, 4))}{liveGlyph(node.status, frame())} {node.id}
               </text>
             </box>}</For>
           </scrollbox>
           <scrollbox ref={(value) => { detail = value }} flexGrow={1} height={compact() ? "60%" : "100%"} scrollX={false} contentOptions={{ flexDirection: "column", paddingRight: 1 }}>
             <Show when={current()}>{(node) => <>
               <text fg={theme().text.base} attributes={1}>{node().id}</text>
+              <Show when={node().title}><text fg={theme().text.muted}>{node().title}</text></Show>
               <text fg={statusColor(node().status, theme())}>Status: {node().status} · {node().kind}</text>
               <text fg={theme().text.base}>Agent: {node().agent || "human"}</text>
               <text fg={theme().text.base}>Model: {node().model || "none"}</text>
