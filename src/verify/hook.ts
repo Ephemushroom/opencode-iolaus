@@ -6,9 +6,7 @@ import { mutatedPaths, renderReport, verify } from "./run"
 export interface VerifyHost {
   readonly directory: (sessionID: string) => Promise<string>
   readonly trace?: (event: string, data: Record<string, unknown>) => void
-  readonly inline?: unknown
-  /** User-layer directory holding a fallback verify.json. */
-  readonly userLayer?: string
+  readonly config?: Record<string, unknown>
 }
 
 type AfterEvent = {
@@ -29,7 +27,7 @@ export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> },
     if (!MUTATION_TOOLS.has(e.tool) || e.status !== "completed") return
     try {
       const directory = await host.directory(e.sessionID)
-      const config = loadVerifyConfig(directory, host.inline, host.userLayer)
+      const config = loadVerifyConfig(directory, host.config)
       if (config.source === "disabled") return
       const paths = mutatedPaths(e.input, directory)
       if (!paths.length) {

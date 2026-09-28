@@ -47,19 +47,20 @@ test("comment scan flags request-explaining comments only", () => {
   rmSync(dir, { recursive: true, force: true })
 })
 
-test("config: detection, file, inline, disabled and validation", () => {
+test("config: detection, global section, disabled and validation", () => {
   const dir = project({ "tsconfig.json": "{}" })
   expect(detectCheckers(dir)[0]?.argv.slice(1)).toEqual(["--noEmit", "--pretty", "false"])
   expect(loadVerifyConfig(dir).source).toBe("detected")
   mkdirSync(join(dir, ".iolaus"))
-  writeFileSync(join(dir, ".iolaus", "verify.json"), JSON.stringify({ checkers: [{ argv: ["bun", "run", "lint"] }], timeoutMs: 5000 }))
-  const fromFile = loadVerifyConfig(dir)
+  writeFileSync(join(dir, ".iolaus", "verify.json"), JSON.stringify({ checkers: [{ argv: ["old-check"] }] }))
+  expect(loadVerifyConfig(dir).source).toBe("detected")
+  const fromFile = loadVerifyConfig(dir, { checkers: [{ argv: ["bun", "run", "lint"] }], timeoutMs: 5000 })
   expect(fromFile.source).toBe("config")
   expect(fromFile.checkers[0]).toEqual({ name: "bun", argv: ["bun", "run", "lint"] })
   expect(fromFile.timeoutMs).toBe(5000)
   expect(loadVerifyConfig(dir, { checkers: [], commentPattern: null }).source).toBe("disabled")
   expect(() => parseVerifyConfig({ checkers: [{ argv: [] }] })).toThrow(/argv/)
-  expect(() => parseVerifyConfig({ nope: 1 })).toThrow(/Unknown verify.json keys/)
+  expect(() => parseVerifyConfig({ nope: 1 })).toThrow(/Unknown verify keys/)
   expect(() => parseVerifyConfig({ commentPattern: "(" })).toThrow()
   rmSync(dir, { recursive: true, force: true })
 })
@@ -86,7 +87,7 @@ test("hook appends the report to completed mutations only", async () => {
   let handler: ((event: unknown) => Effect.Effect<void>) | undefined
   const traces: unknown[] = []
   await Effect.runPromise(Effect.scoped(registerVerifyHook({ tool: { hook: (_name: string, callback: unknown) => Effect.sync(() => { handler = callback as never; return { dispose: Effect.void } }) } } as never,
-    { directory: async () => dir, trace: (event, data) => traces.push({ event, ...data }), inline: { checkers: [] } })))
+    { directory: async () => dir, trace: (event, data) => traces.push({ event, ...data }), config: { checkers: [] } })))
   const event = { tool: "edit", status: "completed", sessionID: "ses_1", agent: "sisyphus", input: { filePath: "src/a.ts" }, result: { output: "ok", content: "Edited." } }
   await Effect.runPromise(handler!(event))
   expect(event.result.content).toContain("[iolaus verify] 1 issue")

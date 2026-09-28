@@ -1,12 +1,9 @@
-import { afterEach, expect, test } from "bun:test"
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
-import { tmpdir } from "node:os"
-import { join } from "node:path"
+import { expect, test } from "bun:test"
 import { Effect } from "effect"
 import { Agent, Model } from "@opencode/plugin"
 import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "@iolaus/model-core"
-import { firstChainChoice, loadModelsConfig, modelString, parseModelsConfig, resolveLane } from "../src/models"
+import { firstChainChoice, modelString, parseModelsConfig, resolveLane } from "../src/models"
 import { AGENT_NAMES, CATEGORY_NAMES, agentID, categoryID } from "../src/prompts/catalog"
 import { parseOptions } from "../src/options"
 import { categoryMarker, planRegistration, registerAgents } from "../src/registration"
@@ -14,9 +11,6 @@ import { renderCategory, bindNative } from "../src/prompts/render"
 import { buildSisyphusJuniorPrompt } from "../src/omo/agents"
 import { applyDefaultModels } from "../src/dag/controller"
 import { validateDefinition, DagValidationError } from "../src/dag/graph"
-
-let directory: string | undefined
-afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 
 test("every Iolaus agent and category lane has an upstream requirement table entry", () => {
   for (const name of AGENT_NAMES) expect(AGENT_MODEL_REQUIREMENTS[name]?.fallbackChain.length).toBeGreaterThan(0)
@@ -39,6 +33,7 @@ test("lanes follow the first chain entry without checking connectivity, and conf
   expect(resolveLane("oracle", config)).toEqual({ lane: "oracle", source: "config", model: "openai/gpt-5.5", variant: "high" })
   expect(resolveLane("sisyphus", config)).toEqual({ lane: "sisyphus", source: "config", model: "proxy-cc/claude-opus-5-5", variant: "max" })
   expect(resolveLane("quick", config)).toEqual({ lane: "quick", source: "config", model: "openai/gpt-5.5" })
+  expect(resolveLane("explore", parseModelsConfig({ agents: { explore: "ds-bryan/deepseek-v4-flash#max" } }))).toEqual({ lane: "explore", source: "config", model: "ds-bryan/deepseek-v4-flash", variant: "max" })
   expect(modelString({ model: "a/b", variant: "c" })).toBe("a/b#c")
   expect(modelString({ model: "a/b" })).toBe("a/b")
 })
@@ -58,24 +53,6 @@ test("models config rejects unknown lanes, malformed refs and unknown keys", () 
   expect(() => parseOptions({ categories: ["deep"] })).toThrow()
 })
 
-test("models config layers: user home, then project directories outward-in, then inline options", () => {
-  directory = mkdtempSync(join(tmpdir(), "iolaus-models-"))
-  const home = join(directory, "home"), repo = join(home, "work", "repo"), nested = join(repo, "pkg")
-  for (const dir of [join(home, ".iolaus"), join(repo, ".iolaus"), join(nested, ".iolaus")]) mkdirSync(dir, { recursive: true })
-  writeFileSync(join(home, ".iolaus", "models.json"), JSON.stringify({ agents: { oracle: "user/one", explore: "user/explore" }, categories: { quick: "user/quick" } }))
-  writeFileSync(join(repo, ".iolaus", "models.json"), JSON.stringify({ agents: { oracle: "repo/two" } }))
-  writeFileSync(join(nested, ".iolaus", "models.json"), JSON.stringify({ agents: { oracle: "nested/three" }, categories: { quick: "nested/quick#low" } }))
-  const loaded = loadModelsConfig(nested, { home, inline: { agents: { explore: "inline/explore" } } })
-  expect(loaded.diagnostics).toEqual([])
-  expect(loaded.sources).toEqual([join(home, ".iolaus", "models.json"), join(repo, ".iolaus", "models.json"), join(nested, ".iolaus", "models.json"), "plugin options"])
-  expect(loaded.config.agents).toEqual({ oracle: "nested/three", explore: "inline/explore" })
-  expect(loaded.config.categories).toEqual({ quick: "nested/quick#low" })
-  writeFileSync(join(repo, ".iolaus", "models.json"), "{ not json")
-  const broken = loadModelsConfig(nested, { home })
-  expect(broken.diagnostics).toHaveLength(1)
-  expect(broken.config.agents?.oracle).toBe("nested/three")
-})
-
 function registry() {
   const agents = new Map<string, ReturnType<AgentEditor["list"]>[number]>()
   for (const id of ["build", "plan"]) agents.set(id, Agent.Info.default(Agent.ID.make(id)))
@@ -89,9 +66,9 @@ function registry() {
 
 test("registration pins every agent and category lane from config and hides lanes with no model", async () => {
   const fixture = registry()
-  const plan = await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({ models: { agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } } }), parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high" }, categories: { writing: "proxy-cc/claude-opus-5-5" } }))))
+  const plan = await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high", explore: "ds-bryan/deepseek-v4-flash#max" }, categories: { writing: "proxy-cc/claude-opus-5-5" } }))))
   expect(fixture.agents.get(agentID("oracle"))?.model).toEqual(Model.Ref.parse("openai/gpt-5.5#high"))
-  expect(fixture.agents.get(agentID("explore"))?.model).toEqual(Model.Ref.parse("kimi-for-coding/kimi-for-coding-highspeed#off"))
+  expect(fixture.agents.get(agentID("explore"))?.model).toEqual(Model.Ref.parse("ds-bryan/deepseek-v4-flash#max"))
   expect(fixture.agents.get(agentID("hephaestus"))?.model).toEqual(Model.Ref.parse("openai/gpt-6-sol#medium"))
   for (const name of CATEGORY_NAMES) {
     const agent = fixture.agents.get(categoryID(name))

@@ -102,7 +102,7 @@ export function applyDefaultModels(definition: DagDefinition, defaultModel: DagC
     if (model === undefined) { missing.push(`${node.id} (${node.agent})`); return node }
     return { ...node, model }
   })
-  if (missing.length) throw new DagValidationError(`model_unavailable: no configured model for ${missing.join(", ")}; set model on the node or configure the lane in .iolaus/models.json`)
+  if (missing.length) throw new DagValidationError(`model_unavailable: no configured model for ${missing.join(", ")}; set model on the node or configure the lane in IOLAUS_HOME/iolaus.json`)
   return { ...definition, nodes }
 }
 

@@ -1,7 +1,6 @@
-import { existsSync, readFileSync } from "node:fs"
+import { existsSync } from "node:fs"
 import { join } from "node:path"
 
-export const VERIFY_CONFIG_FILE = "verify.json"
 export const MUTATION_TOOLS = new Set(["edit", "write", "patch", "apply_patch"])
 
 /** A checker: `argv` runs without a shell; stdout+stderr are scanned for `file:line` diagnostics. */
@@ -27,27 +26,19 @@ export const DEFAULT_TIMEOUT_MS = 120_000
 export const DEFAULT_COMMENT_PATTERN =
   String.raw`(?:^|\s)(?://|#|/\*|\*)\s*(?:[\w']+\s+){0,4}?(?:(?:(?:as\s+)?requested\s+by|as\s+requested|per)\s+(?:the\s+)?(?:ai|claude|gpt|copilot|assistant|user|request)|by\s+(?:the\s+)?(?:ai|claude|gpt|copilot|assistant))\b`
 
-function readJson(path: string): Record<string, unknown> | undefined {
-  if (!existsSync(path)) return undefined
-  try {
-    const value = JSON.parse(readFileSync(path, "utf8")) as unknown
-    return typeof value === "object" && value !== null ? (value as Record<string, unknown>) : undefined
-  } catch {
-    return undefined
-  }
-}
-
 function parseChecker(value: unknown, index: number): Checker {
-  if (typeof value !== "object" || value === null) throw new TypeError(`verify.json checkers[${index}] must be an object`)
+  if (typeof value !== "object" || value === null || Array.isArray(value)) throw new TypeError(`verify checkers[${index}] must be an object`)
   const record = value as Record<string, unknown>
+  const unknown = Object.keys(record).filter((key) => !["name", "argv", "extensions", "format"].includes(key))
+  if (unknown.length) throw new TypeError(`Unknown verify checkers[${index}] keys: ${unknown.join(", ")}`)
   if (!Array.isArray(record.argv) || !record.argv.length || record.argv.some((item) => typeof item !== "string")) {
-    throw new TypeError(`verify.json checkers[${index}].argv must be a non-empty string array`)
+    throw new TypeError(`verify checkers[${index}].argv must be a non-empty string array`)
   }
   if (record.extensions !== undefined && (!Array.isArray(record.extensions) || record.extensions.some((item) => typeof item !== "string"))) {
-    throw new TypeError(`verify.json checkers[${index}].extensions must be a string array`)
+    throw new TypeError(`verify checkers[${index}].extensions must be a string array`)
   }
   if (record.format !== undefined && record.format !== "location" && record.format !== "json") {
-    throw new TypeError(`verify.json checkers[${index}].format must be "location" or "json"`)
+    throw new TypeError(`verify checkers[${index}].format must be "location" or "json"`)
   }
   return {
     name: typeof record.name === "string" && record.name ? record.name : String(record.argv[0]),
@@ -59,13 +50,13 @@ function parseChecker(value: unknown, index: number): Checker {
 
 export function parseVerifyConfig(value: Record<string, unknown>): Omit<VerifyConfig, "source"> {
   const unknown = Object.keys(value).filter((key) => !["checkers", "timeoutMs", "commentPattern"].includes(key))
-  if (unknown.length) throw new TypeError(`Unknown verify.json keys: ${unknown.join(", ")}`)
-  if (value.checkers !== undefined && !Array.isArray(value.checkers)) throw new TypeError("verify.json checkers must be an array")
+  if (unknown.length) throw new TypeError(`Unknown verify keys: ${unknown.join(", ")}`)
+  if (value.checkers !== undefined && !Array.isArray(value.checkers)) throw new TypeError("verify checkers must be an array")
   if (value.timeoutMs !== undefined && (typeof value.timeoutMs !== "number" || value.timeoutMs < 1000)) {
-    throw new TypeError("verify.json timeoutMs must be a number >= 1000")
+    throw new TypeError("verify timeoutMs must be a number >= 1000")
   }
   if (value.commentPattern !== undefined && value.commentPattern !== null && typeof value.commentPattern !== "string") {
-    throw new TypeError("verify.json commentPattern must be a string or null")
+    throw new TypeError("verify commentPattern must be a string or null")
   }
   if (typeof value.commentPattern === "string") new RegExp(value.commentPattern)
   return {
@@ -100,18 +91,11 @@ export function detectCheckers(directory: string): Checker[] {
 }
 
 /**
- * `.iolaus/verify.json` in the session directory wins, then the user layer's
- * `verify.json`; `{ "checkers": [] }` turns
- * the checkers off while keeping the comment check, `false`-like disabling is
- * `{ "checkers": [], "commentPattern": null }`.
+ * An explicit global verify section suppresses checker detection.
  */
-export function loadVerifyConfig(directory: string, inline?: unknown, userLayer?: string): VerifyConfig {
-  const file = readJson(join(directory, ".iolaus", VERIFY_CONFIG_FILE)) ?? (userLayer ? readJson(join(userLayer, VERIFY_CONFIG_FILE)) : undefined)
-  const record = inline !== undefined
-    ? (typeof inline === "object" && inline !== null ? (inline as Record<string, unknown>) : undefined)
-    : file
-  if (record) {
-    const parsed = parseVerifyConfig(record)
+export function loadVerifyConfig(directory: string, config?: Record<string, unknown>): VerifyConfig {
+  if (config) {
+    const parsed = parseVerifyConfig(config)
     const disabled = parsed.checkers.length === 0 && parsed.commentPattern === null
     return { ...parsed, source: disabled ? "disabled" : "config" }
   }

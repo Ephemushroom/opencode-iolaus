@@ -22,9 +22,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `oracle`, `quick`, `deep-high`) with title-cased display names; the only host agent Iolaus replaces is `explore`
   (registration resets its rules and marks it `iolaus.agent.replaced`). Any other id that already exists is left alone.
   Commands are `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`; the old `/iolaus-*` forms are not recognised.
-- Iolaus config has two layers (`src/home.ts`). User layer `IOLAUS_HOME` (default `~/.iolaus`): `models.json`,
-  `verify.json`. Project layer `<project>/.iolaus`: `dag/`, `plans/` and overrides of the same files. Project wins.
-  `provisionHome` creates missing directories at setup and never overwrites; every rendered prompt ends with
+- Iolaus reads config only from `IOLAUS_HOME/iolaus.json` (default `~/.iolaus/iolaus.json`).
+  Legacy user/project config files and inline plugin options do not override it. Project layer `<project>/.iolaus`
+  still owns `dag/` and `plans/`; DAG storage remains project-local.
+  `provisionHome` creates missing directories and a missing global config at setup and never overwrites; every rendered prompt ends with
   `<iolaus-home>` naming both paths. Iolaus owns no skills directory and no memory store: skill discovery is the
   host's (`~/.agent/skills`, global skills) and cross-session memory is the user's memory plugin's (claude-mem); the
   contract says so. Never modify the host's global session/config stores outside an isolated QA sandbox.
@@ -111,10 +112,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - `src/verify/` hooks `tool.hook("execute.after")` for `edit`, `write` and
   `patch`. After a completed mutation it runs the project's checkers on the
   changed files and appends only their diagnostics, plus request-narrating
-  comments, to the tool result. Checkers come from `.iolaus/verify.json`
-  (`checkers[].argv` run via execFile, no shell; `timeoutMs`; `commentPattern`
-  or `null`), from the plugin `verify` option as an inline object, or, when
-  neither exists, from marker files: `tsconfig.json` → `tsc --noEmit`,
+  comments, to the tool result. Checkers come from the global `iolaus.json` `verify`
+  section (`checkers[].argv` run via execFile, no shell; `timeoutMs`; `commentPattern`
+  or `null`), or, when absent, from project marker files: `tsconfig.json` → `tsc --noEmit`,
   `biome.json` → `biome lint --reporter=github` (else an eslint config →
   `eslint --format unix`), `pyproject.toml`/`ruff.toml` → `ruff check
   --output-format concise --no-fix`, `Cargo.toml` → `cargo check
@@ -153,8 +153,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `/start-work` runs persist `authorizedPlan` and Atlas node fingerprints in
   `dag_authorizations`; `checkAtlas` rejects amended Atlas nodes.
 - Every Iolaus Agent and category lane is registered with a pinned model. The
-  model comes from `.iolaus/models.json` (user `~/.iolaus/`, then project
-  directories outward-in, then plugin `models` option) or, when unconfigured,
+  model comes from global `IOLAUS_HOME/iolaus.json` `models` or, when unconfigured,
   the first entry of the OMO requirement chain. Iolaus does not check provider
   connectivity or subscription; a lane whose config and chain both name no
   model is not registered. A DAG node may omit `model` to run on its lane's

@@ -1,0 +1,26 @@
+[
+  {
+    "name": "explore uses only global model and variant, project DAG remains local",
+    "verdict": "PASS"
+  },
+  {
+    "name": "invalid-json rejects plugin setup without fallback",
+    "verdict": "PASS"
+  },
+  {
+    "name": "invalid-model rejects plugin setup without fallback",
+    "verdict": "PASS"
+  },
+  {
+    "name": "invalid-verify rejects plugin setup without fallback",
+    "verdict": "PASS"
+  },
+  {
+    "name": "host state isolation",
+    "verdict": "PASS"
+  },
+  {
+    "name": "process, mock and sandbox cleanup",
+    "verdict": "PASS"
+  }
+]

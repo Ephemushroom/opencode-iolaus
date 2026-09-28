@@ -23,18 +23,20 @@ For the live DAG sidebar, add the TUI entry alongside the main plugin:
 }
 ```
 
-Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in the plugin object to disable it for a location.
+Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in `IOLAUS_HOME/iolaus.json` to disable it globally.
 
-Model routing follows configuration only. Write `.iolaus/models.json` in your home directory or in a project directory (project layers override user layers) to pin models per lane:
+Model routing follows configuration only. Write `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) to pin models per lane:
 
 ```json
 {
-  "agents": { "oracle": "openai/gpt-5.6-sol#xhigh", "sisyphus": { "model": "anthropic/claude-opus-5-5", "variant": "max" } },
-  "categories": { "quick": "openai/gpt-6-luna-fast#low", "writing": "anthropic/claude-fable-5-1" }
+  "models": {
+    "agents": { "oracle": "openai/gpt-5.6-sol#xhigh", "sisyphus": { "model": "anthropic/claude-opus-5-5", "variant": "max" } },
+    "categories": { "quick": "openai/gpt-6-luna-fast#low", "writing": "anthropic/claude-fable-5-1" }
+  }
 }
 ```
 
-The same object may be passed as the plugin `models` option. Lanes you do not configure use the first entry of OMO's requirement chain; a lane with no model at all is not registered. Use `agents` / `categories` options to select which lanes register.
+Plugin options and legacy `models.json` files are ignored. Lanes you do not configure use the first entry of OMO's requirement chain; a lane with no model at all is not registered. Use top-level `agents` / `categories` in the global file to select which lanes register.
 
 ## Three workflows
 
@@ -76,7 +78,7 @@ completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
 is available through the `opencode-iolaus/tui` entry. Every Iolaus Agent and
 category lane (`quick`, `deep-low`, `deep-high`, ...) runs on a
-pinned model taken from `.iolaus/models.json` or, unconfigured, from OMO's
+pinned model taken from `IOLAUS_HOME/iolaus.json` or, unconfigured, from OMO's
 requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
@@ -92,15 +94,15 @@ Templates get no exemption from the delegation rule: the expanded definition, wi
 
 `/ultrawork <task>` and `/hyperplan <request>` now run as DAGs. Ultrawork loops work → review → fix → re-review until Momus passes the work, growing the graph one round at a time up to `iterations` (default three), then pauses at a gate for you. Reviews are judge nodes: a single model call on Momus's lane, no child session. Hyperplan runs four category lanes through independent analysis, cross-attack and defence in parallel, has Metis distill the surviving positions, Prometheus write the plan and Momus review it. Both are also available as templates (`"template": "ultrawork"` with `iterations`, `"template": "hyperplan"` with `members`). `/team` is unchanged.
 
-When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or `{ "astGrep": false }` to turn the tools off.
+When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or set `{ "astGrep": false }` in the global `iolaus.json` to turn the tools off.
 
-Iolaus also registers two remote MCP servers from upstream OMO: `context7` (official library documentation, `https://mcp.context7.com/mcp`; set `CONTEXT7_API_KEY` for higher rate limits) and `grep_app` (regex code search across public GitHub repositories, `https://mcp.grep.app`, no account). Queries sent to those tools leave your machine. Their tools appear in Code Mode as `tools.context7[...]` and `tools.grep_app.searchGitHub`, and read-only specialists such as the librarian may call them. A server you define yourself under the same name is left untouched. Pass `{ "mcps": [] }` to register neither, or `{ "mcps": ["context7"] }` to pick one.
+Iolaus also registers two remote MCP servers from upstream OMO: `context7` (official library documentation, `https://mcp.context7.com/mcp`; set `CONTEXT7_API_KEY` for higher rate limits) and `grep_app` (regex code search across public GitHub repositories, `https://mcp.grep.app`, no account). Queries sent to those tools leave your machine. Their tools appear in Code Mode as `tools.context7[...]` and `tools.grep_app.searchGitHub`, and read-only specialists such as the librarian may call them. A server you define yourself under the same name is left untouched. Set `{ "mcps": [] }` in the global `iolaus.json` to register neither, or `{ "mcps": ["context7"] }` to pick one.
 
-After every `edit`, `write` or `patch`, Iolaus verifies the changed files and appends the findings to the tool result the agent sees: type or lint errors located in those files, and comments that narrate the request instead of the code ("as requested by the user"). Without configuration, checkers are detected from marker files: `tsc` for `tsconfig.json`, `biome lint` or `eslint` for their configs, `ruff check` for Python projects, `cargo check` for `Cargo.toml`, `go vet` for `go.mod`; every detected command is read-only. Checkers that print JSON can declare `"format": "json"`. Put `.iolaus/verify.json` in the project to choose checkers, for example `{ "checkers": [{ "name": "biome", "argv": ["bunx", "biome", "check", "."], "extensions": [".ts", ".tsx"] }], "timeoutMs": 60000 }`. Commands run without a shell. Set the plugin option `"verify": false` to turn it off.
+After every `edit`, `write` or `patch`, Iolaus verifies the changed files and appends the findings to the tool result the agent sees: type or lint errors located in those files, and comments that narrate the request instead of the code ("as requested by the user"). Without configuration, checkers are detected from marker files: `tsc` for `tsconfig.json`, `biome lint` or `eslint` for their configs, `ruff check` for Python projects, `cargo check` for `Cargo.toml`, `go vet` for `go.mod`; every detected command is read-only. Checkers that print JSON can declare `"format": "json"`. Put a `"verify"` section in `IOLAUS_HOME/iolaus.json` to choose checkers, for example `{ "verify": { "checkers": [{ "name": "biome", "argv": ["bunx", "biome", "check", "."], "extensions": [".ts", ".tsx"] }], "timeoutMs": 60000 } }`. Commands run without a shell. Set global `"verify": false` to turn it off.
 
-If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh` namespace in Code Mode: `tools.gh.searchCode`, `searchRepos`, `repo`, `issues`, `issue`, `prs`, `pr`, `prDiff`, and `clone` (shallow, into a temporary directory) followed by `log`, `blame` and `show` on the clone. Calls run the `gh` binary directly with fixed arguments; there is no shell and no `gh api`, so nothing can write to GitHub. Set `"gh": false` to leave it out.
+If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh` namespace in Code Mode: `tools.gh.searchCode`, `searchRepos`, `repo`, `issues`, `issue`, `prs`, `pr`, `prDiff`, and `clone` (shallow, into a temporary directory) followed by `log`, `blame` and `show` on the clone. Calls run the `gh` binary directly with fixed arguments; there is no shell and no `gh api`, so nothing can write to GitHub. Set `"gh": false` in the global `iolaus.json` to leave it out.
 
-Iolaus keeps configuration in two layers. `~/.iolaus` (or `IOLAUS_HOME`) is shared across projects: `models.json` and `verify.json`. `<project>/.iolaus` holds DAG state and plans and overrides the shared files. Both are created on first run; existing files are never touched. Skills and memory are not Iolaus features: the host discovers skills, and your memory plugin keeps memory.
+Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for settings, models and verification. It provisions `{}` if missing and never overwrites an existing file; malformed or unknown settings reject plugin setup. `<project>/.iolaus` still holds project-local DAG state and plans, not configuration overrides. Skills and memory are not Iolaus features: the host discovers skills, and your memory plugin keeps memory.
 
 ## Development
 

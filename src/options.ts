@@ -10,12 +10,10 @@ export interface Options {
   astGrep: boolean
   /** Built-in remote MCP servers to register unless the user already defines the same name. `[]` disables them. */
   mcps: McpName[]
-  /** Post-edit verification: `false` disables; an object is an inline `.iolaus/verify.json`. */
+  /** Post-edit verification: `false` disables; an object configures checkers. */
   verify: boolean | Record<string, unknown>
   /** Register the read-only `gh` Code Mode tools when an authenticated gh CLI is available. */
   gh: boolean
-  /** Inline models config, merged after `.iolaus/models.json` layers. */
-  models?: unknown
 }
 
 function selection<T extends string>(value: unknown, allowed: readonly T[], name: string): T[] {
@@ -50,6 +48,5 @@ export function parseOptions(input: Record<string, unknown>): Options {
     gh: input.gh !== false,
     mcps: selection(input.mcps, MCP_NAMES, "mcps"),
     verify: input.verify === undefined ? true : (input.verify as boolean | Record<string, unknown>),
-    ...(input.models === undefined ? {} : { models: input.models }),
   }
 }
