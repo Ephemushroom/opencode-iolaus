@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runClock, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runActivity, runClock, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -70,4 +70,12 @@ test("sidebar lists active runs first and keeps only recent history; running gly
   expect(groups.hidden).toBe(2)
   expect(liveGlyph("running", 0)).not.toBe(liveGlyph("running", 1))
   expect(liveGlyph("completed", 3)).toBe(statusGlyph("completed"))
+})
+
+test("composer status names the gate, the running node, or the queue", () => {
+  expect(runActivity(run)).toBe("awaiting approval: approve")
+  const live = { ...run, status: "running", nodes: [node("plan", "running", [], { title: "Write the plan" }), node("review", "pending", ["plan"])] }
+  expect(runActivity(live)).toBe("plan · Write the plan")
+  expect(runActivity({ ...live, nodes: [node("a", "running"), node("b", "starting")] })).toBe("a, b")
+  expect(runActivity({ ...live, nodes: [node("a", "pending")] })).toBe("queued")
 })

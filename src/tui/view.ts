@@ -72,6 +72,16 @@ export function liveGlyph(status: string, frame: number): string {
   return status === "running" || status === "starting" ? SPINNER[frame % SPINNER.length] : statusGlyph(status)
 }
 
+/** What a run is doing right now, for the one-line status above the composer. */
+export function runActivity(run: DagViewRun): string {
+  const gates = run.nodes.filter((node) => node.status === "waiting_approval")
+  if (gates.length) return `awaiting approval: ${gates.map((node) => node.id).join(", ")}`
+  const live = run.nodes.filter((node) => node.status === "running" || node.status === "starting")
+  if (live.length === 1) return `${live[0].id}${live[0].title ? ` · ${live[0].title}` : ""}`
+  if (live.length) return live.map((node) => node.id).join(", ")
+  return "queued"
+}
+
 export function settledCount(run: DagViewRun): number {
   return run.nodes.filter((n) => n.status === "completed" || n.status === "reused" || n.status === "skipped").length
 }

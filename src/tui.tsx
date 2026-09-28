@@ -6,7 +6,7 @@ import { IOLAUS_DAG_RPC } from "./dag/rpc"
 import { dagTarget } from "./tui/data"
 import { openDagDialog } from "./tui/dialog"
 import { useDagData, useNow } from "./tui/hooks"
-import { DASHED_BORDER, liveGlyph, orderNodes, partitionRuns, progressBar, runClock, settledCount, statusColor, statusGlyph, summarize, type DagViewRun } from "./tui/view"
+import { DASHED_BORDER, isActiveRun, liveGlyph, orderNodes, partitionRuns, progressBar, runActivity, runClock, settledCount, statusColor, statusGlyph, summarize, type DagViewRun } from "./tui/view"
 
 function RunNodes(props: { readonly run: DagViewRun; readonly frame: number; readonly context: Context; readonly open: (runID: string, nodeID?: string) => void }) {
   const theme = () => props.context.theme
@@ -53,6 +53,23 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
   )
 }
 
+/** Live line above the composer: the transcript's iolaus_dag row is static while the tool waits. */
+function DagComposerStatus(props: { readonly sessionID: string; readonly context: Context }) {
+  const { context } = props
+  const theme = () => context.theme
+  const { runs } = useDagData(props)
+  const now = useNow(200)
+  const active = createMemo(() => runs().filter(isActiveRun))
+  return <Show when={active().length > 0}>
+    <box flexDirection="column" paddingLeft={2} paddingRight={2}>
+      <For each={active()}>{(run) => <text wrapMode="none" truncate fg={statusColor(run.status, theme())}
+        onMouseUp={(event) => { if (event.button === 0) openDagDialog(context, props.sessionID, run.runID) }}>
+        {liveGlyph(run.status, Math.floor(now() / 200))} DAG {run.name} · {settledCount(run)}/{run.nodes.length} · {runActivity(run)} · {runClock(run, now())}
+      </text>}</For>
+    </box>
+  </Show>
+}
+
 function DagFooter(props: { readonly sessionID: string; readonly context: Context }) {
   const theme = () => props.context.theme
   const { runs, state } = useDagData(props)
@@ -93,6 +110,7 @@ export default Plugin.define({
     const unregisterLauncher = context.ui.slot({ append: "app", render: () => <DagLauncher context={context} /> })
     const unregisterSidebar = context.ui.slot({ append: "sidebar.content", render: (props) => <DagSidebar sessionID={props.sessionID} context={context} /> })
     const unregisterFooter = context.ui.slot({ append: "sidebar.footer", render: (props) => <DagFooter sessionID={props.sessionID} context={context} /> })
-    return () => { unregisterLauncher(); unregisterSidebar(); unregisterFooter(); trace("iolaus.tui.closed") }
+    const unregisterStatus = context.ui.slot({ append: "session.composer.top", render: (props) => <DagComposerStatus sessionID={props.sessionID} context={context} /> })
+    return () => { unregisterLauncher(); unregisterSidebar(); unregisterFooter(); unregisterStatus(); trace("iolaus.tui.closed") }
   },
 })

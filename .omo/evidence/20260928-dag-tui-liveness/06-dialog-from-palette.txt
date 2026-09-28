@@ -39,7 +39,7 @@
   ┃
   ┃  jkoar
   ┃                    ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
-  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-kyxSni/project
+  ┃  Build · GPT-5.5 O                                                                                                                    ui-qa-Tq7Puy/project
   ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
-  /…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-kyxSni/project   15 (0%) · $0.00  ctrl+p commands    DAG · 1 run
+  /…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-Tq7Puy/project   15 (0%) · $0.00  ctrl+p commands    DAG · 1 run
 

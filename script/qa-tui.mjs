@@ -263,6 +263,8 @@ assert.match(strip(screens.running), /DAG · 1 run/, "footer summary missing on 
 assert.match(strip(screens.running), /[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] plan/, "running plan node not rendered with the spinner")
 assert.match(strip(screens.running), /╭╌* running ╌*╮/, "running run is not framed by the dashed border")
 assert.match(strip(screens.running), /running \d+s/, "running run has no live clock")
+assert.match(strip(screens.running), /[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] DAG plan-review: IOLAUS_TUI_TASK · \d+\/6 · (plan|review)/, "composer status line missing while the run is active")
+assert.match(strip(screens.gate), /⏸ DAG plan-review: IOLAUS_TUI_TASK · \d+\/6 · awaiting approval: approve/, "composer status must switch to the waiting gate")
 assert.match(strip(screens.running), /Write the plan/, "node summary line missing")
 assert.match(strip(screens.running), /\[[█░]+\] \d+\/\d+/, "progress bar missing")
 assert.match(strip(screens.gate), /⏸ approve/, "waiting gate not rendered")
@@ -280,6 +282,7 @@ const finishedClock = (screen) => strip(screen).match(/done in [0-9hms ]+/)?.[0]
 assert.ok(finishedClock(screens.returned), "completed run must show a fixed duration")
 assert.equal(finishedClock(screens.returnedLater), finishedClock(screens.returned), "completed run clock kept ticking")
 assert.doesNotMatch(strip(screens.returned), /╌/, "completed run must not keep the running frame")
+assert.doesNotMatch(strip(screens.returned), /DAG plan-review: IOLAUS_TUI_TASK ·/, "composer status must disappear once the run finishes")
 assert.match(strip(screens.returned), /Recent/, "completed run must move to the history list")
 const colors = []
 for (const [file, label, expectedMode] of [["02-running.ansi", "Iolaus", mode], ["05-opened-child.ansi", "No active DAG runs", mode], ["05-theme-switched.ansi", "No active DAG runs", mode === "light" ? "dark" : "light"]]) {
