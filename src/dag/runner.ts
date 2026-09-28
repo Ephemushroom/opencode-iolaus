@@ -9,6 +9,7 @@ export interface DagExecutionResult {
 }
 
 export interface DagRunnerStart {
+  readonly runID?: string
   readonly node: DagNodeDefinition
   readonly prompt: string
   readonly attempt: number
@@ -72,6 +73,7 @@ const JUDGE_REF = "judge:"
  */
 export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly generate: GenerateApi; readonly location: { readonly directory: string } }): DagRunner {
   const judgeReplies = new Map<string, string>()
+  const pendingPrompts = new Map<string, string>()
   return {
     start: (input) => Effect.gen(function* () {
       if (input.node.kind === "judge") {
@@ -87,9 +89,9 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
         agent: Agent.ID.make(input.node.agent),
         ...(input.node.model === undefined ? {} : { model: Model.Ref.parse(input.node.model) }),
         location: { directory: ctx.location.directory as never },
-        metadata: { iolaus_dag_node: input.node.id, iolaus_dag_attempt: input.attempt },
+        metadata: { iolaus_dag_node: input.node.id, iolaus_dag_attempt: input.attempt, ...(input.runID ? { iolaus_dag_run: input.runID } : {}) },
       }).pipe(Effect.mapError(runnerError(input.node.id)))
-      yield* ctx.session.prompt({ sessionID: session.id, text: input.prompt, delivery: "queue" }).pipe(Effect.mapError(runnerError(input.node.id)))
+      pendingPrompts.set(String(session.id), input.prompt)
       return { nodeID: input.node.id, attempt: input.attempt, sessionID: String(session.id) }
     }),
     wait: (ref) => Effect.gen(function* () {
@@ -100,6 +102,11 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
         return { payload: { text } }
       }
       const sessionID = ref.sessionID as never
+      const prompt = pendingPrompts.get(ref.sessionID)
+      if (prompt !== undefined) {
+        pendingPrompts.delete(ref.sessionID)
+        yield* ctx.session.prompt({ sessionID, text: prompt, delivery: "queue" }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+      }
       yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
       const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
       const messages = yield* ctx.session.context({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
@@ -107,6 +114,10 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
       if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
       return { payload: { text: assistantText(messages as readonly unknown[]) } }
     }),
-    cancel: (ref) => ref.sessionID.startsWith(JUDGE_REF) ? Effect.sync(() => { judgeReplies.delete(ref.sessionID) }) : ctx.session.interrupt({ sessionID: ref.sessionID as never, resume: false }).pipe(Effect.asVoid, Effect.mapError(runnerError(ref.nodeID))),
+    cancel: (ref) => Effect.gen(function* () {
+      if (ref.sessionID.startsWith(JUDGE_REF)) { judgeReplies.delete(ref.sessionID); return }
+      pendingPrompts.delete(ref.sessionID)
+      yield* ctx.session.interrupt({ sessionID: ref.sessionID as never, resume: false }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+    }),
   }
 }

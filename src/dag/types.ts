@@ -171,6 +171,8 @@ export interface DagNodeRecord {
 export interface DagRunRecord {
   readonly runID: string
   readonly ownerSessionID: string
+  readonly authorizedPlan?: string
+  readonly authorizedAtlasNodes?: Readonly<Record<string, string>>
   readonly name: string
   readonly definition: DagDefinition
   readonly fingerprint: string

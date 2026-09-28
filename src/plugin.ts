@@ -22,6 +22,8 @@ import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
 import { registerRoles } from "./roles/register"
 import { registerSubagentObserver } from "./dag/observe"
+import { DagValidationError } from "./dag/errors"
+import { admitTier, tierSource, type TierSession } from "./roles/tier"
 
 /** Session directory for a call, falling back to the plugin's own location. */
 function sessionDirectory(ctx: Context, sessionID: string): Effect.Effect<string> {
@@ -62,16 +64,24 @@ export default Plugin.define({
 
     // The RPC registration is created after the controller, so events emitted before it exists are dropped.
     let emit: ((sessionID: string, runID: string, sequence: number, type: string) => Effect.Effect<void, unknown>) | undefined
+    const getTierSession = (sessionID: string): Effect.Effect<TierSession, DagValidationError> => ctx.session.get({ sessionID: sessionID as never }).pipe(
+      Effect.map((session) => session as TierSession), Effect.mapError(() => new DagValidationError("Session ancestry is unavailable")))
+    const source = (sessionID: string) => tierSource(sessionID, getTierSession, (runID, nodeID, childID) => controller.lineage(runID, nodeID, childID))
     const controller = createDagController({
       directory: ctx.location.directory,
       runner: createOpenCodeDagRunner(ctx),
       defaultModel,
+      admit: (owner, definition, authorizedPlan) => Effect.gen(function* () {
+        const session = yield* getTierSession(owner).pipe(Effect.mapError(() => new DagValidationError("DAG owner session is unavailable")))
+        const caller = yield* source(owner).pipe(Effect.mapError(() => new DagValidationError("DAG owner ancestry is unavailable")))
+        yield* Effect.try({ try: () => admitTier(caller, session, definition, authorizedPlan), catch: (error) => error instanceof DagValidationError ? error : new DagValidationError(String(error)) })
+      }),
       trace,
       onEvent: (event, sessionID) => emit?.(sessionID, event.runID, event.sequence, event.type),
     })
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
-    yield* registerRoles(ctx, options, { controller, directory: (sessionID) => sessionDirectory(ctx, sessionID), stateDirectory: ctx.location.directory, trace })
+    yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), stateDirectory: ctx.location.directory, trace })
     // After the role guard, so a refused subagent call is not recorded.
     yield* registerSubagentObserver(ctx, controller, trace)
 

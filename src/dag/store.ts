@@ -38,6 +38,10 @@ export class DagStore {
         created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
         PRIMARY KEY (run_id, node_id), FOREIGN KEY (run_id) REFERENCES dag_runs(run_id) ON DELETE CASCADE
       );
+      CREATE TABLE IF NOT EXISTS dag_authorizations (
+        run_id TEXT PRIMARY KEY REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+        plan TEXT NOT NULL, atlas_nodes_json TEXT NOT NULL
+      );
       CREATE TABLE IF NOT EXISTS dag_actions (
         action_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, node_id TEXT,
         kind TEXT NOT NULL, idempotency_key TEXT NOT NULL, payload_json TEXT,
@@ -59,6 +63,7 @@ export class DagStore {
   createRun(run: DagRunRecord): void {
     this.transaction(() => {
       this.db.run("INSERT INTO dag_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [run.runID, run.ownerSessionID, run.name, canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.createdAt, run.updatedAt])
+      if (run.authorizedPlan && run.authorizedAtlasNodes) this.db.run("INSERT INTO dag_authorizations VALUES (?, ?, ?)", [run.runID, run.authorizedPlan, canonicalJson(run.authorizedAtlasNodes)])
       for (const node of run.nodes) this.writeNode(run.runID, node)
     })
   }
@@ -83,8 +88,10 @@ export class DagStore {
     const row = this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
+    const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null
     return {
       runID: row.run_id, ownerSessionID: row.owner_session_id, name: row.name,
+      ...(authorization ? { authorizedPlan: authorization.plan, authorizedAtlasNodes: parse<Record<string, string>>(authorization.atlas_nodes_json) } : {}),
       definition: parse<DagDefinition>(row.definition_json), fingerprint: row.fingerprint,
       generation: row.generation, status: row.status, createdAt: row.created_at, updatedAt: row.updated_at,
       nodes: nodeRows.map((node) => ({

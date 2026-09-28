@@ -16,7 +16,8 @@ export { DagValidationError }
  * execution failures never escape, they become node retry/failure state.
  */
 export interface DagController {
-  readonly create: (definition: DagDefinition, ownerSessionID: string) => Effect.Effect<DagRunRecord, DagValidationError>
+  readonly lineage: (runID: string, nodeID: string, sessionID: string) => Effect.Effect<DagRunRecord | undefined>
+  readonly create: (definition: DagDefinition, ownerSessionID: string, authorizedPlan?: string) => Effect.Effect<DagRunRecord, DagValidationError>
   readonly list: (ownerSessionID?: string) => Effect.Effect<readonly DagRunRecord[]>
   readonly snapshot: (runID: string, ownerSessionID: string) => Effect.Effect<DagSnapshot, DagValidationError>
   readonly node: (runID: string, ownerSessionID: string, nodeID: string) => Effect.Effect<DagNodeRecord, DagValidationError>
@@ -39,6 +40,7 @@ export interface DagControllerOptions {
   readonly runner: DagRunner
   /** Returns the configured "provider/model[#variant]" for an agent ID, or undefined. */
   readonly defaultModel?: (agent: string) => string | undefined
+  readonly admit?: (ownerSessionID: string, definition: DagDefinition, authorizedPlan?: string) => Effect.Effect<void, DagValidationError>
   readonly maxParallel?: number
   readonly now?: () => number
   readonly trace?: (event: string, data?: Record<string, unknown>) => void
@@ -260,7 +262,10 @@ export function createDagController(options: DagControllerOptions): DagControlle
     const node = run?.nodes.find((candidate) => candidate.definition.id === nodeID)
     if (!run || !node || node.status !== "starting") return
     const execution = Effect.gen(function* () {
-      const ref = yield* runner.start({ node: node.definition, prompt: buildPrompt(node, run), attempt: node.attempt })
+      yield* checkAtlas(run, { ...run.definition, nodes: [node.definition] }).pipe(Effect.mapError((error) => new DagRunnerError({ message: error.message, nodeID })))
+      if (options.admit) yield* options.admit(run.ownerSessionID, { ...run.definition, nodes: [node.definition] }, run.authorizedPlan).pipe(
+        Effect.mapError((error) => new DagRunnerError({ message: error.message, nodeID })))
+      const ref = yield* runner.start({ node: node.definition, prompt: buildPrompt(node, run), attempt: node.attempt, runID })
       yield* locked(runID, Effect.sync(() => {
         const current = store.getRun(runID)
         if (!current) return
@@ -272,18 +277,26 @@ export function createDagController(options: DagControllerOptions): DagControlle
     })
     const outcome = yield* Effect.exit(execution)
     yield* settle(runID, nodeID, node, outcome)
-    yield* grow(runID, nodeID)
+    yield* grow(runID, nodeID).pipe(Effect.catch((error) => locked(runID, Effect.sync(() => {
+      const current = store.getRun(runID)
+      if (!current || terminal(current.status)) return
+      const failed: DagRunRecord = { ...current, status: "failed", updatedAt: now(), nodes: current.nodes.map((value) =>
+        value.status === "pending" || value.status === "needs_retry" ? { ...value, status: "blocked", error: error.message, updatedAt: now() } : value) }
+      save(failed); event(failed, "run.failed", nodeID, { message: error.message }); notify(failed)
+    }))))
     yield* schedule(runID)
   })
 
   /** Dynamic review loop: after a review settles FAIL with rounds left, append the next fix/review pair. */
-  const grow = (runID: string, nodeID: string): Effect.Effect<void> => locked(runID, Effect.sync(() => {
+  const grow = (runID: string, nodeID: string): Effect.Effect<void, DagValidationError> => locked(runID, Effect.gen(function* () {
     const run = store.getRun(runID)
     if (!run || !run.definition.loop || terminal(run.status)) return
     const next = growLoop(run, nodeID)
     if (!next) return
     const definition = applyDefaultModels(next, options.defaultModel)
     validateDefinition(definition)
+    yield* checkAtlas(run, definition)
+    if (options.admit) yield* options.admit(run.ownerSessionID, definition, run.authorizedPlan)
     const previousByID = new Map(run.nodes.map((node) => [node.definition.id, node]))
     const fingerprints = fingerprintNodes(definition)
     const nodes = definition.nodes.map((node) => {
@@ -320,15 +333,30 @@ export function createDagController(options: DagControllerOptions): DagControlle
     ? Effect.fail(new DagValidationError("This run records native subagent calls; it cannot be retried, resumed or amended. Call the subagent again, or build an iolaus_dag definition when the work needs scheduling."))
     : Effect.void
 
+  const checkAtlas = (run: DagRunRecord, definition: DagDefinition): Effect.Effect<void, DagValidationError> => validated(() => {
+    if (!run.authorizedPlan) return
+    for (const node of definition.nodes) {
+      if (node.agent === "atlas" && run.authorizedAtlasNodes?.[node.id] !== nodeFingerprint(node))
+        throw new DagValidationError(`Atlas node ${node.id} is not part of the authorized /start-work plan`)
+    }
+  })
+
   const slug = (title: string) => title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 32) || "subagent"
 
   const controller: DagController = {
-    create: (input, ownerSessionID) => Effect.gen(function* () {
+    lineage: (runID, nodeID, sessionID) => Effect.sync(() => {
+      const run = store.getRun(runID)
+      if (!run || run.definition.observed) return undefined
+      const node = run.nodes.find((candidate) => candidate.definition.id === nodeID)
+      return node?.execution?.sessionID === sessionID || node?.result?.provenance.execution?.sessionID === sessionID ? run : undefined
+    }),
+    create: (input, ownerSessionID, authorizedPlan) => Effect.gen(function* () {
       const definition = yield* validated(() => { const d = applyDefaultModels(input, options.defaultModel); validateDefinition(d); return d })
+      if (options.admit) yield* options.admit(ownerSessionID, definition, authorizedPlan)
       const createdAt = now()
       const runID = randomUUID()
       const fingerprints = fingerprintNodes(definition)
-      const run: DagRunRecord = { runID, ownerSessionID, name: definition.name, definition, fingerprint: graphFingerprint(definition), generation: 1, status: "running", nodes: definition.nodes.map((node) => ({ definition: node, fingerprint: fingerprints.get(node.id)!, status: "pending", attempt: 0, createdAt, updatedAt: createdAt })), createdAt, updatedAt: createdAt }
+      const run: DagRunRecord = { runID, ownerSessionID, ...(authorizedPlan ? { authorizedPlan, authorizedAtlasNodes: Object.fromEntries(definition.nodes.filter((node) => node.agent === "atlas").map((node) => [node.id, nodeFingerprint(node)])) } : {}), name: definition.name, definition, fingerprint: graphFingerprint(definition), generation: 1, status: "running", nodes: definition.nodes.map((node) => ({ definition: node, fingerprint: fingerprints.get(node.id)!, status: "pending", attempt: 0, createdAt, updatedAt: createdAt })), createdAt, updatedAt: createdAt }
       store.createRun(run); event(run, "run.started")
       yield* schedule(runID)
       return yield* current(runID)
@@ -361,6 +389,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
     retry: (runID, ownerSessionID, nodeID, expectedGeneration) => Effect.gen(function* () {
       let run = yield* owned(runID, ownerSessionID)
       yield* schedulable(run)
+      yield* checkAtlas(run, run.definition)
+      if (options.admit) yield* options.admit(ownerSessionID, run.definition, run.authorizedPlan)
       yield* checkGeneration(run, expectedGeneration)
       if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry")) return yield* Effect.fail(new DagValidationError("Retry requires a terminal run or a node needing retry"))
       const selected = nodeID ? new Set([nodeID]) : new Set(run.nodes.filter((node) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry").map((node) => node.definition.id))
@@ -404,6 +434,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const previous = yield* owned(runID, ownerSessionID)
       yield* schedulable(previous)
       const definition = yield* validated(() => { const d = applyDefaultModels(input, options.defaultModel); validateDefinition(d); return d })
+      yield* checkAtlas(previous, definition)
+      if (options.admit) yield* options.admit(ownerSessionID, definition, previous.authorizedPlan)
       const previousByID = new Map(previous.nodes.map((node) => [node.definition.id, node]))
       const fingerprints = fingerprintNodes(definition)
       const nextNodes = definition.nodes.map((node) => {
