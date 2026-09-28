@@ -45,7 +45,7 @@ Each primary has one job, and the plugin enforces it in code rather than in prom
 - **Prometheus** only plans. It may write `.iolaus/plans/`, `CONTEXT.md`, `CONTEXT-MAP.md` and `docs/adr/`; every other write, shell, and any template but `hyperplan` is refused, and the subagents and DAG nodes it starts run read-only too. `/hyperplan <request>` belongs to it. A plan is `.iolaus/plans/<plan>/spec.md` plus `tickets/NN-<name>.md`, each with a `**Blocked by:** None` or `**Blocked by:** 01, 02` line.
 - **Atlas** only implements a plan. Until `/start-work <plan>` it can read and nothing else. `/start-work` checks the plan, then runs it as a DAG: one fresh Atlas session per ticket in blocking order, so the planning conversation never enters an implementer's context, then Momus reviews the Standards and Spec axes side by side, one fix pass runs if either fails, and an accept gate waits for you.
 
-Running one of these commands in another agent's session switches the session to the owning agent first; the session keeps its model. No lane but Prometheus's planning sessions may rewrite a plan.
+Running one of these commands in another agent's session switches the session to the owning agent first; the session keeps its model.
 
 ## Durable DAG
 
@@ -61,6 +61,8 @@ requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
 pause the run for a human approve/reject.
+
+Native `subagent` calls stay native: follow-ups by `sessionID`, background runs and completion notices work as before. Iolaus also records each call as a node of the session's **Subagent calls** run, so the DAG view shows it with its agent, model, child session and result; calls a child makes hang under that child's node. That run is a record, not a schedule: it has no data-dependency edges and cannot be retried, resumed or amended. The agents are told to call `subagent` directly for simple delegation and to build an `iolaus_dag` definition only when the work needs dependency scheduling, retry/resume, a human gate or a conditional branch. The host allows one level of nesting unless `experimental.subagent_depth` says otherwise.
 
 The sidebar is a read-only overview of each run's progress, colour-coded nodes and waiting approvals. Click a run or node to open its details dialog, or use `<leader>d` (normally `Ctrl+X`, then `D`) or **Iolaus DAG: show details** in the command palette. The dialog shows nodes in dependency order alongside their agent, model, dependencies, attempts, approval request, errors and result excerpts; narrow terminals stack the two panes. Only inside the dialog do `j`/`k` or arrow keys select nodes, `Enter`/`o` open an agent session, and `a`/`r` approve or reject the selected waiting gate. `PageUp`/`PageDown` scroll details; retry and cancel are clickable actions. `Esc` closes the dialog and restores the input draft and cursor. Updates never open it automatically. The footer keeps a one-line summary and a waiting gate raises a desktop notification.
 

@@ -70,7 +70,7 @@ test("start-work compiles tickets to fresh Atlas nodes, two review axes, a condi
   expect(def.nodes.find((n) => n.id === "accept")?.kind).toBe("gate")
 })
 
-test("role policy: planner writes only plan and domain docs, Atlas needs a plan, workers cannot rewrite plans", () => {
+test("role policy: planner writes only plan and domain docs, Atlas needs a plan, workers are unrestricted", () => {
   const dir = "/p"
   const edit = (path: string) => ({ filePath: path, oldString: "a", newString: "b" })
   expect(denial("planner", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toBeUndefined()
@@ -90,7 +90,7 @@ test("role policy: planner writes only plan and domain docs, Atlas needs a plan,
   }
   expect(denial("atlas-unbound", "read", { path: "a" }, dir)).toBeUndefined()
   expect(denial("atlas-orchestrator", "iolaus_dag", { action: "wait", run_id: "r" }, dir)).toBeUndefined()
-  expect(denial("worker", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toMatch(/only planning sessions/)
+  expect(denial("worker", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toBeUndefined()
   expect(denial("worker", "edit", edit("src/a.ts"), dir)).toBeUndefined()
   expect(denial("native", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toBeUndefined()
 

@@ -40,7 +40,8 @@ export function runnerFromPromise(runner: DagRunnerPromise): DagRunner {
   }
 }
 
-function assistantText(messages: readonly unknown[]): string {
+/** The last assistant text in a session context, which is what a child session reports. */
+export function assistantText(messages: readonly unknown[]): string {
   for (const raw of [...messages].reverse()) {
     if (!raw || typeof raw !== "object") continue
     const message = raw as { type?: unknown; content?: unknown }

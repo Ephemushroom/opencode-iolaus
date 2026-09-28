@@ -280,7 +280,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/default.ts",
       "path": "src/omo/agents/sisyphus/default.ts",
       "sourceSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4",
-      "activeSha256": "320ce77f6816b7c6e9b70c7651f0e5f406a815896b9c63f7f6c65433f71b2596"
+      "activeSha256": "bd10140fcd24b83f048a264215f0fd93978bf97a298a65c06b6422486a8cc76f"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/gemini.ts",

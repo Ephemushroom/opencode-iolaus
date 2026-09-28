@@ -103,10 +103,35 @@ export interface DagLoop {
 export interface DagDefinition {
   readonly schemaVersion: 1
   readonly name: string
+  /**
+   * An observed run records native subagent calls instead of scheduling them:
+   * nodes are ordered by time and nested by parent, have no data-dependency
+   * edges, and cannot be retried, resumed or amended.
+   */
+  readonly observed?: true
   readonly loop?: DagLoop
   readonly nodes: readonly DagNodeDefinition[]
   readonly maxParallel?: number
 }
+
+/** A native subagent call as it starts: the child session and where it hangs in its owner's observed run. */
+export interface DagObservedStart {
+  readonly ownerSessionID: string
+  /** Absent when the call failed before a child session existed. */
+  readonly sessionID?: string
+  readonly agent: string
+  /** Known once the child session exists; set later through a running update. */
+  readonly model?: string
+  readonly title: string
+  readonly prompt: string
+  readonly parentNodeID?: string
+}
+
+export type DagObservedUpdate =
+  /** A follow-up to the node, or the child session and model becoming known. */
+  | { readonly status: "running"; readonly sessionID?: string; readonly model?: string }
+  | { readonly status: "completed"; readonly text: string; readonly model?: string }
+  | { readonly status: "failed" | "interrupted"; readonly error: string }
 
 export interface DagExecutionRef {
   readonly nodeID: string

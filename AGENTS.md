@@ -49,6 +49,21 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - `src/dag/` is the active Iolaus durable DAG module. It uses SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
   cancellation and JSON-safe result envelopes.
+- `src/dag/observe.ts` records native `subagent` calls without changing them. The
+  `execute.before` hook (registered after the role guard, so refused calls are not
+  recorded) appends a node to the owner session's observed run
+  (`definition.observed: true`, name "Subagent calls") via `controller.observe`; the
+  child session comes from `session.created` (`parentID`) or the tool result
+  (`{output: {sessionID, status, output}}`, the `<subagent …>` text or the background
+  notice), and settles on the tool result or the child's
+  `session.execution.succeeded|failed|interrupted`, whichever comes first. A call
+  inside a child hangs under the child's node (`dependsOn` is the parent link, not
+  a data edge); a follow-up by `sessionID` reopens the same node as a new attempt; a
+  call the host refuses before running it fails when its caller's turn ends.
+  Correlation is in memory. Observed runs are never scheduled: `retry`, `resume`
+  and `amend` reject them. The native binding tells agents to call `subagent`
+  directly for simple delegation and to use `iolaus_dag` only for data
+  dependencies, retry/resume, gates or conditional branches.
 - `iolaus_dag` is the only model-facing orchestration tool in the first runtime
   slice. It is owner-scoped and schema-validated.
 - Node kinds: `agent` runs a child session; `judge` makes one `generate.text`
@@ -151,7 +166,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   to its subagent and DAG node prompts), Atlas is `atlas-unbound` (read only) until
   `/start-work` makes it `atlas-orchestrator` (operates the run, changes nothing) or a
   ticket marker for a plan that still validates makes it a `worker`; other Iolaus
-  lanes are `worker` (anything but writing plans); host agents are untouched.
+  lanes are `worker` (unrestricted by role); host agents are untouched.
   Refusals are `Tool.Error`s prefixed `[iolaus <policy>]`. Session roles persist in
   `<location>/.iolaus/roles/`. `session.hook("prompt")` switches a command's session
   to its owner (`COMMAND_OWNERS`: ultrawork → sisyphus, hyperplan → prometheus,
