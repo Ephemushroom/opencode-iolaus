@@ -21,6 +21,7 @@ import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tool
 import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
 import { loadGlobalConfig } from "./global-config"
+import { SessionStateStore } from "./database"
 import { registerRoles } from "./roles/register"
 import { registerSubagentObserver } from "./dag/observe"
 import { DagValidationError } from "./dag/errors"
@@ -71,6 +72,7 @@ export default Plugin.define({
     const source = (sessionID: string) => tierSource(sessionID, getTierSession, (runID, nodeID, childID) => controller.lineage(runID, nodeID, childID))
     const controller = createDagController({
       directory: ctx.location.directory,
+      databasePath: home.database,
       runner: createOpenCodeDagRunner(ctx),
       defaultModel,
       admit: (owner, definition, authorizedPlan) => Effect.gen(function* () {
@@ -82,8 +84,10 @@ export default Plugin.define({
       onEvent: (event, sessionID) => emit?.(sessionID, event.runID, event.sequence, event.type),
     })
     yield* Effect.addFinalizer(() => controller.close)
+    const state = new SessionStateStore(home.database)
+    yield* Effect.addFinalizer(() => Effect.sync(() => state.close()))
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
-    yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), stateDirectory: ctx.location.directory, trace })
+    yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), state, trace })
     // After the role guard, so a refused subagent call is not recorded.
     yield* registerSubagentObserver(ctx, controller, trace)
 

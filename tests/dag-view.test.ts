@@ -3,13 +3,16 @@ import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect } from "effect"
-import { createDagController } from "../src/dag/controller"
+import { createDagController as createEffectController } from "../src/dag/controller"
 import { dagView, nodeSummary, viewNodeStatus } from "../src/dag/register-rpc"
 import { DagStore } from "../src/dag/store"
 import type { DagExecutionRef, DagRunRecord } from "../src/dag/types"
 import { runnerFromPromise } from "../src/dag/runner"
 
 let directory: string | undefined
+function createDagController(options: Parameters<typeof createEffectController>[0]) {
+  return createEffectController({ ...options, databasePath: options.databasePath ?? join(options.directory, "iolaus.db") })
+}
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 
 test("a node's title wins; otherwise the first meaningful prompt line summarises it", () => {
@@ -51,7 +54,7 @@ test("cancel settles running nodes, a late child outcome cannot reopen them, and
   await Effect.runPromise(controller.close)
 
   // Rows written by an older build (cancelled run, node still "starting") are shown settled.
-  const store = new DagStore(join(directory, ".iolaus", "dag", "state.db"))
+  const store = new DagStore(join(directory, "iolaus.db"), directory)
   const legacy = store.getRun(run.runID)!
   store.saveRun({ ...legacy, nodes: legacy.nodes.map((node) => ({ ...node, status: "starting" })) } as DagRunRecord)
   store.close()

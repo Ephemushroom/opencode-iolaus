@@ -119,7 +119,6 @@ const env = {
   OPENCODE_DISABLE_MODELS_FETCH: "1",
   IOLAUS_TRACE: tracePath,
   IOLAUS_HOME: join(home, ".iolaus"),
-  IOLAUS_DAG_DB: join(project, ".iolaus/dag/state.db"),
   OPENCODE_CLI_CONFIG_CONTENT: JSON.stringify({ plugins: [localPackage], keybinds: { "theme.switch_mode": "f6" } }),
 }
 

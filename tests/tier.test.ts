@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect } from "effect"
-import { createDagController } from "../src/dag/controller"
+import { createDagController as createEffectController } from "../src/dag/controller"
 import { createOpenCodeDagRunner, runnerFromPromise } from "../src/dag/runner"
 import { DagValidationError } from "../src/dag/errors"
 import { admitTier, subagentTargets, tierDenial, tierSource, isTopLevel, type TierSession } from "../src/roles/tier"
@@ -11,6 +11,9 @@ import { expandTemplate } from "../src/dag/templates"
 import type { DagDefinition, DagRunRecord } from "../src/dag/types"
 
 let directory: string | undefined
+function createDagController(options: Parameters<typeof createEffectController>[0]) {
+  return createEffectController({ ...options, databasePath: options.databasePath ?? join(options.directory, "iolaus.db") })
+}
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 
 test("session ancestry determines authority, not prompt markers or a child model", async () => {

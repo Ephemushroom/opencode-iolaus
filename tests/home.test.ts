@@ -9,16 +9,19 @@ import { loadGlobalConfig } from "../src/global-config"
 import { parseOptions } from "../src/options"
 import { bindNative } from "../src/prompts/render"
 
-test("home resolves from IOLAUS_HOME, provisions project DAG locally and never overwrites", () => {
+test("home resolves from IOLAUS_HOME, provisions only the user layer and never overwrites", () => {
   const root = mkdtempSync(join(tmpdir(), "iolaus-home-"))
   const project = join(root, "proj"); mkdirSync(project)
   const home = resolveHome(project, { IOLAUS_HOME: join(root, "userhome") })
   expect(home.user).toBe(join(root, "userhome"))
   expect(home.project).toBe(join(project, ".iolaus"))
   const first = provisionHome(home)
-  expect(first.created.length).toBe(6)
+  expect(first.created.length).toBe(3)
   expect(readFileSync(join(home.user, "iolaus.json"), "utf8")).toBe("{}\n")
-  for (const dir of [home.user, home.projectPlans, home.projectDag]) expect(existsSync(dir)).toBe(true)
+  expect(existsSync(home.user)).toBe(true)
+  expect(existsSync(home.project)).toBe(false)
+  expect(existsSync(home.projectPlans)).toBe(false)
+  expect(existsSync(home.database)).toBe(false)
   expect(existsSync(join(home.user, "agent"))).toBe(false)
   writeFileSync(join(home.user, "README.md"), "custom")
   writeFileSync(join(home.user, "iolaus.json"), "{\"gh\":false}\n")
@@ -81,7 +84,7 @@ test("home contract is appended after the native contract", () => {
   const text = bindNative("PROMPT", homeContract(home))
   expect(text.indexOf("<iolaus-native-contract>")).toBeLessThan(text.indexOf("<iolaus-home>"))
   expect(text).toContain("plans belong in /p/.iolaus/plans")
-  expect(text).toContain("/p/.iolaus/dag")
+  expect(text).toContain("/u/iolaus.db")
   expect(text).not.toContain("models.json")
   expect(text).not.toContain("tools.memory")
   expect(text).not.toContain("iolaus-home:")

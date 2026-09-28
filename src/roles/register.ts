@@ -1,6 +1,4 @@
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
-import { dirname, join } from "node:path"
-import { randomUUID } from "node:crypto"
+import type { SessionStateStore } from "../database"
 import { Cause, Effect, Exit, Stream, type Scope } from "effect"
 import { Agent } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
@@ -24,30 +22,17 @@ export interface RoleHost {
   readonly source: (sessionID: string) => Effect.Effect<TierSource, DagValidationError>
   /** Where plans are read: the session's directory. */
   readonly directory: (sessionID: string) => Effect.Effect<string>
-  /** Where role and goal state live: the plugin location, like DAG state. */
-  readonly stateDirectory: string
+  readonly state: SessionStateStore
   readonly trace: Trace
 }
 
-export function rolePath(directory: string, sessionID: string): string {
-  return join(directory, ".iolaus", "roles", `${encodeURIComponent(sessionID)}.json`)
+export function readRole(state: SessionStateStore, sessionID: string): RoleRecord | undefined {
+  const role = state.read("role", sessionID) as RoleRecord | undefined
+  return role !== undefined && role !== null && ["planning", "ticket", "orchestrator"].includes(role.role) ? role : undefined
 }
 
-export function readRole(directory: string, sessionID: string): RoleRecord | undefined {
-  try {
-    const role = JSON.parse(readFileSync(rolePath(directory, sessionID), "utf8")) as RoleRecord
-    return ["planning", "ticket", "orchestrator"].includes(role.role) ? role : undefined
-  } catch {
-    return undefined
-  }
-}
-
-export function saveRole(directory: string, sessionID: string, role: RoleRecord): void {
-  const path = rolePath(directory, sessionID)
-  const temp = `${path}.${randomUUID()}.tmp`
-  mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(temp, `${JSON.stringify(role)}\n`)
-  renameSync(temp, path)
+export function saveRole(state: SessionStateStore, sessionID: string, role: RoleRecord): void {
+  state.save("role", sessionID, role)
 }
 
 type SessionInfo = { readonly agent?: unknown; readonly parentID?: unknown; readonly metadata?: Record<string, unknown> }
@@ -65,7 +50,7 @@ export function isGoalSessionInfo(session: SessionInfo): boolean {
  */
 export function registerRoles(ctx: Context, options: Options, host: RoleHost): Effect.Effect<void, never, Scope.Scope> {
   return Effect.gen(function* () {
-    const { stateDirectory: state, trace } = host
+    const { state, trace } = host
     const sessionInfo = (sessionID: string) => ctx.session.get({ sessionID: sessionID as never }).pipe(
       Effect.map((session) => session as unknown as SessionInfo),
       Effect.catch(() => Effect.succeed(undefined as SessionInfo | undefined)))

@@ -7,6 +7,7 @@ import { growLoop } from "./loop"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
+import { canonicalProject } from "../database"
 import type { DagDefinition, DagEvent, DagNodeDefinition, DagNodeRecord, DagObservedStart, DagObservedUpdate, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
 
 export { DagValidationError }
@@ -37,6 +38,7 @@ export interface DagController {
 
 export interface DagControllerOptions {
   readonly directory: string
+  readonly databasePath?: string
   readonly runner: DagRunner
   /** Returns the configured "provider/model[#variant]" for an agent ID, or undefined. */
   readonly defaultModel?: (agent: string) => string | undefined
@@ -112,13 +114,15 @@ function validated<A>(compute: () => A): Effect.Effect<A, DagValidationError> {
 }
 
 export function createDagController(options: DagControllerOptions): DagController {
-  const databasePath = resolveDagDatabasePath(options.directory)
-  const existing = sharedControllers.get(databasePath)
+  const databasePath = options.databasePath ?? resolveDagDatabasePath(options.directory)
+  const project = canonicalProject(options.directory)
+  const key = JSON.stringify([databasePath, project])
+  const existing = sharedControllers.get(key)
   if (existing) {
     existing.refs += 1
-    return { ...existing.controller, close: Effect.sync(() => releaseSharedController(databasePath, existing)) }
+    return { ...existing.controller, close: Effect.sync(() => releaseSharedController(key, existing)) }
   }
-  const store = new DagStore(databasePath)
+  const store = new DagStore(databasePath, project)
   const runner = options.runner
   const now = options.now ?? Date.now
   const maxParallel = options.maxParallel ?? 4
@@ -519,8 +523,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
     }),
   }
   const shared: SharedController = { controller, refs: 1 }
-  sharedControllers.set(databasePath, shared)
-  return { ...controller, close: Effect.sync(() => releaseSharedController(databasePath, shared)) }
+  sharedControllers.set(key, shared)
+  return { ...controller, close: Effect.sync(() => releaseSharedController(key, shared)) }
 }
 
 function releaseSharedController(path: string, shared: SharedController): void {
