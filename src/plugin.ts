@@ -11,7 +11,7 @@ import { createDagController } from "./dag/controller"
 import { createOpenCodeDagRunner } from "./dag/runner"
 import { createDagTool } from "./dag/tool"
 import { registerDagRpc } from "./dag/register-rpc"
-import { loadModelsConfig, modelString, resolveLane } from "./models"
+import { parseModelsConfig, modelString, resolveLane } from "./models"
 import { agentName, categoryName } from "./prompts/catalog"
 import { resolveAstGrepBinary } from "./ast-grep/binary"
 import { AST_GREP_NAMESPACE, AST_GREP_NAMESPACE_DESCRIPTION, createAstGrepTools } from "./ast-grep/tools"
@@ -20,6 +20,7 @@ import { resolveGhBinary } from "./gh/binary"
 import { GH_NAMESPACE, GH_NAMESPACE_DESCRIPTION, createGhTools } from "./gh/tools"
 import { effectTool } from "./effect-bridge"
 import { homeContract, provisionHome, resolveHome } from "./home"
+import { loadGlobalConfig } from "./global-config"
 import { registerRoles } from "./roles/register"
 import { registerSubagentObserver } from "./dag/observe"
 import { DagValidationError } from "./dag/errors"
@@ -44,20 +45,21 @@ function permissionRules(ctx: Context, sessionID: string, agent: string): Effect
 export default Plugin.define({
   id: "iolaus",
   effect: (ctx) => Effect.gen(function* () {
-    const options = parseOptions({ ...ctx.options })
+    const home = resolveHome(ctx.location.directory)
+    const global = loadGlobalConfig(home.user)
+    const options = parseOptions(global)
     trace("iolaus.loaded", { enabled: options.enabled, host: ctx.app.version })
     if (!options.enabled) return
-    const home = resolveHome(ctx.location.directory)
     const provisioned = provisionHome(home)
     trace("iolaus.home.ready", { user: home.user, project: home.project, created: provisioned.created })
-    const models = loadModelsConfig(ctx.location.directory, { inline: options.models })
-    trace("iolaus.models.loaded", { sources: models.sources, diagnostics: models.diagnostics })
-    yield* registerAgents(ctx, options, models.config)
+    const models = parseModelsConfig(global.models ?? {})
+    trace("iolaus.models.loaded", { source: global.models === undefined ? "requirements" : "iolaus.json" })
+    yield* registerAgents(ctx, options, models)
     yield* registerModes(ctx, options)
     yield* registerMcps(ctx, options.mcps)
     const defaultModel = (agent: string): string | undefined => {
       const lane = agentName(agent) ?? categoryName(agent)
-      const assignment = lane ? resolveLane(lane, models.config) : undefined
+      const assignment = lane ? resolveLane(lane, models) : undefined
       return assignment ? modelString(assignment) : undefined
     }
     yield* ctx.session.hook("context", (event) => composeContext(event, ctx, options, homeContract(home)))
@@ -113,11 +115,10 @@ export default Plugin.define({
       yield* registerVerifyHook(ctx, {
         directory: (sessionID) => Effect.runPromise(sessionDirectory(ctx, sessionID)),
         trace,
-        userLayer: home.user,
-        ...(typeof options.verify === "object" ? { inline: options.verify } : {}),
+        config: typeof options.verify === "object" ? options.verify : undefined,
       })
     }
-    trace("iolaus.verify.registered", { enabled: options.verify !== false, inline: typeof options.verify === "object" })
+    trace("iolaus.verify.registered", { enabled: options.verify !== false, configured: typeof options.verify === "object" })
 
     const rpc = yield* registerDagRpc(ctx, controller).pipe(Effect.orDie)
     emit = (sessionID, runID, sequence, type) => rpc.events.emit("updated", { sessionID, runID, sequence, type })

@@ -217,9 +217,12 @@ const mock = http.createServer(async (req, res) => {
 })
 mock.listen(0, "127.0.0.1"); await once(mock, "listening")
 const model = "openai/gpt-5.5"
+const iolausHome = join(home, ".iolaus")
+mkdirSync(iolausHome, { recursive: true })
+writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ mcps: [], gh: false, verify: false, models: {
+  agents: { sisyphus: model, prometheus: model, atlas: model, momus: model, explore: model, hephaestus: model, metis: model }, categories: { quick: model } } }))
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
-  plugins: [{ package: join(root, "dist"), options: { mcps: [], gh: false, verify: false, models: {
-    agents: { sisyphus: model, prometheus: model, atlas: model, momus: model, explore: model, hephaestus: model, metis: model }, categories: { quick: model } } } }],
+  plugins: [{ package: join(root, "dist") }],
   // No global allow-all: it would override the per-agent deny rules this QA checks (tool visibility).
   model, default_agent: "build", experimental: { subagent_depth: 2 },
   provider: { openai: { options: { apiKey: "fake-key", baseURL: `http://127.0.0.1:${mock.address().port}/v1` }, models: {
@@ -227,7 +230,7 @@ writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
 }))
 const env = { PATH: process.env.PATH, HOME: home, USERPROFILE: home, TMPDIR: sandbox, IOLAUS_TRACE: trace,
   XDG_CONFIG_HOME: config, XDG_DATA_HOME: join(sandbox, "data"), XDG_CACHE_HOME: join(sandbox, "cache"), XDG_STATE_HOME: join(sandbox, "state"),
-  OPENCODE_TEST_HOME: home, IOLAUS_HOME: join(home, ".iolaus"), OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1" }
+  OPENCODE_TEST_HOME: home, IOLAUS_HOME: iolausHome, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1" }
 const server = spawn(binary, ["serve", "--hostname", "127.0.0.1", "--port", "0"], { cwd: project, env, stdio: ["ignore", "pipe", "pipe"] })
 const exited = once(server, "exit")
 let log = ""

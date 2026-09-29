@@ -3,10 +3,8 @@ import { homedir } from "node:os"
 import { join, resolve } from "node:path"
 
 /**
- * Iolaus keeps configuration in two layers. The user layer is one directory for
- * every project (`IOLAUS_HOME`, default `~/.iolaus`): `models.json` and
- * `verify.json`. The project layer is `<project>/.iolaus`: DAG state, plans and
- * project overrides of the same config files. Project wins over user. Skills
+ * Iolaus reads configuration only from `IOLAUS_HOME/iolaus.json` (default
+ * `~/.iolaus/iolaus.json`). The project layer holds DAG state and plans. Skills
  * and memory are the host's (and the user's plugins') concern, not Iolaus's.
  */
 export interface IolausHome {
@@ -26,11 +24,8 @@ export function resolveHome(projectDirectory: string, env: NodeJS.ProcessEnv = p
 
 const USER_README = `# Iolaus home
 
-Shared across projects. Iolaus reads:
-- models.json   agent/category -> provider/model[#variant]
-- verify.json   post-edit checkers (project .iolaus/verify.json overrides)
-
-Project-level .iolaus/ overrides these and holds DAG state and plans.
+Shared across projects. iolaus.json configures features, models and verification.
+Project-level .iolaus/ holds DAG state and plans, not configuration overrides.
 `
 
 export interface ProvisionResult {
@@ -47,10 +42,13 @@ export function provisionHome(home: IolausHome): ProvisionResult {
   }
   const readme = join(home.user, "README.md")
   if (!existsSync(readme)) { writeFileSync(readme, USER_README); created.push(readme) }
+  const config = join(home.user, "iolaus.json")
+  try { writeFileSync(config, "{}\n", { flag: "wx" }); created.push(config) }
+  catch (error) { if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error }
   return { created }
 }
 
 /** Sentence appended to every rendered prompt so agents write to the right place. */
 export function homeContract(home: IolausHome): string {
-  return `<iolaus-home>Iolaus config: user layer ${home.user} (models.json, verify.json), project layer ${home.project} (plans/, dag/; overrides). Plans belong in ${home.projectPlans}. Skills and cross-session memory come from the host and its plugins, not from Iolaus.</iolaus-home>`
+  return `<iolaus-home>Iolaus config: ${home.user}/iolaus.json. Project DAG state belongs in ${home.projectDag}; plans belong in ${home.projectPlans}. Skills and cross-session memory come from the host and its plugins, not from Iolaus.</iolaus-home>`
 }

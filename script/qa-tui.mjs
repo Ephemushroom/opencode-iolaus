@@ -96,9 +96,11 @@ const mock = http.createServer(async (req, res) => {
 })
 mock.listen(0, "127.0.0.1"); await once(mock, "listening")
 const mockURL = `http://127.0.0.1:${mock.address().port}/v1`
+mkdirSync(join(home, ".iolaus"), { recursive: true })
+writeFileSync(join(home, ".iolaus", "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } }))
 
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
-  plugins: [{ package: join(packageRoot, "dist"), options: { enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } } }],
+  plugins: [{ package: join(packageRoot, "dist") }],
   model: "openai/gpt-5.5",
   permissions: [{ action: "*", resource: "*", effect: "allow" }],
   provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: {
