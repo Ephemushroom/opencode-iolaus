@@ -36,11 +36,13 @@ test("global file validates all sections before plugin setup", () => {
   const root = mkdtempSync(join(tmpdir(), "iolaus-global-"))
   const user = join(root, "user"); mkdirSync(user)
   const path = join(user, "iolaus.json")
-  writeFileSync(path, JSON.stringify({ enabled: true, agents: ["oracle"], mcps: [], gh: false, models: { agents: { oracle: "global/oracle" } }, verify: { checkers: [{ argv: ["global-check"] }] } }))
+  writeFileSync(path, JSON.stringify({ enabled: true, agents: ["oracle"], mcps: [], gh: false, models: { agents: { oracle: "global/oracle" } }, verify: { checkers: [{ argv: ["global-check"] }] }, background_task: { defaultConcurrency: 7 } }))
   const options = parseOptions(loadGlobalConfig(user))
   expect(options.agents).toEqual(["oracle"])
   expect(options.mcps).toEqual([])
-  for (const bad of ["{", "[]", "null", '{"enabled":"no"}', '{"unknown":true}', '{"models":{"agents":{"oracle":"bad"}}}', '{"models":{"agents":{"unknown":"a/b"}}}', '{"models":{"agents":{"oracle":{"model":"a/b","extra":true}}}}', '{"verify":{"checkers":[{"argv":[]}]}}', '{"verify":{"checkers":[{"argv":["x"],"extra":true}]}}', '{"verify":{"commentPattern":"("}}', '{"enabled":false,"models":{"invalid":true}}']) {
+  expect(options.defaultConcurrency).toBe(7)
+  expect(parseOptions({}).defaultConcurrency).toBe(5)
+  for (const bad of ["{", "[]", "null", '{"enabled":"no"}', '{"unknown":true}', '{"models":{"agents":{"oracle":"bad"}}}', '{"models":{"agents":{"unknown":"a/b"}}}', '{"models":{"agents":{"oracle":{"model":"a/b","extra":true}}}}', '{"verify":{"checkers":[{"argv":[]}]}}', '{"verify":{"checkers":[{"argv":["x"],"extra":true}]}}', '{"verify":{"commentPattern":"("}}', '{"enabled":false,"models":{"invalid":true}}', '{"background_task":7}', '{"background_task":{"defaultConcurrency":0}}', '{"background_task":{"defaultConcurrency":1.5}}', '{"background_task":{"other":1}}']) {
     writeFileSync(path, bad)
     expect(() => loadGlobalConfig(user)).toThrow(`Invalid Iolaus global config ${path}`)
   }

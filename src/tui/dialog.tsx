@@ -4,6 +4,7 @@ import type { BoxRenderable, ScrollBoxRenderable } from "@opentui/core"
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js"
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
+import { paneHeights, revealScroll } from "./layout"
 import { liveGlyph, nodeResultText, progressBar, runClock, settledCount, statusColor, statusLabel, topologyNodes, waves } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
@@ -23,39 +24,67 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   const current = createMemo(() => nodes().find((node) => node.id === selected()))
   const [busy, setBusy] = createSignal<string>()
   const [focused, setFocused] = createSignal(false)
-  const [width, setWidth] = createSignal(context.renderer.width)
+  const [width, setWidth] = createSignal(0)
   const [height, setHeight] = createSignal(context.renderer.height)
+  const [graphContent, setGraphContent] = createSignal(6)
+  const [detailContent, setDetailContent] = createSignal(10)
   const now = useNow(200)
   const frame = () => Math.floor(now() / 200)
   let panel: BoxRenderable | undefined
   let list: ScrollBoxRenderable | undefined
   let detail: ScrollBoxRenderable | undefined
   let alive = true
-  const compact = () => width() < 110
-  const bodyHeight = () => Math.max(12, height() - 12)
-  // The graph takes the top half; the selected node's details fill the rest.
-  const graphHeight = () => Math.max(6, Math.floor(bodyHeight() * 0.5))
+  const cardWidth = () => Math.min(width() || 30, width() < 90 ? 26 : 30)
+  const panes = createMemo(() => paneHeights(height() - 13, graphContent(), detailContent()))
   const close = () => context.ui.dialog.clear()
 
   createEffect(on(nodes, (items) => {
     if (items.some((node) => node.id === selected())) return
     setSelected((items.find((node) => node.status === "waiting_approval") ?? items.find((node) => node.status === "running" || node.status === "starting") ?? items[0])?.id)
   }))
-  // Scroll after the cards are laid out, including on first open. The wave count is a memo so a refresh that
-  // rebuilds the same graph does not cancel the pending scroll; the renderer is never idle while a spinner runs.
-  const waveCount = createMemo(() => layers().length)
-  createEffect(on([selected, waveCount], ([id]) => {
-    const timer = setTimeout(() => {
-      const wave = layers().findIndex((items) => items.some((node) => node.id === id))
-      if (wave >= 0) list?.scrollChildIntoView(`dag-dialog-wave-${wave}`)
-    }, 50)
-    onCleanup(() => clearTimeout(timer))
-  }))
+  // Card positions are only refreshed by the renderer's layout pass inside a frame, and a resize re-wraps the cards
+  // over several frames (pane height, then measured width, then card width), so no timer can know when the geometry
+  // is final. The renderer emits "frame" after that pass; its root Yoga node is dirty there exactly when the pass
+  // changed a size that an effect answered, so the reveal keeps following frames until the root is clean and the
+  // selected card is in view. The offset is computed here because scrollChildIntoView leaves a card that is exactly
+  // as tall as the viewport where it is.
+  let revealing = false
+  function reveal() {
+    const id = selected(), box = list
+    if (!id || !box) return false
+    const card = box.content.findDescendantById(`dag-dialog-node-${id}`)
+    if (!card) return false
+    const before = box.scrollTop
+    box.scrollTop = revealScroll(before, card.y - box.viewport.y, card.height, box.viewport.height)
+    return box.scrollTop !== before
+  }
+  function stopReveal() {
+    if (!revealing) return
+    revealing = false
+    context.renderer.off("frame", onFrame)
+  }
+  function onFrame() {
+    try {
+      if (reveal() || context.renderer.root.getLayoutNode().isDirty()) return
+    } catch (error) {
+      trace("iolaus.tui.dialog.reveal.failed", { error: String(error) })
+    }
+    stopReveal()
+  }
+  function startReveal() {
+    if (!revealing) {
+      revealing = true
+      context.renderer.on("frame", onFrame)
+    }
+    context.renderer.requestRender()
+  }
+  createEffect(on([selected, width, height, graphContent, detailContent], startReveal))
+  onCleanup(stopReveal)
   createEffect(on(selected, () => detail?.scrollTo(0)))
   onMount(() => {
     context.ui.dialog.set({ size: "xlarge", centered: true })
     panel?.focus()
-    const resize = () => { setWidth(context.renderer.width); setHeight(context.renderer.height) }
+    const resize = () => setHeight(context.renderer.height)
     context.renderer.on("resize", resize)
     onCleanup(() => context.renderer.off("resize", resize))
   })
@@ -82,6 +111,13 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     if (!node || !value || busy()) return
     if ((action === "approve" || action === "reject") && !waiting()) return
     if ((action === "retry" && !retryable()) || (action === "cancel" && !cancellable())) return
+    if (action === "cancel") {
+      const confirmed = await context.ui.dialog.confirm({ title: "Cancel DAG run?", message: `Stop "${value.name}" and interrupt its running agents. Finished nodes keep their results.`, label: { confirm: "Cancel run", cancel: "Keep running" } })
+      // The confirm prompt takes over the dialog slot; bring the details back whatever the answer.
+      if (!alive) openDagDialog(context, props.sessionID, props.runID, node.id)
+      if (!confirmed) return
+      trace("iolaus.tui.cancel.confirmed", { runID: value.runID })
+    }
     setBusy(action)
     const destination = target()
     try {
@@ -103,6 +139,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       { id: "iolaus.dag.open", title: "Iolaus DAG: open agent session", bind: "o,return", enabled: hasSession, run: open },
       { id: "iolaus.dag.approve", title: "Iolaus DAG: approve gate", bind: "a", enabled: waiting, run: () => void decide("approve") },
       { id: "iolaus.dag.reject", title: "Iolaus DAG: reject gate", bind: "r", enabled: waiting, run: () => void decide("reject") },
+      { id: "iolaus.dag.cancel", title: "Iolaus DAG: cancel run", bind: "c", enabled: cancellable, run: () => void decide("cancel") },
       { bind: "pageup", run: () => detail?.scrollBy(-Math.max(1, detail.viewport.height - 1)) },
       { bind: "pagedown", run: () => detail?.scrollBy(Math.max(1, detail.viewport.height - 1)) },
       { bind: "escape", run: close },
@@ -123,15 +160,16 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       <Show when={run()}>{(value) => <>
         <text fg={statusColor(value().status, theme())} attributes={1}>{liveGlyph(value().status, frame())} {value().name}</text>
         <text fg={theme().text.muted}>{statusLabel(value().status)} · Done {settledCount(value())}/{value().nodes.length} {progressBar(settledCount(value()), value().nodes.length).split("]")[0]}] · gen {value().generation} · {runClock(value(), now())}</text>
-        <box flexDirection="column" height={bodyHeight()} marginTop={1} gap={1}>
-          <scrollbox ref={(value) => { list = value }} width="100%" height={graphHeight()} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+        <box flexDirection="column" height={panes().graph + panes().detail + 1} flexShrink={0} marginTop={1} gap={1}>
+          <scrollbox ref={(value) => { list = value }} width="100%" height={panes().graph} flexShrink={0} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+            <box width="100%" flexDirection="column" flexShrink={0} onSizeChange={function () { setWidth(this.width); setGraphContent(this.height) }}>
             <For each={layers()}>{(wave, index) => <box id={`dag-dialog-wave-${index()}`} flexDirection="column" alignItems="center">
               <Show when={index() > 0}><text fg={theme().text.muted}>│</text><text fg={theme().text.muted}>▼</text></Show>
-              <box flexDirection="row" flexWrap="wrap" justifyContent="center" gap={1}>
+              <box width="100%" flexDirection="row" flexWrap="wrap" justifyContent="center" gap={1}>
                 <For each={wave}>{(node) => {
                   const chosen = () => selected() === node.id
                   const live = () => node.status === "running" || node.status === "starting"
-                  return <box id={`dag-dialog-node-${node.id}`} width={compact() ? 26 : 30} flexDirection="column" paddingLeft={1} paddingRight={1}
+                  return <box id={`dag-dialog-node-${node.id}`} width={cardWidth()} flexShrink={0} flexDirection="column" paddingLeft={1} paddingRight={1}
                     border borderStyle={chosen() ? "heavy" : "rounded"}
                     borderColor={chosen() ? theme().text.action.primary.base : live() ? statusColor(node.status, theme()) : theme().border.base}
                     onMouseDown={(event) => { if (event.button === 0) setSelected(node.id) }}>
@@ -145,9 +183,10 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               </box>
               <Show when={wave.length > 1}><text fg={theme().text.muted}>· {wave.length} in parallel</text></Show>
             </box>}</For>
+            </box>
           </scrollbox>
-          <scrollbox ref={(value) => { detail = value }} width="100%" flexGrow={1} scrollX={false} contentOptions={{ flexDirection: "column" }}>
-            <Show when={current()}>{(node) => <box flexDirection="column" border borderStyle="rounded" borderColor={theme().text.action.primary.base} paddingLeft={1} paddingRight={1}
+          <scrollbox ref={(value) => { detail = value }} width="100%" height={panes().detail} flexShrink={0} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+            <Show when={current()}>{(node) => <box width="100%" flexDirection="column" flexShrink={0} onSizeChange={function () { setDetailContent(this.height) }} border borderStyle="rounded" borderColor={theme().text.action.primary.base} paddingLeft={1} paddingRight={1}
               title={" Node details "} titleColor={theme().text.action.primary.base}>
               <text fg={statusColor(node().status, theme())} attributes={1}>{liveGlyph(node().status, frame())} {node().id}{node().title ? ` · ${node().title}` : ""}</text>
               <text fg={statusColor(node().status, theme())}>Status: {statusLabel(node().status)} · {node().kind}</text>
@@ -159,11 +198,10 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>Result</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
               <Show when={!node().result && !node().error && !node().prompt}><text marginTop={1} fg={theme().text.muted}>No result yet.</text></Show>
               <Show when={retryable()}><text marginTop={1} fg={theme().text.action.primary.base} onMouseUp={(event) => { if (event.button === 0) void decide("retry") }}>[Retry node]</text></Show>
-              <Show when={cancellable()}><text fg={theme().text.feedback.error.base} onMouseUp={(event) => { if (event.button === 0) void decide("cancel") }}>[Cancel run]</text></Show>
             </box>}</Show>
           </scrollbox>
         </box>
-        <text marginTop={1} fg={theme().text.muted}>{busy() ? `${busy()}...` : `↑/↓ j/k select · ${hasSession() ? "Enter/o open · " : ""}${waiting() ? "a approve · r reject · " : ""}PgUp/PgDn details · Esc close`}</text>
+        <text marginTop={1} fg={theme().text.muted}>{busy() ? `${busy()}...` : `↑/↓ j/k select · ${hasSession() ? "Enter/o open · " : ""}${waiting() ? "a approve · r reject · " : ""}${cancellable() ? "c cancel run · " : ""}PgUp/PgDn details · Esc close`}</text>
       </>}</Show>
     </box>
   )

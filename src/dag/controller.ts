@@ -125,7 +125,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const store = new DagStore(databasePath, project)
   const runner = options.runner
   const now = options.now ?? Date.now
-  const maxParallel = options.maxParallel ?? 4
+  const maxParallel = options.maxParallel ?? 5
   const locks = new Map<string, Semaphore.Semaphore>()
   const waiters = new Map<string, Set<Deferred.Deferred<DagRunRecord>>>()
   // Every launch fiber lives in this scope; closing the controller interrupts them.
@@ -222,7 +222,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
           event(run, "node.waiting", node.definition.id, { message: node.definition.prompt, inputs: jsonText(resolveInputs(node, run)) })
           continue
         }
-        if (activeCount(run) + launches.length >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
+        // run already marks this pass's launches as starting, so activeCount includes them.
+        if (activeCount(run) >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
         const next = updateNode(run, node.definition.id, (current) => ({ ...current, status: "starting", attempt: current.attempt + 1, updatedAt: now() }))
         run = next
         launches.push(next.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
@@ -245,6 +246,9 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const current = store.getRun(runID)
       // A cancelled run already settled its nodes; the interrupted child's late outcome must not reopen them.
       if (!current || current.status === "cancelled") return
+      // Settle each attempt once: a node already settled (or retried) keeps its newer state.
+      const live = current.nodes.find((candidate) => candidate.definition.id === nodeID)
+      if (!live || (live.status !== "starting" && live.status !== "running") || live.attempt !== node.attempt) return
       if (Exit.isSuccess(outcome)) {
         const { ref, payload } = outcome.value
         const envelope: DagResultEnvelope = { schemaVersion: 1, runID, nodeID, generation: current.generation, attempt: node.attempt, status: "completed", payload, provenance: { parentNodeIDs: node.definition.dependsOn, execution: ref, agent: node.definition.agent ?? "", model: node.definition.model ?? "" }, createdAt: now() }
@@ -280,7 +284,10 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const result = yield* runner.wait(ref)
       return { ref, payload: result.payload }
     })
-    const outcome = yield* Effect.exit(execution)
+    yield* finish(runID, nodeID, node, yield* Effect.exit(execution))
+  })
+
+  const finish = (runID: string, nodeID: string, node: DagNodeRecord, outcome: Exit.Exit<{ ref: import("./types").DagExecutionRef; payload: JsonValue }, DagRunnerError>): Effect.Effect<void> => Effect.gen(function* () {
     yield* settle(runID, nodeID, node, outcome)
     yield* grow(runID, nodeID).pipe(Effect.catch((error) => locked(runID, Effect.sync(() => {
       const current = store.getRun(runID)
@@ -290,6 +297,42 @@ export function createDagController(options: DagControllerOptions): DagControlle
       save(failed); event(failed, "run.failed", nodeID, { message: error.message }); notify(failed)
     }))))
     yield* schedule(runID)
+  })
+
+  const interrupt = (runID: string, node: DagNodeRecord, message: string): Effect.Effect<void> => locked(runID, Effect.sync(() => {
+    const current = store.getRun(runID)
+    const live = current?.nodes.find((candidate) => candidate.definition.id === node.definition.id)
+    if (!current || terminal(current.status) || !live || (live.status !== "starting" && live.status !== "running") || live.attempt !== node.attempt) return
+    const updated = updateNode(current, node.definition.id, (value) => ({ ...value, status: "interrupted", error: message, updatedAt: now() }))
+    event(updated, "node.failed", node.definition.id, { message, status: "interrupted" })
+    save(updateRunStatus(updated))
+  }))
+
+  /**
+   * A controller that stopped mid-run (plugin reload, restart) left nodes starting or running with nobody waiting on
+   * them. A child that received its prompt is waited on again and settles with its own outcome, even if it finished
+   * while no controller was listening; a node whose prompt never reached a child is interrupted for an explicit retry.
+   */
+  const recover = (run: DagRunRecord): Effect.Effect<void> => Effect.gen(function* () {
+    for (const node of run.nodes) {
+      if (node.status !== "starting" && node.status !== "running") continue
+      const ref = node.execution
+      if (!ref) {
+        trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "interrupted" })
+        yield* interrupt(run.runID, node, "The controller stopped before this node started; retry it to run again")
+        continue
+      }
+      trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "reattached", sessionID: ref.sessionID })
+      yield* Effect.forkIn(Effect.gen(function* () {
+        const outcome = yield* Effect.exit(runner.reattach(ref))
+        if (Exit.isSuccess(outcome) && outcome.value === undefined) {
+          yield* interrupt(run.runID, node, "The controller stopped before the child session received its prompt; retry it to run again")
+          return yield* schedule(run.runID)
+        }
+        yield* finish(run.runID, node.definition.id, node, Exit.isSuccess(outcome) ? Exit.succeed({ ref, payload: outcome.value!.payload }) : Exit.failCause(outcome.cause))
+      }), scope)
+    }
+    yield* schedule(run.runID)
   })
 
   /** Dynamic review loop: after a review settles FAIL with rounds left, append the next fix/review pair. */
@@ -397,9 +440,10 @@ export function createDagController(options: DagControllerOptions): DagControlle
       yield* checkAtlas(run, run.definition)
       if (options.admit) yield* options.admit(ownerSessionID, run.definition, run.authorizedPlan)
       yield* checkGeneration(run, expectedGeneration)
-      if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry")) return yield* Effect.fail(new DagValidationError("Retry requires a terminal run or a node needing retry"))
+      if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry" || node.status === "interrupted")) return yield* Effect.fail(new DagValidationError("Retry requires a terminal run or a node needing retry"))
       const selected = nodeID ? new Set([nodeID]) : new Set(run.nodes.filter((node) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry").map((node) => node.definition.id))
-      run = { ...run, generation: run.generation + 1, status: "running", updatedAt: now(), nodes: run.nodes.map((node) => selected.has(node.definition.id) ? { ...node, status: "pending", error: undefined, execution: undefined, updatedAt: now() } : node) }
+      // Blocked nodes return to pending too; the frontier blocks them again if another dependency still failed.
+      run = { ...run, generation: run.generation + 1, status: "running", updatedAt: now(), nodes: run.nodes.map((node) => selected.has(node.definition.id) || node.status === "blocked" ? { ...node, status: "pending", error: undefined, execution: undefined, updatedAt: now() } : node) }
       save(run); event(run, "node.retrying", nodeID)
       yield* schedule(runID)
       return yield* current(runID)
@@ -524,6 +568,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   }
   const shared: SharedController = { controller, refs: 1 }
   sharedControllers.set(key, shared)
+  Effect.runFork(Effect.forkIn(Effect.forEach(store.listRuns().filter((run) => !terminal(run.status) && !run.definition.observed), recover, { discard: true }), scope))
   return { ...controller, close: Effect.sync(() => releaseSharedController(key, shared)) }
 }
 

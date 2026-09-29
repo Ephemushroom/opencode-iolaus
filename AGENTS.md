@@ -162,8 +162,14 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   connectivity or subscription; a lane whose config and chain both name no
   model is not registered. A DAG node may omit `model` to run on its lane's
   configured model.
-- Restart recovery is conservative. Already-admitted prompts are not blindly
-  replayed; interrupted work requires explicit retry/resume.
+- Restart recovery never replays a prompt. When a controller starts (plugin
+  reload or restart) it reattaches every starting/running node whose child
+  session already received its prompt (`runner.reattach`, no new prompt) and
+  settles it with that child's own outcome, even one that finished while no
+  controller listened, then continues the frontier. A node whose prompt never
+  reached a child becomes `interrupted` and needs an explicit retry, which also
+  returns blocked dependents to pending. `settle` is once per attempt.
+  `script/qa-dag-recover.mjs` reloads the plugin mid-run in a real TUI.
 - Fan-in is an ordinary Agent node binding `inputs: [{node: "*"}]`; every
   upstream result arrives with producer provenance. Conditional routing uses a
   deterministic `when` predicate over settled upstream payloads; a false
@@ -233,7 +239,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `src/tui/hooks.ts`) keeps `sidebar.content` and `sidebar.footer` read-only.
   Click a run/node or use `<leader>d` / the command palette to open a native
   details dialog. Its target-scoped keymap owns single-letter actions only
-  while the dialog is focused; `Esc` closes it and the host restores the input
+  while the dialog is focused (`c` cancels the run after the host confirm dialog); `Esc` closes it and the host restores the input
   draft/cursor. Keep the launcher in the `app` slot so it remains mounted when
   the host hides the sidebar. Register reactive keymap layers inside rendered
   components, not plugin setup. Nodes use dependency order in the dialog and

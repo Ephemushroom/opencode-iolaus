@@ -75,6 +75,7 @@ export default Plugin.define({
       databasePath: home.database,
       runner: createOpenCodeDagRunner(ctx),
       defaultModel,
+      maxParallel: options.defaultConcurrency,
       admit: (owner, definition, authorizedPlan) => Effect.gen(function* () {
         const session = yield* getTierSession(owner).pipe(Effect.mapError(() => new DagValidationError("DAG owner session is unavailable")))
         const caller = yield* source(owner).pipe(Effect.mapError(() => new DagValidationError("DAG owner ancestry is unavailable")))
