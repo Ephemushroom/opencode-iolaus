@@ -169,6 +169,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   controller listened, then continues the frontier. A node whose prompt never
   reached a child becomes `interrupted` and needs an explicit retry, which also
   returns blocked dependents to pending. `settle` is once per attempt.
+  Observed (native `subagent`) runs recover the same way: a `running` node is
+  waited on through its recorded session and settled with that session's
+  outcome, so a reload no longer leaves "Subagent calls" running forever.
   `script/qa-dag-recover.mjs` reloads the plugin mid-run in a real TUI.
 - Fan-in is an ordinary Agent node binding `inputs: [{node: "*"}]`; every
   upstream result arrives with producer provenance. Conditional routing uses a

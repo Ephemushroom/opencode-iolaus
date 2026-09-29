@@ -386,6 +386,28 @@ test("gate validation requires a message and forbids an execution target", () =>
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "ok?", dependsOn: [] }]))).not.toThrow()
 })
 
+test("a restarted controller settles an observed subagent node from its recorded session", async () => {
+  const { createDagController: createEffect } = await import("../src/dag/controller")
+  const { Effect } = await import("effect")
+  directory = mkdtempSync(join(tmpdir(), "iolaus-observe-recover-"))
+  const path = join(directory, "iolaus.db")
+  for (const [session, expected] of [["ses_done", "completed"], ["ses_silent", "interrupted"]] as const) {
+    const first = createEffect({ directory, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+    const node = await Effect.runPromise(first.observe({ ownerSessionID: "owner", agent: "explore", title: `Work ${session}`, prompt: "go" }))
+    await Effect.runPromise(first.observed(node.runID, node.nodeID, { status: "running", sessionID: session }))
+    Effect.runSync(first.close)
+    const reattached: string[] = []
+    const second = createEffect({ directory, databasePath: path, runner: runnerFromPromise({ ...fakeRunner(), async reattach(ref) { reattached.push(ref.sessionID); return ref.sessionID === "ses_done" ? { payload: { text: "done while detached" } } : undefined } }) })
+    const until = Date.now() + 2000
+    let record = await Effect.runPromise(second.node(node.runID, "owner", node.nodeID))
+    while (record.status === "running" && Date.now() < until) { await new Promise((resolve) => setTimeout(resolve, 20)); record = await Effect.runPromise(second.node(node.runID, "owner", node.nodeID)) }
+    expect(reattached).toEqual([session])
+    expect(record.status).toBe(expected)
+    if (expected === "completed") expect(record.result?.payload).toEqual({ text: "done while detached" })
+    Effect.runSync(second.close)
+  }
+})
+
 test("observed runs record subagent calls by time and parent, settle once, and refuse scheduling", async () => {
   const { createDagController: createEffect } = await import("../src/dag/controller")
   const { Effect } = await import("effect")
