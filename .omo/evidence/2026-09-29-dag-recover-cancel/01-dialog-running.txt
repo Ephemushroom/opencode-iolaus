@@ -1,0 +1,44 @@
+   IOLAUS_QA_OK                  +
+
+  ┃                                                                                                                     IOLAUS_QA_OK
+  ┃  Run IOLAUS_QA_RECOVER
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_dag [action=create]                                                                                       0% used
+                                                                                                                        $0.00 spent
+     IOLAUS_QA_CREATED
+                                                                                                                         Iolaus
+     Build · GPT-5.5 · 60ms · 357.1 tok/s
+                                                                                                                                          ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┃                                                                                                                                                        ╎
+  ┃  Run IOLAUS_QA_CAN DAG details · 80593974                                                                                   Esc close 0/1 · gen 1 ·    ╎
+  ┃                    ⠴ QA cancel                                                                                                                         ╎
+                       Running · Done 0/1 [░░░░░░░░░░░░] · gen 1 · running 2s                                                                              ╎
+     ✓ iolaus_dag [act                                                                                                                                     ╎
+                                                                 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                           ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     IOLAUS_QA_CREATED                                           ┃ › hang                     ┃
+                                                                 ┃ ⠴ Running                  ┃
+     Build · GPT-5.5 ·                                           ┃ hang                       ┃
+                                                                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                           s
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮  · ctrl+x d
+                       │ ⠴ hang · hang                                                                                                  │
+                       │ Status: Running · agent                                                                                        │
+                       │ Agent: sisyphus · Model: openai/gpt-5.5 · Attempt: 1                                                           │
+                       │ Depends on: none (start node)                                                                                  │
+                       │ Unblocks: none (final node)                                                                                    │
+                       │                                                                                                                │
+                       │ No result yet.                                                                                                 │
+                       ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+                       ↑/↓ j/k select · Enter/o open · c cancel run · PgUp/PgDn details · Esc close
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-e1nNyi/project   15 (0%) · $0.00  ctrl+p commands    /…/T/iolaus-recover-qa-e1nNyi/project
