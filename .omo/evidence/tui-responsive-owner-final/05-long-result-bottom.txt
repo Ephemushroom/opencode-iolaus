@@ -1,0 +1,45 @@
+   RESPONSIVE_QA_READY           +
+
+  ┃                                                                                                                                       Y
+  ┃  Create the respon
+  ┃                    DAG details · 92149c65                                                                                   Esc close
+                       ✓ Responsive seven parallel
+     ✓ iolaus_dag [act Done · Done 7/7 [████████████] · gen 1 · done in 0s
+
+     ✓ iolaus_dag [act            ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓ ╭────────────────────────────╮ ╭────────────────────────────╮          █
+                                  ┃ › p1 ⚖                     ┃ │   p2 ⚖                     │ │   p3 ⚖                     │          █
+     RESPONSIVE_QA_REA            ┃ ✓ Done                     ┃ │ ✓ Done                     │ │ ✓ Done                     │          █
+                                  ┃ Parallel card 1            ┃ │ Parallel card 2            │ │ Parallel card 3            │          █
+     Build · GPT-5.5 ·            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────────╯ ╰────────────────────────────╯          █ n parallel
+                                                                                                                                          s
+                                  ╭────────────────────────────╮ ╭────────────────────────────╮ ╭────────────────────────────╮
+                                  │   p4 ⚖                     │ │   p5 ⚖                     │ │   p6 ⚖                     │             · ctrl+x d
+                                  │ ✓ Done                     │ │ ✓ Done                     │ │ ✓ Done                     │
+                                  │ Parallel card 4            │ │ Parallel card 5            │ │ Parallel card 6            │
+                                  ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+
+                                                                 ╭────────────────────────────╮
+                                                                 │   p7 ⚖                     │
+                                                                 │ ✓ Done                     │
+                                                                 │ CARD_LAST_VISIBLE          │
+
+                       │ RESULT_LINE_47                                                                                                │
+                       │ RESULT_LINE_48                                                                                                │
+                       │ RESULT_LINE_49                                                                                                │
+                       │ RESULT_LINE_50                                                                                                │
+                       │ RESULT_LINE_51                                                                                                │
+                       │ RESULT_LINE_52                                                                                                │
+                       │ RESULT_LINE_53                                                                                                │  d                ✕
+                       │ RESULT_LINE_54                                                                                                │
+                       │ RESULT_LINE_55                                                                                                │  des free models so
+                       │ RESULT_LINE_56                                                                                                │  immediately.
+                       │ RESULT_LINE_57                                                                                                │
+                       │ RESULT_LINE_58                                                                                                │  5+ providers to
+                       │ RESULT_LINE_59                                                                                                │▄ ls, including
+  ┃                    │ RESULT_LINE_60                                                                                                │█ emini etc
+  ┃                    │ RESULT_END                                                                                                    │█
+  ┃                    ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────╯█ er        /connect
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · PgUp/PgDn details · Esc close
+  /…/fold…/cy/qc1d9pgd                                                                                                                    ve-qa-ig0eTS/project
+
