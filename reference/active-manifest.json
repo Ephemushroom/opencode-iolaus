@@ -220,7 +220,7 @@
       "source": "reference/omo/packages/agents-core/src/specialists/momus-prompt.ts",
       "path": "src/omo/agents/specialists/momus-prompt.ts",
       "sourceSha256": "e59c6a44d79ee29f7838dcbaa977091e1b777c936c96f681d70495db3e4611ed",
-      "activeSha256": "e59c6a44d79ee29f7838dcbaa977091e1b777c936c96f681d70495db3e4611ed"
+      "activeSha256": "37aab3cb59c2181fa4e3de354d314ae1ca39ba1713083572847110dfd2583393"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/librarian-prompt.ts",
@@ -238,7 +238,7 @@
       "source": "reference/omo/packages/agents-core/src/specialists/momus-gpt-5-6.ts",
       "path": "src/omo/agents/specialists/momus-gpt-5-6.ts",
       "sourceSha256": "51933fcbcd5f82df47103ed730c9820b3fb5ecf34aa5d78e3f9b331479cb3095",
-      "activeSha256": "51933fcbcd5f82df47103ed730c9820b3fb5ecf34aa5d78e3f9b331479cb3095"
+      "activeSha256": "4a1c68ddbd92e19a20949fceb9ae87864dc395680d2349ff62de15d98440fc4b"
     },
     {
       "source": "reference/omo/packages/agents-core/src/specialists/explore-prompt.ts",
@@ -370,7 +370,7 @@
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/codex.md",
       "path": "src/omo/modes/prompts/ultrawork/codex.md",
       "sourceSha256": "0dc0fa1b57be2511ffc64372c0a7a862c2f0465b41b8f3ac23ba058c6a138ded",
-      "activeSha256": "0dc0fa1b57be2511ffc64372c0a7a862c2f0465b41b8f3ac23ba058c6a138ded"
+      "activeSha256": "2cb4230bf0414eaaaf65ceb2d30851539c5a60281ea69528f8dc5ab983062b15"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/glm.md",
@@ -394,55 +394,55 @@
       "source": "reference/omo/packages/prompts-core/prompts/prometheus/default.md",
       "path": "src/omo/modes/prompts/prometheus/default.md",
       "sourceSha256": "16a4fc20cb2fa4810354b44f6aa589038a8f5b1fcfa4b0944a905e0af6d1cc9e",
-      "activeSha256": "16a4fc20cb2fa4810354b44f6aa589038a8f5b1fcfa4b0944a905e0af6d1cc9e"
+      "activeSha256": "d06f3cf42f60889d8244c3462e2a004761f20c30db99a4663b467e7f92478d0e"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi-k2-7.md",
       "path": "src/omo/modes/prompts/atlas/kimi-k2-7.md",
       "sourceSha256": "3fe3753c3ff953d704cbcacdb8ca516ac49f11d5f50ade28f994524af0c64a24",
-      "activeSha256": "61bece1f4c63654572b7e25cd285c8f94d7b97e8806430d289a0d5fcc0f00130"
+      "activeSha256": "211f23c73269e1f3e62027c8f39558b31a62af134aa9e823c5d7de2ef04f67ff"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi.md",
       "path": "src/omo/modes/prompts/atlas/kimi.md",
       "sourceSha256": "f6bb5ff2f721bbd48aeb59c399adfe3172fbfe3e62248175bfc074b1a09ea2d2",
-      "activeSha256": "f9abf508bb6c73fc31b07caee53cf37d6d59dc9f497bdd907515401c30c3bbfd"
+      "activeSha256": "1e6250bd3a2062e2485aab3cff4f753d0f5e9187544cd438533defab2bcee262"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/default.md",
       "path": "src/omo/modes/prompts/atlas/default.md",
       "sourceSha256": "ae78e9bd557d6520f4ee2cc8bc749b503ce42beee8a1369f4b230c1a1654b60a",
-      "activeSha256": "6a511a17459f2082e3b9420c680c01302ba9f9f60c4c62ff60eb4efda7f6fa61"
+      "activeSha256": "34091b2464e616f84706784a168769f8245615cc0f87dfbb2c02d2c1c992eac1"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/kimi-k3.md",
       "path": "src/omo/modes/prompts/atlas/kimi-k3.md",
       "sourceSha256": "25853da40661a894c74511fb81e92e606ce67bd309d5391edf803cc11386619b",
-      "activeSha256": "60b16e3efbf1958e5fe9a199e7560c3b67ac55d861729bc565ffca6f43eb867a"
+      "activeSha256": "99d06e0775f352c72bae1a1dce8ff76b91478cd803d8a2f716ebea7460f1c36d"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/gpt.md",
       "path": "src/omo/modes/prompts/atlas/gpt.md",
       "sourceSha256": "c2192d7542965999b819b9550f4f6b2d952af026ce562e85174347935a4028ac",
-      "activeSha256": "36e7dbdd1408dbfed73a0e4165018522935331d7ea05748ef86e43d2c69a6d55"
+      "activeSha256": "f1f3870cd054c75e9a10d139f12f0bc8d67151b8d68c3352b429d77588da56e2"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/glm.md",
       "path": "src/omo/modes/prompts/atlas/glm.md",
       "sourceSha256": "594c6e50937da2b655930552aed16284def1e7259c2ddc9f74b0afb2b97bed5b",
-      "activeSha256": "78f76299fac0327bbdc3cf208e70477d3e29daf5918ebc022a4463df5aa1f4e5"
+      "activeSha256": "1c6e1e3def3a8f12756f252a99daeb31584b00027f3390b2dc70857ee4c15ed3"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/gemini.md",
       "path": "src/omo/modes/prompts/atlas/gemini.md",
       "sourceSha256": "3da83ccd7f8fcbdfda34f581fbe5af0166fb724405bb375d9c9fddfecdce1c09",
-      "activeSha256": "7dabcf8630d0cd64c546c44fa7f43111c1828ebeee6853cd76c39e64fa675ca5"
+      "activeSha256": "cb2b1574d929ee4dfd0a7c90951fdd41098ef16d6d659503df9d5bc871e1d6e1"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/atlas/opus-4-7.md",
       "path": "src/omo/modes/prompts/atlas/opus-4-7.md",
       "sourceSha256": "6b3f4f1c0b7dcd6342c4de957152ee902e2060fc36e2b06d6e94d2afba722eca",
-      "activeSha256": "ce9eb01b7a15def5687c2f653f6de971ef1dc98f1a59a5f2232f14c987a8abdf"
+      "activeSha256": "22c4cb0f76f22bb18a9383b7b17d091a5418d6f5c5365a7bf369f02db027cd34"
     },
     {
       "source": "reference/omo/packages/prompts-core/src/variant-resolver.ts",

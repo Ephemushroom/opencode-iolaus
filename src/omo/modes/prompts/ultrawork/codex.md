@@ -428,7 +428,7 @@ body style, and typical commit size. Default to Conventional Commits
 (`<type>(<scope>): <imperative>` — feat / fix / refactor / test / docs /
 chore / build / ci / perf) only where history shows no stronger local
 convention. If a plan file exists, final commit footer:
-`Plan: .omo/plans/<slug>.md`. Skip committing only when the user forbade
+`Plan: .iolaus/plans/<slug>/spec.md`. Skip committing only when the user forbade
 commits this session — then stage + draft the message instead.
 
 # Constraints
