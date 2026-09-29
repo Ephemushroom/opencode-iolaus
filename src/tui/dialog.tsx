@@ -111,6 +111,13 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     if (!node || !value || busy()) return
     if ((action === "approve" || action === "reject") && !waiting()) return
     if ((action === "retry" && !retryable()) || (action === "cancel" && !cancellable())) return
+    if (action === "cancel") {
+      const confirmed = await context.ui.dialog.confirm({ title: "Cancel DAG run?", message: `Stop "${value.name}" and interrupt its running agents. Finished nodes keep their results.`, label: { confirm: "Cancel run", cancel: "Keep running" } })
+      // The confirm prompt takes over the dialog slot; bring the details back whatever the answer.
+      if (!alive) openDagDialog(context, props.sessionID, props.runID, node.id)
+      if (!confirmed) return
+      trace("iolaus.tui.cancel.confirmed", { runID: value.runID })
+    }
     setBusy(action)
     const destination = target()
     try {
@@ -132,6 +139,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       { id: "iolaus.dag.open", title: "Iolaus DAG: open agent session", bind: "o,return", enabled: hasSession, run: open },
       { id: "iolaus.dag.approve", title: "Iolaus DAG: approve gate", bind: "a", enabled: waiting, run: () => void decide("approve") },
       { id: "iolaus.dag.reject", title: "Iolaus DAG: reject gate", bind: "r", enabled: waiting, run: () => void decide("reject") },
+      { id: "iolaus.dag.cancel", title: "Iolaus DAG: cancel run", bind: "c", enabled: cancellable, run: () => void decide("cancel") },
       { bind: "pageup", run: () => detail?.scrollBy(-Math.max(1, detail.viewport.height - 1)) },
       { bind: "pagedown", run: () => detail?.scrollBy(Math.max(1, detail.viewport.height - 1)) },
       { bind: "escape", run: close },
@@ -190,11 +198,10 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>Result</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
               <Show when={!node().result && !node().error && !node().prompt}><text marginTop={1} fg={theme().text.muted}>No result yet.</text></Show>
               <Show when={retryable()}><text marginTop={1} fg={theme().text.action.primary.base} onMouseUp={(event) => { if (event.button === 0) void decide("retry") }}>[Retry node]</text></Show>
-              <Show when={cancellable()}><text fg={theme().text.feedback.error.base} onMouseUp={(event) => { if (event.button === 0) void decide("cancel") }}>[Cancel run]</text></Show>
             </box>}</Show>
           </scrollbox>
         </box>
-        <text marginTop={1} fg={theme().text.muted}>{busy() ? `${busy()}...` : `↑/↓ j/k select · ${hasSession() ? "Enter/o open · " : ""}${waiting() ? "a approve · r reject · " : ""}PgUp/PgDn details · Esc close`}</text>
+        <text marginTop={1} fg={theme().text.muted}>{busy() ? `${busy()}...` : `↑/↓ j/k select · ${hasSession() ? "Enter/o open · " : ""}${waiting() ? "a approve · r reject · " : ""}${cancellable() ? "c cancel run · " : ""}PgUp/PgDn details · Esc close`}</text>
       </>}</Show>
     </box>
   )

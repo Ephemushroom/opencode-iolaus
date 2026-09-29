@@ -1,0 +1,44 @@
+   IOLAUS_QA_OK                  +
+
+  ┃                                                                                                                     IOLAUS_QA_OK
+  ┃  Run IOLAUS_QA_RECOVER
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_dag [action=create]                                                                                       0% used
+                                                                                                                        $0.00 spent
+     IOLAUS_QA_CREATED
+                                                                                                                         Iolaus
+     Build · GPT-5.5 · 60ms · 357.1 tok/s
+
+  ┃
+  ┃  Run IOLAUS_QA_CAN DAG details · 80593974                                                                                   Esc close  in 4s
+  ┃                    × QA cancel
+                       Cancelled · Done 0/1 [░░░░░░░░░░░░] · gen 1 · cancelled in 4s                                                      s
+     ✓ iolaus_dag [act
+                                                                 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                            · ctrl+x d
+     IOLAUS_QA_CREATED                                           ┃ › hang                     ┃
+                                                                 ┃ × Cancelled                ┃
+     Build · GPT-5.5 ·                                           ┃ hang                       ┃
+                                                                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ × hang · hang                                                                                                  │
+                       │ Status: Cancelled · agent                                                                                      │
+                       │ Agent: sisyphus · Model: openai/gpt-5.5 · Attempt: 1                                                           │
+                       │ Depends on: none (start node)                                                                                  │
+                       │ Unblocks: none (final node)                                                                                    │
+                       │                                                                                                                │
+                       │ No result yet.                                                                                                 │
+                       ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+                       ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-e1nNyi/project   15 (0%) · $0.00  ctrl+p commands    /…/T/iolaus-recover-qa-e1nNyi/project

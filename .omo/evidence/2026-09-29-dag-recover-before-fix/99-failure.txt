@@ -1,0 +1,44 @@
+   IOLAUS_QA_OK                  +
+
+  ┃                                                                                                                     IOLAUS_QA_OK
+  ┃  Run IOLAUS_QA_RECOVER
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_dag [action=create]                                                                                       0% used
+                                                                                                                        $0.00 spent
+     IOLAUS_QA_CREATED
+                                                                                                                         Iolaus
+     Build · GPT-5.5 · 63ms · 303.0 tok/s
+                                                                                                                         ╭╌ running ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+                                                                                                                         ╎ ⠹ QA recover                    ╎
+                                                                                                                         ╎ [░░░░░░░░░░░░] 0/2 · gen 1 ·    ╎
+                                                                                                                         ╎ running 34s                     ╎
+                                                                                                                         ╎   ⠹ slow                        ╎
+                                                                                                                         ╎     slow                        ╎
+                                                                                                                         ╎   · after                       ╎
+                                                                                                                         ╎     after                       ╎
+                                                                                                                         ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+                                                                                                                         Click for details · ctrl+x d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-PidpPB/project   15 (0%) · $0.00  ctrl+p commands    /…/T/iolaus-recover-qa-PidpPB/project
