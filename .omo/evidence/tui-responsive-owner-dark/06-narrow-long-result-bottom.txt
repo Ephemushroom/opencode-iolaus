@@ -1,0 +1,28 @@
+   RESPONSIVE_QA_READY           +
+
+
+
+  DAG details · 241dedcc                                             Esc close
+  ✓ Responsive seven parallel
+  Done · Done 7/7 [████████████] · gen 1 · done in 0s
+
+             ┏━━━━━━━━━━━━━━━━━━━━━━━━┓ ╭────────────────────────╮           ▀
+             ┃ › p1 ⚖                 ┃ │   p2 ⚖                 │
+             ┃ ✓ Done                 ┃ │ ✓ Done                 │
+             ┃ Parallel card 1        ┃ │ Parallel card 2        │
+             ┗━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────╯
+
+             ╭────────────────────────╮ ╭────────────────────────╮
+             │   p3 ⚖                 │ │   p4 ⚖                 │
+
+  │ RESULT_LINE_54                                                          │
+  │ RESULT_LINE_55                                                          │
+  │ RESULT_LINE_56                                                          │
+  │ RESULT_LINE_57                                                          │
+  │ RESULT_LINE_58                                                          │
+  │ RESULT_LINE_59                                                          │
+  │ RESULT_LINE_60                                                          │
+  │ RESULT_END                                                              │
+  ╰─────────────────────────────────────────────────────────────────────────╯█
+
+  ↑/↓ j/k select · PgUp/PgDn details · Esc close

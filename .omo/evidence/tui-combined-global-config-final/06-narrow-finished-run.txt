@@ -1,0 +1,44 @@
+   IOLAUS_TUI_QA_DONE              Iolaus DAG · execute          +
+
+  ┃
+  ┃  Run a plan-review DAG for IOLAUS_TUI_TASK
+  ┃
+
+     ✓ iolaus_dag [action=create]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     ✓ iolaus_dag [action=snapshot, run_id=3e160fcb-494d-4002-b23b-6e24a2e5fd65]
+
+     IOLAUS_TUI_QA_DONE
+
+     Build · GPT-5.5 · 24.2s · 2.1 tok/s
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  jkoar
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/qc1d9pgd1hq599hhhw_z2l2w000…/T/iolaus-tui-qa-WhoQG1/project  15 (0%) · $0.00  ctrl+p commands
