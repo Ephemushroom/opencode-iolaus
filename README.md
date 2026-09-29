@@ -102,6 +102,8 @@ After every `edit`, `write` or `patch`, Iolaus verifies the changed files and ap
 
 If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh` namespace in Code Mode: `tools.gh.searchCode`, `searchRepos`, `repo`, `issues`, `issue`, `prs`, `pr`, `prDiff`, and `clone` (shallow, into a temporary directory) followed by `log`, `blame` and `show` on the clone. Calls run the `gh` binary directly with fixed arguments; there is no shell and no `gh api`, so nothing can write to GitHub. Set `"gh": false` in the global `iolaus.json` to leave it out.
 
+A DAG run starts at most `background_task.defaultConcurrency` nodes at once (default 5), for example `{ "background_task": { "defaultConcurrency": 7 } }` in the global `iolaus.json`. A run's own `maxParallel` can lower that limit but not raise it.
+
 Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for settings, models and verification. It provisions `{}` if missing and never overwrites an existing file; malformed or unknown settings reject plugin setup. `<project>/.iolaus` still holds project-local DAG state and plans, not configuration overrides. Skills and memory are not Iolaus features: the host discovers skills, and your memory plugin keeps memory.
 
 ## Development
