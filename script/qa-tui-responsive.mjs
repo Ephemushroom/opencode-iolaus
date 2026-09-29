@@ -125,12 +125,13 @@ const processTable = () => execFileSync("ps", ["-axo", "pid=,ppid=,command="], {
 })
 let failure, panePID, tracked = [], forcedCleanup = []
 try {
-  for (const path of [project, localPackage, home, join(config, "opencode/plugins/iolaus")]) mkdirSync(path, { recursive: true })
+  for (const path of [project, localPackage, join(home, ".iolaus"), join(config, "opencode/plugins/iolaus")]) mkdirSync(path, { recursive: true })
   symlinkSync(join(packageRoot, "dist"), join(localPackage, "dist"), "dir")
   writeFileSync(join(localPackage, "package.json"), JSON.stringify({ name: "opencode-iolaus", type: "module", main: "./dist/index.js", exports: { ".": "./dist/index.js", "./tui": "./dist/tui.js" } }))
   mock.listen(0, "127.0.0.1"); await once(mock, "listening")
+  writeFileSync(join(home, ".iolaus", "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], gh: false, astGrep: false, verify: false, models: { agents: { momus: "openai/gpt-5.5" } } }))
   writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
-    plugins: [{ package: join(packageRoot, "dist"), options: { enabled: true, mcps: [], gh: false, astGrep: false, verify: false, models: { agents: { momus: "openai/gpt-5.5" } } } }],
+    plugins: [{ package: join(packageRoot, "dist") }],
     model: "openai/gpt-5.5", permissions: [{ action: "*", resource: "*", effect: "allow" }],
     provider: { openai: { options: { apiKey: "fake-key", baseURL: `http://127.0.0.1:${mock.address().port}/v1` }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } },
   }))
