@@ -58,6 +58,7 @@ test("canonical JSON and graph fingerprints are stable across object ordering", 
 test("graph validation rejects cycles and unknown dependencies", () => {
   expect(() => validateDefinition(definition([node("a", ["b"]), node("b", ["a"])]))).toThrow(DagValidationError)
   expect(() => validateDefinition(definition([node("a", ["missing"])]))).toThrow("Unknown dependency")
+  for (const maxParallel of [0, -1, 1.5]) expect(() => validateDefinition({ ...definition([node("a")]), maxParallel })).toThrow("maxParallel must be a positive integer")
 })
 
 test("dependency frontier starts independent roots and then unlocks descendants", async () => {
@@ -68,6 +69,30 @@ test("dependency frontier starts independent roots and then unlocks descendants"
   const completed = await controller.wait(run.runID, "caller")
   expect(completed.status).toBe("completed")
   expect(runner.started).toEqual(["a", "b", "c"])
+  controller.close()
+})
+
+test("independent roots run concurrently up to maxParallel", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  let active = 0
+  let peak = 0
+  const runner: DagRunnerPromise = {
+    async start(input) {
+      active += 1
+      peak = Math.max(peak, active)
+      return { nodeID: input.node.id, attempt: input.attempt, sessionID: `session-${input.node.id}` }
+    },
+    async wait(ref: DagExecutionRef) {
+      await new Promise((resolve) => setTimeout(resolve, 20))
+      active -= 1
+      return { payload: { node: ref.nodeID } }
+    },
+    async cancel() {},
+  }
+  const controller = createDagController({ directory, runner })
+  const run = await controller.create(definition([node("a"), node("b"), node("c")]), "caller")
+  expect((await controller.wait(run.runID, "caller")).status).toBe("completed")
+  expect(peak).toBe(2)
   controller.close()
 })
 

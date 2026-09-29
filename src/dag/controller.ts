@@ -121,7 +121,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const store = new DagStore(databasePath)
   const runner = options.runner
   const now = options.now ?? Date.now
-  const maxParallel = options.maxParallel ?? 4
+  const maxParallel = options.maxParallel ?? 5
   const locks = new Map<string, Semaphore.Semaphore>()
   const waiters = new Map<string, Set<Deferred.Deferred<DagRunRecord>>>()
   // Every launch fiber lives in this scope; closing the controller interrupts them.
@@ -218,7 +218,8 @@ export function createDagController(options: DagControllerOptions): DagControlle
           event(run, "node.waiting", node.definition.id, { message: node.definition.prompt, inputs: jsonText(resolveInputs(node, run)) })
           continue
         }
-        if (activeCount(run) + launches.length >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
+        // run already marks this pass's launches as starting, so activeCount includes them.
+        if (activeCount(run) >= Math.min(maxParallel, run.definition.maxParallel ?? maxParallel)) continue
         const next = updateNode(run, node.definition.id, (current) => ({ ...current, status: "starting", attempt: current.attempt + 1, updatedAt: now() }))
         run = next
         launches.push(next.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)

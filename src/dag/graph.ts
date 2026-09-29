@@ -16,6 +16,9 @@ export function validateDefinition(definition: DagDefinition): void {
   if (definition.schemaVersion !== 1) throw new DagValidationError("Unsupported DAG schema version")
   if (!definition.name.trim()) throw new DagValidationError("DAG name must be nonempty")
   if (definition.nodes.length === 0) throw new DagValidationError("DAG must contain at least one node")
+  if (definition.maxParallel !== undefined && (!Number.isInteger(definition.maxParallel) || definition.maxParallel < 1)) {
+    throw new DagValidationError("DAG maxParallel must be a positive integer")
+  }
   const nodes = new Map<string, DagNodeDefinition>()
   for (const node of definition.nodes) {
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")

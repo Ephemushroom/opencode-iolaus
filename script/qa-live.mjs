@@ -183,6 +183,8 @@ try {
      { name: "mode", enabled: true, agent: "build", mode: "ultrawork" },
      { name: "dag", enabled: true, agent: "build", dag: true },
      { name: "fanin", enabled: true, agent: "build", dag: true, fanin: true },
+     // background_task.defaultConcurrency 1 caps the run below its own maxParallel 2.
+     { name: "fanin-serial", enabled: true, agent: "build", dag: true, fanin: true, concurrency: 1 },
      { name: "route", enabled: true, agent: "build", dag: true, route: true },
      // plan-review template through the real tool: Prometheus plans, Momus fails once, Prometheus revises, Momus passes, gate, Sisyphus executes.
      { name: "template", enabled: true, agent: "build", dag: true, template: true, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
@@ -227,7 +229,7 @@ try {
     const iolausHome = join(home, ".iolaus")
     mkdirSync(iolausHome, { recursive: true })
     env.IOLAUS_HOME = iolausHome
-    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}) }))
+    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}), ...(scenario.concurrency ? { background_task: { defaultConcurrency: scenario.concurrency } } : {}) }))
     const settings = { plugins: [{ package: join(root,"dist") }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
@@ -305,6 +307,10 @@ try {
          assert.deepEqual(inputs.map((i) => i.provenance.agent), ["sisyphus", "hephaestus"], "Fan-in provenance agent missing")
          assert.ok(inputs.every((i) => typeof i.provenance.sessionID === "string" && i.provenance.sessionID.startsWith("ses_")), "Fan-in provenance sessionID missing")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 3, "Expected three completed fan-in nodes")
+        // maxParallel 2 admits both independent roots before either completes; defaultConcurrency 1 admits one.
+        const firstCompleted = Math.min(...traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.sequence))
+        const rootsReady = traces.filter((t) => t.event === "iolaus.dag.node.ready" && ["a", "b"].includes(t.nodeID) && t.sequence < firstCompleted).length
+        assert.equal(rootsReady, scenario.concurrency ?? 2, "Independent roots ignored the concurrency limit")
        }
        if (scenario.astGrep) {
          assert.ok(traces.some((t) => t.event === "iolaus.ast_grep.registered" && t.binary), "ast_grep tools were not registered")

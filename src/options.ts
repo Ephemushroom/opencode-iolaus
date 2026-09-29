@@ -14,6 +14,8 @@ export interface Options {
   verify: boolean | Record<string, unknown>
   /** Register the read-only `gh` Code Mode tools when an authenticated gh CLI is available. */
   gh: boolean
+  /** `background_task.defaultConcurrency`: most DAG nodes one run may execute at once; a run's own `maxParallel` can only lower it. */
+  defaultConcurrency: number
 }
 
 function selection<T extends string>(value: unknown, allowed: readonly T[], name: string): T[] {
@@ -25,7 +27,7 @@ function selection<T extends string>(value: unknown, allowed: readonly T[], name
 }
 
 export function parseOptions(input: Record<string, unknown>): Options {
-  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify", "gh"].includes(key))
+  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify", "gh", "background_task"].includes(key))
   if (unknown.length) throw new TypeError(`Unknown Iolaus options: ${unknown.join(", ")}`)
   if (input.enabled !== undefined && typeof input.enabled !== "boolean") {
     throw new TypeError("Iolaus enabled must be a boolean")
@@ -35,6 +37,16 @@ export function parseOptions(input: Record<string, unknown>): Options {
   }
   if (input.gh !== undefined && typeof input.gh !== "boolean") {
     throw new TypeError("Iolaus gh must be a boolean")
+  }
+  const background = input.background_task
+  if (background !== undefined) {
+    if (typeof background !== "object" || background === null || Array.isArray(background)) throw new TypeError("Iolaus background_task must be an object")
+    const unknownBackground = Object.keys(background).filter((key) => key !== "defaultConcurrency")
+    if (unknownBackground.length) throw new TypeError(`Unknown Iolaus background_task options: ${unknownBackground.join(", ")}`)
+    const concurrency = (background as Record<string, unknown>).defaultConcurrency
+    if (concurrency !== undefined && (!Number.isInteger(concurrency) || (concurrency as number) < 1)) {
+      throw new TypeError("Iolaus background_task.defaultConcurrency must be a positive integer")
+    }
   }
   if (input.verify !== undefined && typeof input.verify !== "boolean" && (typeof input.verify !== "object" || input.verify === null || Array.isArray(input.verify))) {
     throw new TypeError("Iolaus verify must be a boolean or an object")
@@ -48,5 +60,6 @@ export function parseOptions(input: Record<string, unknown>): Options {
     gh: input.gh !== false,
     mcps: selection(input.mcps, MCP_NAMES, "mcps"),
     verify: input.verify === undefined ? true : (input.verify as boolean | Record<string, unknown>),
+    defaultConcurrency: ((background as { defaultConcurrency?: number } | undefined)?.defaultConcurrency) ?? 5,
   }
 }
