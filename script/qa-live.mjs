@@ -100,6 +100,7 @@ const server = http.createServer(async (req, res) => {
        call = undefined
        if (childNode[1] === "REVIEW") text = "IOLAUS_ROUTE_VERDICT_PASS"
        else if (childNode[1] === "QUICK" || childNode[1] === "ORACLE") text = `IOLAUS_LANE_RESULT_${childNode[1]}`
+       else if (childNode[1] === "MOMUS") text = "No blockers found in the diff.\nVERDICT: PASS"
        else if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
      } else if (active.dag && tools.includes("iolaus_dag")) {
        const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
@@ -143,6 +144,11 @@ const server = http.createServer(async (req, res) => {
                  { id: "a", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
                  { id: "b", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
                  { id: "merge", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
+           : active.momus
+             // No plan path anywhere in the prompt: Momus must review the "diff" directly (general review mode)
+             // instead of rejecting for missing input, and its rendered system prompt must carry the Iolaus plan path.
+             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA momus", maxParallel: 1, nodes: [
+                 { id: "node", agent: "momus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MOMUS Review this diff for correctness; there is no plan involved:\ndiff --git a/src/a.ts b/src/a.ts\n+const x = 1\n+export default x", dependsOn: [] } ] } } }
              : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if ((active.astGrep || active.code) && tools.includes("execute")) {
        const outputs = (body.input ?? []).filter((item) => item?.type === "function_call_output")
@@ -192,6 +198,9 @@ try {
      // /ultrawork is a DAG mode: the command text tells the primary to create the ultrawork template; the loop runs three rounds.
      { name: "ultrawork-dag", enabled: true, agent: "build", dag: true, mode: "ultrawork", template: "ultrawork", models: { agents: { momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } },
      { name: "lanes", enabled: true, agent: "build", dag: true, lanes: true, models: { agents: { oracle: "openai/gpt-5.6-sol#xhigh" }, categories: { quick: "openai/gpt-6-luna-fast#low" } } },
+     // A momus DAG node reviewing a diff with no plan path anywhere in the prompt: Momus must review it directly
+     // (general review mode) instead of rejecting for missing input, and must carry the Iolaus `.iolaus/plans` layout.
+     { name: "momus", enabled: true, agent: "build", dag: true, momus: true },
      { name: "astgrep-explore", enabled: true, agent: "explore", agentPermissions: true,
        astGrep: 'const r = await tools.ast_grep.search({ pattern: "console.log($A)", language: "typescript", paths: ["src"] }); return { ok: r.ok, count: r.matches.length, lines: r.matches.map((m) => m.path + ":" + m.range.start.line), first: r.matches[0].metavariables.single.A }' },
      { name: "astgrep-rewrite", enabled: true, agent: "build",
@@ -411,6 +420,18 @@ try {
          const finalWait = captured.map((r) => r.input).find((input) => input.includes("IOLAUS_LANE_RESULT_QUICK") && input.includes("openai/gpt-6-luna-fast#low"))
          assert.ok(finalWait, "DAG result did not record the lane model in provenance")
          assert.equal(traces.filter((t) => t.event === "iolaus.dag.node.completed").length, 2)
+       }
+       if (scenario.momus) {
+         assert.ok(traces.some((t) => t.event === "iolaus.agent.rendered" && t.agent === "momus"), "momus was not rendered as a DAG child")
+         // ".iolaus/plans/<plan>/spec.md" (literal placeholder) is shared verbatim by all three Momus prompt variants
+         // (default, GPT, GPT-5.6), so it both identifies the momus request and proves the Iolaus plan path is in it.
+         const momusRequest = captured.find((r) => r.instructions.includes(".iolaus/plans/<plan>/spec.md"))
+         assert.ok(momusRequest, "momus child session did not render the Iolaus plan-path input contract")
+         assert.ok(!momusRequest.instructions.includes(".omo/plans"), "momus system prompt still references the OMO plan path")
+         const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
+         const reviewed = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_MOMUS"))
+         assert.ok(reviewed, "momus was not prompted with the plan-free diff to review")
+         assert.ok(traces.some((t) => t.event === "iolaus.dag.node.completed" && t.nodeID === "node"), "momus DAG node did not complete")
        }
        if (scenario.template === true) {
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
