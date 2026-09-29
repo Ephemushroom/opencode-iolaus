@@ -19,6 +19,11 @@ export interface DagRunnerStart {
 export interface DagRunner {
   start(input: DagRunnerStart): Effect.Effect<DagExecutionRef, DagRunnerError>
   wait(ref: DagExecutionRef): Effect.Effect<DagExecutionResult, DagRunnerError>
+  /**
+   * Picks up a child started by an earlier controller (plugin reload or restart) without prompting it again: waits
+   * for it like `wait` when it received its prompt, or returns undefined when it never did.
+   */
+  reattach(ref: DagExecutionRef): Effect.Effect<DagExecutionResult | undefined, DagRunnerError>
   cancel(ref: DagExecutionRef): Effect.Effect<void, DagRunnerError>
 }
 
@@ -26,6 +31,8 @@ export interface DagRunner {
 export interface DagRunnerPromise {
   start(input: DagRunnerStart): Promise<DagExecutionRef>
   wait(ref: DagExecutionRef): Promise<DagExecutionResult>
+  /** Optional; a runner without it treats every child from an earlier controller as never prompted. */
+  reattach?(ref: DagExecutionRef): Promise<DagExecutionResult | undefined>
   cancel(ref: DagExecutionRef): Promise<void>
 }
 
@@ -37,6 +44,7 @@ export function runnerFromPromise(runner: DagRunnerPromise): DagRunner {
   return {
     start: (input) => lift(input.node.id, () => runner.start(input)),
     wait: (ref) => lift(ref.nodeID, () => runner.wait(ref)),
+    reattach: (ref) => runner.reattach ? lift(ref.nodeID, () => runner.reattach!(ref)) : Effect.succeed(undefined),
     cancel: (ref) => lift(ref.nodeID, () => runner.cancel(ref)),
   }
 }
@@ -74,6 +82,15 @@ const JUDGE_REF = "judge:"
 export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly generate: GenerateApi; readonly location: { readonly directory: string } }): DagRunner {
   const judgeReplies = new Map<string, string>()
   const pendingPrompts = new Map<string, string>()
+  const finish = (ref: DagExecutionRef) => Effect.gen(function* () {
+    const sessionID = ref.sessionID as never
+    yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+    const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+    const messages = yield* ctx.session.context({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+    if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID })
+    if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
+    return { payload: { text: assistantText(messages as readonly unknown[]) } }
+  })
   return {
     start: (input) => Effect.gen(function* () {
       if (input.node.kind === "judge") {
@@ -107,12 +124,14 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
         pendingPrompts.delete(ref.sessionID)
         yield* ctx.session.prompt({ sessionID, text: prompt, delivery: "queue" }).pipe(Effect.mapError(runnerError(ref.nodeID)))
       }
-      yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
-      const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
-      const messages = yield* ctx.session.context({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
-      if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID })
-      if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
-      return { payload: { text: assistantText(messages as readonly unknown[]) } }
+      return yield* finish(ref)
+    }),
+    reattach: (ref) => Effect.gen(function* () {
+      // A judge reply and an unsent prompt live only in the controller that started them.
+      if (ref.sessionID.startsWith(JUDGE_REF) || pendingPrompts.has(ref.sessionID)) return undefined
+      const messages = yield* ctx.session.context({ sessionID: ref.sessionID as never }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+      const prompted = (messages as readonly unknown[]).some((message) => typeof message === "object" && message !== null && (message as { type?: unknown }).type === "user")
+      return prompted ? yield* finish(ref) : undefined
     }),
     cancel: (ref) => Effect.gen(function* () {
       if (ref.sessionID.startsWith(JUDGE_REF)) { judgeReplies.delete(ref.sessionID); return }

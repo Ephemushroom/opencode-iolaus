@@ -128,6 +128,80 @@ test("completed DAG state survives controller restart through SQLite WAL", async
   second.close()
 })
 
+/** A runner whose children never finish, standing in for a controller that stops while nodes run. */
+function stalledRunner(stage: "start" | "wait"): DagRunnerPromise {
+  const never = new Promise<never>(() => {})
+  return {
+    async start(input) { if (stage === "start") return never; return { nodeID: input.node.id, attempt: input.attempt, sessionID: `session-${input.node.id}` } },
+    wait: () => never,
+    async cancel() {},
+  }
+}
+
+async function stalledRun(stage: "start" | "wait") {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const first = createDagController({ directory, runner: stalledRunner(stage) })
+  const run = await first.create(definition([node("a"), node("b", ["a"])]), "caller")
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  expect((await first.snapshot(run.runID, "caller")).run.nodes[0]?.status).toBe(stage === "start" ? "starting" : "running")
+  first.close()
+  return run.runID
+}
+
+test("a restarted controller settles a child that finished while nobody waited, then runs its dependents", async () => {
+  const runID = await stalledRun("wait")
+  const runner = fakeRunner()
+  const reattached: string[] = []
+  const second = createDagController({ directory: directory!, runner: { ...runner, async reattach(ref) { reattached.push(ref.sessionID); return { payload: { text: "finished while detached" } } } } })
+  const done = await second.wait(runID, "caller")
+  expect(done.status).toBe("completed")
+  expect(reattached).toEqual(["session-a"])
+  expect(runner.started).toEqual(["b"])
+  expect(done.nodes[0]?.result?.payload).toEqual({ text: "finished while detached" })
+  expect(done.nodes[0]?.result?.provenance.execution?.sessionID).toBe("session-a")
+  second.close()
+})
+
+test("a restarted controller interrupts nodes whose prompt never reached a child, and retry runs them again", async () => {
+  for (const stage of ["start", "wait"] as const) {
+    const runID = await stalledRun(stage)
+    const runner = fakeRunner()
+    const second = createDagController({ directory: directory!, runner: { ...runner, async reattach() { return undefined } } })
+    const stopped = await second.wait(runID, "caller")
+    expect(stopped.status).toBe("failed")
+    expect(stopped.nodes.map((n) => n.status)).toEqual(["interrupted", "blocked"])
+    expect(runner.started).toEqual([])
+    await second.retry(runID, "caller")
+    const done = await second.wait(runID, "caller")
+    expect(done.status).toBe("completed")
+    expect(runner.started).toEqual(["a", "b"])
+    second.close()
+    rmSync(directory!, { recursive: true, force: true })
+  }
+})
+
+test("the native runner reattaches a prompted child without prompting it again", async () => {
+  const { createOpenCodeDagRunner } = await import("../src/dag/runner")
+  const { Effect } = await import("effect")
+  let prompted = 0
+  const context: Record<string, unknown[]> = {
+    prompted: [{ type: "user", text: "do" }, { type: "assistant", content: [{ type: "text", text: "child done" }] }],
+    silent: [],
+  }
+  const runner = createOpenCodeDagRunner({
+    location: { directory: "/p" },
+    generate: { text: () => Effect.succeed({ text: "" }) },
+    session: {
+      create: () => Effect.succeed({ id: "ses_new" }), prompt: () => { prompted += 1; return Effect.void }, wait: () => Effect.void,
+      get: () => Effect.succeed({ outcome: "succeeded" }), context: (input: { sessionID: string }) => Effect.succeed(context[input.sessionID] ?? []), interrupt: () => Effect.void,
+    },
+  } as never)
+  expect(await Effect.runPromise(runner.reattach({ nodeID: "a", attempt: 1, sessionID: "prompted" }))).toEqual({ payload: { text: "child done" } })
+  expect(await Effect.runPromise(runner.reattach({ nodeID: "a", attempt: 1, sessionID: "silent" }))).toBeUndefined()
+  expect(await Effect.runPromise(runner.reattach({ nodeID: "j", attempt: 1, sessionID: "judge:j:1:0" }))).toBeUndefined()
+  expect(prompted).toBe(0)
+})
+
 test("fan-in binding expands to every dependency and carries producer provenance", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
   const prompts = new Map<string, string>()
