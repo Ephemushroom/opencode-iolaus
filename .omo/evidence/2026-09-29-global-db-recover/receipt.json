@@ -1,0 +1,67 @@
+{
+  "verdict": "PASS",
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.19",
+  "packageRoot": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/global-dag-store",
+  "checks": [
+    {
+      "name": "plugin reloaded mid-run",
+      "verdict": "PASS",
+      "loads": 2
+    },
+    {
+      "name": "running node reattached and run completed",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel keybind declines and confirms",
+      "verdict": "PASS"
+    },
+    {
+      "name": "observed subagent node reattached after reload",
+      "verdict": "PASS"
+    }
+  ],
+  "screens": [
+    "01-dialog-running",
+    "02-confirm-shown",
+    "03-confirm-declined",
+    "04-confirm-again",
+    "05-after-confirm"
+  ],
+  "requestCount": 12,
+  "realBefore": {
+    "config": "f7c263ceb4d3b5d9cd320b6153b4df04847a12041ca872b5204381a572fc6068",
+    "database": "a305db1c6fecb43fb01e594f471f15eabfdcd63957ac06037986097a8c2dc82f"
+  },
+  "realAfter": {
+    "config": "f7c263ceb4d3b5d9cd320b6153b4df04847a12041ca872b5204381a572fc6068",
+    "database": "a305db1c6fecb43fb01e594f471f15eabfdcd63957ac06037986097a8c2dc82f"
+  },
+  "hostConfigUnchanged": true,
+  "realDatabaseDigestChanged": false,
+  "isolation": {
+    "databasePaths": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db-wal"
+    ],
+    "databasePathsAtEnd": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/data/opencode/opencode.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-RDLJHS/home/.iolaus/iolaus.db-wal"
+    ]
+  },
+  "cleanup": {
+    "sandboxRemoved": true,
+    "mockClosed": true,
+    "tmuxStopped": true
+  },
+  "omitted": "No provider credentials, auth files or inherited secret-bearing environment values were recorded."
+}

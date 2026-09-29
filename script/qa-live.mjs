@@ -293,7 +293,7 @@ try {
          assert.ok(ready.project.startsWith(project), `project layer outside the project: ${ready.project}`)
          assert.ok(existsSync(join(home, ".iolaus", "README.md")), "user layer README missing")
          assert.ok(!existsSync(join(home, ".iolaus", "agent")), "Iolaus must not provision an agent/ directory (skills and memory are the host's)")
-         assert.ok(existsSync(join(project, ".iolaus", "plans")), "project plans dir missing")
+         assert.ok(!existsSync(join(project, ".iolaus", "plans")), "project plans dir was pre-created")
          const rendered = requests.filter((r) => r.scenario === scenario.name && r.instructions.includes("<iolaus-native-contract>"))
          if (rendered.length) assert.ok(rendered.every((r) => r.instructions.includes(`<iolaus-home>Iolaus config: ${join(home, ".iolaus", "iolaus.json")}`)), "rendered prompt lacks the home contract")
        }

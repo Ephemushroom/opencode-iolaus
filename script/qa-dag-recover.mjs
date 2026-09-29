@@ -22,6 +22,7 @@ const project = join(sandbox, "project"), home = join(sandbox, "home"), config =
 const localPackage = join(sandbox, "iolaus-package")
 const tracePath = join(evidence, "trace.ndjson")
 const release = join(sandbox, "release-slow")
+const releaseChild = join(sandbox, "release-child")
 for (const dir of [project, home, join(config, "opencode/plugins/iolaus"), localPackage]) mkdirSync(dir, { recursive: true })
 // A copy, not a symlink: the reload rewrites this dist and must not touch the repository build.
 cpSync(join(packageRoot, "dist"), join(localPackage, "dist"), { recursive: true })
@@ -79,6 +80,16 @@ const mock = http.createServer(async (req, res) => {
     text = "IOLAUS_SLOW_DONE"
   } else if (messages.includes("IOLAUS_NODE_HANG")) { await sleep(60000); text = "IOLAUS_HANG_DONE" }
   else if (messages.includes("IOLAUS_NODE_AFTER")) text = "IOLAUS_AFTER_DONE"
+  else if (messages.includes("IOLAUS_CHILD_SLOW")) {
+    const until = Date.now() + 60000
+    while (!existsSync(releaseChild) && Date.now() < until) await sleep(200)
+    text = "IOLAUS_CHILD_DONE"
+  } else if (JSON.stringify(input[lastUser] ?? "").includes("IOLAUS_QA_SUBAGENT") && tools.includes("subagent")) {
+    // A native subagent call, recorded in the owner's observed "Subagent calls" run.
+    const created = input.slice(lastUser).some((item) => item?.type === "function_call_output")
+    if (!created) call = { name: "subagent", args: { agent: "general", description: "slow child", prompt: "IOLAUS_CHILD_SLOW", background: true } }
+    else text = "IOLAUS_QA_SUBAGENT_SENT"
+  }
   else if (task && tools.includes("iolaus_dag")) {
     const created = input.slice(lastUser).some((item) => item?.type === "function_call_output")
     if (!created) call = { name: "iolaus_dag", args: { action: "create", definition: RUNS[task] } }
@@ -103,7 +114,7 @@ const env = {
   ...process.env, HOME: home, USERPROFILE: home, PWD: project, XDG_CONFIG_HOME: config,
   XDG_DATA_HOME: join(sandbox, "data"), XDG_CACHE_HOME: join(sandbox, "cache"), XDG_STATE_HOME: join(sandbox, "state"),
   OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1",
-  IOLAUS_TRACE: tracePath, IOLAUS_HOME: join(home, ".iolaus"), IOLAUS_DAG_DB: join(project, ".iolaus/dag/state.db"),
+  IOLAUS_TRACE: tracePath, IOLAUS_HOME: join(home, ".iolaus"),
   OPENCODE_CLI_CONFIG_CONTENT: JSON.stringify({ plugins: [localPackage] }),
 }
 const session = `iolaus-recover-${process.pid}`
@@ -125,7 +136,7 @@ const waitFor = async (pattern, timeoutMs, label, above = 0) => {
   throw new Error(`timed out waiting for ${label}`)
 }
 const runStatus = (name) => {
-  const out = spawnSync("sqlite3", [env.IOLAUS_DAG_DB, `select status from dag_runs where name='${name}'`], { encoding: "utf8" })
+  const out = spawnSync("sqlite3", [join(home, ".iolaus/iolaus.db"), `select status from dag_runs where name='${name}'`], { encoding: "utf8" })
   return out.stdout.trim()
 }
 const checks = []
@@ -194,6 +205,21 @@ try {
   await waitFor(/iolaus\.dag\.run\.cancelled/, 10000, "run cancelled")
   assert.equal(runStatus("QA cancel"), "cancelled")
   checks.push({ name: "cancel keybind declines and confirms", verdict: "PASS" })
+  // 3. Observed run: a native subagent call is running when the plugin reloads; its node must still settle.
+  keys("Escape"); await sleep(300)
+  keys("-l", "Run IOLAUS_QA_SUBAGENT"); keys("Enter")
+  await waitFor(/iolaus\.subagent\.observed/, 30000, "subagent call observed")
+  await waitFor(/iolaus\.dag\.node\.started.*"nodeID":"1-slow-child"/, 30000, "observed node running with its session")
+  await sleep(1000)
+  const loadsBeforeChild = traceCount(/"event":"iolaus\.loaded"/)
+  appendFileSync(join(localPackage, "dist/index.js"), "\n// qa reload 2\n")
+  await waitFor(/"event":"iolaus\.loaded"/, 20000, "second plugin reload", loadsBeforeChild)
+  await sleep(2000)
+  writeFileSync(releaseChild, "go")
+  await waitFor(/iolaus\.dag\.node\.completed.*"nodeID":"1-slow-child"/, 30000, "observed subagent node settled after the reload")
+  assert.match(trace(), /iolaus\.dag\.recovered.*"nodeID":"1-slow-child".*"outcome":"reattached"/, "the new controller did not reattach the observed subagent node")
+  assert.equal(runStatus("Subagent calls"), "completed")
+  checks.push({ name: "observed subagent node reattached after reload", verdict: "PASS" })
   const after = sandboxDatabases()
   assert.ok(after.every((path) => path.startsWith(`${sandbox}/`)), `standalone process opened a DB outside the sandbox: ${after}`)
   isolation.databasePathsAtEnd = after

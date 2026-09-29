@@ -15,7 +15,7 @@ let directory: string | undefined
 
 type ControllerOptions = Omit<Parameters<typeof createEffectController>[0], "runner"> & { readonly runner: DagRunnerPromise }
 function createDagController(options: ControllerOptions) {
-  return promiseController(createEffectController({ ...options, runner: runnerFromPromise(options.runner) }))
+  return promiseController(createEffectController({ ...options, databasePath: options.databasePath ?? join(options.directory, "iolaus.db"), runner: runnerFromPromise(options.runner) }))
 }
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
 

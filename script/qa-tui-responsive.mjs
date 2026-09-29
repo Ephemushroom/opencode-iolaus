@@ -93,7 +93,7 @@ const env = {
   HOME: home, USERPROFILE: home, PWD: project, XDG_CONFIG_HOME: config,
   XDG_DATA_HOME: join(sandbox, "data"), XDG_CACHE_HOME: join(sandbox, "cache"), XDG_STATE_HOME: join(sandbox, "state"),
   OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1",
-  IOLAUS_TRACE: tracePath, IOLAUS_HOME: join(home, ".iolaus"), IOLAUS_DAG_DB: join(project, ".iolaus/dag/state.db"),
+  IOLAUS_TRACE: tracePath, IOLAUS_HOME: join(home, ".iolaus"),
   OPENCODE_CLI_CONFIG_CONTENT: JSON.stringify({ plugins: [localPackage] }),
 }
 const tmux = (...args) => spawnSync("tmux", ["-L", session, ...args], { env, encoding: "utf8" })

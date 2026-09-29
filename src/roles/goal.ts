@@ -1,13 +1,11 @@
-import { mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs"
-import { dirname, join } from "node:path"
-import { randomUUID } from "node:crypto"
 import { Effect } from "effect"
 import type { Tool } from "@opencode/schema/tool"
+import type { SessionStateStore } from "../database"
 
 /**
  * Hephaestus goal loop, after OMO's goal hook (oh-my-openagent, OpenCode 2
- * adapter, hooks/goal): the session goal is persisted under
- * `.iolaus/goals/`, and when the session goes idle with the goal still active the
+ * adapter, hooks/goal): the session goal is persisted in the shared database,
+ * and when the session goes idle with the goal still active the
  * plugin queues a continuation prompt until the agent calls `update_goal` with
  * `complete`. The runaway stops come from OMO's todo-continuation enforcer: a cap on
  * continuations and a stop after consecutive turns that made no tool call.
@@ -35,48 +33,36 @@ export interface Goal {
   readonly updatedAt: number
 }
 
-export function goalPath(directory: string, sessionID: string): string {
-  return join(directory, ".iolaus", "goals", `${encodeURIComponent(sessionID)}.json`)
+export function readGoal(state: SessionStateStore, sessionID: string): Goal | null {
+  const goal = state.read("goal", sessionID) as Goal | undefined
+  return goal && typeof goal.objective === "string" && ["active", "paused", "complete"].includes(goal.status) ? goal : null
 }
 
-export function readGoal(directory: string, sessionID: string): Goal | null {
-  try {
-    const goal = JSON.parse(readFileSync(goalPath(directory, sessionID), "utf8")) as Goal
-    return typeof goal.objective === "string" && ["active", "paused", "complete"].includes(goal.status) ? goal : null
-  } catch {
-    return null
-  }
+export function saveGoal(state: SessionStateStore, goal: Goal): void {
+  state.save("goal", goal.sessionID, goal)
 }
 
-export function saveGoal(directory: string, goal: Goal): void {
-  const path = goalPath(directory, goal.sessionID)
-  const temp = `${path}.${randomUUID()}.tmp`
-  mkdirSync(dirname(path), { recursive: true })
-  writeFileSync(temp, `${JSON.stringify(goal, null, 2)}\n`)
-  renameSync(temp, path)
-}
-
-export function setGoal(directory: string, sessionID: string, objective: string, now = Date.now()): Goal {
+export function setGoal(state: SessionStateStore, sessionID: string, objective: string, now = Date.now()): Goal {
   const goal: Goal = { sessionID, objective: objective.trim().slice(0, MAX_OBJECTIVE), status: "active", continuations: 0, stagnant: 0, createdAt: now, updatedAt: now }
-  saveGoal(directory, goal)
+  saveGoal(state, goal)
   return goal
 }
 
 /** A new request in a goal session: a finished goal is replaced, a live one gains the request as an update. */
-export function extendGoal(directory: string, sessionID: string, request: string, now = Date.now()): Goal {
-  const goal = readGoal(directory, sessionID)
-  if (!goal || goal.status === "complete") return setGoal(directory, sessionID, request, now)
+export function extendGoal(state: SessionStateStore, sessionID: string, request: string, now = Date.now()): Goal {
+  const goal = readGoal(state, sessionID)
+  if (!goal || goal.status === "complete") return setGoal(state, sessionID, request, now)
   const combined = `${goal.objective}\n\nUpdate from the user: ${request.trim()}`
   const next: Goal = { ...goal, objective: combined.length > MAX_OBJECTIVE ? request.trim().slice(0, MAX_OBJECTIVE) : combined, status: "active", stagnant: 0, updatedAt: now }
-  saveGoal(directory, next)
+  saveGoal(state, next)
   return next
 }
 
-export function updateGoal(directory: string, sessionID: string, status: GoalStatus, reason?: string, now = Date.now()): Goal | null {
-  const goal = readGoal(directory, sessionID)
+export function updateGoal(state: SessionStateStore, sessionID: string, status: GoalStatus, reason?: string, now = Date.now()): Goal | null {
+  const goal = readGoal(state, sessionID)
   if (!goal) return null
   const next: Goal = { sessionID: goal.sessionID, objective: goal.objective, status, continuations: goal.continuations, stagnant: status === "active" ? 0 : goal.stagnant, createdAt: goal.createdAt, updatedAt: now, ...(reason ? { reason } : {}) }
-  saveGoal(directory, next)
+  saveGoal(state, next)
   return next
 }
 
@@ -204,7 +190,7 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
  * lane but Hephaestus; native agents still see them, so sessions that cannot loop get
  * an error envelope, as iolaus_dag does.
  */
-export function createGoalTools(directory: string, isGoalSession: (sessionID: string) => Effect.Effect<boolean>, trace?: GoalRuntimePorts["trace"]): Tool.Info[] {
+export function createGoalTools(state: SessionStateStore, isGoalSession: (sessionID: string) => Effect.Effect<boolean>, trace?: GoalRuntimePorts["trace"]): Tool.Info[] {
   const reply = (value: unknown) => ({ content: JSON.stringify(value) })
   const guarded = (sessionID: string, run: () => unknown) => isGoalSession(sessionID).pipe(Effect.map((ok) => reply(ok
     ? { goal: run() }
@@ -216,7 +202,7 @@ export function createGoalTools(directory: string, isGoalSession: (sessionID: st
       description: "Read the goal of this Hephaestus session.",
       input: { type: "object", properties: {}, additionalProperties: false },
       options,
-      execute: (_input: unknown, context: Tool.Context) => guarded(String(context.sessionID), () => readGoal(directory, String(context.sessionID))),
+      execute: (_input: unknown, context: Tool.Context) => guarded(String(context.sessionID), () => readGoal(state, String(context.sessionID))),
     },
     {
       name: "create_goal",
@@ -227,7 +213,7 @@ export function createGoalTools(directory: string, isGoalSession: (sessionID: st
         const objective = (input as { objective?: unknown } | undefined)?.objective
         if (typeof objective !== "string" || !objective.trim()) return Effect.succeed(reply({ error: "objective must be a nonempty string" }))
         return guarded(String(context.sessionID), () => {
-          const goal = setGoal(directory, String(context.sessionID), objective)
+          const goal = setGoal(state, String(context.sessionID), objective)
           trace?.("iolaus.goal.set", { sessionID: goal.sessionID, via: "create_goal" })
           return goal
         })
@@ -244,7 +230,7 @@ export function createGoalTools(directory: string, isGoalSession: (sessionID: st
         if (status !== "complete" && status !== "paused" && status !== "active") return Effect.succeed(reply({ error: 'status must be "complete", "paused" or "active"' }))
         const sessionID = String(context.sessionID)
         return guarded(sessionID, () => {
-          const goal = updateGoal(directory, sessionID, status, typeof record.reason === "string" ? record.reason : undefined)
+          const goal = updateGoal(state, sessionID, status, typeof record.reason === "string" ? record.reason : undefined)
           if (goal) trace?.(status === "complete" ? "iolaus.goal.completed" : "iolaus.goal.updated", { sessionID, status, continuations: goal.continuations })
           return goal
         })

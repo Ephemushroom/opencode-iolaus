@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import { Deferred, Effect, Exit, Scope, Semaphore } from "effect"
+import { Cause, Deferred, Effect, Exit, Scope, Semaphore } from "effect"
 import { evaluateCondition } from "./condition"
 import { DagRunnerError, DagValidationError, errorMessage } from "./errors"
 import { dependencyState, isGate, validateDefinition } from "./graph"
@@ -7,6 +7,7 @@ import { growLoop } from "./loop"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
 import { DagStore, resolveDagDatabasePath } from "./store"
+import { canonicalProject } from "../database"
 import type { DagDefinition, DagEvent, DagNodeDefinition, DagNodeRecord, DagObservedStart, DagObservedUpdate, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, JsonValue } from "./types"
 
 export { DagValidationError }
@@ -37,6 +38,7 @@ export interface DagController {
 
 export interface DagControllerOptions {
   readonly directory: string
+  readonly databasePath?: string
   readonly runner: DagRunner
   /** Returns the configured "provider/model[#variant]" for an agent ID, or undefined. */
   readonly defaultModel?: (agent: string) => string | undefined
@@ -112,13 +114,15 @@ function validated<A>(compute: () => A): Effect.Effect<A, DagValidationError> {
 }
 
 export function createDagController(options: DagControllerOptions): DagController {
-  const databasePath = resolveDagDatabasePath(options.directory)
-  const existing = sharedControllers.get(databasePath)
+  const databasePath = options.databasePath ?? resolveDagDatabasePath(options.directory)
+  const project = canonicalProject(options.directory)
+  const key = JSON.stringify([databasePath, project])
+  const existing = sharedControllers.get(key)
   if (existing) {
     existing.refs += 1
-    return { ...existing.controller, close: Effect.sync(() => releaseSharedController(databasePath, existing)) }
+    return { ...existing.controller, close: Effect.sync(() => releaseSharedController(key, existing)) }
   }
-  const store = new DagStore(databasePath)
+  const store = new DagStore(databasePath, project)
   const runner = options.runner
   const now = options.now ?? Date.now
   const maxParallel = options.maxParallel ?? 5
@@ -305,11 +309,37 @@ export function createDagController(options: DagControllerOptions): DagControlle
   }))
 
   /**
+   * An observed run's correlation with its subagent sessions lives in the observer's memory, so after a reload the
+   * child's completion never reaches the node. Wait on the recorded session again and record its own outcome.
+   */
+  const recoverObserved = (run: DagRunRecord): Effect.Effect<void> => Effect.gen(function* () {
+    for (const node of run.nodes) {
+      if (node.status !== "running") continue
+      const ref = node.execution
+      if (!ref) {
+        trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "interrupted" })
+        yield* controller.observed(run.runID, node.definition.id, { status: "interrupted", error: "The controller stopped before the subagent session was known" })
+        continue
+      }
+      trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "reattached", sessionID: ref.sessionID })
+      yield* Effect.forkIn(Effect.gen(function* () {
+        const outcome = yield* Effect.exit(runner.reattach(ref))
+        if (!Exit.isSuccess(outcome)) return yield* controller.observed(run.runID, node.definition.id, { status: "failed", error: errorMessage(Cause.squash(outcome.cause)) })
+        if (outcome.value === undefined) return yield* controller.observed(run.runID, node.definition.id, { status: "interrupted", error: "The controller stopped before the subagent session received its prompt" })
+        const payload = outcome.value.payload
+        const text = payload !== null && typeof payload === "object" && !Array.isArray(payload) && typeof payload.text === "string" ? payload.text : ""
+        yield* controller.observed(run.runID, node.definition.id, { status: "completed", text })
+      }), scope)
+    }
+  })
+
+  /**
    * A controller that stopped mid-run (plugin reload, restart) left nodes starting or running with nobody waiting on
    * them. A child that received its prompt is waited on again and settles with its own outcome, even if it finished
    * while no controller was listening; a node whose prompt never reached a child is interrupted for an explicit retry.
    */
   const recover = (run: DagRunRecord): Effect.Effect<void> => Effect.gen(function* () {
+    if (run.definition.observed) return yield* recoverObserved(run)
     for (const node of run.nodes) {
       if (node.status !== "starting" && node.status !== "running") continue
       const ref = node.execution
@@ -563,9 +593,9 @@ export function createDagController(options: DagControllerOptions): DagControlle
     }),
   }
   const shared: SharedController = { controller, refs: 1 }
-  sharedControllers.set(databasePath, shared)
-  Effect.runFork(Effect.forkIn(Effect.forEach(store.listRuns().filter((run) => !terminal(run.status) && !run.definition.observed), recover, { discard: true }), scope))
-  return { ...controller, close: Effect.sync(() => releaseSharedController(databasePath, shared)) }
+  sharedControllers.set(key, shared)
+  Effect.runFork(Effect.forkIn(Effect.forEach(store.listRuns().filter((run) => !terminal(run.status)), recover, { discard: true }), scope))
+  return { ...controller, close: Effect.sync(() => releaseSharedController(key, shared)) }
 }
 
 function releaseSharedController(path: string, shared: SharedController): void {

@@ -1,5 +1,5 @@
 import { afterEach, expect, test } from "bun:test"
-import { mkdtempSync, rmSync } from "node:fs"
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { createDagController as createEffectController, resolveInputs } from "../src/dag/controller"
@@ -9,13 +9,15 @@ import { evaluateCondition, selectField } from "../src/dag/condition"
 import { canonicalJson } from "../src/dag/canonical-json"
 import { fingerprint, graphFingerprint } from "../src/dag/fingerprint"
 import { DagValidationError, validateDefinition } from "../src/dag/graph"
+import { DagStore } from "../src/dag/store"
+import { Effect } from "effect"
 import type { DagDefinition, DagExecutionRef, DagNodeDefinition } from "../src/dag/types"
 
 let directory: string | undefined
 
 type ControllerOptions = Omit<Parameters<typeof createEffectController>[0], "runner"> & { readonly runner: DagRunnerPromise }
 function createDagController(options: ControllerOptions) {
-  return promiseController(createEffectController({ ...options, runner: runnerFromPromise(options.runner) }))
+  return promiseController(createEffectController({ ...options, databasePath: options.databasePath ?? join(options.directory, "iolaus.db"), runner: runnerFromPromise(options.runner) }))
 }
 
 afterEach(() => {
@@ -126,6 +128,41 @@ test("completed DAG state survives controller restart through SQLite WAL", async
   expect(restored.run.nodes[0]?.result?.payload).toEqual({ node: "a", attempt: 1 })
   expect(restored.events.some((event) => event.type === "node.completed")).toBe(true)
   second.close()
+})
+
+test("projects sharing one database have separate controllers, runners and run visibility", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-multiproject-"))
+  const alpha = join(directory, "alpha"), beta = join(directory, "beta")
+  mkdirSync(alpha); mkdirSync(beta)
+  symlinkSync(alpha, join(directory, "alpha-link"))
+  const path = join(directory, "home", "iolaus.db")
+  const firstRunner = fakeRunner(), secondRunner = fakeRunner()
+  const first = createDagController({ directory: alpha, databasePath: path, runner: firstRunner })
+  const same = createDagController({ directory: join(directory, "alpha-link"), databasePath: path, runner: fakeRunner() })
+  const second = createDagController({ directory: beta, databasePath: path, runner: secondRunner })
+  const a = await first.create(definition([node("a")]), "shared-owner")
+  const b = await second.create(definition([node("b")]), "shared-owner")
+  await first.wait(a.runID, "shared-owner")
+  await second.wait(b.runID, "shared-owner")
+  expect(firstRunner.started).toEqual(["a"])
+  expect(secondRunner.started).toEqual(["b"])
+  expect((await same.list()).map((run) => run.runID)).toEqual([a.runID])
+  expect((await second.list()).map((run) => run.runID)).toEqual([b.runID])
+  expect((await first.list("shared-owner")).map((run) => run.runID)).toEqual([a.runID])
+  await expect(second.snapshot(a.runID, "shared-owner")).rejects.toThrow("Unknown")
+  const firstLineage = createEffectController({ directory: alpha, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+  const secondLineage = createEffectController({ directory: beta, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+  expect(await Effect.runPromise(secondLineage.lineage(a.runID, "a", "session-a-1"))).toBeUndefined()
+  expect((await Effect.runPromise(firstLineage.lineage(a.runID, "a", "session-a-1")))?.runID).toBe(a.runID)
+  const store = new DagStore(path, beta)
+  expect(store.getRun(a.runID)).toBeUndefined()
+  expect(store.events(a.runID)).toEqual([])
+  store.close()
+  Effect.runSync(firstLineage.close); Effect.runSync(secondLineage.close)
+  first.close(); same.close(); second.close()
+  const restored = createDagController({ directory: alpha, databasePath: path, runner: fakeRunner() })
+  expect((await restored.snapshot(a.runID, "shared-owner")).run.status).toBe("completed")
+  restored.close()
 })
 
 /** A runner whose children never finish, standing in for a controller that stops while nodes run. */
@@ -349,11 +386,33 @@ test("gate validation requires a message and forbids an execution target", () =>
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "ok?", dependsOn: [] }]))).not.toThrow()
 })
 
+test("a restarted controller settles an observed subagent node from its recorded session", async () => {
+  const { createDagController: createEffect } = await import("../src/dag/controller")
+  const { Effect } = await import("effect")
+  directory = mkdtempSync(join(tmpdir(), "iolaus-observe-recover-"))
+  const path = join(directory, "iolaus.db")
+  for (const [session, expected] of [["ses_done", "completed"], ["ses_silent", "interrupted"]] as const) {
+    const first = createEffect({ directory, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+    const node = await Effect.runPromise(first.observe({ ownerSessionID: "owner", agent: "explore", title: `Work ${session}`, prompt: "go" }))
+    await Effect.runPromise(first.observed(node.runID, node.nodeID, { status: "running", sessionID: session }))
+    Effect.runSync(first.close)
+    const reattached: string[] = []
+    const second = createEffect({ directory, databasePath: path, runner: runnerFromPromise({ ...fakeRunner(), async reattach(ref) { reattached.push(ref.sessionID); return ref.sessionID === "ses_done" ? { payload: { text: "done while detached" } } : undefined } }) })
+    const until = Date.now() + 2000
+    let record = await Effect.runPromise(second.node(node.runID, "owner", node.nodeID))
+    while (record.status === "running" && Date.now() < until) { await new Promise((resolve) => setTimeout(resolve, 20)); record = await Effect.runPromise(second.node(node.runID, "owner", node.nodeID)) }
+    expect(reattached).toEqual([session])
+    expect(record.status).toBe(expected)
+    if (expected === "completed") expect(record.result?.payload).toEqual({ text: "done while detached" })
+    Effect.runSync(second.close)
+  }
+})
+
 test("observed runs record subagent calls by time and parent, settle once, and refuse scheduling", async () => {
   const { createDagController: createEffect } = await import("../src/dag/controller")
   const { Effect } = await import("effect")
   directory = mkdtempSync(join(tmpdir(), "iolaus-observe-"))
-  const controller = createEffect({ directory, runner: runnerFromPromise(fakeRunner()) })
+  const controller = createEffect({ directory, databasePath: join(directory, "iolaus.db"), runner: runnerFromPromise(fakeRunner()) })
   const run = <A, E>(effect: import("effect").Effect.Effect<A, E>) => Effect.runPromise(effect)
   const a = await run(controller.observe({ ownerSessionID: "owner", agent: "explore", title: "Find config", prompt: "look" }))
   const b = await run(controller.observe({ ownerSessionID: "owner", agent: "oracle", title: "Review", prompt: "judge", parentNodeID: a.nodeID }))

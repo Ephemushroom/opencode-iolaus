@@ -408,7 +408,7 @@ try {
     assert.ok(mine[0].tools.includes("update_goal"), "goal tools missing for Hephaestus")
     assert.equal(traces().filter((t) => t.event === "iolaus.goal.continued" && t.sessionID === id).length, 1)
     assert.ok(traces().some((t) => t.event === "iolaus.goal.set" && t.sessionID === id && t.via === "command"))
-    const goal = JSON.parse(readFileSync(join(project, ".iolaus/goals", `${id}.json`), "utf8"))
+    const goal = JSON.parse(execFileSync("sqlite3", ["-readonly", join(home, ".iolaus/iolaus.db"), `SELECT value_json FROM session_state WHERE session_id = '${id}' AND kind = 'goal'`], { encoding: "utf8" }))
     assert.equal(goal.status, "complete")
     assert.equal(of(id).length, mine.length, "the loop kept going after the goal completed")
     assert.equal(mine.at(-1).text, "GOAL_DONE")

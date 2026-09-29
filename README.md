@@ -53,7 +53,7 @@ Prometheus → Atlas is one workflow with a hand-off only you make: Prometheus w
 Each primary has one job, and the plugin enforces it in code rather than in prompt text:
 
 - **Sisyphus** does anything. `/ultrawork <task>` belongs to it.
-- **Hephaestus** is a goal loop on any model. In a top-level session every request becomes, or updates, the session goal, and whenever Hephaestus stops while the goal is active Iolaus resumes it, up to 50 times, pausing after three turns in a row without a tool call. It ends the loop by calling `update_goal` with `complete` (or `paused` when only you can unblock it). `/goal <task>` switches to it. Goals live in `.iolaus/goals/`.
+- **Hephaestus** is a goal loop on any model. In a top-level session every request becomes, or updates, the session goal, and whenever Hephaestus stops while the goal is active Iolaus resumes it, up to 50 times, pausing after three turns in a row without a tool call. It ends the loop by calling `update_goal` with `complete` (or `paused` when only you can unblock it). `/goal <task>` switches to it. Goals live in `IOLAUS_HOME/iolaus.db`.
 - **Prometheus** only plans. It may write `.iolaus/plans/`, `CONTEXT.md`, `CONTEXT-MAP.md` and `docs/adr/`; every other write, shell, and any template but `hyperplan` is refused, and the subagents and DAG nodes it starts run read-only too. `/hyperplan <request>` belongs to it. A plan is `.iolaus/plans/<plan>/spec.md` plus `tickets/NN-<name>.md`, each with a `**Blocked by:** None` or `**Blocked by:** 01, 02` line.
 - **Atlas** only implements a plan. Until `/start-work <plan>` it can read and nothing else. `/start-work` checks the plan, then runs it as a DAG: one fresh Atlas session per ticket in blocking order, so the planning conversation never enters an implementer's context, then Momus reviews the Standards and Spec axes side by side, one fix pass runs if either fails, and an accept gate waits for you.
 
@@ -71,8 +71,12 @@ The same rule covers native `subagent` calls and `iolaus_dag` nodes, including `
 
 ## Durable DAG
 
-The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state under
-`.iolaus/dag/state.db`. The first runtime slice supports graph validation,
+The `iolaus_dag` tool runs local multi-Agent DAGs with SQLite WAL state in
+`IOLAUS_HOME/iolaus.db` (default `~/.iolaus/iolaus.db`). Runs are isolated by
+project directory, while session roles and goals share the same database.
+Project `.iolaus/plans/` is created only when a plan is written. Legacy
+`<project>/.iolaus/dag/state.db`, role/goal JSON and `~/.iolaus/state.db` files
+are ignored, not migrated or removed. The first runtime slice supports graph validation,
 dependency-frontier scheduling, node-level retry, cancellation, restart-safe
 completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar

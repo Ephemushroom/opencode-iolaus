@@ -1,7 +1,6 @@
-import { mkdirSync } from "node:fs"
-import { dirname, join } from "node:path"
-import { Database } from "bun:sqlite"
+import type { Database } from "bun:sqlite"
 import { randomUUID } from "node:crypto"
+import { canonicalProject, databasePath, openDatabase } from "../database"
 import { canonicalJson } from "./canonical-json"
 import type { DagAction, DagDefinition, DagEvent, DagNodeRecord, DagRunRecord, JsonValue } from "./types"
 
@@ -13,65 +12,35 @@ function parse<T>(value: string): T {
 }
 
 export function resolveDagDatabasePath(directory: string): string {
-  return process.env.IOLAUS_DAG_DB ?? join(directory, ".iolaus", "dag", "state.db")
+  return databasePath(directory)
 }
 
 export class DagStore {
   readonly path: string
+  readonly project: string
   private readonly db: Database
 
-  constructor(path: string) {
+  constructor(path: string, project: string) {
     this.path = path
-    mkdirSync(dirname(path), { recursive: true })
-    this.db = new Database(path)
-    this.db.exec("PRAGMA journal_mode = WAL; PRAGMA foreign_keys = ON; PRAGMA busy_timeout = 5000; PRAGMA synchronous = NORMAL;")
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS dag_runs (
-        run_id TEXT PRIMARY KEY, owner_session_id TEXT NOT NULL, name TEXT NOT NULL,
-        definition_json TEXT NOT NULL, fingerprint TEXT NOT NULL, generation INTEGER NOT NULL,
-        status TEXT NOT NULL, created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS dag_nodes (
-        run_id TEXT NOT NULL, node_id TEXT NOT NULL, node_json TEXT NOT NULL,
-        fingerprint TEXT NOT NULL, status TEXT NOT NULL, attempt INTEGER NOT NULL,
-        result_json TEXT, error TEXT, execution_json TEXT,
-        created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
-        PRIMARY KEY (run_id, node_id), FOREIGN KEY (run_id) REFERENCES dag_runs(run_id) ON DELETE CASCADE
-      );
-      CREATE TABLE IF NOT EXISTS dag_authorizations (
-        run_id TEXT PRIMARY KEY REFERENCES dag_runs(run_id) ON DELETE CASCADE,
-        plan TEXT NOT NULL, atlas_nodes_json TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS dag_actions (
-        action_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, node_id TEXT,
-        kind TEXT NOT NULL, idempotency_key TEXT NOT NULL, payload_json TEXT,
-        created_at INTEGER NOT NULL, UNIQUE(run_id, idempotency_key)
-      );
-      CREATE TABLE IF NOT EXISTS dag_events (
-        event_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, sequence INTEGER NOT NULL,
-        event_type TEXT NOT NULL, node_id TEXT, generation INTEGER NOT NULL,
-        payload_json TEXT, created_at INTEGER NOT NULL, delivered_at INTEGER,
-        UNIQUE(run_id, sequence)
-      );
-      CREATE INDEX IF NOT EXISTS dag_nodes_status ON dag_nodes(run_id, status);
-      CREATE INDEX IF NOT EXISTS dag_events_run ON dag_events(run_id, sequence);
-    `)
+    this.project = canonicalProject(project)
+    this.db = openDatabase(path)
   }
 
   close(): void { this.db.close() }
 
   createRun(run: DagRunRecord): void {
     this.transaction(() => {
-      this.db.run("INSERT INTO dag_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [run.runID, run.ownerSessionID, run.name, canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.createdAt, run.updatedAt])
+      this.db.run("INSERT INTO dag_runs VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [run.runID, this.project, run.ownerSessionID, run.name, canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.createdAt, run.updatedAt])
       if (run.authorizedPlan && run.authorizedAtlasNodes) this.db.run("INSERT INTO dag_authorizations VALUES (?, ?, ?)", [run.runID, run.authorizedPlan, canonicalJson(run.authorizedAtlasNodes)])
       for (const node of run.nodes) this.writeNode(run.runID, node)
     })
   }
 
   saveRun(run: DagRunRecord, events: readonly Omit<DagEvent, "eventID" | "sequence">[] = []): readonly DagEvent[] {
+    if (!this.owns(run.runID)) throw new Error("Unknown DAG run in this project")
     const committed: DagEvent[] = []
     this.transaction(() => {
-      this.db.run("UPDATE dag_runs SET definition_json = ?, fingerprint = ?, generation = ?, status = ?, updated_at = ? WHERE run_id = ?", [canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.updatedAt, run.runID])
+      this.db.run("UPDATE dag_runs SET definition_json = ?, fingerprint = ?, generation = ?, status = ?, updated_at = ? WHERE run_id = ? AND project = ?", [canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.updatedAt, run.runID, this.project])
       this.db.run("DELETE FROM dag_nodes WHERE run_id = ?", [run.runID])
       for (const node of run.nodes) this.writeNode(run.runID, node)
       for (const event of events) {
@@ -85,7 +54,7 @@ export class DagStore {
   }
 
   getRun(runID: string): DagRunRecord | undefined {
-    const row = this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) as RunRow | null
+    const row = this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
     const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null
@@ -107,17 +76,19 @@ export class DagStore {
 
   listRuns(ownerSessionID?: string): readonly DagRunRecord[] {
     const rows = ownerSessionID === undefined
-      ? this.db.query("SELECT run_id FROM dag_runs ORDER BY updated_at DESC").all() as Array<{ run_id: string }>
-      : this.db.query("SELECT run_id FROM dag_runs WHERE owner_session_id = ? ORDER BY updated_at DESC").all(ownerSessionID) as Array<{ run_id: string }>
+      ? this.db.query("SELECT run_id FROM dag_runs WHERE project = ? ORDER BY updated_at DESC").all(this.project) as Array<{ run_id: string }>
+      : this.db.query("SELECT run_id FROM dag_runs WHERE project = ? AND owner_session_id = ? ORDER BY updated_at DESC").all(this.project, ownerSessionID) as Array<{ run_id: string }>
     return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
   }
 
   appendAction(action: Omit<DagAction, "actionID">): boolean {
+    if (!this.owns(action.runID)) return false
     const result = this.db.run("INSERT OR IGNORE INTO dag_actions VALUES (?, ?, ?, ?, ?, ?, ?)", [randomUUID(), action.runID, action.nodeID ?? null, action.kind, action.idempotencyKey, action.payload === undefined ? null : canonicalJson(action.payload), action.createdAt])
     return result.changes > 0
   }
 
   appendEvent(event: Omit<DagEvent, "eventID" | "sequence">): DagEvent {
+    if (!this.owns(event.runID)) throw new Error("Unknown DAG run in this project")
     const row = this.db.query("SELECT COALESCE(MAX(sequence), 0) AS sequence FROM dag_events WHERE run_id = ?").get(event.runID) as { sequence: number }
     const full = { ...event, eventID: randomUUID(), sequence: row.sequence + 1 }
     this.db.run("INSERT INTO dag_events VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL)", [full.eventID, full.runID, full.sequence, full.type, full.nodeID ?? null, full.generation, full.payload === undefined ? null : canonicalJson(full.payload), full.createdAt])
@@ -125,8 +96,14 @@ export class DagStore {
   }
 
   events(runID: string, after = 0): readonly DagEvent[] {
+    if (!this.owns(runID)) return []
     const rows = this.db.query("SELECT * FROM dag_events WHERE run_id = ? AND sequence > ? ORDER BY sequence").all(runID, after) as Array<{ event_id: string; run_id: string; sequence: number; event_type: DagEvent["type"]; node_id: string | null; generation: number; payload_json: string | null; created_at: number }>
     return rows.map((row) => ({ schemaVersion: 1, eventID: row.event_id, runID: row.run_id, sequence: row.sequence, type: row.event_type, generation: row.generation, createdAt: row.created_at, ...(row.node_id ? { nodeID: row.node_id } : {}), ...(row.payload_json ? { payload: parse<JsonValue>(row.payload_json) } : {}) }))
+  }
+
+  /** Every run read or write is limited to this store's project. */
+  private owns(runID: string): boolean {
+    return this.db.query("SELECT 1 FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project) !== null
   }
 
   private writeNode(runID: string, node: DagNodeRecord): void {

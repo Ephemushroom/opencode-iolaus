@@ -19,6 +19,8 @@ import { parseOptions } from "../src/options"
 import { evaluate } from "../src/ast-grep/permissions"
 import { renderAgent } from "../src/prompts/render"
 import { buildDynamicHephaestusPrompt } from "../src/omo/agents"
+import { SessionStateStore } from "../src/database"
+import { readRole, saveRole } from "../src/roles/register"
 
 let directory: string | undefined
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
@@ -131,7 +133,7 @@ test("commands parse from markers and slash text, and each role command has an o
 
 test("goal loop continues an idle active goal, stops on completion, stagnation and the continuation cap", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-goal-"))
-  const dir = directory
+  const dir = new SessionStateStore(join(directory, "iolaus.db"))
   const dispatched: string[] = []
   const runtime = createGoalRuntime({
     read: (s) => readGoal(dir, s), save: (g) => saveGoal(dir, g),
@@ -170,6 +172,28 @@ test("goal loop continues an idle active goal, stops on completion, stagnation a
   expect(extendGoal(dir, "idle", "also docs").objective).toContain("Update from the user: also docs")
   expect(readGoal(dir, "idle")?.status).toBe("active")
   expect(extendGoal(dir, "s", "new task").objective).toBe("new task")
+  dir.close()
+})
+
+test("roles and goals round-trip in one database without project JSON files", () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-state-"))
+  const path = join(directory, "iolaus.db")
+  const first = new SessionStateStore(path)
+  saveRole(first, "ses_role", { role: "orchestrator", plan: "p", runID: "r" })
+  setGoal(first, "ses_goal", "finish")
+  first.close()
+  const second = new SessionStateStore(path)
+  expect(readRole(second, "ses_role")).toEqual({ role: "orchestrator", plan: "p", runID: "r" })
+  expect(readGoal(second, "ses_goal")?.objective).toBe("finish")
+  second.save("role", "invalid", { role: "unknown" })
+  second.save("goal", "invalid", { status: "unknown", objective: "x" })
+  expect(readRole(second, "invalid")).toBeUndefined()
+  expect(readGoal(second, "invalid")).toBeNull()
+  second.save("role", "empty", null)
+  second.save("goal", "empty", null)
+  expect(readRole(second, "empty")).toBeUndefined()
+  expect(readGoal(second, "empty")).toBeNull()
+  second.close()
 })
 
 test("only top-level Hephaestus sessions loop", () => {

@@ -24,8 +24,12 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   Commands are `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`; the old `/iolaus-*` forms are not recognised.
 - Iolaus reads config only from `IOLAUS_HOME/iolaus.json` (default `~/.iolaus/iolaus.json`).
   Legacy user/project config files and inline plugin options do not override it. Project layer `<project>/.iolaus`
-  still owns `dag/` and `plans/`; DAG storage remains project-local.
-  `provisionHome` creates missing directories and a missing global config at setup and never overwrites; every rendered prompt ends with
+  owns only `plans/`, created when plans are written. Shared SQLite WAL state is
+  `IOLAUS_HOME/iolaus.db` (default `~/.iolaus/iolaus.db`), with DAG runs scoped to
+  canonical project directories and session roles/goals global by session ID.
+  Legacy per-project DAG/role/goal files and `~/.iolaus/state.db` are ignored,
+  not migrated or deleted.
+  `provisionHome` creates only the user directory, README and missing global config at setup and never overwrites; every rendered prompt ends with
   `<iolaus-home>` naming both paths. Iolaus owns no skills directory and no memory store: skill discovery is the
   host's (`~/.agent/skills`, global skills) and cross-session memory is the user's memory plugin's (claude-mem); the
   contract says so. Never modify the host's global session/config stores outside an isolated QA sandbox.
@@ -47,7 +51,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the Effect editor. `effect@4.0.0-rc.112` is a peer dependency pinned to the
   host's version and is external in the bundle.
 
-- `src/dag/` is the active Iolaus durable DAG module. It uses SQLite WAL state,
+- `src/dag/` is the active Iolaus durable DAG module. It uses shared SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
   cancellation and JSON-safe result envelopes.
 - `src/dag/observe.ts` records native `subagent` calls without changing them. The
@@ -165,6 +169,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   controller listened, then continues the frontier. A node whose prompt never
   reached a child becomes `interrupted` and needs an explicit retry, which also
   returns blocked dependents to pending. `settle` is once per attempt.
+  Observed (native `subagent`) runs recover the same way: a `running` node is
+  waited on through its recorded session and settled with that session's
+  outcome, so a reload no longer leaves "Subagent calls" running forever.
   `script/qa-dag-recover.mjs` reloads the plugin mid-run in a real TUI.
 - Fan-in is an ordinary Agent node binding `inputs: [{node: "*"}]`; every
   upstream result arrives with producer provenance. Conditional routing uses a
@@ -199,7 +206,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   informational only. Other Iolaus
   lanes are `worker` (unrestricted by role); host agents are untouched.
   Refusals are `Tool.Error`s prefixed `[iolaus <policy>]`. Session roles persist in
-  `<location>/.iolaus/roles/`. `session.hook("prompt")` acts on commands only in
+  `IOLAUS_HOME/iolaus.db`. `session.hook("prompt")` acts on commands only in
   top-level sessions (no `parentID`, no DAG node metadata); in a child, command text is
   plain prompt text. It switches a command's session
   to its owner (`COMMAND_OWNERS`: ultrawork → sisyphus, hyperplan → prometheus,
