@@ -70,6 +70,24 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       const ref = record(value)
       return typeof ref.providerID === "string" && typeof ref.id === "string" ? `${ref.providerID}/${ref.id}${typeof ref.variant === "string" && ref.variant !== "default" ? `#${ref.variant}` : ""}` : undefined
     }
+    // Correlation is in memory; after a reload it is read back from the store.
+    const childOf = (sessionID: string) => Effect.gen(function* () {
+      const known = children.get(sessionID)
+      if (known) return known
+      const stored = yield* controller.observedChild(sessionID)
+      if (stored) children.set(sessionID, stored)
+      return stored
+    })
+    // A session the DAG scheduler started belongs to its run's owner; its calls join the owner's observed run, labelled with the node.
+    const scheduledOf = (sessionID: string) => Effect.gen(function* () {
+      const session = yield* ctx.session.get({ sessionID: sessionID as never }).pipe(Effect.catch(() => Effect.succeed(undefined)))
+      const metadata = record((session as { metadata?: unknown } | undefined)?.metadata)
+      if (typeof metadata.iolaus_dag_run !== "string" || typeof metadata.iolaus_dag_node !== "string") return undefined
+      const run = yield* controller.lineage(metadata.iolaus_dag_run, metadata.iolaus_dag_node, sessionID)
+      if (!run) return undefined
+      const parent = yield* childOf(run.ownerSessionID)
+      return { owner: parent?.owner ?? run.ownerSessionID, ...(parent ? { parentNodeID: parent.nodeID } : {}), node: metadata.iolaus_dag_node }
+    })
     const attach = (call: Call, sessionID: string, known?: string) => Effect.gen(function* () {
       call.sessionID = sessionID
       children.set(sessionID, { runID: call.runID, nodeID: call.nodeID, owner: call.owner })
@@ -81,23 +99,26 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
     yield* ctx.tool.hook("execute.before", (event) => event.tool !== "subagent" ? Effect.void : Effect.gen(function* () {
       const input = record(event.input)
       const caller = String(event.sessionID)
-      const followed = typeof input.sessionID === "string" ? children.get(input.sessionID) : undefined
+      const followed = typeof input.sessionID === "string" ? yield* childOf(input.sessionID) : undefined
       const agent = typeof input.agent === "string" ? input.agent : "subagent"
-      const title = typeof input.description === "string" && input.description.trim() ? input.description.trim() : agent
+      const described = typeof input.description === "string" && input.description.trim() ? input.description.trim() : agent
       if (followed) {
-        calls.set(String(event.id), { ...followed, caller, agent, title, sessionID: input.sessionID as string })
+        calls.set(String(event.id), { ...followed, caller, agent, title: described, sessionID: input.sessionID as string })
         yield* controller.observed(followed.runID, followed.nodeID, { status: "running" })
         trace("iolaus.subagent.followed", { owner: followed.owner, nodeID: followed.nodeID })
         return
       }
-      const parent = children.get(caller)
-      const owner = parent?.owner ?? caller
+      const observedParent = yield* childOf(caller)
+      const scheduled = observedParent ? undefined : yield* scheduledOf(caller)
+      const owner = observedParent?.owner ?? scheduled?.owner ?? caller
+      const parentNodeID = observedParent?.nodeID ?? scheduled?.parentNodeID
+      const title = scheduled ? `${scheduled.node} › ${described}` : described
       const node = yield* controller.observe({ ownerSessionID: owner, agent, title, prompt: typeof input.prompt === "string" ? input.prompt.slice(0, PROMPT_LIMIT) : "",
-        ...(parent ? { parentNodeID: parent.nodeID } : {}), ...(typeof input.sessionID === "string" ? { sessionID: input.sessionID } : {}) })
+        ...(parentNodeID ? { parentNodeID } : {}), ...(typeof input.sessionID === "string" ? { sessionID: input.sessionID } : {}) })
       const call: Call = { ...node, owner, caller, agent, title }
       calls.set(String(event.id), call)
       if (typeof input.sessionID === "string") yield* attach(call, input.sessionID)
-      trace("iolaus.subagent.observed", { owner, runID: node.runID, nodeID: node.nodeID, agent, nested: parent !== undefined, background: input.background === true })
+      trace("iolaus.subagent.observed", { owner, runID: node.runID, nodeID: node.nodeID, agent, nested: observedParent !== undefined, ...(scheduled ? { scheduledNode: scheduled.node } : {}), background: input.background === true })
     }).pipe(safe("before")))
 
     yield* ctx.tool.hook("execute.after", (event) => event.tool !== "subagent" ? Effect.void : Effect.gen(function* () {

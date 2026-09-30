@@ -5,7 +5,7 @@ import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMou
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
 import { paneHeights, revealScroll } from "./layout"
-import { liveGlyph, nodeResultText, progressBar, runClock, settledCount, statusColor, statusLabel, topologyNodes, waves } from "./view"
+import { liveGlyph, nodeResultText, progressBar, resultLabel, runClock, settledCount, statusColor, statusLabel, topologyNodes, waves } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
   trace("iolaus.tui.dialog.open", { sessionID, runID, nodeID })
@@ -171,7 +171,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
                   const live = () => node.status === "running" || node.status === "starting"
                   return <box id={`dag-dialog-node-${node.id}`} width={cardWidth()} flexShrink={0} flexDirection="column" paddingLeft={1} paddingRight={1}
                     border borderStyle={chosen() ? "heavy" : "rounded"}
-                    borderColor={chosen() ? theme().text.action.primary.base : live() ? statusColor(node.status, theme()) : theme().border.base}
+                    borderColor={live() ? statusColor(node.status, theme()) : theme().border.base}
                     onMouseDown={(event) => { if (event.button === 0) setSelected(node.id) }}>
                     <text wrapMode="none" truncate fg={chosen() ? theme().text.action.primary.base : theme().text.base} attributes={chosen() ? 1 : 0}>
                       {chosen() ? "›" : " "} {node.id}{node.kind === "judge" ? " ⚖" : node.kind === "gate" ? " ⏸" : ""}
@@ -195,7 +195,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               <text fg={theme().text.base}>Unblocks: {downstream(node().id).join(", ") || "none (final node)"}</text>
               <Show when={node().prompt}><text marginTop={1} fg={theme().text.action.primary.base}>Approval request</text><text fg={theme().text.base}>{node().prompt}</text></Show>
               <Show when={node().error}><text marginTop={1} fg={theme().text.feedback.error.base}>Error</text><text fg={theme().text.base}>{node().error}</text></Show>
-              <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>Result</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
+              <Show when={node().result}>{(result) => <><text marginTop={1} fg={theme().text.muted}>{resultLabel(node().attempt, node().resultAttempt)}</text><text fg={theme().text.base}>{nodeResultText(result())}</text></>}</Show>
               <Show when={!node().result && !node().error && !node().prompt}><text marginTop={1} fg={theme().text.muted}>No result yet.</text></Show>
               <Show when={retryable()}><text marginTop={1} fg={theme().text.action.primary.base} onMouseUp={(event) => { if (event.button === 0) void decide("retry") }}>[Retry node]</text></Show>
             </box>}</Show>
