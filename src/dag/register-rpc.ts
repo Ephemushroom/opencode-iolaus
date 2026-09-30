@@ -40,7 +40,7 @@ export function dagView(controller: DagController, sessionID: string): Effect.Ef
       ...(node.definition.kind === "gate" ? { prompt: node.definition.prompt } : {}),
       ...(node.error !== undefined ? { error: node.error } : {}),
       ...(node.execution?.sessionID !== undefined ? { sessionID: node.execution.sessionID } : {}),
-      ...(node.result ? { result: JSON.stringify(node.result.payload).slice(0, 16000) } : {}),
+      ...(node.result ? { result: JSON.stringify(node.result.payload).slice(0, 16000), resultAttempt: node.result.attempt } : {}),
       }
     }),
   })) })))

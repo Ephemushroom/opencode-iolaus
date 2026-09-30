@@ -1,3 +1,4 @@
+import { isAbsolute } from "node:path"
 import { validateCondition } from "./condition"
 import { DagValidationError } from "./graph-error"
 import type { DagDefinition, DagNodeDefinition } from "./types"
@@ -19,6 +20,8 @@ export function validateDefinition(definition: DagDefinition): void {
   if (definition.maxParallel !== undefined && (!Number.isInteger(definition.maxParallel) || definition.maxParallel < 1)) {
     throw new DagValidationError("DAG maxParallel must be a positive integer")
   }
+  if (definition.directory !== undefined && (typeof definition.directory !== "string" || !isAbsolute(definition.directory)))
+    throw new DagValidationError("DAG directory must be an absolute path")
   const nodes = new Map<string, DagNodeDefinition>()
   for (const node of definition.nodes) {
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")
@@ -32,6 +35,10 @@ export function validateDefinition(definition: DagDefinition): void {
       if (!node.agent?.trim()) throw new DagValidationError(`Invalid execution target: ${node.id}`)
       if (node.model !== undefined && !node.model.includes("/")) throw new DagValidationError(`Invalid model reference: ${node.id}`)
     }
+    if (node.fallbackModels !== undefined && (!Array.isArray(node.fallbackModels) || node.fallbackModels.some((model) => typeof model !== "string" || !model.includes("/"))))
+      throw new DagValidationError(`fallbackModels must be "provider/model" strings: ${node.id}`)
+    if (node.worktree !== undefined && (typeof node.worktree !== "boolean" || (node.worktree && (node.kind ?? "agent") !== "agent")))
+      throw new DagValidationError(`Only agent nodes can run in a worktree: ${node.id}`)
     if (node.maxAttempts !== undefined && (!Number.isInteger(node.maxAttempts) || node.maxAttempts < 1)) {
       throw new DagValidationError(`Invalid maxAttempts for node: ${node.id}`)
     }

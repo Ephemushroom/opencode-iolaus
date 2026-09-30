@@ -4,7 +4,7 @@ import { modeMarker } from "../prompts/catalog"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
 import { PLAN_FORMAT } from "../roles/plan"
 
-export const DAG_TEMPLATE_NAMES = ["plan-review", "goal-review", "ultrawork", "hyperplan"] as const
+export const DAG_TEMPLATE_NAMES = ["plan-review", "goal-review", "ultrawork", "hyperplan", "team"] as const
 export type DagTemplateName = (typeof DAG_TEMPLATE_NAMES)[number]
 
 export interface DagTemplateInput {
@@ -22,8 +22,10 @@ export interface DagTemplateInput {
   readonly maxAttempts?: number
   /** ultrawork: work/review rounds before the loop gives up. Default 3. */
   readonly iterations?: number
-  /** hyperplan: adversarial member lanes. Default unspecified-low, unspecified-high, ultrabrain, artistry. */
+  /** hyperplan: adversarial member lanes. Default unspecified-low, unspecified-high, ultrabrain, artistry. team: worker lanes, repeats allowed. Default two deep-low. */
   readonly members?: readonly string[]
+  /** team: the lane that splits the work and integrates the branches. Default unspecified-high. */
+  readonly lead?: string
 }
 
 export const REVIEW_VERDICT_PASS = "VERDICT: PASS"
@@ -145,19 +147,60 @@ ${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }, { node: "distill
   ]
 }
 
+const TEAM_MEMBERS = ["deep-low", "deep-low"] as const
+
+/**
+ * Team: the lead splits the task into one assignment per member; members work in
+ * parallel, each in its own git worktree and branch; the lead merges their branches
+ * in an integration worktree and runs the checks; a reviewer judges the integrated
+ * branch; a human accepts it. The user's working tree is never touched: the
+ * integration branch is theirs to merge.
+ */
+function team(input: DagTemplateInput): DagNodeDefinition[] {
+  const attempts = input.maxAttempts ?? 2
+  const members = input.members ?? TEAM_MEMBERS
+  const lead = input.lead ?? "unspecified-high"
+  const reviewer = input.reviewer ?? "momus"
+  const gate = input.gate !== false
+  const ids = members.map((_, i) => `member${i + 1}`)
+  return [
+    { id: "split", title: "Split the work", agent: lead, prompt: `You lead a team of ${members.length} workers (${members.join(", ")}) on this task. Read the codebase as needed, then split the task into exactly ${members.length} assignments that can be built in parallel on separate branches with the fewest overlapping files. Do not edit files.
+Reply with one section per assignment, headed "## Assignment <n>" for n = 1..${members.length}, each saying what to build, which files it owns, the interfaces it shares with the others, and how to verify it. Then a "## Integration" section: merge order and the checks that prove the whole works.
+
+TASK:
+${input.task}`, dependsOn: [], maxAttempts: attempts },
+    ...members.map((lane, i) => ({ id: ids[i], title: `Assignment ${i + 1} (${lane})`, agent: lane, worktree: true, prompt: `The lead's split of the task is in <iolaus-dag-inputs>. Do only "## Assignment ${i + 1}", within the files it owns, in your worktree. Verify it as the assignment says, commit it to your branch, and report what changed, the evidence, and the branch name as a final line "BRANCH: <branch>".
+
+TASK:
+${input.task}`, dependsOn: ["split"], inputs: [{ node: "split" }], maxAttempts: attempts })),
+    { id: "integrate", title: "Integrate the branches", agent: lead, worktree: true, prompt: `Integrate the team's work in your worktree. The split and every member's report (with its "BRANCH:" line) are in <iolaus-dag-inputs>. Merge each member branch into your branch with git merge --no-ff in the split's merge order, resolve conflicts by the split's interfaces, then run the integration checks, the type checker and the full test suite, and fix what the merge broke. Commit, and report the merged branches, the checks with their output, and your branch as a final line "BRANCH: <branch>".
+
+TASK:
+${input.task}`, dependsOn: ids, inputs: [{ node: "split" }, ...ids.map((node) => ({ node }))], maxAttempts: attempts },
+    { id: "review", title: "Review the integrated work", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}
+
+The work passes only if every assignment is done, the integration checks ran with real output and passed, and nothing out of scope changed.
+
+TASK:
+${input.task}`, dependsOn: ["integrate"], inputs: [{ node: "split" }, { node: "integrate" }], maxAttempts: attempts },
+    ...(gate ? [{ id: "accept", title: "Accept the team's branch", kind: "gate" as const, prompt: `Team work for "${input.name ?? input.task.slice(0, 60)}" is integrated on the branch named in the integrate result and passed review. Approve to accept it (merging that branch is yours to do) or reject to stop.`, dependsOn: ["review"], inputs: [{ node: "integrate" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
+  ]
+}
+
 /** Expands a named template into an ordinary definition; the caller may edit it before `create`. */
 export function expandTemplate(raw: unknown): DagDefinition {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) throw new DagValidationError("template input must be an object")
   const input = raw as Record<string, unknown>
   if (!DAG_TEMPLATE_NAMES.includes(input.template as DagTemplateName)) throw new DagValidationError(`Unknown DAG template: ${String(input.template)}; expected ${DAG_TEMPLATE_NAMES.join(" | ")}`)
   if (typeof input.task !== "string" || !input.task.trim()) throw new DagValidationError("template task must be a nonempty string")
-  for (const key of ["name", "reviewer", "executor"]) if (input[key] !== undefined && (typeof input[key] !== "string" || !(input[key] as string).trim())) throw new DagValidationError(`template ${key} must be a nonempty string`)
+  for (const key of ["name", "reviewer", "executor", "lead"]) if (input[key] !== undefined && (typeof input[key] !== "string" || !(input[key] as string).trim())) throw new DagValidationError(`template ${key} must be a nonempty string`)
   if (input.gate !== undefined && typeof input.gate !== "boolean") throw new DagValidationError("template gate must be a boolean")
   if (input.maxAttempts !== undefined && (!Number.isInteger(input.maxAttempts) || (input.maxAttempts as number) < 1)) throw new DagValidationError("template maxAttempts must be a positive integer")
   if (input.iterations !== undefined && (!Number.isInteger(input.iterations) || (input.iterations as number) < 1 || (input.iterations as number) > 10)) throw new DagValidationError("template iterations must be an integer from 1 to 10")
-  if (input.members !== undefined && (!Array.isArray(input.members) || input.members.length < 2 || input.members.some((m) => typeof m !== "string" || !m.trim()) || new Set(input.members).size !== input.members.length)) throw new DagValidationError("template members must be at least two distinct lane names")
+  // Team members may repeat a lane (two deep-low workers); hyperplan members must differ, or the debate has one voice.
+  if (input.members !== undefined && (!Array.isArray(input.members) || input.members.length < 2 || input.members.length > 8 || input.members.some((m) => typeof m !== "string" || !m.trim()) || (input.template !== "team" && new Set(input.members).size !== input.members.length))) throw new DagValidationError(input.template === "team" ? "template members must be two to eight lane names" : "template members must be at least two distinct lane names")
   const typed = input as unknown as DagTemplateInput
-  const built = typed.template === "plan-review" ? { nodes: planReview(typed) } : typed.template === "goal-review" ? { nodes: goalReview(typed) } : typed.template === "ultrawork" ? ultrawork(typed) : { nodes: hyperplan(typed) }
-  const maxParallel = typed.template === "hyperplan" ? (typed.members ?? HYPERPLAN_MEMBERS).length : 1
+  const built = typed.template === "plan-review" ? { nodes: planReview(typed) } : typed.template === "goal-review" ? { nodes: goalReview(typed) } : typed.template === "ultrawork" ? ultrawork(typed) : typed.template === "team" ? { nodes: team(typed) } : { nodes: hyperplan(typed) }
+  const maxParallel = typed.template === "hyperplan" ? (typed.members ?? HYPERPLAN_MEMBERS).length : typed.template === "team" ? (typed.members ?? TEAM_MEMBERS).length : 1
   return { schemaVersion: 1, name: typed.name ?? `${typed.template}: ${typed.task.slice(0, 60)}`, maxParallel, nodes: built.nodes, ...("loop" in built ? { loop: built.loop } : {}) }
 }

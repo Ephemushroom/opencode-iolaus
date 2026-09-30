@@ -10,8 +10,11 @@ import { agentName, categoryName } from "../prompts/catalog"
 import { COMMAND_OWNERS, commandMarker, parseCommand } from "./command"
 import { createGoalRuntime, createGoalTools, extendGoal, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
 import { denial, inheritPlanning, resolvePolicy, type RoleRecord } from "./guard"
-import { loadPlan, PLANNING_MARKER, resolvePlan } from "./plan"
-import { compilePlan, gitHead } from "./startwork"
+import { loadPlan, PLANNING_MARKER, PLANS_DIR, resolvePlan } from "./plan"
+import { compilePlan, gitHead, parseStartWork, type Delivery } from "./startwork"
+import { copyInto, defaultWorktreePath, ensureWorktree, repositoryRoot } from "../dag/worktree"
+import { homedir } from "node:os"
+import { resolve } from "node:path"
 import { isTopLevel, subagentTargets, tierDenial, type TierSource } from "./tier"
 import { DagValidationError } from "../dag/errors"
 
@@ -86,13 +89,27 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
       }
       if (command?.name === "start-work" && agent === "atlas") {
         const directory = yield* host.directory(sessionID)
-        const result = resolvePlan(directory, command.args)
-        if (!result.ok) {
-          event.prompt.text = `${commandMarker("start-work")}\n/start-work did not start. Tell the user what to fix and do not implement anything:\n${result.errors.map((error) => `- ${error}`).join("\n")}`
-          trace("iolaus.startwork.rejected", { sessionID, errors: result.errors })
-          return
+        const reject = (errors: readonly string[]) => {
+          event.prompt.text = `${commandMarker("start-work")}\n/start-work did not start. Tell the user what to fix and do not implement anything:\n${errors.map((error) => `- ${error}`).join("\n")}`
+          trace("iolaus.startwork.rejected", { sessionID, errors })
         }
-        const created = yield* Effect.exit(host.controller.create(compilePlan(result.plan, gitHead(directory)), sessionID, result.plan.slug))
+        const parsed = parseStartWork(command.args)
+        if (!parsed.ok) return reject([parsed.error])
+        const result = resolvePlan(directory, parsed.args.plan)
+        if (!result.ok) return reject(result.errors)
+        let delivery: Delivery | undefined
+        if (parsed.args.worktree) {
+          const root = repositoryRoot(directory)
+          if (!root) return reject([`--worktree needs a git repository; ${directory} is not one`])
+          const branch = `iolaus/${result.plan.slug.replace(/[^a-z0-9._-]/g, "-")}`
+          const path = parsed.args.worktreePath ? resolve(directory, parsed.args.worktreePath.replace(/^~(?=\/|$)/, homedir())) : defaultWorktreePath(root, result.plan.slug)
+          // Plans live under a git-ignored directory, so the worktree gets a copy: its ticket sessions read and validate it there.
+          const made = yield* Effect.exit(Effect.try(() => { ensureWorktree(directory, path, branch); copyInto(directory, path, `${PLANS_DIR}/${result.plan.slug}`) }))
+          if (Exit.isFailure(made)) return reject([String((Cause.squash(made.cause) as Error)?.message ?? "the worktree could not be created").replace(/^.*?: /, "")])
+          delivery = { directory: path, branch, root, pr: parsed.args.makePr, ship: parsed.args.ship }
+          trace("iolaus.startwork.worktree", { sessionID, path, branch, pr: delivery.pr, ship: delivery.ship })
+        }
+        const created = yield* Effect.exit(host.controller.create(compilePlan(result.plan, gitHead(delivery?.directory ?? directory), delivery), sessionID, result.plan.slug))
         if (Exit.isFailure(created)) {
           const message = Cause.squash(created.cause) instanceof Error ? (Cause.squash(created.cause) as Error).message : "the run could not be created"
           event.prompt.text = `${commandMarker("start-work")}\n/start-work did not start: ${message}. Tell the user; do not implement anything.`
@@ -102,7 +119,9 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
         const run = created.value
         saveRole(state, sessionID, { role: "orchestrator", plan: result.plan.slug, runID: run.runID })
         trace("iolaus.startwork.started", { sessionID, plan: result.plan.slug, runID: run.runID, tickets: result.plan.tickets.map((t) => t.id) })
-        event.prompt.text = `${commandMarker("start-work")}\nIolaus started run ${run.runID} for plan "${result.plan.slug}": ${result.plan.tickets.length} ticket(s), each in its own Atlas session, then Standards and Spec reviews, a fix pass if either fails, and an accept gate. Call iolaus_dag with action "wait" and run_id "${run.runID}". When it pauses at the accept gate, show the user both reviews and ask for their decision.`
+        const where = delivery ? ` in the worktree ${delivery.directory} on branch ${delivery.branch}` : ""
+        const after = delivery?.ship ? " After approval Atlas opens the PR, watches CI until it passes, merges it and removes the worktree." : delivery?.pr ? " After approval Atlas opens the PR; report its URL." : ""
+        event.prompt.text = `${commandMarker("start-work")}\nIolaus started run ${run.runID} for plan "${result.plan.slug}"${where}: ${result.plan.tickets.length} ticket(s), each in its own Atlas session, then Standards and Spec reviews, a fix pass if either fails, and an accept gate.${after} Call iolaus_dag with action "wait" and run_id "${run.runID}". When it pauses at the accept gate, show the user both reviews and ask for their decision.`
         return
       }
       if (agent !== "hephaestus" || !isGoalSessionInfo({ ...session, agent })) return

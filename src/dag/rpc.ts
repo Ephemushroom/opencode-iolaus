@@ -6,7 +6,7 @@ const session = z.object({ sessionID: id }).strict()
 const node = z.object({
   id, title: z.string().optional(), status: z.string(), kind: z.string(), agent: z.string(), model: z.string(), attempt: z.number(),
   dependsOn: z.array(z.string()), error: z.string().optional(), prompt: z.string().optional(),
-  sessionID: z.string().optional(), result: z.string().optional(),
+  sessionID: z.string().optional(), result: z.string().optional(), resultAttempt: z.number().optional(),
 })
 export const DagViewSchema = z.object({
   runs: z.array(z.object({

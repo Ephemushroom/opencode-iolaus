@@ -53,8 +53,9 @@ export class DagStore {
     return committed
   }
 
-  getRun(runID: string): DagRunRecord | undefined {
-    const row = this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project) as RunRow | null
+  /** `anyProject` reads a run another project's controller owns; only lineage uses it, for runs working in this project. */
+  getRun(runID: string, anyProject = false): DagRunRecord | undefined {
+    const row = (anyProject ? this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) : this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project)) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
     const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null
@@ -79,6 +80,14 @@ export class DagStore {
       ? this.db.query("SELECT run_id FROM dag_runs WHERE project = ? ORDER BY updated_at DESC").all(this.project) as Array<{ run_id: string }>
       : this.db.query("SELECT run_id FROM dag_runs WHERE project = ? AND owner_session_id = ? ORDER BY updated_at DESC").all(this.project, ownerSessionID) as Array<{ run_id: string }>
     return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
+  }
+
+  /** The observed-run node whose child is this session, newest first. */
+  observedNode(sessionID: string): { readonly runID: string; readonly nodeID: string; readonly ownerSessionID: string } | undefined {
+    const row = this.db.query(`SELECT n.run_id, n.node_id, r.owner_session_id FROM dag_nodes n JOIN dag_runs r ON r.run_id = n.run_id
+      WHERE r.project = ? AND json_extract(r.definition_json, '$.observed') = 1 AND json_extract(n.execution_json, '$.sessionID') = ?
+      ORDER BY n.updated_at DESC LIMIT 1`).get(this.project, sessionID) as { run_id: string; node_id: string; owner_session_id: string } | null
+    return row ? { runID: row.run_id, nodeID: row.node_id, ownerSessionID: row.owner_session_id } : undefined
   }
 
   appendAction(action: Omit<DagAction, "actionID">): boolean {

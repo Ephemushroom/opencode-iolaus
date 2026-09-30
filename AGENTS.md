@@ -65,7 +65,13 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   inside a child hangs under the child's node (`dependsOn` is the parent link, not
   a data edge); a follow-up by `sessionID` reopens the same node as a new attempt; a
   call the host refuses before running it fails when its caller's turn ends.
-  Correlation is in memory. Observed runs are never scheduled: `retry`, `resume`
+  Correlation is cached in memory and read back from the store
+  (`controller.observedChild`) after a reload. A call made inside a scheduled
+  `iolaus_dag` node's session (found through its `iolaus_dag_run`/`iolaus_dag_node`
+  metadata and `controller.lineage`) joins the run owner's observed run, titled
+  `<node> › <description>`; the scheduled run's definition is not touched. A
+  reopened node keeps its last result, which the view labels with its attempt
+  (`resultAttempt`). Observed runs are never scheduled: `retry`, `resume`
   and `amend` reject them. The native binding tells agents to call `subagent`
   directly for simple delegation and to use `iolaus_dag` only for data
   dependencies, retry/resume, gates or conditional branches.
@@ -76,6 +82,40 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `judge:<node>:<attempt>:<ts>`, the reply is returned by `wait`); `gate`
   waits for a human. Every template reviewer is a `judge`, so reviews cost one
   model call instead of a session.
+- Runtime model fallback: a lane configured as an array in `iolaus.json` `models`
+  (`laneFallbacks` in `src/models.ts`) fills `fallbackModels` on agent and judge
+  nodes that omit `model`. The runner marks a failed child session, failed
+  `session.create` or failed judge call as `DagRunnerError({model: true})`; that,
+  or an empty reply, moves the node to the next fallback (`node.fallback`,
+  `needs_retry`) until the chain is exhausted, then ordinary `maxAttempts` applies.
+  Requirement chains never fall back. `fallbackModels` and the effective model
+  live on the node record; Atlas authorization is checked against the planned
+  node in `run.definition`, and `retry` restores the planned model.
+- A `deep-low` node whose reply has the line `ESCALATE: deep-high` is rewritten
+  in place to `deep-high` (lane model and fallbacks), its findings appended in
+  `<iolaus-escalation>`, and rerun (`node.escalated`). Only when deep-high
+  resolves to a model; admission re-checks the new agent at launch.
+- Worktrees (`src/dag/worktree.ts`): a run-level `directory` (absolute, a
+  worktree of the project's repository by `git rev-parse --git-common-dir`,
+  checked at create/amend/growth) is every child's session location; a node's
+  `worktree: true` makes the runner create `<repo>-wt/iolaus-<run8>-<node>` on
+  branch `iolaus/<run8>-<node>` from the run directory's HEAD, reused by retries.
+  Branches outside `iolaus/<slug>` are refused. `lineage` also finds a run owned
+  by another project when that run's `directory` is this project, since the
+  worktree's own plugin instance serves those children.
+- `/start-work <plan> [--worktree [path]] [--make-pr] [--ship]`
+  (`parseStartWork`): the prompt hook creates the worktree on `iolaus/<plan>`,
+  copies the git-ignored plan into it and compiles the run with that
+  `directory`; `--make-pr` adds an Atlas `pr` node after `accept`, `--ship` a
+  `ship` node after it. Both are authorized Atlas ticket nodes of the run.
+- `team` is a DAG template and mode: split (lead) → `member<n>` worktree nodes
+  → `integrate` in its own worktree → judge review → accept gate. The OMO
+  `team_*` mode prompt is replaced by `TEAM_DAG_MODE_PROMPT`.
+- `src/compaction.ts` hooks `session.hook("compaction")` and appends
+  `<iolaus-compaction-state>` (goal, role, unfinished owned runs with open nodes)
+  to the compaction request's system parts. `script/qa-borrows.mjs` is the live
+  QA for fallback, escalation, team, run directories, /start-work delivery and
+  compaction.
 - `src/ast-grep/` registers `ast_grep.search`, `ast_grep.rewrite` and
   `ast_grep.scan` as Code Mode tools when an `ast-grep` binary answers
   `--version` (`IOLAUS_AST_GREP_BIN`, then PATH, then common prefixes); the
@@ -234,8 +274,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   appends `work<n>` / `review<n>` (event `loop.grown`, generation +1) and
   rewires the tail gate to the newest review. `iterations` is the round cap. `hyperplan` fans `members` (default the
   four category lanes) through analyse → cross-attack → defend, then Metis
-  distills, Prometheus plans, Momus reviews, gate. `team` remains a prompt-only
-  mode. `opencode run "/<mode> ..."` resolves the command client-side, so
+  distills, Prometheus plans, Momus reviews, gate. `team` runs its template. `opencode run "/<mode> ..."` resolves the command client-side, so
   the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
   context hook is what makes the mode a DAG.
 - The DAG TUI (`src/tui.tsx`, dialog in `src/tui/dialog.tsx`, shared hooks in
