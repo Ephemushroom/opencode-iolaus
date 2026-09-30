@@ -11,7 +11,7 @@ import { createDagController } from "./dag/controller"
 import { createOpenCodeDagRunner } from "./dag/runner"
 import { createDagTool } from "./dag/tool"
 import { registerDagRpc } from "./dag/register-rpc"
-import { parseModelsConfig, modelString, resolveLane } from "./models"
+import { laneFallbacks, parseModelsConfig, modelString, resolveLane } from "./models"
 import { agentName, categoryName } from "./prompts/catalog"
 import { resolveAstGrepBinary } from "./ast-grep/binary"
 import { AST_GREP_NAMESPACE, AST_GREP_NAMESPACE_DESCRIPTION, createAstGrepTools } from "./ast-grep/tools"
@@ -24,6 +24,7 @@ import { loadGlobalConfig } from "./global-config"
 import { SessionStateStore } from "./database"
 import { registerRoles } from "./roles/register"
 import { registerSubagentObserver } from "./dag/observe"
+import { registerCompaction } from "./compaction"
 import { DagValidationError } from "./dag/errors"
 import { admitTier, tierSource, type TierSession } from "./roles/tier"
 
@@ -63,6 +64,10 @@ export default Plugin.define({
       const assignment = lane ? resolveLane(lane, models) : undefined
       return assignment ? modelString(assignment) : undefined
     }
+    const fallbackModels = (agent: string): readonly string[] => {
+      const lane = agentName(agent) ?? categoryName(agent)
+      return lane ? laneFallbacks(lane, models) : []
+    }
     yield* ctx.session.hook("context", (event) => composeContext(event, ctx, options, homeContract(home)))
 
     // The RPC registration is created after the controller, so events emitted before it exists are dropped.
@@ -75,6 +80,7 @@ export default Plugin.define({
       databasePath: home.database,
       runner: createOpenCodeDagRunner(ctx),
       defaultModel,
+      fallbackModels,
       maxParallel: options.defaultConcurrency,
       admit: (owner, definition, authorizedPlan) => Effect.gen(function* () {
         const session = yield* getTierSession(owner).pipe(Effect.mapError(() => new DagValidationError("DAG owner session is unavailable")))
@@ -91,6 +97,7 @@ export default Plugin.define({
     yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), state, trace })
     // After the role guard, so a refused subagent call is not recorded.
     yield* registerSubagentObserver(ctx, controller, trace)
+    yield* registerCompaction(ctx, { controller, state, trace })
 
     const sgPath = options.astGrep ? resolveAstGrepBinary() : undefined
     trace(sgPath ? "iolaus.ast_grep.registered" : "iolaus.ast_grep.unavailable", { enabled: options.astGrep, binary: sgPath ?? null })

@@ -19,11 +19,14 @@ export interface LaneAssignment extends ModelChoice {
   readonly source: "config" | "requirement"
 }
 
-export type ModelOverride = string | { readonly model: string; readonly variant?: string }
+export type ModelEntry = string | { readonly model: string; readonly variant?: string }
+/** One model, or an ordered chain: the first is the lane's model, the rest are runtime fallbacks for DAG nodes. */
+export type ModelOverride = ModelEntry | readonly ModelEntry[]
 
 /**
  * Model overrides from the global iolaus.json file.
- * Values are "provider/model", "provider/model#variant" or {model, variant}.
+ * Values are "provider/model", "provider/model#variant", {model, variant}, or a
+ * nonempty array of those.
  */
 export interface ModelsConfig {
   readonly agents?: Readonly<Record<string, ModelOverride>>
@@ -51,13 +54,19 @@ export function parseModelOverride(value: unknown, path: string): ModelChoice {
   throw new TypeError(`${path} must be a string or {model, variant}`)
 }
 
+export function parseModelChain(value: unknown, path: string): ModelChoice[] {
+  if (!Array.isArray(value)) return [parseModelOverride(value, path)]
+  if (!value.length) throw new TypeError(`${path} must name at least one model`)
+  return value.map((entry, index) => parseModelOverride(entry, `${path}[${index}]`))
+}
+
 function parseSection(value: unknown, section: string, allowed: readonly string[]): Record<string, ModelOverride> {
   if (value === undefined) return {}
   if (typeof value !== "object" || value === null || Array.isArray(value)) throw new TypeError(`${section} must be an object`)
   const result: Record<string, ModelOverride> = {}
   for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
     if (!allowed.includes(key)) throw new TypeError(`Unknown ${section} name: ${key}`)
-    parseModelOverride(entry, `${section}.${key}`)
+    parseModelChain(entry, `${section}.${key}`)
     result[key] = entry as ModelOverride
   }
   return result
@@ -91,7 +100,7 @@ export function firstChainChoice(requirement: ModelRequirement | undefined): Mod
 export function resolveLane(lane: LaneName, config: ModelsConfig): LaneAssignment | undefined {
   const isCategory = (CATEGORY_NAMES as readonly string[]).includes(lane)
   const override = isCategory ? config.categories?.[lane] : config.agents?.[lane]
-  if (override !== undefined) return { lane, source: "config", ...parseModelOverride(override, lane) }
+  if (override !== undefined) return { lane, source: "config", ...parseModelChain(override, lane)[0] }
   const requirement = isCategory ? CATEGORY_MODEL_REQUIREMENTS[lane] : AGENT_MODEL_REQUIREMENTS[lane]
   const choice = firstChainChoice(requirement)
   return choice ? { lane, source: "requirement", ...choice } : undefined
@@ -99,4 +108,15 @@ export function resolveLane(lane: LaneName, config: ModelsConfig): LaneAssignmen
 
 export function modelString(choice: ModelChoice): string {
   return choice.variant ? `${choice.model}#${choice.variant}` : choice.model
+}
+
+/**
+ * Runtime fallbacks for a lane: the configured chain after its first model. The
+ * OMO requirement chains name providers a user may not have, so only an explicit
+ * iolaus.json chain falls back.
+ */
+export function laneFallbacks(lane: LaneName, config: ModelsConfig): string[] {
+  const isCategory = (CATEGORY_NAMES as readonly string[]).includes(lane)
+  const override = isCategory ? config.categories?.[lane] : config.agents?.[lane]
+  return override === undefined ? [] : parseModelChain(override, lane).slice(1).map(modelString)
 }

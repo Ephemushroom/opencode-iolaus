@@ -36,6 +36,8 @@ Model routing follows configuration only. Write `~/.iolaus/iolaus.json` (or `IOL
 }
 ```
 
+A lane may also name an ordered chain, for example `"quick": ["openai/gpt-6-luna-fast#low", "deepseek/deepseek-flash"]`: the first model is the lane's model, and the rest are runtime fallbacks for DAG nodes. When a node's model fails (a provider error that fails the child session or judge call, or an empty reply) the node moves to the next model of the chain and runs again; a node that pins `model` itself does not fall back. Only configured chains fall back, since OMO's requirement chains name providers you may not have.
+
 Plugin options and legacy `models.json` files are ignored. Lanes you do not configure use the first entry of OMO's requirement chain; a lane with no model at all is not registered. Use top-level `agents` / `categories` in the global file to select which lanes register.
 
 ## Three workflows
@@ -56,6 +58,9 @@ Each primary has one job, and the plugin enforces it in code rather than in prom
 - **Hephaestus** is a goal loop on any model. In a top-level session every request becomes, or updates, the session goal, and whenever Hephaestus stops while the goal is active Iolaus resumes it, up to 50 times, pausing after three turns in a row without a tool call. It ends the loop by calling `update_goal` with `complete` (or `paused` when only you can unblock it). `/goal <task>` switches to it. Goals live in `IOLAUS_HOME/iolaus.db`.
 - **Prometheus** only plans. It may write `.iolaus/plans/`, `CONTEXT.md`, `CONTEXT-MAP.md` and `docs/adr/`; every other write, shell, and any template but `hyperplan` is refused, and the subagents and DAG nodes it starts run read-only too. `/hyperplan <request>` belongs to it. A plan is `.iolaus/plans/<plan>/spec.md` plus `tickets/NN-<name>.md`, each with a `**Blocked by:** None` or `**Blocked by:** 01, 02` line.
 - **Atlas** only implements a plan. Until `/start-work <plan>` it can read and nothing else. `/start-work` checks the plan, then runs it as a DAG: one fresh Atlas session per ticket in blocking order, so the planning conversation never enters an implementer's context, then Momus reviews the Standards and Spec axes side by side, one fix pass runs if either fails, and an accept gate waits for you.
+  - `/start-work <plan> --worktree [path]` runs the whole plan in a git worktree on branch `iolaus/<plan>` (default path `<repo>-wt/<plan>`, reused when it already is that branch's worktree); the plan is copied into it. Your own working tree is not touched.
+  - `--make-pr` implies `--worktree`; after you approve the accept gate, an Atlas node commits the work, pushes the branch and opens the PR with `gh pr create`.
+  - `--ship` implies `--make-pr`; after the PR opens, an Atlas node watches `gh pr checks`, fixes failures on the branch, merges with a merge commit once the checks pass, and removes the worktree (never with `--force`).
 
 Running one of these commands in another agent's top-level session switches the session to the owning agent first; the session keeps its model. Commands act only in top-level sessions: in a subagent or DAG child, `/start-work` or `/goal` is ordinary prompt text.
 
@@ -96,7 +101,15 @@ Two templates come built in. `{ "action": "create", "template": { "template": "p
 
 Templates get no exemption from the delegation rule: the expanded definition, with its `executor`, `reviewer` and `members` overrides applied, is checked like any other. So `ultrawork` runs from Sisyphus, `goal-review` from Hephaestus and `hyperplan` from Prometheus, each with its own primary plus lower workers. `plan-review` puts Prometheus and Sisyphus in one graph, so every Iolaus primary is refused it; the Iolaus path from plan to implementation is `/hyperplan` followed by your `/start-work`.
 
-`/ultrawork <task>` and `/hyperplan <request>` now run as DAGs. Ultrawork loops work → review → fix → re-review until Momus passes the work, growing the graph one round at a time up to `iterations` (default three), then pauses at a gate for you. Reviews are judge nodes: a single model call on Momus's lane, no child session. Hyperplan runs four category lanes through independent analysis, cross-attack and defence in parallel, has Metis distill the surviving positions, Prometheus write the plan and Momus review it. Both are also available as templates (`"template": "ultrawork"` with `iterations`, `"template": "hyperplan"` with `members`). `/team` is unchanged.
+`/ultrawork <task>` and `/hyperplan <request>` now run as DAGs. Ultrawork loops work → review → fix → re-review until Momus passes the work, growing the graph one round at a time up to `iterations` (default three), then pauses at a gate for you. Reviews are judge nodes: a single model call on Momus's lane, no child session. Hyperplan runs four category lanes through independent analysis, cross-attack and defence in parallel, has Metis distill the surviving positions, Prometheus write the plan and Momus review it. Both are also available as templates (`"template": "ultrawork"` with `iterations`, `"template": "hyperplan"` with `members`).
+
+`/team <task>` runs the `team` template. A lead (default `unspecified-high`, override with `lead`) splits the task into one assignment per member (`members`, two to eight lanes, repeats allowed, default two `deep-low`). The members build in parallel, each in its own git worktree on branch `iolaus/<run>-member<n>`. The lead then merges their branches in an integration worktree and runs the checks, Momus reviews the result, and a gate waits for you. Your working tree and branch are never touched: the integration branch is yours to merge.
+
+Any agent node can ask for its own worktree with `worktree: true`, and a run-level `directory` moves every child of the run into an existing worktree. That directory must be a worktree of the project's own repository; anything else is refused at create.
+
+A `deep-low` node that cannot settle its central decision from evidence ends its reply with the line `ESCALATE: deep-high`. Iolaus then reruns the node on `deep-high` with the findings so far appended to its prompt; the deep-low lane prompt states this contract.
+
+When OpenCode compacts a session, Iolaus adds that session's live state to the compaction request so the summary keeps it: an active or paused goal, the session's role, and every unfinished DAG run it owns with its open nodes and waiting gates.
 
 When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or set `{ "astGrep": false }` in the global `iolaus.json` to turn the tools off.
 

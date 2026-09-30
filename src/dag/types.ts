@@ -82,6 +82,18 @@ export interface DagNodeDefinition {
   readonly inputs?: readonly DagInputBinding[]
   readonly when?: DagCondition
   readonly maxAttempts?: number
+  /**
+   * Models tried in order when a child fails on its model (provider error, failed
+   * session, empty reply). Filled from the lane's iolaus.json chain when `model` is
+   * omitted. Not part of the fingerprint: a fallback changes the model a node runs
+   * on, not what the node is.
+   */
+  readonly fallbackModels?: readonly string[]
+  /**
+   * Run the child in its own git worktree on a fresh branch
+   * (`iolaus/<run>-<node>`) cut from the run directory's HEAD. Agent nodes only.
+   */
+  readonly worktree?: boolean
 }
 
 /**
@@ -114,6 +126,12 @@ export interface DagDefinition {
   readonly loop?: DagLoop
   readonly nodes: readonly DagNodeDefinition[]
   readonly maxParallel?: number
+  /**
+   * Absolute directory the run's child sessions work in, e.g. the git worktree
+   * /start-work --worktree created. Must be a worktree of the project's own
+   * repository; omitted, children work in the project directory.
+   */
+  readonly directory?: string
 }
 
 /** A native subagent call as it starts: the child session and where it hangs in its owner's observed run. */
@@ -209,6 +227,8 @@ export interface DagEvent {
     | "node.approved"
     | "node.rejected"
     | "loop.grown"
+    | "node.fallback"
+    | "node.escalated"
     | "run.paused"
   readonly payload?: JsonValue
   readonly createdAt: number
