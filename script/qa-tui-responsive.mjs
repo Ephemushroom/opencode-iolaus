@@ -10,9 +10,9 @@ import { once } from "node:events"
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)))
 const packageRoot = resolve(process.env.IOLAUS_QA_PACKAGE_ROOT ?? root)
-const evidence = resolve(process.argv[2] ?? join(root, `.omo/evidence/tui-responsive-${Date.now()}`))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
-mkdirSync(join(root, ".omo/evidence"), { recursive: true })
+const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/tui-responsive-${Date.now()}`))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
+mkdirSync(join(root, ".iolaus/evidence"), { recursive: true })
 mkdirSync(evidence)
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"
 const mode = process.env.IOLAUS_QA_THEME ?? "light"

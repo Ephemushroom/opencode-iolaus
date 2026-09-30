@@ -1,0 +1,9 @@
+{
+  "dirs": {
+    "member1": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-Sm4uCZ/project-wt/iolaus-85c33fc7-member1",
+    "member2": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-Sm4uCZ/project-wt/iolaus-85c33fc7-member2",
+    "integrate": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-Sm4uCZ/project-wt/iolaus-85c33fc7-integrate"
+  },
+  "integrateBranch": "iolaus/85c33fc7-integrate",
+  "log": "728a356 merge iolaus/85c33fc7-member2\nb063e4e merge iolaus/85c33fc7-member1\n7fcabaa m2\n30aa265 m1\nb6e665d init"
+}

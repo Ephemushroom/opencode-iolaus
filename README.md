@@ -121,7 +121,7 @@ If the GitHub CLI is installed and logged in, the librarian gets a read-only `gh
 
 A DAG run starts at most `background_task.defaultConcurrency` nodes at once (default 5), for example `{ "background_task": { "defaultConcurrency": 7 } }` in the global `iolaus.json`. A run's own `maxParallel` can lower that limit but not raise it.
 
-Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for settings, models and verification. It provisions `{}` if missing and never overwrites an existing file; malformed or unknown settings reject plugin setup. `<project>/.iolaus` still holds project-local DAG state and plans, not configuration overrides. Skills and memory are not Iolaus features: the host discovers skills, and your memory plugin keeps memory.
+Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for settings, models and verification. It provisions `{}` if missing and never overwrites an existing file; malformed or unknown settings reject plugin setup. `<project>/.iolaus` holds plans and QA evidence in `plans/` and `evidence/`, created only when written, not configuration overrides or runtime state. DAG and session state remain in `IOLAUS_HOME/iolaus.db` (default `~/.iolaus/iolaus.db`). Skills and memory are not Iolaus features: the host discovers skills, and your memory plugin keeps memory.
 
 ## Development
 

@@ -9,8 +9,8 @@ import { once } from "node:events"
 import { createDagQuery } from "../src/tui/data.ts"
 
 const root = resolve(new URL("..", import.meta.url).pathname)
-const evidence = resolve(process.argv[2] ?? join(root, ".omo/evidence/tui-routing"))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
+const evidence = resolve(process.argv[2] ?? join(root, ".iolaus/evidence/tui-routing"))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: true })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-routing-")))
 const a = join(sandbox, "a"), b = join(sandbox, "b"), home = join(sandbox, "home"), config = join(sandbox, "config")

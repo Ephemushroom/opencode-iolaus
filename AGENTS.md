@@ -24,7 +24,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   Commands are `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`; the old `/iolaus-*` forms are not recognised.
 - Iolaus reads config only from `IOLAUS_HOME/iolaus.json` (default `~/.iolaus/iolaus.json`).
   Legacy user/project config files and inline plugin options do not override it. Project layer `<project>/.iolaus`
-  owns only `plans/`, created when plans are written. Shared SQLite WAL state is
+  owns `plans/` and QA `evidence/`, created only when written. Shared SQLite WAL state is
   `IOLAUS_HOME/iolaus.db` (default `~/.iolaus/iolaus.db`), with DAG runs scoped to
   canonical project directories and session roles/goals global by session ID.
   Legacy per-project DAG/role/goal files and `~/.iolaus/state.db` are ignored,
@@ -292,12 +292,12 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   cursor restoration, mouse/keyboard/palette entry, narrow layout and actions.
   RPC output omits undefined fields (host validates JSON before the schema).
   Do not claim a feature as
-  implemented until its runtime QA evidence exists under `.omo/evidence/`.
+  implemented until its runtime QA evidence exists under `.iolaus/evidence/`.
 
 ## Verification
 
 Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length.
 
-Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.omo/evidence/`. Unit tests alone do not establish live compatibility.
+Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Unit tests alone do not establish live compatibility.
 
 Deliver changes through task-owned worktrees and pull requests. Preserve user changes and merge using merge commits after the relevant checks pass.
