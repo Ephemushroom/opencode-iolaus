@@ -143,6 +143,11 @@ export function topologyNodes(run: DagViewRun): DagViewNode[] {
   return [...run.nodes].sort((a, b) => (levels.get(a.id) ?? 0) - (levels.get(b.id) ?? 0))
 }
 
+/** A reopened node (follow-up or retry) keeps its last result until the new attempt settles; say which attempt it came from. */
+export function resultLabel(attempt: number, resultAttempt: number | undefined): string {
+  return resultAttempt !== undefined && resultAttempt < attempt ? `Previous result · attempt ${resultAttempt}` : "Result"
+}
+
 export function nodeResultText(result: string): string {
   try {
     const value: unknown = JSON.parse(result)

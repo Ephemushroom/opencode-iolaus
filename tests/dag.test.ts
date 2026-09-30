@@ -441,6 +441,24 @@ test("observed runs record subagent calls by time and parent, settle once, and r
   Effect.runSync(controller.close)
 })
 
+test("an observed child session is found from the store after a reload, and only in observed runs", async () => {
+  const { createDagController: createEffect } = await import("../src/dag/controller")
+  const { Effect } = await import("effect")
+  directory = mkdtempSync(join(tmpdir(), "iolaus-observe-child-"))
+  const path = join(directory, "iolaus.db")
+  const first = createEffect({ directory, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+  const node = await Effect.runPromise(first.observe({ ownerSessionID: "owner", agent: "explore", title: "Scan", prompt: "go", sessionID: "ses_child" }))
+  await Effect.runPromise(first.observed(node.runID, node.nodeID, { status: "completed", text: "done" }))
+  await Effect.runPromise(first.observed(node.runID, node.nodeID, { status: "running" }))
+  const reopened = (await Effect.runPromise(first.node(node.runID, "owner", node.nodeID)))
+  expect([reopened.attempt, reopened.result?.attempt]).toEqual([2, 1])
+  Effect.runSync(first.close)
+  const second = createEffect({ directory, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+  expect(await Effect.runPromise(second.observedChild("ses_child"))).toEqual({ runID: node.runID, nodeID: node.nodeID, owner: "owner" })
+  expect(await Effect.runPromise(second.observedChild("ses_unknown"))).toBeUndefined()
+  Effect.runSync(second.close)
+})
+
 test("subagent results parse from the structured output, the tagged text and the background notice", async () => {
   const { subagentOutcome } = await import("../src/dag/observe")
   expect(subagentOutcome({ output: { sessionID: "ses_1", status: "completed", output: "done" } })).toEqual({ sessionID: "ses_1", status: "completed", text: "done" })

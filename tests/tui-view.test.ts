@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, runActivity, runClock, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, resultLabel, runActivity, runClock, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -51,6 +51,12 @@ test("dialog result excerpts show plain text and preserve structured or truncate
   expect(nodeResultText('{"decision":"approved"}')).toBe('{"decision":"approved"}')
   expect(nodeResultText('{"text":"truncated')).toBe('{"text":"truncated')
   expect(nodeResultText("null")).toBe("null")
+})
+
+test("a reopened node labels the result it kept from an earlier attempt", () => {
+  expect(resultLabel(2, 1)).toBe("Previous result · attempt 1")
+  expect(resultLabel(2, 2)).toBe("Result")
+  expect(resultLabel(1, undefined)).toBe("Result")
 })
 
 test("a finished run shows a fixed duration while an active run keeps a live clock", () => {
