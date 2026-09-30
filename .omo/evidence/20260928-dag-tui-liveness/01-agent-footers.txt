@@ -1,6 +1,0 @@
-┃  Plan · GPT-5.5 OpenAI
-┃  Sisyphus · GPT-5.5 OpenAI
-
-┃  Prometheus · GPT-5.5 OpenAI
-┃  Atlas · GPT-5.5 OpenAI
-┃  Build · GPT-5.5 OpenAI
