@@ -4,7 +4,7 @@ import { join, resolve } from "node:path"
 
 /**
  * Iolaus reads configuration only from `IOLAUS_HOME/iolaus.json` (default
- * `~/.iolaus/iolaus.json`). The project layer holds plans. Skills
+ * `~/.iolaus/iolaus.json`). The project layer holds plans and QA evidence. Skills
  * and memory are the host's (and the user's plugins') concern, not Iolaus's.
  */
 export interface IolausHome {
@@ -26,14 +26,15 @@ const USER_README = `# Iolaus home
 
 Shared across projects. iolaus.json configures features, models and verification;
 iolaus.db stores DAG runs and session state. Project-level .iolaus/plans/ holds
-plans only, not configuration overrides. Legacy state files are ignored.
+plans and .iolaus/evidence/ holds QA evidence, not configuration overrides or
+runtime state. Legacy state files are ignored.
 `
 
 export interface ProvisionResult {
   readonly created: readonly string[]
 }
 
-/** Creates only the user layer. Project plans are created when written. */
+/** Creates only the user layer. Project plans and QA evidence are created when written. */
 export function provisionHome(home: IolausHome): ProvisionResult {
   const created: string[] = []
   for (const dir of [home.user]) {

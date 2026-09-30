@@ -10,8 +10,8 @@ import { once } from "node:events"
 // Live QA for the role policy: a real `opencode serve` in a sandboxed HOME, a local mock model, the built plugin.
 // `serve` (not `run`) so a session outlives its first reply, which the goal loop needs.
 const root = resolve(new URL("..", import.meta.url).pathname)
-const evidence = resolve(process.argv[2] ?? join(root, ".omo/evidence/roles"))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
+const evidence = resolve(process.argv[2] ?? join(root, ".iolaus/evidence/roles"))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: true })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-roles-qa-")))
 const project = join(sandbox, "project"), home = join(sandbox, "home"), config = join(sandbox, "config")

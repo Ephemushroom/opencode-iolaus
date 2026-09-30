@@ -9,8 +9,8 @@ import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
-const evidence = resolve(process.argv[2] ?? join(root, `.omo/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-live`))
-assert.ok(evidence.startsWith(join(root, ".omo/evidence/")))
+const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-live`))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: false })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-qa-")))
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"

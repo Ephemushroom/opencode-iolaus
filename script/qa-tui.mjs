@@ -11,8 +11,8 @@ const root = resolve(new URL("..", import.meta.url).pathname)
 const packageRoot = resolve(process.env.IOLAUS_QA_PACKAGE_ROOT ?? root)
 const mode = process.env.IOLAUS_QA_THEME ?? "light"
 assert.ok(mode === "light" || mode === "dark")
-const evidence = resolve(process.argv[2] ?? join(root, ".omo/evidence/20260924-iolaus-dag-tui"))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
+const evidence = resolve(process.argv[2] ?? join(root, ".iolaus/evidence/20260924-iolaus-dag-tui"))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: false })
 
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"

@@ -12,8 +12,8 @@ import { once } from "node:events"
 // child up and finish the run. A second run is then cancelled from the details dialog with `c` and a confirmation.
 const root = resolve(new URL("..", import.meta.url).pathname)
 const packageRoot = resolve(process.env.IOLAUS_QA_PACKAGE_ROOT ?? root)
-const evidence = resolve(process.argv[2] ?? join(root, `.omo/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-dag-recover`))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
+const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-dag-recover`))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: false })
 
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"

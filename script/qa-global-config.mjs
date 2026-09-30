@@ -8,8 +8,8 @@ import { homedir, tmpdir } from "node:os"
 import { join, resolve } from "node:path"
 
 const root = resolve(new URL("..", import.meta.url).pathname)
-const evidence = resolve(process.argv[2] ?? join(root, `.omo/evidence/global-config-${Date.now()}`))
-assert.ok(evidence.startsWith(join(root, ".omo/evidence/")))
+const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/global-config-${Date.now()}`))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: true })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-global-config-")))
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"

@@ -11,8 +11,8 @@ import { once } from "node:events"
 // the team template in git worktrees, /start-work --worktree --make-pr, and compaction keeping Iolaus state.
 // A real `opencode serve` in a sandboxed HOME, a local mock model, the built plugin, a git repository project.
 const root = resolve(new URL("..", import.meta.url).pathname)
-const evidence = resolve(process.argv[2] ?? join(root, `.omo/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-borrows`))
-assert.ok(evidence.startsWith(`${join(root, ".omo/evidence")}/`))
+const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-borrows`))
+assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
 mkdirSync(evidence, { recursive: true })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-borrows-qa-")))
 const project = join(sandbox, "project"), home = join(sandbox, "home"), config = join(sandbox, "config")

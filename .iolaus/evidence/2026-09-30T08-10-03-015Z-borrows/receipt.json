@@ -1,0 +1,76 @@
+{
+  "verdict": "PASS",
+  "command": "node script/qa-borrows.mjs /Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-evidence-paths/.iolaus/evidence/2026-09-30T08-10-03-015Z-borrows",
+  "version": "opencode v2.0.20",
+  "results": [
+    {
+      "name": "a node whose model fails (provider error or empty reply) moves to the lane's next configured model; a pinned model does not",
+      "verdict": "PASS"
+    },
+    {
+      "name": "a deep-low node ending with ESCALATE: deep-high is rerun on deep-high with its findings",
+      "verdict": "PASS"
+    },
+    {
+      "name": "team: members build in their own worktrees, the lead integrates on a branch, the user's tree is untouched",
+      "verdict": "PASS"
+    },
+    {
+      "name": "a run directory outside the project's repository is refused at create",
+      "verdict": "PASS"
+    },
+    {
+      "name": "/start-work rejects an unknown option",
+      "verdict": "PASS"
+    },
+    {
+      "name": "/start-work --make-pr works the tickets in a new worktree and opens the PR there after the accept gate",
+      "verdict": "PASS"
+    },
+    {
+      "name": "compaction keeps the session's role and paused run in the summary request",
+      "verdict": "PASS"
+    },
+    {
+      "name": "approving the gate runs the PR node in the worktree",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cleanup",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mock protocol",
+      "verdict": "PASS"
+    }
+  ],
+  "requestCount": 33,
+  "before": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "4194c51ec9395b417567e15752170a1ea3fac067c2836e58aa9e33eac83a3168",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.iolaus/iolaus.json": "ed3dcc46daa2fff1dc9d6a34704e0447f2b7f4ebd980733b093242c49a4ba74f"
+    },
+    "sessions": {
+      "session": "2713",
+      "session_v2": "2632"
+    }
+  },
+  "after": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "4194c51ec9395b417567e15752170a1ea3fac067c2836e58aa9e33eac83a3168",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.iolaus/iolaus.json": "ed3dcc46daa2fff1dc9d6a34704e0447f2b7f4ebd980733b093242c49a4ba74f"
+    },
+    "sessions": {
+      "session": "2713",
+      "session_v2": "2632"
+    }
+  },
+  "sandboxRemoved": true,
+  "omitted": "No user credentials or inherited environment dumps. Local mock only."
+}
