@@ -3,6 +3,7 @@ import { Agent, Model } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import { DagRunnerError } from "./errors"
 import type { DagExecutionRef, DagNodeDefinition, JsonValue } from "./types"
+import { defaultWorktreePath, ensureWorktree, repositoryRoot } from "./worktree"
 
 export interface DagExecutionResult {
   readonly payload: JsonValue
@@ -13,6 +14,8 @@ export interface DagRunnerStart {
   readonly node: DagNodeDefinition
   readonly prompt: string
   readonly attempt: number
+  /** The run's working directory; omitted, the plugin's project directory. */
+  readonly directory?: string
 }
 
 /** Executes one DAG node. Every method is an Effect so the scheduler can compose, interrupt and retry it. */
@@ -37,7 +40,7 @@ export interface DagRunnerPromise {
 }
 
 function lift<A>(nodeID: string | undefined, run: () => Promise<A>): Effect.Effect<A, DagRunnerError> {
-  return Effect.tryPromise({ try: run, catch: (cause) => new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), ...(nodeID ? { nodeID } : {}), cause }) })
+  return Effect.tryPromise({ try: run, catch: (cause) => cause instanceof DagRunnerError ? cause : new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), ...(nodeID ? { nodeID } : {}), cause }) })
 }
 
 export function runnerFromPromise(runner: DagRunnerPromise): DagRunner {
@@ -67,8 +70,16 @@ export function assistantText(messages: readonly unknown[]): string {
 type SessionApi = Pick<Context["session"], "create" | "prompt" | "wait" | "get" | "context" | "interrupt">
 type GenerateApi = Pick<Context["generate"], "text">
 
-function runnerError(nodeID: string) {
-  return (cause: unknown) => new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), nodeID, cause })
+function runnerError(nodeID: string, model = false) {
+  return (cause: unknown) => new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), nodeID, cause, ...(model ? { model } : {}) })
+}
+
+/** Branch and path of a worktree node: one per run and node, reused by its retries. */
+export function nodeWorktree(directory: string, runID: string, nodeID: string): { readonly branch: string; readonly path: string } {
+  const root = repositoryRoot(directory)
+  if (!root) throw new Error(`Node ${nodeID} asks for a worktree, but ${directory} is not a git repository`)
+  const name = `iolaus-${runID.slice(0, 8)}-${nodeID.toLowerCase().replace(/[^a-z0-9._-]+/g, "-")}`
+  return { branch: `iolaus/${name.slice("iolaus-".length)}`, path: defaultWorktreePath(root, name) }
 }
 
 /** Prefix marking a judge execution ref; judge nodes have no session, the ref carries the completed text. */
@@ -87,7 +98,7 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
     yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
     const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
     const messages = yield* ctx.session.context({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
-    if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID })
+    if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID, model: true })
     if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
     return { payload: { text: assistantText(messages as readonly unknown[]) } }
   })
@@ -95,20 +106,28 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
     start: (input) => Effect.gen(function* () {
       if (input.node.kind === "judge") {
         const model = input.node.model === undefined ? undefined : Model.Ref.parse(input.node.model)
-        const reply = yield* ctx.generate.text({ prompt: input.prompt, ...(model ? { model } : {}) }).pipe(Effect.mapError(runnerError(input.node.id)))
+        const reply = yield* ctx.generate.text({ prompt: input.prompt, ...(model ? { model } : {}) }).pipe(Effect.mapError(runnerError(input.node.id, true)))
         const key = `${JUDGE_REF}${input.node.id}:${input.attempt}:${Date.now()}`
         judgeReplies.set(key, reply.text)
         return { nodeID: input.node.id, attempt: input.attempt, sessionID: key }
       }
       if (input.node.agent === undefined) return yield* new DagRunnerError({ message: `Iolaus DAG node ${input.node.id} has no execution target`, nodeID: input.node.id })
+      let directory = input.directory ?? ctx.location.directory
+      let prompt = input.prompt
+      if (input.node.worktree) {
+        const base = directory
+        const tree = yield* Effect.try({ try: () => { const tree = nodeWorktree(base, input.runID ?? "run", input.node.id); ensureWorktree(base, tree.path, tree.branch); return tree }, catch: runnerError(input.node.id) })
+        directory = tree.path
+        prompt = `<iolaus-worktree branch="${tree.branch}" path="${tree.path}">\nYou work in your own git worktree ${tree.path} on branch ${tree.branch}, cut from ${base} at its HEAD (uncommitted changes there are not here). Commit your work to ${tree.branch}; do not touch other worktrees or branches.\n</iolaus-worktree>\n\n${prompt}`
+      }
       const session = yield* ctx.session.create({
         title: `Iolaus DAG · ${input.node.id}`,
         agent: Agent.ID.make(input.node.agent),
         ...(input.node.model === undefined ? {} : { model: Model.Ref.parse(input.node.model) }),
-        location: { directory: ctx.location.directory as never },
+        location: { directory: directory as never },
         metadata: { iolaus_dag_node: input.node.id, iolaus_dag_attempt: input.attempt, ...(input.runID ? { iolaus_dag_run: input.runID } : {}) },
-      }).pipe(Effect.mapError(runnerError(input.node.id)))
-      pendingPrompts.set(String(session.id), input.prompt)
+      }).pipe(Effect.mapError(runnerError(input.node.id, true)))
+      pendingPrompts.set(String(session.id), prompt)
       return { nodeID: input.node.id, attempt: input.attempt, sessionID: String(session.id) }
     }),
     wait: (ref) => Effect.gen(function* () {

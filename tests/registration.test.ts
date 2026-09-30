@@ -147,12 +147,12 @@ test("omitted agent and mode selections disable their context paths", async () =
   expect(event).toEqual(before)
 })
 
-test("ultrawork and hyperplan render a DAG instruction for the commanding session but not for DAG children", async () => {
+test("ultrawork, hyperplan and team render a DAG instruction for the commanding session but not for DAG children", async () => {
   const { modeDagInstruction, DAG_CHILD_MARKER } = await import("../src/prompts/mode-dag")
   const { expandTemplate } = await import("../src/dag/templates")
   expect(modeDagInstruction("ultrawork")).toContain('"template": "ultrawork"')
   expect(modeDagInstruction("hyperplan")).toContain('"template": "hyperplan"')
-  expect(modeDagInstruction("team")).toBeUndefined()
+  expect(modeDagInstruction("team")).toContain('"template": "team"')
   const work = expandTemplate({ template: "ultrawork", task: "t" }).nodes.find((n) => n.id === "work")!
   expect(work.prompt.startsWith(`${modeMarker("ultrawork")}\n${DAG_CHILD_MARKER}`)).toBe(true)
   expect(explicitMode(work.prompt)).toBe("ultrawork")

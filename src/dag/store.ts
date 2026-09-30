@@ -53,8 +53,9 @@ export class DagStore {
     return committed
   }
 
-  getRun(runID: string): DagRunRecord | undefined {
-    const row = this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project) as RunRow | null
+  /** `anyProject` reads a run another project's controller owns; only lineage uses it, for runs working in this project. */
+  getRun(runID: string, anyProject = false): DagRunRecord | undefined {
+    const row = (anyProject ? this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) : this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project)) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
     const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null

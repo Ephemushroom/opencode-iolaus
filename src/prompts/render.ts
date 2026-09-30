@@ -6,11 +6,12 @@ import {
 } from "../omo/agents"
 import {
   atlasPromptVariants, prometheusPromptVariants, ultraworkPromptVariants,
-  HYPERPLAN_MODE_PROMPT, TEAM_MODE_PROMPT, loadPromptSync, resolveVariant,
+  HYPERPLAN_MODE_PROMPT, loadPromptSync, resolveVariant,
 } from "../omo/modes/src"
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
 import { NATIVE_BINDINGS } from "./native-bindings"
+import { TEAM_DAG_MODE_PROMPT } from "./mode-dag"
 import { buildHephaestusPrompt } from "../omo/agents/hephaestus/gpt"
 
 export interface PromptContext {
@@ -45,14 +46,20 @@ export function renderAgent(name: AgentName, context: PromptContext): string {
   }
 }
 
+/** Lane contracts the runtime acts on: a deep-low DAG node that ends with the escalation line is rerun on deep-high. */
+const CATEGORY_CONTRACTS: Partial<Record<CategoryName, string>> = {
+  "deep-low": `If the goal's central decision cannot be settled from what you can read and run (a trade-off, a contract across a package or process boundary, a mechanism with no pattern in the repository, correctness that must be argued from invariants), stop before guessing: report your findings, then end your reply with the line "ESCALATE: deep-high". The goal is then rerun on the deep-high lane with your findings.`,
+}
+
 export function renderCategory(name: CategoryName, model: string): string {
-  const append = `<Category_Context name="${name}">\n${CATEGORY_DESCRIPTIONS[name]}\n</Category_Context>`
+  const contract = CATEGORY_CONTRACTS[name]
+  const append = `<Category_Context name="${name}">\n${CATEGORY_DESCRIPTIONS[name]}${contract ? `\n${contract}` : ""}\n</Category_Context>`
   return buildSisyphusJuniorPrompt(model, false, append)
 }
 
 export function renderMode(mode: ModeName, model: string, agent?: AgentName): string {
   if (mode === "hyperplan") return HYPERPLAN_MODE_PROMPT
-  if (mode === "team") return TEAM_MODE_PROMPT
+  if (mode === "team") return TEAM_DAG_MODE_PROMPT
   const variant = resolveVariant({ modelID: model, agentName: agent, variants: ultraworkPromptVariants }) as keyof typeof ultraworkPromptVariants
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }
