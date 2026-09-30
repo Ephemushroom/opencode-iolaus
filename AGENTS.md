@@ -32,7 +32,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `provisionHome` creates only the user directory, README and missing global config at setup and never overwrites; every rendered prompt ends with
   `<iolaus-home>` naming both paths. Iolaus owns no skills directory and no memory store: skill discovery is the
   host's (`~/.agent/skills`, global skills) and cross-session memory is the user's memory plugin's (claude-mem); the
-  contract says so. Never modify the host's global session/config stores outside an isolated QA sandbox.
+  contract says so. Never modify the host's session database outside an isolated QA sandbox.
 - No automatic upstream synchronization or dependency on published OMO packages.
 
 ## Runtime
