@@ -1,0 +1,45 @@
+ ⠧ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    DAG details · ad57ca78                                                                                   Esc close
+                       ⏸ plan-review: IOLAUS_TUI_TASK
+     ✓ iolaus_dag [act Paused · Done 4/6 [████████░░░░] · gen 1 · waiting 15s
+
+     ✓ iolaus_dag [act                                           ╰────────────────────────────╯
+                                                                               │
+     ✓ iolaus_dag [act                                                         ▼
+                                                                 ╭────────────────────────────╮                                           al ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     ✓ iolaus_dag [act                                           │   rereview ⚖               │                                           IOLAUS_TUI_TASK  ╎
+                                                                 │ ✓ Done                     │                                           4/6 · gen 1 ·    ╎
+     ✓ iolaus_dag [act                                           │ Re-review the revised plan │                                                            ╎
+                                                                 ╰────────────────────────────╯                                           oval             ╎
+     ✓ iolaus_dag [act                                                         │                                                                           ╎
+                                                                               ▼                                                           plan            ╎
+     ✓ iolaus_dag [act                                           ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓                                         █                  ╎
+                                                                 ┃ › approve ⏸                ┃                                         █ lan              ╎
+     ✓ iolaus_dag [act                                           ┃ ⏸ Waiting approval         ┃                                         █                  ╎
+                                                                 ┃ Approve the plan           ┃                                         █ plan             ╎
+                                                                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                         █                  ╎
+                                                                               │                                                        █ plan             ╎
+                                                                               ▼                                                        █                  ╎
+                                                                 ╭────────────────────────────╮                                         █ he revised plan  ╎
+                                                                 │   execute                  │                                         █                  ╎
+                                                                 │ · Pending                  │                                         █  approved plan   ╎
+                                                                 │ Execute the approved plan  │                                         █ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                 ╰────────────────────────────╯                                         █
+                                                                                                                                           · ctrl+x d
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ⏸ approve · Approve the plan                                                                                   │
+                       │ Status: Waiting approval · gate                                                                                │
+                       │ Agent: human · Model: none · Attempt: 1                                                                        │
+                       │ Depends on: review, rereview                                                                                   │
+                       │ Unblocks: execute                                                                                              │
+                       │                                                                                                                │
+  ┃                    │ Approval request                                                                                               │
+  ┃                    │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject to stop.                        │
+  ┃                    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · a approve · r reject · c cancel run · PgUp/PgDn details · Esc close
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interr                                                                                                                    ui-qa-f1voHO/project
+

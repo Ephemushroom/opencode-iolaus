@@ -61,6 +61,13 @@ async function reply(body, instructions, input) {
   if (first.includes("<iolaus-planning>") && !instructions.includes("<iolaus-planner>")) {
     return outs.length ? { text: "CONSULT_DONE" } : { call: { name: "shell", args: { command: "ls", description: "consult" } } }
   }
+  if (active === "observe-dag") {
+    if (first.includes("OBS_DAG_NESTED")) return { text: "OBS_DAG_NESTED_DONE" }
+    if (first.includes("OBS_DAG_CHILD")) return outs.length ? { text: "OBS_DAG_CHILD_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "dag nested", prompt: "OBS_DAG_NESTED" } } }
+    const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
+    if (!outs.length) return { call: { name: "iolaus_dag", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "OBS_DAG_CHILD" }] } } } }
+    return outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "wait", run_id: runID } } } : { text: "OBS_DAG_PARENT_DONE" }
+  }
   if (active === "observe") {
     const lastUser = JSON.stringify([...items].reverse().find((item) => item?.type === "message" && item.role === "user") ?? "")
     if (first.includes("OBS_NESTED")) return { text: "OBS_NESTED_DONE" }
@@ -201,7 +208,8 @@ const mock = http.createServer(async (req, res) => {
     const body = JSON.parse(Buffer.concat(chunks).toString())
     const instructions = body.instructions ?? ""
     const input = JSON.stringify(body.input ?? [])
-    const session = instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null
+    // Host 2.0.20 sends the session in a header; older hosts put it in the instructions.
+    const session = req.headers["x-opencode-session"] ?? instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null
     const result = await reply(body, instructions, input)
     const record = { scenario: active, session, model: body.model, tools: (body.tools ?? []).map((t) => t.name), call: result.call ?? null, text: result.text ?? null,
       outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),
@@ -309,6 +317,22 @@ try {
     assert.match(of(id).at(-1).outputs[1], /\[iolaus atlas-unbound\]/, "Atlas subagent call was not refused")
     assert.ok(!traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id), "a refused subagent call was recorded")
     assert.equal(readFileSync(join(project, "src/a.ts"), "utf8"), "const x = 1\nexport default x\n")
+  })
+
+  await check("a subagent call inside a scheduled DAG node joins the owner's observed run, labelled with the node", async () => {
+    active = "observe-dag"
+    const id = await create("sisyphus")
+    await api("POST", `/api/session/${id}/prompt`, { text: "OBS_DAG_PARENT" })
+    await finished(id, "OBS_DAG_PARENT_DONE")
+    const snapshot = async (sessionID) => (await api("POST", `/api/rpc/iolaus-dag/snapshot?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID } })).output
+    const observed = await until(async () => (await snapshot(id)).runs.find((r) => r.name === "Subagent calls" && r.nodes.length && !r.nodes.some((n) => n.status === "running")), "owner's observed run", 30000)
+    const scheduled = (await snapshot(id)).runs.find((r) => r.name === "tier QA")
+    assert.equal(scheduled?.status, "completed", `scheduled run: ${JSON.stringify(scheduled)}`)
+    const child = scheduled.nodes[0].sessionID
+    assert.deepEqual(observed.nodes.map((n) => [n.id, n.title, n.status, n.dependsOn]), [["1-work-dag-nested", "work › dag nested", "completed", []]])
+    assert.match(observed.nodes[0].result, /OBS_DAG_NESTED_DONE/)
+    assert.ok(!(await snapshot(child)).runs.some((r) => r.name === "Subagent calls"), "the DAG child got its own observed run")
+    assert.ok(traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id && t.scheduledNode === "work"), "scheduled-node trace missing")
   })
 
   await check("native subagent calls appear as an observed DAG run: background, foreground, nested and a follow-up", async () => {

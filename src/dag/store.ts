@@ -82,6 +82,14 @@ export class DagStore {
     return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
   }
 
+  /** The observed-run node whose child is this session, newest first. */
+  observedNode(sessionID: string): { readonly runID: string; readonly nodeID: string; readonly ownerSessionID: string } | undefined {
+    const row = this.db.query(`SELECT n.run_id, n.node_id, r.owner_session_id FROM dag_nodes n JOIN dag_runs r ON r.run_id = n.run_id
+      WHERE r.project = ? AND json_extract(r.definition_json, '$.observed') = 1 AND json_extract(n.execution_json, '$.sessionID') = ?
+      ORDER BY n.updated_at DESC LIMIT 1`).get(this.project, sessionID) as { run_id: string; node_id: string; owner_session_id: string } | null
+    return row ? { runID: row.run_id, nodeID: row.node_id, ownerSessionID: row.owner_session_id } : undefined
+  }
+
   appendAction(action: Omit<DagAction, "actionID">): boolean {
     if (!this.owns(action.runID)) return false
     const result = this.db.run("INSERT OR IGNORE INTO dag_actions VALUES (?, ?, ?, ?, ?, ?, ?)", [randomUUID(), action.runID, action.nodeID ?? null, action.kind, action.idempotencyKey, action.payload === undefined ? null : canonicalJson(action.payload), action.createdAt])

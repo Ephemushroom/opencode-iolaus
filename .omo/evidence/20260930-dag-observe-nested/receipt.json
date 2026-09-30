@@ -1,0 +1,219 @@
+{
+  "verdict": "FAIL",
+  "command": "node script/qa-roles.mjs /Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/.omo/evidence/20260930-dag-observe-nested",
+  "version": "opencode v2.0.20",
+  "results": [
+    {
+      "name": "ultrawork from build switches the session to Sisyphus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hyperplan switches to Prometheus; planner writes the plan, is refused code edits and implementing runs, and its consult is read-only",
+      "verdict": "FAIL",
+      "error": "Error: QA timed out waiting for consult child\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:254:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:303:19\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:291:3"
+    },
+    {
+      "name": "Atlas without a plan is read-only",
+      "verdict": "PASS"
+    },
+    {
+      "name": "a subagent call inside a scheduled DAG node joins the owner's observed run, labelled with the node",
+      "verdict": "PASS"
+    },
+    {
+      "name": "native subagent calls appear as an observed DAG run: background, foreground, nested and a follow-up",
+      "verdict": "PASS"
+    },
+    {
+      "name": "other lanes may write plans",
+      "verdict": "PASS"
+    },
+    {
+      "name": "start-work with an unknown plan starts nothing",
+      "verdict": "PASS"
+    },
+    {
+      "name": "start-work switches to Atlas and runs each ticket in a fresh Atlas session, then both reviews and the accept gate",
+      "verdict": "PASS"
+    },
+    {
+      "name": "/goal switches to Hephaestus, keeps the session's non-GPT model, and loops until update_goal complete",
+      "verdict": "PASS"
+    },
+    {
+      "name": "a goal that makes no progress pauses after three idle turns",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: allowed",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: nested",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: nested same-primary DAG worker completes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-lower",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: DAG lower worker cannot launch a primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-prometheus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-prometheus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native-deny-atlas",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-atlas",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: model",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: judge",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: executor",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: reviewer",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: member",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-sisyphus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: dag-hephaestus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: lower",
+      "verdict": "FAIL",
+      "error": "Error: QA timed out waiting for tier child lower\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:254:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:460:28\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:492:3"
+    },
+    {
+      "name": "tier: lower child cannot launch a primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: command",
+      "verdict": "FAIL",
+      "error": "Error: QA timed out waiting for tier child command\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:254:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:460:28\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:498:3"
+    },
+    {
+      "name": "tier: command-goal",
+      "verdict": "FAIL",
+      "error": "Error: QA timed out waiting for tier child command-goal\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:254:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:460:28\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:499:3"
+    },
+    {
+      "name": "tier: child command cannot switch or start work",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: forge",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: forged ticket marker leaves Atlas read-only",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native",
+      "verdict": "FAIL",
+      "error": "Error: QA timed out waiting for tier child native\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:254:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:460:28\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:514:3"
+    },
+    {
+      "name": "tier: real continuation rejects stored primary and supplied primary mismatch",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: native lower to general cannot launder a primary DAG",
+      "verdict": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'sisyphus',\n+   'sisyphus',\n    'metis',\n-   'general'\n  ]\n\n    at file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:551:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:541:43"
+    },
+    {
+      "name": "tier: dag lower to general cannot launder a primary DAG",
+      "verdict": "FAIL",
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'sisyphus',\n    'metis',\n+   'metis'\n-   'general'\n  ]\n\n    at file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:551:12\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async check (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:259:9)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/dag-observe-nested/script/qa-roles.mjs:541:43"
+    },
+    {
+      "name": "tier: Prometheus hyperplan runs planning nodes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "tier: amendment cannot insert a forbidden primary",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cleanup",
+      "verdict": "PASS"
+    },
+    {
+      "name": "mock protocol",
+      "verdict": "PASS"
+    }
+  ],
+  "requestCount": 145,
+  "before": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "f7c263ceb4d3b5d9cd320b6153b4df04847a12041ca872b5204381a572fc6068",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2"
+    },
+    "sessions": {
+      "session": "2713",
+      "session_v2": "2629"
+    }
+  },
+  "after": {
+    "files": {
+      "/Users/Bryan/.config/opencode/opencode.json": "f7c263ceb4d3b5d9cd320b6153b4df04847a12041ca872b5204381a572fc6068",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.local/share/opencode/auth.json": "26ad853c32af5fd92442c34552efea22df03177d9e4d2b8454e5c3b8274e8bc2"
+    },
+    "sessions": {
+      "session": "2713",
+      "session_v2": "2629"
+    }
+  },
+  "sandboxRemoved": true,
+  "serverExit": {
+    "code": 130,
+    "signal": null
+  },
+  "mockClosed": true
+}

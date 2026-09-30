@@ -65,7 +65,13 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   inside a child hangs under the child's node (`dependsOn` is the parent link, not
   a data edge); a follow-up by `sessionID` reopens the same node as a new attempt; a
   call the host refuses before running it fails when its caller's turn ends.
-  Correlation is in memory. Observed runs are never scheduled: `retry`, `resume`
+  Correlation is cached in memory and read back from the store
+  (`controller.observedChild`) after a reload. A call made inside a scheduled
+  `iolaus_dag` node's session (found through its `iolaus_dag_run`/`iolaus_dag_node`
+  metadata and `controller.lineage`) joins the run owner's observed run, titled
+  `<node> › <description>`; the scheduled run's definition is not touched. A
+  reopened node keeps its last result, which the view labels with its attempt
+  (`resultAttempt`). Observed runs are never scheduled: `retry`, `resume`
   and `amend` reject them. The native binding tells agents to call `subagent`
   directly for simple delegation and to use `iolaus_dag` only for data
   dependencies, retry/resume, gates or conditional branches.

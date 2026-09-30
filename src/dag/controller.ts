@@ -34,6 +34,8 @@ export interface DagController {
   readonly observe: (input: DagObservedStart) => Effect.Effect<{ readonly runID: string; readonly nodeID: string }>
   /** Moves an observed node to running again (a follow-up), or settles it. */
   readonly observed: (runID: string, nodeID: string, update: DagObservedUpdate) => Effect.Effect<void>
+  /** The observed node a child session belongs to, read from the store so it survives a reload. */
+  readonly observedChild: (sessionID: string) => Effect.Effect<{ readonly runID: string; readonly nodeID: string; readonly owner: string } | undefined>
   readonly close: Effect.Effect<void>
 }
 
@@ -639,6 +641,10 @@ export function createDagController(options: DagControllerOptions): DagControlle
         update.status === "completed" ? { text: update.text } : update.status === "running" ? undefined : { message: update.error, status: update.status })
       if (status !== run.status && (status === "completed" || status === "failed")) event(updated, status === "completed" ? "run.completed" : "run.failed")
       notify(updated)
+    }),
+    observedChild: (sessionID) => Effect.sync(() => {
+      const found = store.observedNode(sessionID)
+      return found ? { runID: found.runID, nodeID: found.nodeID, owner: found.ownerSessionID } : undefined
     }),
     close: Effect.sync(() => {
       closed = true
