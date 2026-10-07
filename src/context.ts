@@ -2,10 +2,13 @@ import { Effect } from "effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { SessionContext } from "@opencode/plugin/effect/session"
 import type { Options } from "./options"
-import { CATEGORY_DESCRIPTIONS, agentName, categoryName, explicitMode } from "./prompts/catalog"
+import { CATEGORY_DESCRIPTIONS, agentName, categoryName, explicitMode, type AgentName } from "./prompts/catalog"
 import { agentMarker, categoryMarker } from "./registration"
 import { bindNative, renderAgent, renderCategory, renderMode } from "./prompts/render"
-import { categorizeTools } from "./omo/agents"
+import {
+  EXPLORE_PROMPT_METADATA, LIBRARIAN_PROMPT_METADATA, MULTIMODAL_LOOKER_PROMPT_METADATA, ORACLE_PROMPT_METADATA,
+  categorizeTools, metisPromptMetadata, momusPromptMetadata, type AgentPromptMetadata,
+} from "./omo/agents"
 import { trace } from "./trace"
 import { DAG_CHILD_MARKER, DAG_MODE_TEMPLATES, modeDagInstruction } from "./prompts/mode-dag"
 import { ROLE_CONTRACTS } from "./roles/contract"
@@ -37,6 +40,20 @@ export function dropNativeDefaultPrompt(system: SessionContext["system"]): numbe
   return removed
 }
 
+/**
+ * OMO's prompt metadata for the delegable specialists. Sisyphus and Hephaestus build their key triggers, tool
+ * selection, delegation table and Oracle/Explore/Librarian sections from it; other subagents are listed without
+ * triggers.
+ */
+const SPECIALIST_METADATA: Partial<Record<AgentName, AgentPromptMetadata>> = {
+  oracle: ORACLE_PROMPT_METADATA,
+  librarian: LIBRARIAN_PROMPT_METADATA,
+  explore: EXPLORE_PROMPT_METADATA,
+  "multimodal-looker": MULTIMODAL_LOOKER_PROMPT_METADATA,
+  metis: metisPromptMetadata,
+  momus: momusPromptMetadata,
+}
+
 export function composeContext(
   event: SessionContext,
   ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list"> },
@@ -61,10 +78,13 @@ export function composeContext(
     const lanes = agents.data.filter((agent) => categoryName(String(agent.id)) !== undefined)
     const prompt = renderAgent(name, {
       model,
-      agents: agents.data.filter((agent) => agent.mode !== "primary" && !agent.hidden && categoryName(String(agent.id)) === undefined).map((agent) => ({
-        name: String(agent.id), description: agent.description ?? "",
-        metadata: { category: "specialist", cost: "CHEAP", triggers: [] },
-      })),
+      agents: agents.data.filter((agent) => agent.mode !== "primary" && !agent.hidden && categoryName(String(agent.id)) === undefined).map((agent) => {
+        const specialist = agentName(String(agent.id))
+        return {
+          name: String(agent.id), description: agent.description ?? "",
+          metadata: (specialist && SPECIALIST_METADATA[specialist]) ?? { category: "specialist", cost: "CHEAP", triggers: [] },
+        }
+      }),
       categories: lanes.map((agent) => {
         const lane = categoryName(String(agent.id))!
         return { name: lane, description: CATEGORY_DESCRIPTIONS[lane], ...(agent.model ? { model: `${agent.model.providerID}/${agent.model.id}` } : {}) }
