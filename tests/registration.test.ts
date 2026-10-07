@@ -10,6 +10,10 @@ import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
 import { bindNative, renderAgent, renderMode } from "../src/prompts/render"
+import {
+  EXPLORE_PROMPT_METADATA, LIBRARIAN_PROMPT_METADATA, MULTIMODAL_LOOKER_PROMPT_METADATA, ORACLE_PROMPT_METADATA,
+  metisPromptMetadata, momusPromptMetadata, type AgentPromptMetadata,
+} from "../src/omo/agents"
 
 function registry() {
   const agents = new Map<string, ReturnType<AgentEditor["list"]>[number]>()
@@ -86,6 +90,30 @@ test("request model selects prompt while tools, model and other system parts are
     expect(event.system[1]).toEqual({ type: "text", text: "project guidance" })
     expect(event.tools).toEqual(tools)
     expect(event.model).toEqual(Model.Ref.parse(model))
+  }
+})
+
+test("Sisyphus lists the delegable specialists with OMO's prompt metadata and other subagents without triggers", async () => {
+  const subagent = (id: string) => ({ ...Agent.Info.default(Agent.ID.make(id)), mode: "subagent" as const, description: `${id} agent.` })
+  const listed = ["oracle", "explore", "librarian", "metis", "momus", "multimodal-looker", "general"].map(subagent)
+  const live = {
+    agent: { list: () => Effect.succeed({ location: { directory: "/test" }, data: listed }) },
+    skill: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
+  } as never as Parameters<typeof composeContext>[1]
+  const metadata: Record<string, AgentPromptMetadata> = {
+    oracle: ORACLE_PROMPT_METADATA, explore: EXPLORE_PROMPT_METADATA, librarian: LIBRARIAN_PROMPT_METADATA,
+    metis: metisPromptMetadata, momus: momusPromptMetadata, "multimodal-looker": MULTIMODAL_LOOKER_PROMPT_METADATA,
+  }
+  const untriggered: AgentPromptMetadata = { category: "specialist", cost: "CHEAP", triggers: [] }
+  const available = (pick: (id: string) => AgentPromptMetadata) => listed.map((agent) => ({ name: String(agent.id), description: agent.description, metadata: pick(String(agent.id)) }))
+  const tools = [{ name: "read", category: "other" as const }]
+  for (const model of ["openai/gpt-5.5", "anthropic/claude-opus-5-5"]) {
+    const expected = bindNative(renderAgent("sisyphus", { model, tools, agents: available((id) => metadata[id] ?? untriggered) }))
+    // The metadata is observable: the same catalog without it renders a different prompt.
+    expect(expected).not.toBe(bindNative(renderAgent("sisyphus", { model, tools, agents: available(() => untriggered) })))
+    const event = context("sisyphus", model)
+    await Effect.runPromise(composeContext(event, live, parseOptions({})))
+    expect(event.system[0].text).toBe(expected)
   }
 })
 

@@ -306,6 +306,13 @@ try {
       assert.ok(captured.length)
        assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite"].includes(t) || t?.startsWith("team_"))))
        if (scenario.dag) assert.ok(captured.some((r) => r.tools.includes("iolaus_dag")), "DAG tool was not exposed")
+       // Sisyphus lists the specialists with OMO's prompt metadata, so their delegation triggers reach its prompt; the native agent's prompt has none.
+       if (scenario.name === "agent") {
+         const sisyphus = captured.find((r) => r.instructions.includes("<iolaus-native-contract>"))
+         assert.ok(sisyphus, "Sisyphus prompt was not captured")
+         for (const id of ["oracle", "explore", "librarian", "metis", "momus"]) assert.ok(sisyphus.instructions.includes(`→ \`${id}\` - `), `delegation trigger for ${id} missing from the Sisyphus prompt`)
+       }
+       if (scenario.name === "native") assert.ok(captured.every((r) => !r.instructions.includes("→ `oracle` - ")), "native agent prompt carries Iolaus delegation triggers")
        if (scenario.fanin) {
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
          const merge = captured.map(messageText).find((text) => text.includes("IOLAUS_DAG_NODE_MERGE"))
