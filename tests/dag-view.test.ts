@@ -4,7 +4,7 @@ import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { Effect } from "effect"
 import { createDagController as createEffectController } from "../src/dag/controller"
-import { dagView, nodeSummary, viewNodeStatus } from "../src/dag/register-rpc"
+import { dagView, nodeSummary, resultExcerpt, viewNodeStatus } from "../src/dag/register-rpc"
 import { DagStore } from "../src/dag/store"
 import type { DagExecutionRef, DagRunRecord } from "../src/dag/types"
 import { runnerFromPromise } from "../src/dag/runner"
@@ -20,6 +20,15 @@ test("a node's title wins; otherwise the first meaningful prompt line summarises
   expect(nodeSummary(undefined, "<iolaus-mode:ultrawork>\n<iolaus-dag-child>\nAchieve this goal end to end.")).toBe("Achieve this goal end to end.")
   expect(nodeSummary(undefined, "TASK: Read-only recommend a design")).toBe("Read-only recommend a design")
   expect(nodeSummary("  ", "")).toBeUndefined()
+})
+
+test("a long reply is cut inside its text, so the excerpt stays JSON the dialog renders as Markdown", () => {
+  const parsed = JSON.parse(resultExcerpt({ text: `# Report\n${"x".repeat(20000)}` }))
+  expect(parsed.text.startsWith("# Report\n")).toBe(true)
+  expect(parsed.text.endsWith("…")).toBe(true)
+  expect(parsed.text.length).toBe(16001)
+  expect(resultExcerpt({ text: "short" })).toBe('{"text":"short"}')
+  expect(resultExcerpt({ decision: "x".repeat(20000) })).toHaveLength(16000)
 })
 
 test("a finished run never reports nodes as in flight", () => {

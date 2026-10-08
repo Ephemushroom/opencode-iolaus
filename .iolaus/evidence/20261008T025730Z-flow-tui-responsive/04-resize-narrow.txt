@@ -1,0 +1,45 @@
+   RESPONSIVE_QA_READY           +
+
+  ┃
+  ┃  Create the responsive seven parallel QA DAG
+  ┃
+
+
+
+  Flow · Responsive seven parallel cards whose long flow name must truncate              esc close
+  ✓ done in 0s  ━━━━━━━━━━━━ 7/7
+
+    ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+    │   p1                     ⚖ │ │   p2                     ⚖ │ │   p3                     ⚖ │
+    │ Parallel card 1            │ │ Parallel card 2            │ │ Parallel card 3            │
+    ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+
+    ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+    │   p4                     ⚖ │ │   p5                     ⚖ │ │   p6                     ⚖ │
+    │ Parallel card 4            │ │ Parallel card 5            │ │ Parallel card 6            │
+    ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+
+                                   ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓
+                                   ┃ › p7                     ⚖ ┃
+                                   ┃ CARD_LAST_VISIBLE          ┃
+                                   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                          · 7 in parallel
+
+  ╭─ Node details ───────────────────────────────────────────────────────────────────────────────╮
+  │ ✓ p7 · CARD_LAST_VISIBLE                                                                     │
+  │ Status: Done · judge                                                                         │
+  │ Agent: momus · Model: openai/gpt-5.5 · Attempt: 1                                            │
+  │ Depends on: none (start node)                                                                │
+  │ Unblocks: none (final node)                                                                  │
+  │                                                                                              │
+  │ Result                                                                                       │
+  │ SHORT_RESULT_7                                                                               │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+
+  ↑/↓ j/k select · PgUp/PgDn details · Esc close
+
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/qc1d9pgd1hq599hhhw_z…/T/iolaus-responsive-qa-AZiaX5/project  15 (0%) · $0.00  ctrl+p commands
+

@@ -1,0 +1,30 @@
+   RESPONSIVE_QA_READY           +
+
+  ┃
+  ┃  Create the responsive seven parallel QA DAG
+  ┃
+
+     ✓ iolaus_dag [action=create]
+
+     ✓ iolaus_dag [action=snapshot, run_id=a76241a4-2a5d-4a69-b2f6-
+       d67fa09c2685]
+
+     RESPONSIVE_QA_READY
+
+     Build · GPT-5.5 · 630ms · 26.8 tok/s
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  responsive-draft
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/T/iolaus-responsive-qa-AZiaX5/project    15 (0%) · $0.00  ctrl+p commands
+

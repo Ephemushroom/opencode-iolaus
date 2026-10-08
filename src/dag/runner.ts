@@ -121,7 +121,7 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
         prompt = `<iolaus-worktree branch="${tree.branch}" path="${tree.path}">\nYou work in your own git worktree ${tree.path} on branch ${tree.branch}, cut from ${base} at its HEAD (uncommitted changes there are not here). Commit your work to ${tree.branch}; do not touch other worktrees or branches.\n</iolaus-worktree>\n\n${prompt}`
       }
       const session = yield* ctx.session.create({
-        title: `Iolaus DAG · ${input.node.id}`,
+        title: `Flow · ${input.node.id}`,
         agent: Agent.ID.make(input.node.agent),
         ...(input.node.model === undefined ? {} : { model: Model.Ref.parse(input.node.model) }),
         location: { directory: directory as never },

@@ -1,0 +1,18 @@
+{
+  "body": {
+    "fg": "238,238,238",
+    "bold": false
+  },
+  "heading": {
+    "fg": "157,124,216",
+    "bold": true
+  },
+  "bold": {
+    "fg": "245,167,66",
+    "bold": true
+  },
+  "code": {
+    "fg": "127,216,143",
+    "bold": false
+  }
+}

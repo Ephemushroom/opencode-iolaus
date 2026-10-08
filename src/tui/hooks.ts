@@ -29,7 +29,7 @@ export function useDagData(props: { readonly sessionID: string; readonly context
       last = Date.now()
       void refresh()
       if (notify && event.data.type === "node.waiting") {
-        void context.attention.notify({ title: "Iolaus DAG", message: "A gate is waiting for your decision", notification: { when: "always" } })
+        void context.attention.notify({ title: "Iolaus Flow", message: "A gate is waiting for your decision", notification: { when: "always" } })
           .catch((error) => trace("iolaus.tui.notification.failed", { error: String(error) }))
       }
     })

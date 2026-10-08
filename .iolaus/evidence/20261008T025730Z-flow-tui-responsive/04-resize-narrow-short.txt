@@ -1,0 +1,30 @@
+   RESPONSIVE_QA_READY           +
+
+
+
+  Flow · Responsive seven parallel c...long flow name must truncate  esc close
+  ✓ done in 0s  ━━━━━━━━━━━━ 7/7
+
+             ╭─ ✓ Done ───────────────╮ ╭─ ✓ Done ───────────────╮
+             │   p5                 ⚖ │ │   p6                 ⚖ │
+             │ Parallel card 5        │ │ Parallel card 6        │
+             ╰────────────────────────╯ ╰────────────────────────╯
+
+                           ┏━ ✓ Done ━━━━━━━━━━━━━━━┓
+                           ┃ › p7                 ⚖ ┃
+                           ┃ CARD_LAST_VISIBLE      ┃                        ▄
+                           ┗━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+  ╭─ Node details ──────────────────────────────────────────────────────────╮█
+  │ ✓ p7 · CARD_LAST_VISIBLE                                                │█
+  │ Status: Done · judge                                                    │█
+  │ Agent: momus · Model: openai/gpt-5.5 · Attempt: 1                       │█
+  │ Depends on: none (start node)                                           │▀
+  │ Unblocks: none (final node)                                             │
+  │                                                                         │
+  │ Result                                                                  │
+  │ SHORT_RESULT_7                                                          │
+
+  ↑/↓ j/k select · PgUp/PgDn details · Esc close
+
+
