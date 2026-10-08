@@ -33,7 +33,7 @@ const mock = http.createServer(async (req, res) => {
     const id = `response_${requests.length}`
     const events = [{ type: "response.created", response: { id, created_at: Math.floor(Date.now() / 1000), model: body.model } }]
     const call = active === "global-explore" && (body.tools ?? []).some((tool) => tool.name === "subagent") && !(body.input ?? []).some((item) => item.type === "function_call_output")
-    const cross = active.startsWith("cross-") && (body.tools ?? []).some((tool) => tool.name === "iolaus_dag") && !called.has(active)
+    const cross = active.startsWith("cross-") && (body.tools ?? []).some((tool) => tool.name === "iolaus_flow") && !called.has(active)
     if (call) {
       const args = JSON.stringify({ agent: "explore", description: "global model route", prompt: "Return GLOBAL_CONFIG_QA_OK" })
       events.push({ type: "response.output_item.added", output_index: 0, item: { type: "function_call", id: `item_${id}`, call_id: id, name: "subagent", arguments: "" } },
@@ -42,9 +42,9 @@ const mock = http.createServer(async (req, res) => {
     } else if (cross) {
       called.add(active)
       const args = JSON.stringify(active.includes("snapshot") ? { action: "snapshot", run_id: activeRunID } : { action: "create", definition: { schemaVersion: 1, name: active, nodes: [{ id: "approve", kind: "gate", prompt: "Approve?", dependsOn: [] }] } })
-      events.push({ type: "response.output_item.added", output_index: 0, item: { type: "function_call", id: `item_${id}`, call_id: id, name: "iolaus_dag", arguments: "" } },
+      events.push({ type: "response.output_item.added", output_index: 0, item: { type: "function_call", id: `item_${id}`, call_id: id, name: "iolaus_flow", arguments: "" } },
         { type: "response.function_call_arguments.delta", item_id: `item_${id}`, output_index: 0, delta: args },
-        { type: "response.output_item.done", output_index: 0, item: { type: "function_call", id: `item_${id}`, call_id: id, name: "iolaus_dag", arguments: args, status: "completed" } })
+        { type: "response.output_item.done", output_index: 0, item: { type: "function_call", id: `item_${id}`, call_id: id, name: "iolaus_flow", arguments: args, status: "completed" } })
     } else events.push({ type: "response.output_item.added", output_index: 0, item: { type: "message", id: `item_${id}` } },
       { type: "response.output_text.delta", item_id: `item_${id}`, output_index: 0, delta: active.includes("snapshot") ? String((body.input ?? []).findLast((item) => item.type === "function_call_output")?.output ?? "NO_SNAPSHOT") : "GLOBAL_CONFIG_QA_OK" },
       { type: "response.output_item.done", output_index: 0, item: { type: "message", id: `item_${id}` } })

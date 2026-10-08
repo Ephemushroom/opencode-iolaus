@@ -96,11 +96,11 @@ const mock = http.createServer(async (req, res) => {
   } else if (messageText.includes("Write the work plan")) { await new Promise((done) => setTimeout(done, 2500)); text = "IOLAUS_TUI_PLAN_V1" }
   else if (messageText.includes("The reviewer rejected the plan")) { await new Promise((done) => setTimeout(done, 2500)); text = "IOLAUS_TUI_PLAN_V2" }
   else if (messageText.includes("Execute the approved plan")) text = "IOLAUS_TUI_EXECUTED"
-  else if (tools.includes("iolaus_dag")) {
+  else if (tools.includes("iolaus_flow")) {
     const prior = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
     let result; try { result = JSON.parse(prior); if (result?.run && result?.events) result = result.run } catch {}
-    if (!result) call = { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TUI_TASK", executor: "sisyphus" } } }
-    else if (result.status === "running" || result.status === "paused") { await new Promise((done) => setTimeout(done, 3000)); call = { name: "iolaus_dag", args: { action: "snapshot", run_id: result.runID } } }
+    if (!result) call = { name: "iolaus_flow", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TUI_TASK", executor: "sisyphus" } } }
+    else if (result.status === "running" || result.status === "paused") { await new Promise((done) => setTimeout(done, 3000)); call = { name: "iolaus_flow", args: { action: "snapshot", run_id: result.runID } } }
   }
   res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
   for (const event of events(text, call)) res.write(`data: ${JSON.stringify(event)}\n\n`)
@@ -411,6 +411,9 @@ assert.match(strip(screens.gate), /╭╌ ⏸ waiting approval · \d+(?:s|m(?: \
 assert.doesNotMatch(strip(screens.gate), /\d+ awaiting approval/, "the sidebar must not repeat the waiting gate on a line of its own")
 assert.doesNotMatch(strip(screens.gate), /gen 1\b/, "the first generation must not be shown")
 assert.match(strip(screens.gate), /Click for details/, "sidebar must explain how to open details")
+// The transcript row is the host's rendering of the tool name: the flow tool, never its retired name.
+assert.match(strip(screens.gate), /✓ iolaus_flow \[action=create\]/, "the transcript must show the iolaus_flow tool call")
+assert.doesNotMatch(strip(screens.gate), /iolaus_dag(?![_a-z])/, "the retired tool name must not appear in the transcript")
 assert.match(strip(screens.dialog).replace(/\s+/g, " "), /Esc close/, "dialog must explain how to return to typing")
 assert.match(strip(screens.dialog), /esc close/, "the dialog header must carry the native esc close hint")
 assert.match(strip(screens.dialog), /╭─ ✓ Done ─+╮/, "dialog cards must carry their status in the border title")

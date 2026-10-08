@@ -8,6 +8,7 @@ import {
   type AgentName, type CategoryName, type ModeName,
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
+import { FLOW_TOOL_NAME } from "./dag/tool"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
 import { commandMarker } from "./roles/command"
 import { GOAL_TOOL_NAMES } from "./roles/goal"
@@ -18,13 +19,13 @@ const REPLACES_HOST = new Set<AgentName>(["explore"])
 
 /**
  * Per-specialist deny lists, after OMO's agent catalog: everything else (shell included) keeps the host default.
- * Host permission names: `edit` covers edit/write/patch, `subagent` is OMO's `task`, `iolaus_dag` is the DAG tool.
+ * Host permission names: `edit` covers edit/write/patch, `subagent` is OMO's `task`, `FLOW_TOOL_NAME` is the flow tool.
  * `gh` stays librarian-only.
  */
 const DENIED: Partial<Record<AgentName, readonly string[]>> = {
-  oracle: ["edit", "subagent", "iolaus_dag", "gh"],
-  librarian: ["edit", "subagent", "iolaus_dag"],
-  explore: ["edit", "subagent", "iolaus_dag", "gh"],
+  oracle: ["edit", "subagent", FLOW_TOOL_NAME, "gh"],
+  librarian: ["edit", "subagent", FLOW_TOOL_NAME],
+  explore: ["edit", "subagent", FLOW_TOOL_NAME, "gh"],
   metis: ["edit", "gh"],
   momus: ["edit", "gh"],
 }

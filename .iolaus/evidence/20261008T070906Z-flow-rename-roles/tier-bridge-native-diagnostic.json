@@ -1,0 +1,21 @@
+{
+  "sessions": [
+    {
+      "id": "ses_ee5a79174ffeEoDbZrqKODSQxQ",
+      "agent": "sisyphus"
+    },
+    {
+      "id": "ses_ee5a79152ffeOTdgAQ4yotxGCe",
+      "agent": "metis",
+      "parentID": "ses_ee5a79174ffeEoDbZrqKODSQxQ"
+    },
+    {
+      "id": "ses_ee5a79141ffeYOGHbURwwEvwLc",
+      "agent": "general",
+      "parentID": "ses_ee5a79152ffeOTdgAQ4yotxGCe"
+    }
+  ],
+  "output": "{\"error\":\"Agent tier boundary: general cannot delegate to primary sisyphus\"}",
+  "forbiddenModelRequests": 0,
+  "nodeReady": []
+}

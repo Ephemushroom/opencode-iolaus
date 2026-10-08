@@ -33,11 +33,11 @@ const mock = http.createServer(async (req, res) => {
   const done = (body.input ?? []).some((item) => item.type === "function_call_output")
   const args = JSON.stringify({ action: "create", definition: { schemaVersion: 1, name: "routing-qa", nodes: [{ id: "gate", kind: "gate", prompt: "Approve routing QA", dependsOn: [] }] } })
   const events = [{ type: "response.created", response: { id, created_at: Math.floor(Date.now() / 1000), model: "gpt-5.5" } }]
-  if (!done && (body.tools ?? []).some((tool) => tool.name === "iolaus_dag")) {
+  if (!done && (body.tools ?? []).some((tool) => tool.name === "iolaus_flow")) {
     events.push(
-      { type: "response.output_item.added", output_index: 0, item: { type: "function_call", id, call_id: id, name: "iolaus_dag", arguments: "" } },
+      { type: "response.output_item.added", output_index: 0, item: { type: "function_call", id, call_id: id, name: "iolaus_flow", arguments: "" } },
       { type: "response.function_call_arguments.delta", item_id: id, output_index: 0, delta: args },
-      { type: "response.output_item.done", output_index: 0, item: { type: "function_call", id, call_id: id, name: "iolaus_dag", arguments: args, status: "completed" } },
+      { type: "response.output_item.done", output_index: 0, item: { type: "function_call", id, call_id: id, name: "iolaus_flow", arguments: args, status: "completed" } },
     )
   } else events.push(
     { type: "response.output_item.added", output_index: 0, item: { type: "message", id } },

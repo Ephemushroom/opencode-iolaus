@@ -88,7 +88,7 @@ const mock = http.createServer(async (req, res) => {
     let text = "RESPONSIVE_QA_READY", call
     if (node) text = node === "1" ? longResult : `SHORT_RESULT_${node}`
     else if (part) text = `FORK_RESULT_${part}`
-    else if (tools.includes("iolaus_dag")) {
+    else if (tools.includes("iolaus_flow")) {
       // Each user turn creates its own flow: only this turn's tool results say whether it already exists.
       const lastUser = input.findLastIndex((item) => item?.type === "message" && item.role === "user")
       const turn = lastUser >= 0 ? input.slice(lastUser) : input
@@ -99,10 +99,10 @@ const mock = http.createServer(async (req, res) => {
         try { result = JSON.parse(prior); if (result?.run && result?.events) result = result.run }
         catch (error) { throw new Error(`Mock received invalid tool result: ${String(error)}`) }
       }
-      if (!result) call = { name: "iolaus_dag", args: { action: "create", definition: forkTurn ? fork : definition } }
+      if (!result) call = { name: "iolaus_flow", args: { action: "create", definition: forkTurn ? fork : definition } }
       else if (result.status === "running" || result.status === "paused") {
         await sleep(500)
-        call = { name: "iolaus_dag", args: { action: "snapshot", run_id: result.runID } }
+        call = { name: "iolaus_flow", args: { action: "snapshot", run_id: result.runID } }
       }
     }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })

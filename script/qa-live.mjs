@@ -102,7 +102,7 @@ const server = http.createServer(async (req, res) => {
        else if (childNode[1] === "QUICK" || childNode[1] === "ORACLE") text = `IOLAUS_LANE_RESULT_${childNode[1]}`
        else if (childNode[1] === "MOMUS") text = "No blockers found in the diff.\nVERDICT: PASS"
        else if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
-     } else if (active.dag && tools.includes("iolaus_dag")) {
+     } else if (active.dag && tools.includes("iolaus_flow")) {
        const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
        let runID
        let priorDagResult
@@ -119,37 +119,37 @@ const server = http.createServer(async (req, res) => {
        call = priorDagResult?.status === "completed" || priorDagResult?.status === "failed" || priorDagResult?.error
          ? undefined
          : runID && priorDagResult?.status === "paused"
-           ? { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: waitingGate, note: "QA approved" } }
+           ? { name: "iolaus_flow", args: { action: "approve", run_id: runID, node_id: waitingGate, note: "QA approved" } }
          : runID
-           ? { name: "iolaus_dag", args: { action: active.template && priorDagResult?.status === "running" ? "snapshot" : "wait", run_id: runID } }
+           ? { name: "iolaus_flow", args: { action: active.template && priorDagResult?.status === "running" ? "snapshot" : "wait", run_id: runID } }
            : active.template === "ultrawork"
-             ? { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "IOLAUS_ULTRAWORK_TASK", iterations: 3, executor: "sisyphus" } } }
+             ? { name: "iolaus_flow", args: { action: "create", template: { template: "ultrawork", task: "IOLAUS_ULTRAWORK_TASK", iterations: 3, executor: "sisyphus" } } }
            : active.template === "unavailable"
-             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", reviewer: "iolaus-no-such-lane" } } }
+             ? { name: "iolaus_flow", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", reviewer: "iolaus-no-such-lane" } } }
            : active.template
-             ? { name: "iolaus_dag", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", executor: "sisyphus" } } }
+             ? { name: "iolaus_flow", args: { action: "create", template: { template: "plan-review", task: "IOLAUS_TEMPLATE_TASK", executor: "sisyphus" } } }
            : active.lanes
-             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA lanes", maxParallel: 2, nodes: [
+             ? { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA lanes", maxParallel: 2, nodes: [
                  { id: "quick", agent: "quick", prompt: "IOLAUS_DAG_NODE_QUICK", dependsOn: [] },
                  { id: "oracle", agent: "oracle", prompt: "IOLAUS_DAG_NODE_ORACLE", dependsOn: [] } ] } } }
            : active.route
-             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA routing", maxParallel: 2, nodes: [
+             ? { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA routing", maxParallel: 2, nodes: [
                  { id: "gate", kind: "gate", prompt: "IOLAUS_GATE_APPROVE_QA", dependsOn: [] },
                  { id: "review", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REVIEW", dependsOn: ["gate"], inputs: [{ node: "gate" }] },
                  { id: "ship", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_SHIP", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_PASS" } },
                  { id: "fix", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_FIX", dependsOn: ["review"], when: { node: "review", field: "text", includes: "VERDICT_FAIL" } },
                  { id: "report", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_REPORT", dependsOn: ["ship", "fix"], inputs: [{ node: "*" }] } ] } } }
            : active.fanin
-             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA fan-in", maxParallel: 2, nodes: [
+             ? { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA fan-in", maxParallel: 2, nodes: [
                  { id: "a", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_A", dependsOn: [] },
                  { id: "b", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_B", dependsOn: [] },
                  { id: "merge", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MERGE", dependsOn: ["a", "b"], inputs: [{ node: "*" }] } ] } } }
            : active.momus
              // No plan path anywhere in the prompt: Momus must review the "diff" directly (general review mode)
              // instead of rejecting for missing input, and its rendered system prompt must carry the Iolaus plan path.
-             ? { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA momus", maxParallel: 1, nodes: [
+             ? { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA momus", maxParallel: 1, nodes: [
                  { id: "node", agent: "momus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MOMUS Review this diff for correctness; there is no plan involved:\ndiff --git a/src/a.ts b/src/a.ts\n+const x = 1\n+export default x", dependsOn: [] } ] } } }
-             : { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
+             : { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if ((active.astGrep || active.code) && tools.includes("execute")) {
        const outputs = (body.input ?? []).filter((item) => item?.type === "function_call_output")
        // Remote MCP servers connect asynchronously after startup; retry until their tools are in the catalog.
@@ -304,8 +304,8 @@ try {
        }
       const captured = requests.filter((r) => r.scenario === scenario.name)
       assert.ok(captured.length)
-       assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite"].includes(t) || t?.startsWith("team_"))))
-       if (scenario.dag) assert.ok(captured.some((r) => r.tools.includes("iolaus_dag")), "DAG tool was not exposed")
+       assert.ok(captured.every((r) => !r.tools.some((t) => ["task","workflow","hashline_edit","background_output","todowrite","iolaus_dag"].includes(t) || t?.startsWith("team_"))))
+       if (scenario.dag) assert.ok(captured.some((r) => r.tools.includes("iolaus_flow")), "DAG tool was not exposed")
        // Sisyphus lists the specialists with OMO's prompt metadata, so their delegation triggers reach its prompt; the native agent's prompt has none.
        if (scenario.name === "agent") {
          const sisyphus = captured.find((r) => r.instructions.includes("<iolaus-native-contract>"))
@@ -515,7 +515,7 @@ try {
       if (scenario.shell) {
         const offered = captured.find((r) => r.tools.length)?.tools ?? []
         assert.ok(offered.includes("shell") && offered.includes("read"), `explore lacks shell/read: ${offered}`)
-        for (const denied of ["edit", "write", "patch", "subagent", "iolaus_dag"]) assert.ok(!offered.includes(denied), `explore was offered ${denied}: ${offered}`)
+        for (const denied of ["edit", "write", "patch", "subagent", "iolaus_flow"]) assert.ok(!offered.includes(denied), `explore was offered ${denied}: ${offered}`)
         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
         assert.ok(outputs.some((o) => o.includes("fixture.txt") && o.includes("git version")), `shell output missing: ${outputs}`)
       }

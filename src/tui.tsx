@@ -57,7 +57,7 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
   )
 }
 
-/** Live line above the composer while the sidebar is hidden; the transcript's iolaus_dag row is static while the tool waits. */
+/** Live line above the composer while the sidebar is hidden; the transcript's iolaus_flow row is static while the tool waits. */
 function DagComposerStatus(props: { readonly sessionID: string; readonly context: Context; readonly presence: SlotPresence }) {
   const { context } = props
   const theme = () => context.theme

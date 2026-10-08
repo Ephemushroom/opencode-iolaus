@@ -28,7 +28,7 @@ export function compactionState(goal: ReturnType<typeof readGoal>, role: ReturnT
   }
   if (!lines.length) return undefined
   return `<iolaus-compaction-state>
-Keep these facts verbatim in the summary; they describe work that continues after it. Operate the runs with iolaus_dag (wait, snapshot, retry; approve or reject only on the user's word).
+Keep these facts verbatim in the summary; they describe work that continues after it. Operate the runs with iolaus_flow (wait, snapshot, retry; approve or reject only on the user's word).
 ${lines.map((line) => `- ${line}`).join("\n")}
 </iolaus-compaction-state>`
 }

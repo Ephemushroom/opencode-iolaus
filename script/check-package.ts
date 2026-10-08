@@ -17,6 +17,8 @@ for (const file of distFiles) {
   if (typeof file !== "string" || !file.endsWith(".js")) continue
   const text = readFileSync(join(root, "dist", file), "utf8")
   for (const token of forbidden) if (text.includes(token)) throw new Error(`Forbidden reference token in dist/${file}: ${token}`)
+  // The flow tool was iolaus_dag: no shipped prompt may name it. Child-session metadata keys (iolaus_dag_run, ...) keep the prefix.
+  if (/iolaus_dag(?![_a-z0-9])/i.test(text)) throw new Error(`Retired tool name iolaus_dag in dist/${file}`)
 }
 if (existsSync(join(root, "dist/metafile.json"))) {
   const metafile = readFileSync(join(root, "dist/metafile.json"), "utf8")

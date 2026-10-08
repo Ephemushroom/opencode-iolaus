@@ -1,0 +1,44 @@
+   IOLAUS_QA_OK                  +
+
+  ┃                                                                                                                     IOLAUS_QA_OK
+  ┃  Run IOLAUS_QA_RECOVER
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_flow [action=create]                                                                                      0% used
+                                                                                                                        $0.00 spent
+     IOLAUS_QA_CREATED
+                                                                                                                         Iolaus
+     Build · GPT-5.5 · 62ms · 344.8 tok/s
+                                                                                                                         ╭╌ ⠸ running · 4s ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+  ┃                                                 Cancel flow?                                         esc             ╎ QA cancel                       ╎
+  ┃  Run IOLAUS_QA_CANCEL                                                                                                ╎ ━━━━━━━━━━━━ 0/1                ╎
+  ┃                                                 Stop "QA cancel" and interrupt its running agents.                   ╎ ⠸ hang                          ╎
+                                                    Finished nodes keep their results.                                   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     ✓ iolaus_flow [action=create]
+                                                                                                                         Recent
+     IOLAUS_QA_CREATED                                                            Keep Running  Cancel Flow              ✓ QA recover
+                                                                                                                           2/2 · done in 4s
+     Build · GPT-5.5 · 23ms · 1250.0 tok/s
+                                                                                                                         Click for details · ctrl+x d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-recover-qa-pGSRuA/project   15 (0%) · $0.00  ctrl+p commands    /…/T/iolaus-recover-qa-pGSRuA/project

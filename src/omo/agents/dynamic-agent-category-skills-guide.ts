@@ -75,7 +75,7 @@ export function buildCategorySkillsDelegationGuide(
 
 Each category is a registered Agent named after the category (\`quick\`, \`deep-low\`, ...) running on its configured
 model. Use it as a DAG node's \`agent\` (omit \`model\` to inherit the lane's model) or
-as a one-off native subagent. Execution is owned by the durable \`iolaus_dag\` graph:
+as a one-off native subagent. Execution is owned by the durable \`iolaus_flow\` graph:
 select the exact Agent ID, define the node prompt and dependencies, and load
 relevant skills inside the node prompt. Use \`snapshot\`/\`wait\` for completion and
 \`retry\` for a failed generation.

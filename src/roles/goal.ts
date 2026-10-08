@@ -188,7 +188,7 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
 /**
  * The model-facing goal tools, OMO's names. Registration hides them from every Iolaus
  * lane but Hephaestus; native agents still see them, so sessions that cannot loop get
- * an error envelope, as iolaus_dag does.
+ * an error envelope, as iolaus_flow does.
  */
 export function createGoalTools(state: SessionStateStore, isGoalSession: (sessionID: string) => Effect.Effect<boolean>, trace?: GoalRuntimePorts["trace"]): Tool.Info[] {
   const reply = (value: unknown) => ({ content: JSON.stringify(value) })

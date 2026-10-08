@@ -4,7 +4,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-category-skills-guide.ts",
       "path": "src/omo/agents/dynamic-agent-category-skills-guide.ts",
       "sourceSha256": "373afce6ba66e9dbd8df110569d38d795d754848771f30d0b3c7b97afd498631",
-      "activeSha256": "539ade41e1b062eaa6da5aa9d76a49c301d064a4dcb4b3289b4da03ad363e8d1"
+      "activeSha256": "29d2409727f1d324d5b1bb5bdb25f83987672d88723ac6cc17cfa565b1189692"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-gemini-fallback-overrides.ts",
@@ -16,7 +16,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
       "path": "src/omo/agents/dynamic-agent-core-sections.ts",
       "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
-      "activeSha256": "be2cf0ba6a0c01b2459e52bd4a90d0a602906cef971af78a8b7bf207659ae5a6"
+      "activeSha256": "cce239acd4a3a15522a1d99bc8fdacc4158b8186cbcb2d8bb8ad49725baf08ef"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",
@@ -88,7 +88,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-sections.ts",
       "path": "src/omo/agents/sisyphus-dynamic-prompt-sections.ts",
       "sourceSha256": "525589f90fe65939ab91be327077d82e0a8a431eacb950bf96f41479ca55656d",
-      "activeSha256": "70e0e2c606d400df1342c1e2dea5817440242519778bea47160675905de3fe35"
+      "activeSha256": "d4d1612d608365d1516937427cd96cd61d1cb3834789eec1e19ee7386bde6c4d"
     },
     {
       "source": "reference/omo/packages/agents-core/src/index.ts",
@@ -280,7 +280,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/default.ts",
       "path": "src/omo/agents/sisyphus/default.ts",
       "sourceSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4",
-      "activeSha256": "bd10140fcd24b83f048a264215f0fd93978bf97a298a65c06b6422486a8cc76f"
+      "activeSha256": "457a4036222e88e1a95c54aa6e4c6b27132a51a1689fc73180c42fd038e00fb0"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/gemini.ts",

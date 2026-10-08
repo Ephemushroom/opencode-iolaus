@@ -58,7 +58,7 @@ function reply(body, instructions) {
   const primary = body.model === PRIMARY
   if (instructions.includes("<iolaus-compaction-state>") || all.includes("<iolaus-compaction-state>")) return { text: "QA_SUMMARY" }
   const qaCase = first.match(/QA_CASE:(\w+)/)?.[1]
-  if (qaCase) return outs.length ? { text: `QA_OWNER_${qaCase}` } : { call: { name: "iolaus_dag", args: CASES[qaCase] } }
+  if (qaCase) return outs.length ? { text: `QA_OWNER_${qaCase}` } : { call: { name: "iolaus_flow", args: CASES[qaCase] } }
   if (first.includes("QA_FALLBACK_PROVIDER")) return primary ? { status: 400 } : { text: "FALLBACK_PROVIDER_OK" }
   if (first.includes("QA_FALLBACK_EMPTY")) return primary ? { text: "" } : { text: "FALLBACK_EMPTY_OK" }
   if (first.includes("QA_FALLBACK_PINNED")) return { status: 400 }

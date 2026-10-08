@@ -15,6 +15,7 @@ import { validateDefinition } from "../src/dag/graph"
 import { applyDefaultModels } from "../src/dag/controller"
 import { REVIEW_VERDICT_FAIL } from "../src/dag/templates"
 import { registerAgents } from "../src/registration"
+import { FLOW_TOOL_NAME } from "../src/dag/tool"
 import { parseOptions } from "../src/options"
 import { evaluate } from "../src/ast-grep/permissions"
 import { renderAgent } from "../src/prompts/render"
@@ -81,17 +82,17 @@ test("role policy: planner writes only plan and domain docs, Atlas needs a plan,
   expect(denial("planner", "edit", edit("../outside/.iolaus/plans/x.md"), dir)).toMatch(/read-only/)
   expect(denial("planner", "patch", { patchText: "*** Begin Patch\n*** Update File: src/a.ts\n@@\n-a\n+b\n*** End Patch" }, dir)).toMatch(/src\/a\.ts/)
   expect(denial("planner", "shell", { command: "ls" }, dir)).toMatch(/no shell/)
-  expect(denial("planner", "iolaus_dag", { action: "create", template: { template: "ultrawork", task: "x" } }, dir)).toMatch(/only planning runs/)
-  expect(denial("planner", "iolaus_dag", { action: "create", template: { template: "hyperplan", task: "x" } }, dir)).toBeUndefined()
-  expect(denial("planner", "iolaus_dag", { action: "wait", run_id: "r" }, dir)).toBeUndefined()
+  expect(denial("planner", FLOW_TOOL_NAME, { action: "create", template: { template: "ultrawork", task: "x" } }, dir)).toMatch(/only planning runs/)
+  expect(denial("planner", FLOW_TOOL_NAME, { action: "create", template: { template: "hyperplan", task: "x" } }, dir)).toBeUndefined()
+  expect(denial("planner", FLOW_TOOL_NAME, { action: "wait", run_id: "r" }, dir)).toBeUndefined()
   expect(denial("planner", "ast_grep_rewrite", { apply: true }, dir)).toBeUndefined()
   expect(denial("planning", "ast_grep_rewrite", { apply: true }, dir)).toMatch(/codemods/)
-  for (const [tool, input] of [["edit", edit("src/a.ts")], ["shell", {}], ["subagent", { prompt: "x" }], ["iolaus_dag", { action: "create" }]] as const) {
+  for (const [tool, input] of [["edit", edit("src/a.ts")], ["shell", {}], ["subagent", { prompt: "x" }], [FLOW_TOOL_NAME, { action: "create" }]] as const) {
     expect(denial("atlas-unbound", tool, input, dir)).toMatch(/\/start-work/)
     expect(denial("atlas-orchestrator", tool, input, dir)).toMatch(/orchestrates/)
   }
   expect(denial("atlas-unbound", "read", { path: "a" }, dir)).toBeUndefined()
-  expect(denial("atlas-orchestrator", "iolaus_dag", { action: "wait", run_id: "r" }, dir)).toBeUndefined()
+  expect(denial("atlas-orchestrator", FLOW_TOOL_NAME, { action: "wait", run_id: "r" }, dir)).toBeUndefined()
   expect(denial("worker", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toBeUndefined()
   expect(denial("worker", "edit", edit("src/a.ts"), dir)).toBeUndefined()
   expect(denial("native", "edit", edit(".iolaus/plans/x/spec.md"), dir)).toBeUndefined()
@@ -112,12 +113,12 @@ test("a planner's subagents and DAG nodes inherit the planning notice; gates and
   inheritPlanning("subagent", sub)
   expect(sub.prompt.split(PLANNING_MARKER).length).toBe(2)
   const dag: Record<string, unknown> = { action: "create", template: { template: "hyperplan", task: "t", members: ["ultrabrain", "artistry"] } }
-  expect(inheritPlanning("iolaus_dag", dag)).toBe(true)
+  expect(inheritPlanning(FLOW_TOOL_NAME, dag)).toBe(true)
   expect(dag.template).toBeUndefined()
   const nodes = (dag.definition as { nodes: { id: string; kind?: string; prompt: string }[] }).nodes
   expect(nodes.filter((n) => n.kind !== "gate" && n.kind !== "judge").every((n) => n.prompt.includes(PLANNING_MARKER))).toBe(true)
   expect(nodes.find((n) => n.kind === "gate")?.prompt.includes(PLANNING_MARKER)).toBe(false)
-  expect(inheritPlanning("iolaus_dag", { action: "wait", run_id: "r" })).toBe(false)
+  expect(inheritPlanning(FLOW_TOOL_NAME, { action: "wait", run_id: "r" })).toBe(false)
 })
 
 test("commands parse from markers and slash text, and each role command has an owner", () => {

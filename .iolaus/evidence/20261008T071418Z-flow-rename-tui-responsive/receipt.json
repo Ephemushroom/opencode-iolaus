@@ -1,0 +1,263 @@
+{
+  "verdict": "PASS",
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.0.24",
+  "packageRoot": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/flow-tool-rename",
+  "mode": "dark",
+  "screens": [
+    "01-idle",
+    "02-completed-sidebar",
+    "03-wide-short-details-last-selected",
+    "04-resize-narrow",
+    "04-resize-narrow-short",
+    "04-resize-wide-short",
+    "04-resize-restored",
+    "05-long-result-top",
+    "05-long-result-bottom",
+    "05-long-result-page-up",
+    "06-narrow-long-result-bottom",
+    "06-selection-resets-detail-scroll",
+    "07-closed-draft",
+    "08-fork-join",
+    "08-fork-join-part-selected"
+  ],
+  "checks": [
+    "esc close: the key in the text colour, the action muted",
+    "wide: all seven cards and short result visible",
+    "100x45: selected last card survives resize",
+    "80x30: selected last card survives resize",
+    "160x24: selected last card survives resize",
+    "160x45: selected last card survives resize",
+    "long result: Markdown concealed and styled from the host theme",
+    "long result: independent PgDn/PgUp scrolling reaches both ends",
+    "narrow long result scrolls; changing selection resets details",
+    "closing disposes dialog bindings; navigation caused no mutations",
+    "fork/join: connectors meet card centres; ↑/↓ mark the selection's neighbours",
+    "isolation: the sandbox TUI opened no database outside the sandbox"
+  ],
+  "requests": [
+    {
+      "node": "owner",
+      "tools": []
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    },
+    {
+      "node": "1",
+      "tools": []
+    },
+    {
+      "node": "2",
+      "tools": []
+    },
+    {
+      "node": "3",
+      "tools": []
+    },
+    {
+      "node": "4",
+      "tools": []
+    },
+    {
+      "node": "5",
+      "tools": []
+    },
+    {
+      "node": "6",
+      "tools": []
+    },
+    {
+      "node": "7",
+      "tools": []
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    },
+    {
+      "node": "fork-split",
+      "tools": []
+    },
+    {
+      "node": "fork-a",
+      "tools": []
+    },
+    {
+      "node": "fork-b",
+      "tools": []
+    },
+    {
+      "node": "fork-c",
+      "tools": []
+    },
+    {
+      "node": "fork-join",
+      "tools": []
+    },
+    {
+      "node": "owner",
+      "tools": [
+        "create_goal",
+        "get_goal",
+        "glob",
+        "grep",
+        "iolaus_flow",
+        "patch",
+        "question",
+        "read",
+        "shell",
+        "skill",
+        "subagent",
+        "update_goal",
+        "webfetch",
+        "websearch",
+        "execute"
+      ]
+    }
+  ],
+  "realBefore": {
+    ".config/opencode/opencode.json": "3e0b56cb9c70282eed37ffc78169cbad1abd2a840aa4bb3cbd7e659daf326f49",
+    ".config/opencode/opencode.jsonc": "absent",
+    ".config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+  },
+  "realAfter": {
+    ".config/opencode/opencode.json": "3e0b56cb9c70282eed37ffc78169cbad1abd2a840aa4bb3cbd7e659daf326f49",
+    ".config/opencode/opencode.jsonc": "absent",
+    ".config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+  },
+  "hostUnchanged": true,
+  "realDatabaseDigestChanged": false,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "mockClosed": true,
+    "tmuxStopped": true,
+    "trackedPIDs": [
+      69613,
+      69541
+    ],
+    "forcedCleanup": [],
+    "survivors": []
+  },
+  "isolation": {
+    "standalone": true,
+    "home": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home",
+    "config": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/config",
+    "project": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/project",
+    "databases": {
+      "atStart": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db-wal"
+      ],
+      "atEnd": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-qeYxs2/home/.iolaus/iolaus.db-wal"
+      ]
+    },
+    "inheritedEnvironment": [
+      "PATH",
+      "TMPDIR"
+    ]
+  }
+}

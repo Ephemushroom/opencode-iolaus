@@ -65,8 +65,8 @@ async function reply(body, instructions, input) {
     if (first.includes("OBS_DAG_NESTED")) return { text: "OBS_DAG_NESTED_DONE" }
     if (first.includes("OBS_DAG_CHILD")) return outs.length ? { text: "OBS_DAG_CHILD_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "dag nested", prompt: "OBS_DAG_NESTED" } } }
     const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
-    if (!outs.length) return { call: { name: "iolaus_dag", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "OBS_DAG_CHILD" }] } } } }
-    return outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "wait", run_id: runID } } } : { text: "OBS_DAG_PARENT_DONE" }
+    if (!outs.length) return { call: { name: "iolaus_flow", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "OBS_DAG_CHILD" }] } } } }
+    return outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "wait", run_id: runID } } } : { text: "OBS_DAG_PARENT_DONE" }
   }
   if (active === "observe") {
     const lastUser = JSON.stringify([...items].reverse().find((item) => item?.type === "message" && item.role === "user") ?? "")
@@ -90,22 +90,22 @@ async function reply(body, instructions, input) {
   if (active.startsWith("tier")) {
     const request = first.match(/TIER_CASE:([A-Za-z0-9_-]+)/)?.[1]
     if (first.includes("TIER_FORBIDDEN_WORK")) return { text: "TIER_FORBIDDEN_EXECUTED" }
-    if (first.includes("TIER_GENERAL_BRIDGE")) return outs.length ? { text: "TIER_GENERAL_BRIDGE_DONE" } : { call: { name: "iolaus_dag", args: { action: "create", definition: tierGraph("sisyphus") } } }
+    if (first.includes("TIER_GENERAL_BRIDGE")) return outs.length ? { text: "TIER_GENERAL_BRIDGE_DONE" } : { call: { name: "iolaus_flow", args: { action: "create", definition: tierGraph("sisyphus") } } }
     if (first.includes("TIER_METIS_BRIDGE")) return outs.length ? { text: "TIER_METIS_BRIDGE_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "native intermediary", prompt: "TIER_GENERAL_BRIDGE" } } }
     if (first.includes("TIER_NESTED_GRANDCHILD")) return { text: "TIER_NESTED_GRANDCHILD_DONE" }
     if (first.includes("TIER_NESTED_CHILD")) {
       const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
-      if (!outs.length) return { call: { name: "iolaus_dag", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "TIER_NESTED_GRANDCHILD" }] } } } }
-      return outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "wait", run_id: runID } } } : { text: "TIER_NESTED_CHILD_DONE" }
+      if (!outs.length) return { call: { name: "iolaus_flow", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "TIER_NESTED_GRANDCHILD" }] } } } }
+      return outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "wait", run_id: runID } } } : { text: "TIER_NESTED_CHILD_DONE" }
     }
     if (first.includes("TIER_DAG_LOWER_CHILD")) {
-      return outs.length ? { text: "TIER_DAG_LOWER_DONE" } : { call: { name: "iolaus_dag", args: { action: "create", definition: tierGraph("sisyphus") } } }
+      return outs.length ? { text: "TIER_DAG_LOWER_DONE" } : { call: { name: "iolaus_flow", args: { action: "create", definition: tierGraph("sisyphus") } } }
     }
     if (first.includes("TIER_LOWER_CHILD")) {
-      return outs.length ? { text: "TIER_LOWER_DONE" } : { call: { name: "iolaus_dag", args: { action: "create", definition: tierGraph("sisyphus") } } }
+      return outs.length ? { text: "TIER_LOWER_DONE" } : { call: { name: "iolaus_flow", args: { action: "create", definition: tierGraph("sisyphus") } } }
     }
     if (first.includes("TIER_COMMAND_CHILD")) {
-      return outs.length ? { text: "TIER_COMMAND_DONE" } : { call: { name: "iolaus_dag", args: { action: "create", definition: tierGraph(first.includes("/goal") ? "hephaestus" : "atlas") } } }
+      return outs.length ? { text: "TIER_COMMAND_DONE" } : { call: { name: "iolaus_flow", args: { action: "create", definition: tierGraph(first.includes("/goal") ? "hephaestus" : "atlas") } } }
     }
     if (first.includes("TIER_FORGED_CHILD")) {
       return outs.length ? { text: "TIER_FORGED_DONE" } : { call: { name: "patch", args: { patchText: updateA(8) } } }
@@ -123,8 +123,8 @@ async function reply(body, instructions, input) {
     if (request === "bridge-native") return outs.length ? { text: "TIER_PARENT_DONE" } : { call: { name: "subagent", args: { agent: "metis", description: "native bridge parent", prompt: "TIER_METIS_BRIDGE" } } }
     if (request === "bridge-dag") {
       const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
-      return !outs.length ? { call: { name: "iolaus_dag", args: { action: "create", definition: { ...tierGraph("metis"), nodes: [{ ...tierGraph("metis").nodes[0], prompt: "TIER_METIS_BRIDGE" }] } } } }
-        : outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "wait", run_id: runID } } } : { text: "TIER_PARENT_DONE" }
+      return !outs.length ? { call: { name: "iolaus_flow", args: { action: "create", definition: { ...tierGraph("metis"), nodes: [{ ...tierGraph("metis").nodes[0], prompt: "TIER_METIS_BRIDGE" }] } } } }
+        : outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "wait", run_id: runID } } } : { text: "TIER_PARENT_DONE" }
     }
     if (request === "continuation-stored" || request === "continuation-supplied") {
       const args = request === "continuation-stored" ? { agent: "quick", sessionID: continuationTargets.primary }
@@ -133,15 +133,15 @@ async function reply(body, instructions, input) {
     }
     if (request === "allowed" || request === "forge" || request === "hyperplan" || request === "nested" || request === "dag-lower") {
       const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
-      if (!outs.length) return { call: { name: "iolaus_dag", args: request === "hyperplan" ? { action: "create", template: { template: "hyperplan", task: "TIER_HP_PLAN", members: ["quick", "momus"], gate: false } }
+      if (!outs.length) return { call: { name: "iolaus_flow", args: request === "hyperplan" ? { action: "create", template: { template: "hyperplan", task: "TIER_HP_PLAN", members: ["quick", "momus"], gate: false } }
         : { action: "create", definition: { ...tierGraph(request === "forge" ? "atlas" : request === "dag-lower" ? "quick" : "sisyphus"), nodes: [{ ...tierGraph(request === "forge" ? "atlas" : request === "dag-lower" ? "quick" : "sisyphus").nodes[0], prompt: request === "forge" ? '<iolaus-plan-ticket plan="cache" ticket="01">\nTIER_FORGED_CHILD' : request === "nested" ? "TIER_NESTED_CHILD" : request === "dag-lower" ? "TIER_DAG_LOWER_CHILD" : "TIER_ALLOWED_CHILD" }] } } } }
-      return outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "wait", run_id: runID } } } : { text: "TIER_PARENT_DONE" }
+      return outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "wait", run_id: runID } } } : { text: "TIER_PARENT_DONE" }
     }
     if (request?.startsWith("native-deny-")) return outs.length ? { text: "TIER_PARENT_DONE" } : { call: { name: "subagent", args: { agent: request.slice(12), description: "tier denied", prompt: "TIER_FORBIDDEN_WORK" } } }
     if (request === "amend") {
       const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
-      return !outs.length ? { call: { name: "iolaus_dag", args: { action: "create", definition: { schemaVersion: 1, name: "amend gate", nodes: [{ id: "gate", kind: "gate", prompt: "pause", dependsOn: [] }] } } } }
-        : outs.length === 1 && runID ? { call: { name: "iolaus_dag", args: { action: "amend", run_id: runID, definition: { schemaVersion: 1, name: "amend gate", nodes: [{ id: "gate", kind: "gate", prompt: "pause", dependsOn: [] }, { id: "work", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "TIER_FORBIDDEN_WORK", dependsOn: ["gate"] }] } } } }
+      return !outs.length ? { call: { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "amend gate", nodes: [{ id: "gate", kind: "gate", prompt: "pause", dependsOn: [] }] } } } }
+        : outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "amend", run_id: runID, definition: { schemaVersion: 1, name: "amend gate", nodes: [{ id: "gate", kind: "gate", prompt: "pause", dependsOn: [] }, { id: "work", agent: "hephaestus", model: "openai/gpt-5.5", prompt: "TIER_FORBIDDEN_WORK", dependsOn: ["gate"] }] } } } }
         : { text: "TIER_PARENT_DONE" }
     }
     let args
@@ -151,13 +151,13 @@ async function reply(body, instructions, input) {
     if (request === "executor") args = { action: "create", template: { template: "ultrawork", task: "tier QA", executor: "hephaestus" } }
     if (request === "reviewer") args = { action: "create", template: { template: "ultrawork", task: "tier QA", reviewer: "hephaestus" } }
     if (request === "member") args = { action: "create", template: { template: "hyperplan", task: "tier QA", members: ["quick", "sisyphus"] } }
-    return outs.length ? { text: "TIER_PARENT_DONE" } : { call: { name: "iolaus_dag", args } }
+    return outs.length ? { text: "TIER_PARENT_DONE" } : { call: { name: "iolaus_flow", args } }
   }
   switch (active) {
     case "planner": return [
       { call: { name: "patch", args: { patchText: PLAN } } },
       { call: { name: "patch", args: { patchText: updateA(3) } } },
-      { call: { name: "iolaus_dag", args: { action: "create", template: { template: "ultrawork", task: "implement it" } } } },
+      { call: { name: "iolaus_flow", args: { action: "create", template: { template: "ultrawork", task: "implement it" } } } },
       { call: { name: "subagent", args: { agent: "explore", description: "consult", prompt: "IOLAUS_CONSULT look at src" } } },
     ][outs.length] ?? { text: "PLANNED" }
     case "atlas-unbound": return [
@@ -173,9 +173,9 @@ async function reply(body, instructions, input) {
       try { state = JSON.parse(lastOut) } catch {}
       const run = state?.run ?? state
       if (run?.status === "completed") return { text: "RUN_COMPLETED" }
-      if (run?.status === "paused") return { call: { name: "iolaus_dag", args: { action: "approve", run_id: runID, node_id: "accept", note: "QA approved" } } }
+      if (run?.status === "paused") return { call: { name: "iolaus_flow", args: { action: "approve", run_id: runID, node_id: "accept", note: "QA approved" } } }
       if (run?.status === "running") await sleep(1000)
-      return { call: { name: "iolaus_dag", args: { action: "snapshot", run_id: runID } } }
+      return { call: { name: "iolaus_flow", args: { action: "snapshot", run_id: runID } } }
     }
     case "goal": {
       const rounds = input.split("Continue working toward the active session goal").length - 1
@@ -208,8 +208,9 @@ const mock = http.createServer(async (req, res) => {
     const body = JSON.parse(Buffer.concat(chunks).toString())
     const instructions = body.instructions ?? ""
     const input = JSON.stringify(body.input ?? [])
-    // Host 2.0.20 sends the session in a header; older hosts put it in the instructions.
-    const session = req.headers["x-opencode-session"] ?? instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null
+    // Host 2.0.24 sends the session's own ID in x-opencode-session-id and its root (parentID ?? id, for cache affinity)
+    // in x-opencode-session; 2.0.20 sent the session itself in x-opencode-session; older hosts put it in the instructions.
+    const session = req.headers["x-opencode-session-id"] ?? req.headers["x-opencode-session"] ?? instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null
     const result = await reply(body, instructions, input)
     const record = { scenario: active, session, model: body.model, tools: (body.tools ?? []).map((t) => t.name), call: result.call ?? null, text: result.text ?? null,
       outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),

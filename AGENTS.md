@@ -3,7 +3,7 @@
 Iolaus is an OpenCode 2 plugin with OMO-derived Agent prompts, explicit modes,
 model-family selection, a local durable DAG runtime, and structural code tools.
 Native OpenCode remains the owner of general tools, permissions, sessions, and
-skill discovery; Iolaus owns its `iolaus_dag` orchestration tool and child-session
+skill discovery; Iolaus owns its `iolaus_flow` orchestration tool and child-session
 runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 `context7` and `grep_app` remote MCP registrations.
 
@@ -67,16 +67,17 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   call the host refuses before running it fails when its caller's turn ends.
   Correlation is cached in memory and read back from the store
   (`controller.observedChild`) after a reload. A call made inside a scheduled
-  `iolaus_dag` node's session (found through its `iolaus_dag_run`/`iolaus_dag_node`
+  `iolaus_flow` node's session (found through its `iolaus_dag_run`/`iolaus_dag_node`
   metadata and `controller.lineage`) joins the run owner's observed run, titled
   `<node> › <description>`; the scheduled run's definition is not touched. A
   reopened node keeps its last result, which the view labels with its attempt
   (`resultAttempt`). Observed runs are never scheduled: `retry`, `resume`
   and `amend` reject them. The native binding tells agents to call `subagent`
-  directly for simple delegation and to use `iolaus_dag` only for data
+  directly for simple delegation and to use `iolaus_flow` only for data
   dependencies, retry/resume, gates or conditional branches.
-- `iolaus_dag` is the only model-facing orchestration tool in the first runtime
-  slice. It is owner-scoped and schema-validated.
+- `iolaus_flow` (`FLOW_TOOL_NAME` in `src/dag/tool.ts`; formerly `iolaus_dag`, which
+  `check:package` refuses in `dist/`) is the only model-facing orchestration tool in
+  the first runtime slice. It is owner-scoped and schema-validated.
 - Node kinds: `agent` runs a child session; `judge` makes one `generate.text`
   call on the node's agent lane model with no session (its execution ref is
   `judge:<node>:<attempt>:<ts>`, the reply is returned by `wait`); `gate`
@@ -138,7 +139,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `search()` catalog is the authority.
 - Specialist permissions follow OMO's agent catalog as per-agent deny lists on
   top of the host default (`DENIED` in `src/registration.ts`): oracle, explore
-  and librarian deny `edit`, `subagent` and `iolaus_dag`; metis and momus deny
+  and librarian deny `edit`, `subagent` and `iolaus_flow`; metis and momus deny
   only `edit`; multimodal-looker allows only `read`. Shell stays allowed, so
   read-only is the prompt's contract, as in OMO. Host names: `edit` covers
   edit/write/patch, `subagent` is OMO's `task`.
@@ -224,7 +225,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   when an agent node names no `model` and its lane resolves to none; no run is
   stored. The scheduler re-scans the frontier after a skip or block settles in
   the same pass, so a node behind a skipped branch is not left pending.
-- `src/dag/templates.ts` expands `iolaus_dag` action `template` (or `create`
+- `src/dag/templates.ts` expands `iolaus_flow` action `template` (or `create`
   with `template` and no `definition`) into ordinary definitions. `plan-review`:
   `plan` (prometheus) → `review` (momus) → `revise` when the review
   ends `VERDICT: FAIL` → `rereview` → `approve` gate → `execute` (default
@@ -279,8 +280,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   context hook is what makes the mode a DAG.
 - The DAG TUI (`src/tui.tsx`, dialog in `src/tui/dialog.tsx`, shared hooks in
   `src/tui/hooks.ts`) calls a run a "flow" in every label (`Flow · <name>`,
-  `Iolaus Flow: show details`, child sessions `Flow · <node>`); the tool, RPC id,
-  command ids, metadata keys and tables keep their `dag` names. Node cards carry
+  `Iolaus Flow: show details`, child sessions `Flow · <node>`) as the tool does
+  (`iolaus_flow`); the RPC id, command ids, metadata keys (`iolaus_dag_run/node/attempt`),
+  prompt markers (`<iolaus-dag-child>`, `<iolaus-dag-inputs>`), trace events and
+  tables keep their `dag` names. Node cards carry
   their status in the border title and are joined row to row by fork/join
   connectors (`connector` in `src/tui/view.ts`); agent replies render through
   the host's `<markdown>` with a `SyntaxStyle` built from the theme, so
