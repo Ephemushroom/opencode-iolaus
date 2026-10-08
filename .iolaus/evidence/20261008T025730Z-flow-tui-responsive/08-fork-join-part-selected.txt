@@ -1,0 +1,45 @@
+   RESPONSIVE_QA_READY           +
+
+  ┃                                                                                                                     RESPONSIVE_QA_READY
+  ┃  Create the responsive seven parallel QA DAG
+  ┃                                                                                                                     Context
+
+     ✓ iolaus_dag [act
+                       Flow · Fork join                                                                                         esc close
+     ✓ iolaus_dag [act ✓ done in 0s  ━━━━━━━━━━━━ 5/5
+
+     RESPONSIVE_QA_REA                                           ╭─ ✓ Done ───────────────────╮
+                                                                 │ ↑ split                  ⚖ │
+     Build · GPT-5.5 ·                                           │ Split the work             │
+                                                                 ╰────────────────────────────╯                                           s
+  ┃                                                                            │                                                          ..me must truncate
+  ┃  Create the FORK_J                          ┌──────────────────────────────┼──────────────────────────────┐                           s
+  ┃                                             ▼                              ▼                              ▼
+                                  ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮             · ctrl+x d
+     ✓ iolaus_dag [act            ┃ › part-a                 ⚖ ┃ │   part-b                 ⚖ │ │   part-c                 ⚖ │
+                                  ┃ Part a                     ┃ │ Part b                     │ │ Part c                     │
+     ✓ iolaus_dag [act            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────────╯ ╰────────────────────────────╯
+                                                └──────────────────────────────┼──────────────────────────────┘
+     RESPONSIVE_QA_REA                                                         ▼
+                                                                 ╭─ ✓ Done ───────────────────╮
+     Build · GPT-5.5 ·                                           │ ↓ join                   ⚖ │
+                                                                 │ Join the parts             │
+                                                                 ╰────────────────────────────╯
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ✓ part-a · Part a                                                                                              │
+                       │ Status: Done · judge                                                                                           │
+                       │ Agent: momus · Model: openai/gpt-5.5 · Attempt: 1                                                              │ d                ✕
+                       │ Depends on: split                                                                                              │
+                       │ Unblocks: join                                                                                                 │ des free models so
+                       │                                                                                                                │ immediately.
+                       │ Result                                                                                                         │
+                       │ FORK_RESULT_a                                                                                                  │ 5+ providers to
+                       ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ ls, including
+  ┃                                                                                                                                       emini etc
+  ┃                    ↑/↓ j/k select · PgUp/PgDn details · Esc close
+  ┃                                                                                                                                       er        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/fold…/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-responsive-qa-AZiaX5/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-responsive-qa-AZiaX5/project
+

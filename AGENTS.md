@@ -278,7 +278,14 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
   context hook is what makes the mode a DAG.
 - The DAG TUI (`src/tui.tsx`, dialog in `src/tui/dialog.tsx`, shared hooks in
-  `src/tui/hooks.ts`) keeps `sidebar.content` and `sidebar.footer` read-only.
+  `src/tui/hooks.ts`) calls a run a "flow" in every label (`Flow · <name>`,
+  `Iolaus Flow: show details`, child sessions `Flow · <node>`); the tool, RPC id,
+  command ids, metadata keys and tables keep their `dag` names. Node cards carry
+  their status in the border title and are joined row to row by fork/join
+  connectors (`connector` in `src/tui/view.ts`); agent replies render through
+  the host's `<markdown>` with a `SyntaxStyle` built from the theme, so
+  `@opentui/core` is external in the build and resolves to the host's copy.
+  The TUI keeps `sidebar.content` and `sidebar.footer` read-only.
   Click a run/node or use `<leader>d` / the command palette to open a native
   details dialog. Its target-scoped keymap owns single-letter actions only
   while the dialog is focused (`c` cancels the run after the host confirm dialog); `Esc` closes it and the host restores the input

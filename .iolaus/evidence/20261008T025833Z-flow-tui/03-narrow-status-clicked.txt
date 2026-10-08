@@ -1,0 +1,45 @@
+ ⠧ IOLAUS_TUI_QA_DONE            +
+
+
+
+  Flow · plan-review: IOLAUS_TUI_TASK                                                    esc close
+  ⏸ waiting approval · 3s  ━━━━━━━━━━━━ 4/6
+
+                                                ▼
+                                  ╭─ ✓ Done ───────────────────╮
+                                  │   revise                   │
+                                  │ Revise the plan            │
+                                  ╰────────────────────────────╯
+                                                │
+                                                ▼
+                                  ╭─ ✓ Done ───────────────────╮                                 ▄
+                                  │ ↑ rereview               ⚖ │                                 █
+                                  │ Re-review the revised plan │                                 █
+                                  ╰────────────────────────────╯                                 █
+                                                │                                                █
+                                                ▼                                                █
+                                  ┏━ ⏸ Waiting approval ━━━━━━━┓                                 █
+                                  ┃ › approve                ◇ ┃                                 █
+                                  ┃ Approve the plan           ┃                                 █
+                                  ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                 █
+                                                │                                                █
+                                                ▼                                                █
+                                  ╭─ · Pending ────────────────╮                                 █
+                                  │ ↓ execute                  │                                 █
+                                  │ Execute the approved plan  │                                 █
+                                  ╰────────────────────────────╯                                 █
+
+  ╭─ Node details ───────────────────────────────────────────────────────────────────────────────╮
+  │ ⏸ approve · Approve the plan                                                                 │
+  │ Status: Waiting approval · gate                                                              │
+  │ Agent: human · Model: none · Attempt: 1                                                      │
+  │ Depends on: review, rereview                                                                 │
+  │ Unblocks: execute                                                                            │
+  │                                                                                              │
+  │ Approval request                                                                             │
+  │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject to stop.      │
+  ╰──────────────────────────────────────────────────────────────────────────────────────────────╯
+
+  ↑/↓ j/k select · a approve · r reject · c cancel flow · PgUp/PgDn details · Esc close
+
+

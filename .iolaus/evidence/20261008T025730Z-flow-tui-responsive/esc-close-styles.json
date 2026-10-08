@@ -1,0 +1,18 @@
+{
+  "name": {
+    "fg": "238,238,238",
+    "bold": true
+  },
+  "label": {
+    "fg": "128,128,128",
+    "bold": false
+  },
+  "key": {
+    "fg": "238,238,238",
+    "bold": false
+  },
+  "action": {
+    "fg": "128,128,128",
+    "bold": false
+  }
+}

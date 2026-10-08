@@ -1,21 +1,23 @@
 import { Plugin } from "@opencode/plugin/tui"
 import type { Context } from "@opencode/plugin/tui/context"
-import { For, Show, createMemo } from "solid-js"
+import { For, Show, createMemo, createSignal } from "solid-js"
 import { trace } from "./trace"
 import { IOLAUS_DAG_RPC } from "./dag/rpc"
 import { dagTarget } from "./tui/data"
-import { openDagDialog } from "./tui/dialog"
+import { Progress, openDagDialog } from "./tui/dialog"
 import { useDagData, useNow } from "./tui/hooks"
 import { createSlotPresence, trackSlotPresence, type SlotPresence } from "./tui/presence"
-import { DASHED_BORDER, isActiveRun, liveGlyph, orderNodes, partitionRuns, progressBar, runActivity, runClock, settledCount, statusColor, statusGlyph, type DagViewRun } from "./tui/view"
+import { DASHED_BORDER, borderTitle, isActiveRun, kindMark, labelColor, liveGlyph, orderNodes, partitionRuns, runActivity, runClock, runHeadline, settledCount, statusColor, statusGlyph, type DagViewRun } from "./tui/view"
 
+/** One line per node: its status glyph, its title (the id when it has none) and the judge or gate mark. */
 function RunNodes(props: { readonly run: DagViewRun; readonly frame: number; readonly context: Context; readonly open: (runID: string, nodeID?: string) => void }) {
   const theme = () => props.context.theme
   return <For each={orderNodes(props.run)}>{(node) => {
-    const live = () => node.status === "running" || node.status === "starting"
-    return <box flexDirection="column" onMouseUp={(event) => { if (event.button === 0) props.open(props.run.runID, node.id) }}>
-      <text fg={statusColor(node.status, theme())} attributes={live() ? 1 : 0}>{"  "}{liveGlyph(node.status, props.frame)} {node.id}{node.kind === "judge" ? " ⚖" : node.kind === "gate" ? " ⏸" : ""}</text>
-      <Show when={node.title}><text wrapMode="none" truncate fg={theme().text.muted}>{"    "}{node.title}</text></Show>
+    const active = () => node.status === "running" || node.status === "starting" || node.status === "waiting_approval"
+    return <box flexDirection="row" onMouseUp={(event) => { if (event.button === 0) props.open(props.run.runID, node.id) }}>
+      <text flexShrink={0} fg={statusColor(node.status, theme())}>{`${liveGlyph(node.status, props.frame)} `}</text>
+      <text flexGrow={1} flexShrink={1} wrapMode="none" truncate fg={labelColor(node.status, theme())} attributes={active() ? 1 : 0}>{node.title ?? node.id}</text>
+      <Show when={kindMark(node.kind)}>{(mark) => <text flexShrink={0} fg={theme().text.muted}>{` ${mark()}`}</text>}</Show>
     </box>
   }}</For>
 }
@@ -28,25 +30,25 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
   const now = useNow(200)
   const frame = () => Math.floor(now() / 200)
   const groups = createMemo(() => partitionRuns(runs()))
+  // Run frames span the sidebar's inner width, and their status title is drawn only when it fits that width.
+  const [inner, setInner] = createSignal(35)
   const open = (runID: string, nodeID?: string) => openDagDialog(context, props.sessionID, runID, nodeID)
-  const title = (run: DagViewRun) => run.name.length > 40 ? `${run.name.slice(0, 39)}…` : run.name
   return (
-    <box flexDirection="column" paddingLeft={1} paddingRight={1}>
+    <box flexDirection="column" paddingLeft={1} paddingRight={1} onSizeChange={function () { setInner(this.width - 2) }}>
       <text fg={theme().text.base} attributes={1}>Iolaus</text>
-      <Show when={state().status === "loading"}><text fg={theme().text.muted}>Loading DAG runs...</text></Show>
-      <Show when={state().status === "error"}><text fg={theme().text.feedback.error.base}>DAG unavailable: {state().error}</text></Show>
-      <Show when={state().status === "ready" && runs().length === 0}><text fg={theme().text.muted}>No active DAG runs</text></Show>
+      <Show when={state().status === "loading"}><text fg={theme().text.muted}>Loading flows...</text></Show>
+      <Show when={state().status === "error"}><text fg={theme().text.feedback.error.base}>Flows unavailable: {state().error}</text></Show>
+      <Show when={state().status === "ready" && runs().length === 0}><text fg={theme().text.muted}>No active flows</text></Show>
       <For each={groups().active}>{(run) => <box flexDirection="column" marginTop={1} paddingLeft={1} paddingRight={1}
         border customBorderChars={DASHED_BORDER} borderColor={statusColor(run.status, theme())}
-        title={run.status === "paused" ? " waiting approval " : " running "} titleColor={statusColor(run.status, theme())}>
-        <text fg={statusColor(run.status, theme())} attributes={1} onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>{liveGlyph(run.status, frame())} {title(run)}</text>
-        <text fg={theme().text.muted}>{progressBar(settledCount(run), run.nodes.length)} · gen {run.generation} · {runClock(run, now())}</text>
-        <Show when={run.nodes.some((node) => node.status === "waiting_approval")}><text fg={theme().text.action.primary.base}>{run.nodes.filter((node) => node.status === "waiting_approval").length} awaiting approval</text></Show>
+        title={borderTitle(liveGlyph(run.status, frame()), runHeadline(run, now()), inner())} titleColor={statusColor(run.status, theme())}>
+        <text wrapMode="none" truncate fg={theme().text.base} attributes={1} onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>{run.name}</text>
+        <Progress run={run} context={context} />
         <RunNodes run={run} frame={frame()} context={context} open={open} />
       </box>}</For>
       <Show when={groups().finished.length > 0}><text marginTop={1} fg={theme().text.muted}>Recent</text></Show>
       <For each={groups().finished}>{(run) => <box flexDirection="column" onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>
-        <text wrapMode="none" truncate fg={statusColor(run.status, theme())}>{statusGlyph(run.status)} {title(run)}</text>
+        <text wrapMode="none" truncate fg={statusColor(run.status, theme())}>{statusGlyph(run.status)} {run.name}</text>
         <text wrapMode="none" truncate fg={theme().text.muted}>{"  "}{settledCount(run)}/{run.nodes.length} · {runClock(run, now())}</text>
       </box>}</For>
       <Show when={groups().hidden > 0}><text fg={theme().text.muted}>+{groups().hidden} older (details: {context.keymap.shortcuts("iolaus.dag.show").join(" / ")})</text></Show>
@@ -67,7 +69,7 @@ function DagComposerStatus(props: { readonly sessionID: string; readonly context
     <box flexDirection="column" paddingLeft={2} paddingRight={2}>
       <For each={active()}>{(run) => <text wrapMode="none" truncate fg={statusColor(run.status, theme())}
         onMouseUp={(event) => { if (event.button === 0) openDagDialog(context, props.sessionID, run.runID) }}>
-        {liveGlyph(run.status, Math.floor(now() / 200))} DAG {run.name} · {settledCount(run)}/{run.nodes.length} · {runActivity(run)} · {runClock(run, now())}
+        {liveGlyph(run.status, Math.floor(now() / 200))} Flow {run.name} · {settledCount(run)}/{run.nodes.length} · {runActivity(run)} · {runClock(run, now())}
       </text>}</For>
     </box>
   </Show>
@@ -78,7 +80,7 @@ function DagLauncher(props: { readonly context: Context }) {
   const rpc = context.client.rpc(IOLAUS_DAG_RPC)
   context.keymap.layer(() => ({
     mode: "global",
-    commands: [{ id: "iolaus.dag.show", title: "Iolaus DAG: show details", group: "Iolaus", bind: "<leader>d", palette: true,
+    commands: [{ id: "iolaus.dag.show", title: "Iolaus Flow: show details", group: "Iolaus", bind: "<leader>d", palette: true,
       enabled: () => context.ui.router.current().type === "session",
       run: async () => {
         const route = context.ui.router.current()
@@ -89,9 +91,9 @@ function DagLauncher(props: { readonly context: Context }) {
           const active = context.ui.router.current()
           if (active.type !== "session" || active.sessionID !== target.sessionID) return
           if (view.runs[0]) openDagDialog(context, target.sessionID, view.runs[0].runID)
-          else context.ui.toast.show({ variant: "info", title: "Iolaus DAG", message: "No DAG runs in this session" })
+          else context.ui.toast.show({ variant: "info", title: "Iolaus Flow", message: "No flows in this session" })
         } catch (error) {
-          context.ui.toast.show({ variant: "error", title: "Iolaus DAG", message: error instanceof Error ? error.message : String(error) })
+          context.ui.toast.show({ variant: "error", title: "Iolaus Flow", message: error instanceof Error ? error.message : String(error) })
         }
       },
     }],

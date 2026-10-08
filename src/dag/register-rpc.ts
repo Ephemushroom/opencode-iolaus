@@ -1,11 +1,21 @@
 import { Effect } from "effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { DagController } from "./controller"
-import type { DagNodeStatus, DagRunStatus } from "./types"
+import type { DagNodeStatus, DagRunStatus, JsonValue } from "./types"
 import { IOLAUS_DAG_RPC, type DagView } from "./rpc"
 
 const SETTLED_RUN: readonly DagRunStatus[] = ["completed", "failed", "cancelled", "interrupted"]
 const IN_FLIGHT: readonly DagNodeStatus[] = ["ready", "starting", "running", "cancel_requested"]
+const RESULT_LIMIT = 16000
+
+/** A reply's text is cut on its own, so a long reply still arrives as JSON and renders as Markdown; other payloads are cut as JSON. */
+export function resultExcerpt(payload: JsonValue): string {
+  if (payload !== null && typeof payload === "object" && !Array.isArray(payload)) {
+    const text = payload.text
+    if (typeof text === "string") return JSON.stringify({ ...payload, text: text.length > RESULT_LIMIT ? `${text.slice(0, RESULT_LIMIT)}…` : text })
+  }
+  return JSON.stringify(payload).slice(0, RESULT_LIMIT)
+}
 
 /** A finished run has no work in flight; rows written before cancel settled every node show how the run ended instead. */
 export function viewNodeStatus(run: DagRunStatus, node: DagNodeStatus): DagNodeStatus {
@@ -40,7 +50,7 @@ export function dagView(controller: DagController, sessionID: string): Effect.Ef
       ...(node.definition.kind === "gate" ? { prompt: node.definition.prompt } : {}),
       ...(node.error !== undefined ? { error: node.error } : {}),
       ...(node.execution?.sessionID !== undefined ? { sessionID: node.execution.sessionID } : {}),
-      ...(node.result ? { result: JSON.stringify(node.result.payload).slice(0, 16000), resultAttempt: node.result.attempt } : {}),
+      ...(node.result ? { result: resultExcerpt(node.result.payload), resultAttempt: node.result.attempt } : {}),
       }
     }),
   })) })))

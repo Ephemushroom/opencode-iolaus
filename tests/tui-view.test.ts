@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, depths, elapsed, liveGlyph, nodeResultText, orderNodes, partitionRuns, progressBar, resultLabel, runActivity, runClock, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, borderTitle, connector, depths, elapsed, kindMark, labelColor, liveGlyph, nodeResult, orderNodes, partitionRuns, progressBar, resultLabel, rowStart, runActivity, runClock, runHeadline, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -24,14 +24,14 @@ test("glyphs and colours map every status; unknown falls back to text", () => {
 
 test("progress, depth, ordering and summary are derived from the run", () => {
   expect(settledCount(run)).toBe(3)
-  expect(progressBar(3, 5, 10)).toBe("[██████░░░░] 3/5")
-  expect(progressBar(0, 0, 4)).toBe("[    ] 0/0")
+  expect(progressBar(3, 5, 10)).toEqual({ done: "━━━━━━", rest: "━━━━", count: "3/5" })
+  expect(progressBar(0, 0, 4)).toEqual({ done: "", rest: "━━━━", count: "0/0" })
   const d = depths(run)
   expect([d.get("plan"), d.get("review"), d.get("revise"), d.get("approve"), d.get("execute")]).toEqual([0, 1, 2, 2, 3])
   expect(orderNodes(run).map((n) => n.id)[0]).toBe("approve")
-  expect(summarize([run]).text).toBe("DAG · 1 run · 1 waiting approval")
-  expect(summarize([]).text).toBe("DAG · idle")
-  expect(summarize([{ ...run, status: "running" }, { ...run, runID: "r2", status: "failed" }]).text).toBe("DAG · 2 runs · 1 running · 1 failed")
+  expect(summarize([run]).text).toBe("Flow · 1 run · 1 waiting approval")
+  expect(summarize([]).text).toBe("Flow · idle")
+  expect(summarize([{ ...run, status: "running" }, { ...run, runID: "r2", status: "failed" }]).text).toBe("Flow · 2 runs · 1 running · 1 failed")
 })
 
 test("activity line and elapsed formatting", () => {
@@ -46,11 +46,11 @@ test("dialog ordering keeps both fan-in parents before their descendant regardle
   expect(topologyNodes(graph).at(-1)?.dependsOn).toEqual(["left", "right"])
 })
 
-test("dialog result excerpts show plain text and preserve structured or truncated data", () => {
-  expect(nodeResultText('{"text":"line one\\nline two"}')).toBe("line one\nline two")
-  expect(nodeResultText('{"decision":"approved"}')).toBe('{"decision":"approved"}')
-  expect(nodeResultText('{"text":"truncated')).toBe('{"text":"truncated')
-  expect(nodeResultText("null")).toBe("null")
+test("dialog results render a reply's text as Markdown and keep structured or truncated data as JSON", () => {
+  expect(nodeResult('{"text":"line one\\nline two"}')).toEqual({ text: "line one\nline two", markdown: true })
+  expect(nodeResult('{"decision":"approved"}')).toEqual({ text: '{"decision":"approved"}', markdown: false })
+  expect(nodeResult('{"text":"truncated')).toEqual({ text: '{"text":"truncated', markdown: false })
+  expect(nodeResult("null")).toEqual({ text: "null", markdown: false })
 })
 
 test("a reopened node labels the result it kept from an earlier attempt", () => {
@@ -66,6 +66,47 @@ test("a finished run shows a fixed duration while an active run keeps a live clo
   expect(runClock({ ...done, status: "cancelled" }, 900_000)).toBe("cancelled in 1m 40s")
   expect(runClock({ ...done, status: "running" }, 31_000)).toBe("running 30s")
   expect(runClock({ ...done, status: "paused", updatedAt: 21_000 }, 31_000)).toBe("waiting 10s")
+  expect(runHeadline({ ...done, status: "running" }, 31_000)).toBe("running · 30s")
+  expect(runHeadline({ ...done, status: "paused", updatedAt: 21_000 }, 31_000)).toBe("waiting approval · 10s")
+  expect(runHeadline(done, 900_000)).toBe("done in 1m 40s")
+})
+
+test("border titles shorten to the width OpenTUI still draws", () => {
+  expect(borderTitle("✓", "Done", 30)).toBe(" ✓ Done ")
+  expect(borderTitle("⠋", "Running", 30, 3)).toBe(" ⠋ Running · attempt 3 ")
+  expect(borderTitle("⏸", "Waiting approval", 26, 2)).toBe(" ⏸ Waiting approval ")
+  expect(borderTitle("·", "waiting approval · 1h 23m", 20)).toBe(" · waiting ap… ")
+  expect(borderTitle("⏸", "waiting approval · 1h 23m", 35)).toBe(" ⏸ waiting approval · 1h 23m ")
+  for (const width of [12, 20, 26, 30, 35]) for (const label of ["Done", "Waiting approval", "waiting approval · 1h 23m"]) {
+    expect(borderTitle("⏸", label, width, 4).length).toBeLessThanOrEqual(width - 5)
+  }
+})
+
+test("node rows mark judges and gates and colour only failed labels", () => {
+  expect([kindMark("judge"), kindMark("gate"), kindMark("agent")]).toEqual(["⚖", "◇", ""])
+  expect(labelColor("failed", theme)).toBe(theme.text.feedback.error.base)
+  expect(labelColor("pending", theme)).toBe(theme.text.muted)
+  expect(labelColor("completed", theme)).toBe(theme.text.base)
+  expect(labelColor("running", theme)).toBe(theme.text.base)
+})
+
+test("a row of cards is centred when it fits and wraps otherwise", () => {
+  expect(rowStart(1, 30, 120)).toBe(45)
+  expect(rowStart(3, 30, 100)).toBe(4)
+  expect(rowStart(2, 26, 53)).toBe(0)
+  expect(rowStart(4, 30, 100)).toBeUndefined()
+})
+
+test("connectors fork, join and pass straight between rows of cards", () => {
+  expect(connector([10], [10], 10)).toEqual(["          │", "          ▼"])
+  expect(connector([6], [2, 6, 10], 6)).toEqual(["      │", "  ┌───┼───┐", "  ▼   ▼   ▼"])
+  expect(connector([2, 6, 10], [6], 6)).toEqual(["  └───┼───┘", "      ▼"])
+  expect(connector([2, 10], [1, 6, 11], 6)).toEqual(["  └───┬───┘", " ┌────┼────┐", " ▼    ▼    ▼"])
+  expect(connector([2], [2, 8], 2)).toEqual(["  │", "  ├─────┐", "  ▼     ▼"])
+  // A row that wraps has no reliable columns and meets its neighbours at the column of a lone card.
+  expect(connector([10], undefined, 10)).toEqual(["          │", "          ▼"])
+  expect(connector(undefined, [2, 10, 18], 10)).toEqual(["          │", "  ┌───────┼───────┐", "  ▼       ▼       ▼"])
+  expect(connector([2, 10, 18], undefined, 10)).toEqual(["  └───────┼───────┘", "          ▼"])
 })
 
 test("sidebar lists active runs first and keeps only recent history; running glyphs animate", () => {

@@ -49,6 +49,18 @@ const hostDatabaseUsers = () => {
   return result.stdout.trim().split("\n").filter(Boolean).map(Number)
 }
 const hostUsersBefore = hostDatabaseUsers()
+// Other host sessions keep writing the real database, so its digest can change for unrelated reasons. Isolation is
+// proven directly: no process of the sandbox TUI opens a database outside the sandbox, at the start or at the end.
+const sandboxDatabases = (panePID) => {
+  const processes = spawnSync("ps", ["-axo", "pid=,ppid="], { encoding: "utf8" })
+  assert.equal(processes.status, 0, processes.stderr)
+  const children = processes.stdout.trim().split("\n").map((line) => line.trim().split(/\s+/).map(Number))
+  const processPIDs = [panePID]
+  for (const pid of processPIDs) for (const [child, parent] of children) if (parent === pid) processPIDs.push(child)
+  // A child that exits between ps and lsof makes lsof exit 1; the files of the others are still listed.
+  const openFiles = spawnSync("lsof", ["-Fn", "-p", processPIDs.join(",")], { encoding: "utf8" })
+  return [...new Set(openFiles.stdout.split("\n").filter((line) => /^n.*\.db(?:-(?:wal|shm))?$/.test(line)).map((line) => line.slice(1)))].sort()
+}
 
 // Local mock model: the main session creates a plan-review DAG and waits; children answer by role. The reviewer (a
 // judge) fails once so the graph shows a revise branch, then passes so the accept gate waits on screen.
@@ -153,13 +165,15 @@ const click = (x, y) => {
   keys("-l", `\x1b[<0;${x + 1};${y + 1}m`)
 }
 const SIDEBAR_HEADER = /^\s*Iolaus\s*$/m
-const COMPOSER_STATUS = /DAG plan-review: IOLAUS_TUI_TASK ·/
-const GATE_STATUS = /⏸ DAG plan-review: IOLAUS_TUI_TASK · \d+\/6 · awaiting approval: approve · waiting \d+(?:s|m(?: \d+s)?)/
+const COMPOSER_STATUS = /Flow plan-review: IOLAUS_TUI_TASK ·/
+const GATE_STATUS = /⏸ Flow plan-review: IOLAUS_TUI_TASK · \d+\/6 · awaiting approval: approve · waiting \d+(?:s|m(?: \d+s)?)/
+// The details dialog is titled with the flow it shows; child session tabs read "Flow · <node>".
+const DIALOG = /Flow · plan-review/
 const SIDEBAR_MOUNTED = /iolaus\.tui\.sidebar\.mounted/
 const SIDEBAR_UNMOUNTED = /iolaus\.tui\.sidebar\.unmounted/
 const screens = {}
 const strip = (text) => text.replace(/\x1b\[[0-9;]*m/g, "")
-const isolation = { standalone: true, home, config, data: env.XDG_DATA_HOME, project, databasePaths: [] }
+const isolation = { standalone: true, home, config, data: env.XDG_DATA_HOME, project, databasePaths: [], databasePathsAtEnd: [] }
 let failure
 let colors = [], nodeOrder = [], presence
 tmux("resize-window", "-t", session, "-x", "160", "-y", "45")
@@ -167,14 +181,7 @@ try {
   await waitFor(/iolaus\.tui\.loaded/, 20000, "tui load")
   const panePID = Number(tmux("display-message", "-p", "-t", target, "#{pane_pid}").stdout.trim())
   assert.ok(Number.isSafeInteger(panePID) && panePID > 0, "missing standalone pane process")
-  const processes = spawnSync("ps", ["-axo", "pid=,ppid="], { encoding: "utf8" })
-  assert.equal(processes.status, 0, processes.stderr)
-  const children = processes.stdout.trim().split("\n").map((line) => line.trim().split(/\s+/).map(Number))
-  const processPIDs = [panePID]
-  for (const pid of processPIDs) for (const [child, parent] of children) if (parent === pid) processPIDs.push(child)
-  const openFiles = spawnSync("lsof", ["-Fn", "-p", processPIDs.join(",")], { encoding: "utf8" })
-  assert.equal(openFiles.status, 0, openFiles.stderr)
-  isolation.databasePaths = [...new Set(openFiles.stdout.split("\n").filter((line) => /^n.*\/opencode\.db(?:-(?:wal|shm))?$/.test(line)).map((line) => line.slice(1)))].sort()
+  isolation.databasePaths = sandboxDatabases(panePID)
   assert.ok(isolation.databasePaths.some((path) => path === join(env.XDG_DATA_HOME, "opencode/opencode.db")), "standalone process did not open sandbox DB")
   assert.ok(isolation.databasePaths.every((path) => path.startsWith(`${sandbox}/`)), "standalone process opened a DB outside sandbox")
   await sleep(1500)
@@ -196,7 +203,7 @@ try {
   await waitFor(/iolaus\.dag\.node\.waiting.*"nodeID":"approve"/, 60000, "approve gate")
   await sleep(1200)
   screens.gate = capture("03-gate-waiting")
-  assert.doesNotMatch(screens.gate, /DAG details/, "a new gate must not open a popup")
+  assert.doesNotMatch(screens.gate, DIALOG, "a new gate must not open a popup")
   // The host hides the sidebar below its width threshold and unmounts sidebar.content with it. While it is gone the
   // composer carries the live status; the moment the sidebar returns the status line leaves again.
   const unmountedBeforeNarrow = traceCount(SIDEBAR_UNMOUNTED)
@@ -213,11 +220,11 @@ try {
   click(statusLines[statusRow].indexOf("plan-review") + 1, statusRow)
   await sleep(400)
   screens.narrowStatusClick = capture("03-narrow-status-clicked")
-  assert.match(screens.narrowStatusClick, /DAG details/, "clicking the composer status must open the details dialog")
+  assert.match(screens.narrowStatusClick, DIALOG, "clicking the composer status must open the details dialog")
   assert.match(screens.narrowStatusClick, /Approval request/, "the dialog opened from the composer status must select the waiting gate")
   keys("Escape"); await sleep(300)
   screens.narrowAfterClick = capture("03-narrow-after-click")
-  assert.doesNotMatch(screens.narrowAfterClick, /DAG details/)
+  assert.doesNotMatch(screens.narrowAfterClick, DIALOG)
   assert.match(screens.narrowAfterClick, /nrw/, "closing the dialog opened from the composer status must keep the draft")
   assert.match(strip(screens.narrowAfterClick), COMPOSER_STATUS, "composer status must survive the dialog round trip while the sidebar stays hidden")
   keys("C-e", "C-u")
@@ -236,13 +243,13 @@ try {
   keys("Left", "Left")
   keys("C-x"); await sleep(150); keys("d"); await sleep(300)
   screens.dialog = capture("03-dag-dialog")
-  assert.match(screens.dialog, /DAG details/, "the keyboard command must open a modal")
+  assert.match(screens.dialog, DIALOG, "the keyboard command must open a modal")
   assert.match(screens.dialog, /Approval request/, "the waiting gate must be selected")
   assert.match(screens.dialog, /Depends on:/)
   assert.match(screens.dialog, /Attempt:/)
   tmux("resize-window", "-t", session, "-x", "100", "-y", "45"); await sleep(400)
   screens.narrowDialog = capture("03-dialog-narrow")
-  assert.match(screens.narrowDialog, /DAG details/)
+  assert.match(screens.narrowDialog, DIALOG)
   assert.match(screens.narrowDialog, /Depends on:/, "narrow dialog must retain node details")
   assert.match(screens.narrowDialog, /Approval request/)
   tmux("resize-window", "-t", session, "-x", "160", "-y", "45"); await sleep(300)
@@ -250,7 +257,7 @@ try {
   keys("-l", "X"); await sleep(300)
   screens.escaped = capture("03-escape-to-composer")
   assert.match(screens.escaped, /jkoXar/, "Escape must restore the draft and original cursor position")
-  assert.doesNotMatch(screens.escaped, /DAG details/)
+  assert.doesNotMatch(screens.escaped, DIALOG)
   keys("C-e", "C-u")
   // Hiding the sidebar by hand on a wide terminal (session.sidebar.toggle, <leader>b) follows the same rule.
   const unmountedBeforeToggle = traceCount(SIDEBAR_UNMOUNTED)
@@ -273,12 +280,12 @@ try {
   assert.match(strip(screens.manualShown), SIDEBAR_HEADER, "the toggle must show the sidebar again")
   assert.doesNotMatch(strip(screens.manualShown), COMPOSER_STATUS, "composer status must disappear when the sidebar is shown again")
   const gateLines = capture("03-before-click").split("\n")
-  const gateRow = gateLines.findIndex((line) => line.includes("⏸ approve"))
+  const gateRow = gateLines.findIndex((line) => line.includes("⏸ Approve the plan"))
   assert.ok(gateRow >= 0)
-  click(gateLines[gateRow].indexOf("approve") + 1, gateRow)
+  click(gateLines[gateRow].indexOf("Approve the plan") + 1, gateRow)
   await sleep(300)
   screens.clicked = capture("03-clicked-node")
-  assert.match(screens.clicked, /DAG details/, "clicking a node must open the modal")
+  assert.match(screens.clicked, DIALOG, "clicking a node must open the modal")
   assert.match(screens.clicked, /Approval request/, "clicking a gate must select that exact node")
   assert.ok(!traceHas(/iolaus\.tui\.(action|open)/))
   keys("k"); await sleep(200)
@@ -297,8 +304,8 @@ try {
   await waitForMore(SIDEBAR_MOUNTED, mountedBeforeChild, 5000, "sidebar mount for the child session")
   await sleep(1200)
   screens.childDuringRun = capture("03-child-during-run")
-  assert.doesNotMatch(screens.childDuringRun, /DAG details/, "opening the child must close the popup")
-  assert.match(strip(screens.childDuringRun), /No active DAG runs/, "the child session must not inherit the owner's active run")
+  assert.doesNotMatch(screens.childDuringRun, DIALOG, "opening the child must close the popup")
+  assert.match(strip(screens.childDuringRun), /No active flows/, "the child session must not inherit the owner's active run")
   assert.doesNotMatch(strip(screens.childDuringRun), COMPOSER_STATUS, "the child session must not show the owner's composer status")
   const mountedBeforeReturn = traceCount(SIDEBAR_MOUNTED)
   keys("C-x"); await sleep(150); keys("w")
@@ -306,7 +313,7 @@ try {
   await sleep(1200)
   screens.ownerDuringRun = capture("03-owner-during-run")
   assert.match(strip(screens.ownerDuringRun), /waiting approval/, "returning to the owner must restore the paused run card")
-  assert.match(strip(screens.ownerDuringRun), /⏸ approve/, "returning to the owner must restore the waiting gate")
+  assert.match(strip(screens.ownerDuringRun), /⏸ Approve the plan/, "returning to the owner must restore the waiting gate")
   assert.doesNotMatch(strip(screens.ownerDuringRun), COMPOSER_STATUS, "the composer status must stay absent while the owner's sidebar is visible")
   const unmountedBeforeOwnerHide = traceCount(SIDEBAR_UNMOUNTED)
   keys("C-x"); await sleep(150); keys("b")
@@ -342,12 +349,12 @@ try {
   // The successor of the gate is an agent node below the viewport; selecting it must scroll its card into view.
   keys("j"); await sleep(300)
   screens.completed = capture("04-completed")
-  assert.match(screens.completed, /DAG details/, "the popup must update live without closing")
+  assert.match(screens.completed, DIALOG, "the popup must update live without closing")
   // Enter opens the selected agent node and dismisses the modal.
   keys("Enter"); await sleep(400)
   await sleep(1200)
   screens.opened = capture("05-opened-child")
-  assert.doesNotMatch(screens.opened, /DAG details/, "opening an agent must close the popup")
+  assert.doesNotMatch(screens.opened, DIALOG, "opening an agent must close the popup")
   keys("F6"); await sleep(1200)
   screens.switched = capture("05-theme-switched")
   // A child has no directly owned DAG. Returning to the owner must restore its view without a new DAG event.
@@ -364,19 +371,22 @@ try {
   assert.doesNotMatch(strip(screens.narrowFinished), COMPOSER_STATUS, "a finished run must not show the composer status even while the sidebar is hidden")
   keys("C-x"); await sleep(150); keys("d"); await sleep(400)
   screens.hiddenSidebar = capture("06-dialog-with-hidden-sidebar")
-  assert.match(screens.hiddenSidebar, /DAG details/, "keyboard entry must work when the host hides the sidebar")
+  assert.match(screens.hiddenSidebar, DIALOG, "keyboard entry must work when the host hides the sidebar")
   keys("Escape"); await sleep(200)
   tmux("resize-window", "-t", session, "-x", "160", "-y", "45"); await sleep(300)
-  keys("C-p"); await sleep(200); keys("-l", "DAG"); await sleep(200)
+  keys("C-p"); await sleep(200); keys("-l", "Iolaus Flow"); await sleep(200)
   screens.commands = capture("06-command-palette")
-  assert.match(screens.commands, /show details/, "the DAG launcher must be discoverable in the palette")
+  assert.match(screens.commands, /Flow: show details/, "the Flow launcher must be discoverable in the palette")
   keys("Enter"); await sleep(400)
   screens.palette = capture("06-dialog-from-palette")
-  assert.match(screens.palette, /DAG details/, "the command palette must open the same dialog")
+  assert.match(screens.palette, DIALOG, "the command palette must open the same dialog")
   keys("Escape"); await sleep(200)
   screens.afterPalette = capture("06-draft-after-palette")
   assert.match(screens.afterPalette, /jkoar/, "palette entry must also preserve the input draft")
   keys("C-e", "C-u")
+  isolation.databasePathsAtEnd = sandboxDatabases(panePID)
+  assert.ok(isolation.databasePathsAtEnd.some((path) => path === join(env.XDG_DATA_HOME, "opencode/opencode.db")), "standalone process lost its sandbox DB")
+  assert.ok(isolation.databasePathsAtEnd.every((path) => path.startsWith(`${sandbox}/`)), "standalone process opened a DB outside sandbox at the end of the run")
   keys("C-c"); await sleep(500)
 const trace = existsSync(tracePath) ? readFileSync(tracePath, "utf8") : ""
 assert.match(trace, /iolaus\.tui\.loaded/)
@@ -386,22 +396,30 @@ assert.match(screens.agents, /\bPrometheus · GPT-5\.5/, `agent cycle did not sh
 assert.match(screens.agents, /\bAtlas · GPT-5\.5/, `agent cycle did not show "Atlas": ${screens.agents}`)
 assert.ok(!/iolaus-(sisyphus|hephaestus|prometheus|atlas)/.test(screens.agents), `primary agents still show the iolaus- prefix: ${screens.agents}`)
 assert.match(strip(screens.running), /^\s*Iolaus\s*$/m, "sidebar header missing")
-assert.doesNotMatch(strip(screens.running), /DAG · \d+ run/, "redundant sidebar footer must not be rendered")
-assert.match(strip(screens.running), /[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] plan/, "running plan node not rendered with the spinner")
-assert.match(strip(screens.running), /╭╌* running ╌*╮/, "running run is not framed by the dashed border")
-assert.match(strip(screens.running), /running \d+s/, "running run has no live clock")
-assert.doesNotMatch(strip(screens.running), /DAG plan-review: IOLAUS_TUI_TASK ·/, "redundant composer status must not be rendered")
-assert.doesNotMatch(strip(screens.gate), /DAG plan-review: IOLAUS_TUI_TASK ·/, "waiting gates must not restore the redundant composer status")
+assert.doesNotMatch(strip(screens.running), /Flow · \d+ run/, "redundant sidebar footer must not be rendered")
+assert.match(strip(screens.running), /[⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] Write the plan/, "running plan node not rendered with the spinner and its title")
+assert.match(strip(screens.running), /╭╌ [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] running · \d+s ╌*╮/, "running run must carry its spinner and live clock in the dashed frame title")
+assert.doesNotMatch(strip(screens.running), COMPOSER_STATUS, "redundant composer status must not be rendered")
+assert.doesNotMatch(strip(screens.gate), COMPOSER_STATUS, "waiting gates must not restore the redundant composer status")
 assert.match(strip(screens.running), /Write the plan/, "node summary line missing")
-assert.match(strip(screens.running), /\[[█░]+\] \d+\/\d+/, "progress bar missing")
-assert.match(strip(screens.gate), /⏸ approve/, "waiting gate not rendered")
+assert.match(strip(screens.running), /━+ \d+\/6/, "progress bar missing")
+assert.match(strip(screens.gate), /⏸ Approve the plan +◇/, "waiting gate not rendered with its title and gate mark")
+assert.match(strip(screens.gate), /✓ Review the plan +⚖/, "judge node not rendered with its title and judge mark")
 assert.match(strip(screens.dialog).replace(/\s+/g, " "), /Plan for "IOLAUS_TUI_TASK" passed review/, "full gate prompt not rendered in the popup")
-assert.match(strip(screens.gate), /↷ (revise|rereview)|✓ revise/, "review branch state not rendered")
-assert.match(strip(screens.gate), /waiting approval/, "sidebar did not report the waiting gate")
+assert.match(strip(screens.gate), /[↷✓] (Revise the plan|Re-review the revised plan)/, "review branch state not rendered")
+assert.match(strip(screens.gate), /╭╌ ⏸ waiting approval · \d+(?:s|m(?: \d+s)?) ╌*╮/, "sidebar frame title must report the waiting gate with its clock")
+assert.doesNotMatch(strip(screens.gate), /\d+ awaiting approval/, "the sidebar must not repeat the waiting gate on a line of its own")
+assert.doesNotMatch(strip(screens.gate), /gen 1\b/, "the first generation must not be shown")
 assert.match(strip(screens.gate), /Click for details/, "sidebar must explain how to open details")
 assert.match(strip(screens.dialog).replace(/\s+/g, " "), /Esc close/, "dialog must explain how to return to typing")
-assert.match(strip(screens.dialog), /╭─+╮/, "dialog nodes must render as bordered cards")
-assert.match(strip(screens.dialog), /┏━+┓/, "the selected card must use the heavy highlight border")
+assert.match(strip(screens.dialog), /esc close/, "the dialog header must carry the native esc close hint")
+assert.match(strip(screens.dialog), /╭─ ✓ Done ─+╮/, "dialog cards must carry their status in the border title")
+assert.match(strip(screens.dialog), /┏━ ⏸ Waiting approval ━+┓/, "the selected card must use the heavy border with its status title")
+assert.match(strip(screens.dialog), /│ ↑ rereview\b/, "the selected gate must mark the card it depends on")
+assert.match(strip(screens.previousNode), /┃ › rereview\b/, "j/k must move the selection to the previous card")
+assert.match(strip(screens.previousNode), /│ ↑ revise\b/, "the selection must mark its upstream card")
+assert.match(strip(screens.previousNode), /│ ↓ approve\b/, "the selection must mark its downstream card")
+assert.doesNotMatch(strip(screens.dialog), /gen \d/, "the dialog must not show the first generation")
 assert.match(strip(screens.dialog), /▼/, "dialog must draw arrows between dependency waves")
 assert.match(strip(screens.dialog), /Waiting approval/, "cards must carry a readable status label")
 assert.match(strip(screens.dialog), /Unblocks: execute/, "node details must name the nodes the selection unblocks")
@@ -410,16 +428,16 @@ assert.match(trace, /iolaus\.tui\.action.*"action":"approve".*"nodeID":"approve"
 assert.match(strip(screens.completed), /✓ execute/, "execute node not shown completed")
 assert.match(strip(screens.completed), /┃ › execute/, "selecting the next node must scroll its highlighted card into view")
 assert.match(trace, /iolaus\.tui\.open.*"sessionID":"ses_/, "open keybind did not target a child session")
-assert.match(strip(screens.opened), /No active DAG runs/, "child session must not inherit another session's ownership")
-assert.match(strip(screens.returned), /plan-review: IOLAUS_TUI_TASK/, "switching back must reload the owner DAG without an event")
+assert.match(strip(screens.opened), /No active flows/, "child session must not inherit another session's ownership")
+assert.match(strip(screens.returned), /plan-review: IOLAUS_TUI_TASK/, "switching back must reload the owner flow without an event")
 const finishedClock = (screen) => strip(screen).match(/done in [0-9hms ]+/)?.[0].trim()
 assert.ok(finishedClock(screens.returned), "completed run must show a fixed duration")
 assert.equal(finishedClock(screens.returnedLater), finishedClock(screens.returned), "completed run clock kept ticking")
 assert.doesNotMatch(strip(screens.returned), /╌/, "completed run must not keep the running frame")
-assert.doesNotMatch(strip(screens.returned), /DAG plan-review: IOLAUS_TUI_TASK ·/, "composer status must disappear once the run finishes")
+assert.doesNotMatch(strip(screens.returned), COMPOSER_STATUS, "composer status must disappear once the run finishes")
 assert.match(strip(screens.returned), /Recent/, "completed run must move to the history list")
 colors = []
-for (const [file, label, expectedMode] of [["02-running.ansi", "Iolaus", mode], ["05-opened-child.ansi", "No active DAG runs", mode], ["05-theme-switched.ansi", "No active DAG runs", mode === "light" ? "dark" : "light"]]) {
+for (const [file, label, expectedMode] of [["02-running.ansi", "Iolaus", mode], ["05-opened-child.ansi", "No active flows", mode], ["05-theme-switched.ansi", "No active flows", mode === "light" ? "dark" : "light"]]) {
   const line = readFileSync(join(evidence, file), "utf8").split("\n").find((line) => strip(line).includes(label))
   assert.ok(line, `missing ${label}`)
   let fg
@@ -460,10 +478,10 @@ assert.equal([...trace.matchAll(/"event":"iolaus\.dag\.run\.started"/g)].length,
 }
 const realAfter = { config: await digest(realConfig), database: await digest(realDatabase) }
 const hostUsersAfter = hostDatabaseUsers()
-const hostUnchanged = JSON.stringify(realAfter) === JSON.stringify(realBefore)
+const hostUnchanged = realAfter.config === realBefore.config
 const sandboxRemoved = !existsSync(sandbox)
 const cleanup = { sandboxRemoved, mockClosed: !mock.listening, tmuxStopped: tmux("has-session", "-t", session).status !== 0 }
-if (!hostUnchanged) failure ??= new assert.AssertionError({ message: "real host config or DB changed during isolated QA", actual: realAfter, expected: realBefore, operator: "deepStrictEqual" })
+if (!hostUnchanged) failure ??= new assert.AssertionError({ message: "real host config changed during isolated QA", actual: realAfter.config, expected: realBefore.config, operator: "strictEqual" })
 if (!cleanup.sandboxRemoved || !cleanup.mockClosed || !cleanup.tmuxStopped) failure ??= new Error("QA cleanup incomplete")
 if (failure) writeFileSync(join(evidence, "failure.txt"), String(failure?.stack ?? failure))
 writeFileSync(join(evidence, "receipt.json"), JSON.stringify({
@@ -483,6 +501,7 @@ writeFileSync(join(evidence, "receipt.json"), JSON.stringify({
   realBefore,
   realAfter,
   hostUnchanged,
+  realDatabaseDigestChanged: realAfter.database !== realBefore.database,
   hostDatabaseUsers: { before: hostUsersBefore, after: hostUsersAfter },
   isolation,
   cleanup,

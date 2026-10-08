@@ -1,0 +1,45 @@
+ ⠼ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    Flow · plan-review: IOLAUS_TUI_TASK                                                                      esc close
+                       ✓ done in 25s  ━━━━━━━━━━━━ 6/6
+     ✓ iolaus_dag [act
+                                                                              ▼
+     ✓ iolaus_dag [act                                          ╭─ ✓ Done ───────────────────╮
+                                                                │   revise                   │
+     ✓ iolaus_dag [act                                          │ Revise the plan            │
+                                                                ╰────────────────────────────╯
+     ✓ iolaus_dag [act                                                        │                                                           LAUS_TUI_TASK
+                                                                              ▼                                                           5s
+     ✓ iolaus_dag [act                                          ╭─ ✓ Done ───────────────────╮
+                                                                │   rereview               ⚖ │                                             · ctrl+x d
+     ✓ iolaus_dag [act                                          │ Re-review the revised plan │
+                                                                ╰────────────────────────────╯                                          ▄
+     ✓ iolaus_dag [act                                                        │                                                         █
+                                                                              ▼                                                         █
+     ✓ iolaus_dag [act                                          ╭─ ✓ Done ───────────────────╮                                          █
+                                                                │ ↑ approve                ◇ │                                          █
+     ✓ iolaus_dag [act                                          │ Approve the plan           │                                          █
+                                                                ╰────────────────────────────╯                                          █
+                                                                              │                                                         █
+                                                                              ▼                                                         █
+                                                                ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓                                          █
+                                                                ┃ › execute                  ┃                                          █
+                                                                ┃ Execute the approved plan  ┃                                          █
+                                                                ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                          █
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ✓ execute · Execute the approved plan                                                                          │
+                       │ Status: Done · agent                                                                                           │
+                       │ Agent: sisyphus · Model: openai/gpt-5.5 · Attempt: 1                                                           │
+                       │ Depends on: approve                                                                                            │
+                       │ Unblocks: none (final node)                                                                                    │
+                       │                                                                                                                │
+  ┃                    │ Result                                                                                                         │
+  ┃                    │ IOLAUS_TUI_EXECUTED                                                                                            │
+  ┃                    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interr                                                                                                                    ui-qa-iTy5GL/project
+

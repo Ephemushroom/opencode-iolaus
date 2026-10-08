@@ -1,0 +1,45 @@
+   RESPONSIVE_QA_READY           +
+
+  ┃                                                                                                                                       Y
+  ┃  Create the respon
+  ┃                    Flow · Responsive seven parallel cards whose long flow name must truncate                                esc close
+                       ✓ done in 0s  ━━━━━━━━━━━━ 7/7
+     ✓ iolaus_dag [act
+                                  ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+     ✓ iolaus_dag [act            ┃ › p1                     ⚖ ┃ │   p2                     ⚖ │ │   p3                     ⚖ │
+                                  ┃ Parallel card 1            ┃ │ Parallel card 2            │ │ Parallel card 3            │
+     RESPONSIVE_QA_REA            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────────╯ ╰────────────────────────────╯
+
+     Build · GPT-5.5 ·            ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮            ..me must truncate
+                                  │   p4                     ⚖ │ │   p5                     ⚖ │ │   p6                     ⚖ │            s
+                                  │ Parallel card 4            │ │ Parallel card 5            │ │ Parallel card 6            │
+                                  ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯             · ctrl+x d
+
+                                                                 ╭─ ✓ Done ───────────────────╮
+                                                                 │   p7                     ⚖ │
+                                                                 │ CARD_LAST_VISIBLE          │
+                                                                 ╰────────────────────────────╯
+                                                                        · 7 in parallel
+
+                       │ RESULT_LINE45                                                                                                 │
+                       │ RESULT_LINE46                                                                                                 │
+                       │ RESULT_LINE47                                                                                                 │
+                       │ RESULT_LINE48                                                                                                 │
+                       │ RESULT_LINE49                                                                                                 │
+                       │ RESULT_LINE50                                                                                                 │
+                       │ RESULT_LINE51                                                                                                 │
+                       │ RESULT_LINE52                                                                                                 │
+                       │ RESULT_LINE53                                                                                                 │  d                ✕
+                       │ RESULT_LINE54                                                                                                 │
+                       │ RESULT_LINE55                                                                                                 │  des free models so
+                       │ RESULT_LINE56                                                                                                 │  immediately.
+                       │ RESULT_LINE57                                                                                                 │
+                       │ RESULT_LINE58                                                                                                 │  5+ providers to
+                       │ RESULT_LINE59                                                                                                 │█ ls, including
+  ┃                    │ RESULT_LINE60                                                                                                 │█ emini etc
+  ┃                    │ RESULT_END                                                                                                    │█
+  ┃                    ╰───────────────────────────────────────────────────────────────────────────────────────────────────────────────╯█ er        /connect
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · PgUp/PgDn details · Esc close
+  /…/fold…/cy/qc1d9pgd                                                                                                                    ve-qa-AZiaX5/project
+

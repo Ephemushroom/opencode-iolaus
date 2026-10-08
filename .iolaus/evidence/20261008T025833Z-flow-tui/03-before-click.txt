@@ -1,0 +1,45 @@
+ ⠙ IOLAUS_TUI_QA_DONE            +
+
+  ┃                                                                                                                     IOLAUS_TUI_QA_DONE
+  ┃  Run a plan-review DAG for IOLAUS_TUI_TASK
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_dag [action=create]                                                                                       0% used
+                                                                                                                        $0.00 spent
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+                                                                                                                         Iolaus
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+                                                                                                                         ╭╌ ⏸ waiting approval · 9s ╌╌╌╌╌╌╌╮
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]                                         ╎ plan-review: IOLAUS_TUI_TASK    ╎
+                                                                                                                         ╎ ━━━━━━━━━━━━ 4/6                ╎
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]                                         ╎ ⏸ Approve the plan            ◇ ╎
+                                                                                                                         ╎ ✓ Write the plan                ╎
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]                                         ╎ ✓ Review the plan             ⚖ ╎
+                                                                                                                         ╎ ✓ Revise the plan               ╎
+                                                                                                                         ╎ ✓ Re-review the revised plan  ⚖ ╎
+                                                                                                                         ╎ · Execute the approved plan     ╎
+                                                                                                                         ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+                                                                                                                         Click for details · ctrl+x d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    /…/qc1…/T/iolaus-tui-qa-iTy5GL/project
+

@@ -59,6 +59,13 @@ export function runClock(run: DagViewRun, now: number): string {
   return `${run.status === "completed" ? "done" : run.status} in ${duration}`
 }
 
+/** What a run is doing with its live clock, for frame titles; a finished run states its outcome and fixed duration. */
+export function runHeadline(run: DagViewRun, now: number): string {
+  if (run.status === "running") return `running · ${elapsed(run.createdAt, now) || "0s"}`
+  if (run.status === "paused") return `waiting approval · ${elapsed(run.updatedAt, now) || "0s"}`
+  return runClock(run, now)
+}
+
 /** Dashed rounded frame drawn around runs that are still in flight. */
 export const DASHED_BORDER = {
   topLeft: "╭", topRight: "╮", bottomLeft: "╰", bottomRight: "╯", horizontal: "╌", vertical: "╎",
@@ -86,11 +93,73 @@ export function settledCount(run: DagViewRun): number {
   return run.nodes.filter((n) => n.status === "completed" || n.status === "reused" || n.status === "skipped").length
 }
 
-/** `[████░░░░] 4/8` in a fixed width. */
-export function progressBar(done: number, total: number, width = 12): string {
-  if (total === 0) return `[${" ".repeat(width)}] 0/0`
-  const filled = Math.round((done / total) * width)
-  return `[${"█".repeat(filled)}${"░".repeat(width - filled)}] ${done}/${total}`
+/** A fixed-width bar split into its filled and empty parts, so each can take its own colour, and the `4/8` count. */
+export function progressBar(done: number, total: number, width = 12): { readonly done: string; readonly rest: string; readonly count: string } {
+  const filled = total === 0 ? 0 : Math.round((done / total) * width)
+  return { done: "━".repeat(filled), rest: "━".repeat(width - filled), count: `${done}/${total}` }
+}
+
+/** A judge reviews and a gate waits for a person; the mark sits after the label, the state stays in the status glyph. */
+export function kindMark(kind: string): string {
+  return kind === "judge" ? "⚖" : kind === "gate" ? "◇" : ""
+}
+
+/** Node labels stay readable and leave the status to their glyph; only failures colour the label too. */
+export function labelColor(status: string, theme: DagTheme): RGBA {
+  switch (status) {
+    case "failed": case "blocked": case "rejected": return theme.text.feedback.error.base
+    case "pending": case "ready": case "skipped": case "cancelled": return theme.text.muted
+    default: return theme.text.base
+  }
+}
+
+/** A border title, shortened to fit: OpenTUI draws no title longer than the box width minus 4; one column stays spare for a wide glyph. */
+export function borderTitle(glyph: string, label: string, width: number, attempt = 1): string {
+  const limit = width - 5
+  const texts = attempt > 1 ? [`${label} · attempt ${attempt}`, `${label} · #${attempt}`, label] : [label]
+  const fit = texts.find((text) => text.length + 4 <= limit)
+  return ` ${glyph} ${fit ?? `${label.slice(0, Math.max(0, limit - 5))}…`} `
+}
+
+/** First column of a row of `count` cards centred in `width`, or undefined when the row would have to wrap. */
+export function rowStart(count: number, card: number, width: number): number | undefined {
+  const span = count * card + count - 1
+  return span <= width ? Math.floor((width - span) / 2) : undefined
+}
+
+// Junctions keyed by the lines that meet there: up, down, left, right.
+const JUNCTION: Readonly<Record<string, string>> = {
+  "1111": "┼", "1110": "┤", "1101": "├", "1100": "│", "1011": "┴", "1010": "┘", "1001": "└", "1000": "│",
+  "0111": "┬", "0110": "┐", "0101": "┌", "0100": "│", "0011": "─", "0010": "─", "0001": "─",
+}
+
+/** One horizontal bar joining the lines arriving from above at `ups` to the lines leaving below at `downs`. */
+function bar(ups: readonly number[], downs: readonly number[]): string {
+  const all = [...ups, ...downs], lo = Math.min(...all), hi = Math.max(...all)
+  let row = " ".repeat(lo)
+  for (let x = lo; x <= hi; x++) row += JUNCTION[`${+ups.includes(x)}${+downs.includes(x)}${+(x > lo)}${+(x < hi)}`] ?? " "
+  return row
+}
+
+function marks(columns: readonly number[], glyph: string): string {
+  let row = ""
+  for (const x of [...columns].sort((a, b) => a - b)) row += `${" ".repeat(Math.max(0, x - row.length))}${glyph}`
+  return row
+}
+
+/**
+ * Rows of box drawing from one wave of cards to the next, given the centre column of each card. The dialog lays nodes
+ * out by dependency depth, so every card above flows into the row below; the selected card marks its real upstream and
+ * downstream. A wave that wraps has no reliable columns (`undefined`) and meets the others at `centre`, the column of a
+ * lone card.
+ */
+export function connector(upper: readonly number[] | undefined, lower: readonly number[] | undefined, centre: number): string[] {
+  const ups = upper ?? [centre], downs = lower ?? [centre]
+  const trunk = ups.length === 1 ? ups[0] : downs.length === 1 ? downs[0] : Math.round((ups[0] + ups[ups.length - 1]) / 2)
+  const rows = [ups.length === 1 ? marks([trunk], "│") : bar(ups, [trunk])]
+  if (downs.length > 1) rows.push(bar([trunk], downs))
+  rows.push(marks(downs, "▼"))
+  return rows
 }
 
 /** Depth of each node in the dependency graph, for indentation. */
@@ -148,14 +217,18 @@ export function resultLabel(attempt: number, resultAttempt: number | undefined):
   return resultAttempt !== undefined && resultAttempt < attempt ? `Previous result · attempt ${resultAttempt}` : "Result"
 }
 
-export function nodeResultText(result: string): string {
+/** An agent or judge reply is its text and renders as Markdown; any other result is shown as its JSON. */
+export function nodeResult(result: string): { readonly text: string; readonly markdown: boolean } {
+  let value: unknown
   try {
-    const value: unknown = JSON.parse(result)
-    return value !== null && typeof value === "object" && "text" in value && typeof value.text === "string" ? value.text : result
+    value = JSON.parse(result)
   } catch {
-    // RPC result excerpts can end in the middle of serialized JSON.
-    return result
+    // A structured result too large for the view arrives cut in the middle of its JSON.
+    return { text: result, markdown: false }
   }
+  return value !== null && typeof value === "object" && "text" in value && typeof value.text === "string"
+    ? { text: value.text, markdown: true }
+    : { text: result, markdown: false }
 }
 
 export interface Summary {
@@ -174,7 +247,7 @@ export function summarize(runs: readonly DagViewRun[]): Summary {
   if (active) parts.push(`${active} running`)
   if (waiting) parts.push(`${waiting} waiting approval`)
   if (failed) parts.push(`${failed} failed`)
-  return { runs: runs.length, active, waiting, failed, text: runs.length ? `DAG · ${parts.join(" · ")}` : "DAG · idle" }
+  return { runs: runs.length, active, waiting, failed, text: runs.length ? `Flow · ${parts.join(" · ")}` : "Flow · idle" }
 }
 
 /** Short one-line label for the latest assistant text of a child session. */

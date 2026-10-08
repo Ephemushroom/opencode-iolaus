@@ -1,0 +1,45 @@
+ ⠧ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review DAG for IOLAUS_TUI_TASK
+  ┃
+
+     ✓ iolaus_dag [action=create]
+
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+
+     ✓ iolaus_dag [action=snapshot, run_id=fa59b93c-c5c5-46d8-acc0-a8ae49ddf639]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    ⏸ Flow plan-review: IOLAUS_TUI_TASK · 4/6 · awaiting approval: approve · waiting 8s
+  ┃
+  ┃  hid
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                                                                                     15 (0%) · $0.00  ctrl+p commands
+
