@@ -1,0 +1,19 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.0.24",
+  "requestCount": 4,
+  "omittedLocationReproducedEmpty": true,
+  "explicitRoutingFoundBothRuns": true,
+  "actionOnlyChangedProjectB": true,
+  "unrelatedOwnerHidden": true,
+  "before": [
+    "3e0b56cb9c70282eed37ffc78169cbad1abd2a840aa4bb3cbd7e659daf326f49",
+    "27f0697b887b6a74877b01cd8cde12c7fefa9c5af6d62927f58578182d6274af"
+  ],
+  "after": [
+    "3e0b56cb9c70282eed37ffc78169cbad1abd2a840aa4bb3cbd7e659daf326f49",
+    "27f0697b887b6a74877b01cd8cde12c7fefa9c5af6d62927f58578182d6274af"
+  ],
+  "sandboxRemoved": true,
+  "serverStopped": true
+}

@@ -453,7 +453,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const current = (runID: string): Effect.Effect<DagRunRecord> => Effect.sync(() => store.getRun(runID)!)
 
   const schedulable = (run: DagRunRecord): Effect.Effect<void, DagValidationError> => run.definition.observed
-    ? Effect.fail(new DagValidationError("This run records native subagent calls; it cannot be retried, resumed or amended. Call the subagent again, or build an iolaus_dag definition when the work needs scheduling."))
+    ? Effect.fail(new DagValidationError("This run records native subagent calls; it cannot be retried, resumed or amended. Call the subagent again, or build an iolaus_flow definition when the work needs scheduling."))
     : Effect.void
 
   const checkAtlas = (run: DagRunRecord, definition: DagDefinition): Effect.Effect<void, DagValidationError> => validated(() => {

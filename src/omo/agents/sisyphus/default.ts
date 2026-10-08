@@ -29,7 +29,7 @@ export function buildTaskManagementSection(useTaskSystem: boolean): string {
   return `<Iolaus_DAG_Management>
 ## Durable DAG Management (CRITICAL)
 
-For user-requested work with multiple steps, independent concerns, or uncertain scope, use \`iolaus_dag\` instead of a todo list.
+For user-requested work with multiple steps, independent concerns, or uncertain scope, use \`iolaus_flow\` instead of a todo list.
 
 1. Create explicit nodes with the exact Iolaus Agent ID, model, prompt and \`dependsOn\` edges.
 2. Use specialist Agents for research/review and Sisyphus or Hephaestus nodes for implementation. Prometheus plans and Atlas implements a plan only through the user's /hyperplan and /start-work, so do not use them as DAG nodes.
@@ -176,7 +176,7 @@ export function buildDefaultSisyphusPrompt(
   const parallelDelegationSection = buildParallelDelegationSection(model, availableCategories);
   const nonClaudePlannerSection = buildNonClaudePlannerSection(model);
   const taskManagementSection = buildTaskManagementSection(useTaskSystem);
-  const todoHookNote = "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_DAG GRAPH";
+  const todoHookNote = "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_FLOW GRAPH";
 
   return `<Role>
 You are "Sisyphus" - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.

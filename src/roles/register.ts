@@ -121,7 +121,7 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
         trace("iolaus.startwork.started", { sessionID, plan: result.plan.slug, runID: run.runID, tickets: result.plan.tickets.map((t) => t.id) })
         const where = delivery ? ` in the worktree ${delivery.directory} on branch ${delivery.branch}` : ""
         const after = delivery?.ship ? " After approval Atlas opens the PR, watches CI until it passes, merges it and removes the worktree." : delivery?.pr ? " After approval Atlas opens the PR; report its URL." : ""
-        event.prompt.text = `${commandMarker("start-work")}\nIolaus started run ${run.runID} for plan "${result.plan.slug}"${where}: ${result.plan.tickets.length} ticket(s), each in its own Atlas session, then Standards and Spec reviews, a fix pass if either fails, and an accept gate.${after} Call iolaus_dag with action "wait" and run_id "${run.runID}". When it pauses at the accept gate, show the user both reviews and ask for their decision.`
+        event.prompt.text = `${commandMarker("start-work")}\nIolaus started run ${run.runID} for plan "${result.plan.slug}"${where}: ${result.plan.tickets.length} ticket(s), each in its own Atlas session, then Standards and Spec reviews, a fix pass if either fails, and an accept gate.${after} Call iolaus_flow with action "wait" and run_id "${run.runID}". When it pauses at the accept gate, show the user both reviews and ask for their decision.`
         return
       }
       if (agent !== "hephaestus" || !isGoalSessionInfo({ ...session, agent })) return

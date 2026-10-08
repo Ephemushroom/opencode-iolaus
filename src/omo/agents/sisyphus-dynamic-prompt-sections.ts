@@ -70,5 +70,5 @@ export function buildSisyphusDynamicPromptSections(
 }
 
 function buildTodoHookNote(useTaskSystem: boolean): string {
-  return "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_DAG GRAPH";
+  return "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_FLOW GRAPH";
 }

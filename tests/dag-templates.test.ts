@@ -69,6 +69,8 @@ test("routing is fail-closed: a lane without a model is rejected as model_unavai
   await expect(controller.create(def, "owner")).rejects.toThrow(/model_unavailable: no configured model for b \(iolaus-unconfigured\)/)
   expect(await controller.list("owner")).toEqual([])
   const tool = createDagTool(effectController)
+  // Users' permission rules and the guards key on this name.
+  expect(tool.name).toBe("iolaus_flow")
   const call = (input: unknown) => Effect.runPromise(tool.execute(input as never, { sessionID: "owner" } as never))
   const result = await call({ action: "create", template: { template: "plan-review", task: "x" } })
   expect(JSON.parse(String(result.content)).error).toMatch(/model_unavailable.*plan \(prometheus\)/)

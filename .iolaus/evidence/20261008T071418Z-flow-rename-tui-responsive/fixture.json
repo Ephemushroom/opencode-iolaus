@@ -1,0 +1,133 @@
+{
+  "definition": {
+    "schemaVersion": 1,
+    "name": "Responsive seven parallel cards whose long flow name must truncate",
+    "nodes": [
+      {
+        "id": "p1",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 1",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_1",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p2",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 2",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_2",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p3",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 3",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_3",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p4",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 4",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_4",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p5",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 5",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_5",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p6",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Parallel card 6",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_6",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "p7",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "CARD_LAST_VISIBLE",
+        "prompt": "RESPONSIVE_FIXTURE_NODE_7",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      }
+    ]
+  },
+  "fork": {
+    "schemaVersion": 1,
+    "name": "Fork join",
+    "nodes": [
+      {
+        "id": "split",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Split the work",
+        "prompt": "FORK_FIXTURE_NODE_split",
+        "model": "openai/gpt-5.5",
+        "dependsOn": []
+      },
+      {
+        "id": "part-a",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Part a",
+        "prompt": "FORK_FIXTURE_NODE_a",
+        "model": "openai/gpt-5.5",
+        "dependsOn": [
+          "split"
+        ]
+      },
+      {
+        "id": "part-b",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Part b",
+        "prompt": "FORK_FIXTURE_NODE_b",
+        "model": "openai/gpt-5.5",
+        "dependsOn": [
+          "split"
+        ]
+      },
+      {
+        "id": "part-c",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Part c",
+        "prompt": "FORK_FIXTURE_NODE_c",
+        "model": "openai/gpt-5.5",
+        "dependsOn": [
+          "split"
+        ]
+      },
+      {
+        "id": "join",
+        "kind": "judge",
+        "agent": "momus",
+        "title": "Join the parts",
+        "prompt": "FORK_FIXTURE_NODE_join",
+        "model": "openai/gpt-5.5",
+        "dependsOn": [
+          "part-a",
+          "part-b",
+          "part-c"
+        ]
+      }
+    ]
+  },
+  "longResult": "RESULT_START\n\n## RESULT_HEADING\n\n- **RESULT_BOLD** item\n- `RESULT_CODE` inline\n\nRESULT_LINE_01\nRESULT_LINE_02\nRESULT_LINE_03\nRESULT_LINE_04\nRESULT_LINE_05\nRESULT_LINE_06\nRESULT_LINE_07\nRESULT_LINE_08\nRESULT_LINE_09\nRESULT_LINE_10\nRESULT_LINE_11\nRESULT_LINE_12\nRESULT_LINE_13\nRESULT_LINE_14\nRESULT_LINE_15\nRESULT_LINE_16\nRESULT_LINE_17\nRESULT_LINE_18\nRESULT_LINE_19\nRESULT_LINE_20\nRESULT_LINE_21\nRESULT_LINE_22\nRESULT_LINE_23\nRESULT_LINE_24\nRESULT_LINE_25\nRESULT_LINE_26\nRESULT_LINE_27\nRESULT_LINE_28\nRESULT_LINE_29\nRESULT_LINE_30\nRESULT_LINE_31\nRESULT_LINE_32\nRESULT_LINE_33\nRESULT_LINE_34\nRESULT_LINE_35\nRESULT_LINE_36\nRESULT_LINE_37\nRESULT_LINE_38\nRESULT_LINE_39\nRESULT_LINE_40\nRESULT_LINE_41\nRESULT_LINE_42\nRESULT_LINE_43\nRESULT_LINE_44\nRESULT_LINE_45\nRESULT_LINE_46\nRESULT_LINE_47\nRESULT_LINE_48\nRESULT_LINE_49\nRESULT_LINE_50\nRESULT_LINE_51\nRESULT_LINE_52\nRESULT_LINE_53\nRESULT_LINE_54\nRESULT_LINE_55\nRESULT_LINE_56\nRESULT_LINE_57\nRESULT_LINE_58\nRESULT_LINE_59\nRESULT_LINE_60\nRESULT_END"
+}

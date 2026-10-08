@@ -6,6 +6,7 @@ import type { SessionContext } from "@opencode/plugin/effect/session"
 import { Session } from "@opencode/schema/session"
 import { registerAgents, registerModes, agentMarker, modeDispatchText } from "../src/registration"
 import { evaluate } from "../src/ast-grep/permissions"
+import { FLOW_TOOL_NAME } from "../src/dag/tool"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
@@ -61,7 +62,7 @@ test("specialists follow OMO's per-agent deny lists", async () => {
   }
   for (const name of ["oracle", "explore", "librarian"]) {
     expect(permission(name, "subagent")).toBe("deny")
-    expect(permission(name, "iolaus_dag")).toBe("deny")
+    expect(permission(name, FLOW_TOOL_NAME)).toBe("deny")
   }
   for (const name of ["metis", "momus"]) expect(permission(name, "subagent")).toBe("allow")
   expect(permission("multimodal-looker", "read")).toBe("allow")

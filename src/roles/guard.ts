@@ -2,6 +2,7 @@ import { isAbsolute, relative, resolve, sep } from "node:path"
 import { MUTATION_TOOLS } from "../verify/config"
 import { mutatedPaths } from "../verify/run"
 import { expandTemplate } from "../dag/templates"
+import { FLOW_TOOL_NAME } from "../dag/tool"
 import { PLANNING_MARKER, PLANNING_NOTICE, PLANS_DIR } from "./plan"
 
 /**
@@ -59,14 +60,14 @@ const startsWork = (input: unknown) => ["create", "amend"].includes(String(recor
 const changes = (tool: string, input: unknown) => MUTATION_TOOLS.has(tool) || tool === "shell" || tool === "subagent" || appliesCodemod(tool, input)
 
 export const ATLAS_UNBOUND = "Atlas works only on a plan Prometheus wrote: plan with Prometheus into .iolaus/plans/<plan>/, then run /start-work <plan>. Until then Atlas may read but not edit, run shell, delegate or start DAG runs."
-export const ATLAS_ORCHESTRATOR = "This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the run with iolaus_dag (wait, snapshot, node, retry; approve or reject only on the user's word) instead of changing files here."
+export const ATLAS_ORCHESTRATOR = "This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the run with iolaus_flow (wait, snapshot, node, retry; approve or reject only on the user's word) instead of changing files here."
 
 export function denial(policy: Policy, tool: string, input: unknown, directory: string): string | undefined {
   switch (policy) {
     case "native":
     case "worker": return undefined
-    case "atlas-unbound": return changes(tool, input) || (tool === "iolaus_dag" && startsWork(input)) ? ATLAS_UNBOUND : undefined
-    case "atlas-orchestrator": return changes(tool, input) || (tool === "iolaus_dag" && startsWork(input)) ? ATLAS_ORCHESTRATOR : undefined
+    case "atlas-unbound": return changes(tool, input) || (tool === FLOW_TOOL_NAME && startsWork(input)) ? ATLAS_UNBOUND : undefined
+    case "atlas-orchestrator": return changes(tool, input) || (tool === FLOW_TOOL_NAME && startsWork(input)) ? ATLAS_ORCHESTRATOR : undefined
   }
   if (MUTATION_TOOLS.has(tool)) {
     const paths = mutatedPaths(input, directory)
@@ -77,7 +78,7 @@ export function denial(policy: Policy, tool: string, input: unknown, directory: 
   }
   if (tool === "shell") return "Planning sessions run no shell commands. Use read, grep, glob and ast_grep search to inspect the workspace."
   if (policy === "planning" && appliesCodemod(tool, input)) return "Planning sessions may not apply codemods; preview with apply: false."
-  if (tool === "iolaus_dag" && startsWork(input)) {
+  if (tool === FLOW_TOOL_NAME && startsWork(input)) {
     const template = record(record(input)?.template)?.template
     if (record(input)?.definition === undefined && typeof template === "string" && !PLANNER_TEMPLATES.has(template)) {
       return `A planner may start only planning runs (${[...PLANNER_TEMPLATES].join(", ")}, or a custom definition, whose nodes then run read-only). "${template}" implements; it starts when the user runs /start-work <plan> or /ultrawork.`
@@ -103,7 +104,7 @@ export function inheritPlanning(tool: string, input: unknown): boolean {
     args.prompt = withNotice(args.prompt)
     return true
   }
-  if (tool !== "iolaus_dag" || !startsWork(args)) return false
+  if (tool !== FLOW_TOOL_NAME || !startsWork(args)) return false
   let definition = record(args.definition)
   if (!definition && args.template !== undefined) {
     try { definition = expandTemplate(args.template) as unknown as Record<string, unknown> } catch { return false }

@@ -90,9 +90,9 @@ const mock = http.createServer(async (req, res) => {
     if (!created) call = { name: "subagent", args: { agent: "general", description: "slow child", prompt: "IOLAUS_CHILD_SLOW", background: true } }
     else text = "IOLAUS_QA_SUBAGENT_SENT"
   }
-  else if (task && tools.includes("iolaus_dag")) {
+  else if (task && tools.includes("iolaus_flow")) {
     const created = input.slice(lastUser).some((item) => item?.type === "function_call_output")
-    if (!created) call = { name: "iolaus_dag", args: { action: "create", definition: RUNS[task] } }
+    if (!created) call = { name: "iolaus_flow", args: { action: "create", definition: RUNS[task] } }
     else text = "IOLAUS_QA_CREATED"
   }
   res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })

@@ -193,7 +193,7 @@ export function buildNonClaudePlannerSection(model: string): string {
 
   return `### Iolaus DAG Planning (Non-Claude)
 
-For multi-step work, create an \`iolaus_dag\` graph before implementation. Use
+For multi-step work, create an \`iolaus_flow\` graph before implementation. Use
 explicit dependencies for execution nodes and use only your own primary
 as an internal worker, or a lower-tier agent. Prometheus planning and Atlas plan
 execution belong to the user's /hyperplan and /start-work. Read the
@@ -213,7 +213,7 @@ export function buildParallelDelegationSection(
     return ""
   }
 
-  return `### DECOMPOSE WITH IOLAUS_DAG
+  return `### DECOMPOSE WITH IOLAUS_FLOW
 
 **YOUR FAILURE MODE: You attempt to do work yourself instead of decomposing and delegating.** When you implement directly, the result is measurably worse than when specialized subagents do it. Subagents have domain-specific configurations, loaded skills, and tuned prompts that you lack.
 
@@ -221,7 +221,7 @@ export function buildParallelDelegationSection(
 
 1. Decompose the task into independent DAG nodes when parallelism pays for its coordination cost.
 2. Assign each node an exact Iolaus Agent ID (a specialist or a category lane such as \`deep-low\`), prompt and \`dependsOn\` list; omit \`model\` unless overriding the lane's configured model.
-3. Use \`iolaus_dag\` for durable parallel execution instead of background task polling.
+3. Use \`iolaus_flow\` for durable parallel execution instead of background task polling.
 4. Preserve explicit result bindings when a later node needs an earlier node's output.
 
 **YOUR PROMPT TO EACH AGENT MUST INCLUDE:**
@@ -234,7 +234,7 @@ export function buildParallelDelegationSection(
 
 | You Want To Do | You MUST Do Instead |
 |---|---|
-| Track multi-step work with todos | Create an \`iolaus_dag\` graph |
+| Track multi-step work with todos | Create an \`iolaus_flow\` graph |
 | Poll background task output | Wait on the DAG run or inspect its snapshot |
 | Hide dependencies in prose | Declare \`dependsOn\` edges |
 
