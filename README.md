@@ -23,6 +23,8 @@ For the live Flow sidebar, add the TUI entry alongside the main plugin:
 }
 ```
 
+Iolaus targets OpenCode 2.0.27 (`@opencode/plugin: 2.0.27`, `@opencode/schema: 2.0.27`). It requires `effect: 4.0.1` as a peer dependency pinned to the host's version, and `@opentui/core` / `@opentui/solid` `>=0.5.17`. Bundled builds externalize `effect`, `@opencode/plugin`, and `@opentui/core` so the plugin shares the host's runtime instance rather than loading duplicate copies.
+
 Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in `IOLAUS_HOME/iolaus.json` to disable it globally.
 
 Model routing follows configuration only. Write `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) to pin models per lane:
@@ -93,6 +95,35 @@ upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
 pause the run for a human approve/reject.
 
+### Nonblocking flows and notifications
+
+Creating a flow (`action: "create"`) is nonblocking: it initializes the run and returns immediately while the DAG frontier executes in the background. The caller remains responsive in the primary conversation instead of blocking the session or forcing manual navigation across child tabs. Calling `action: "wait"` is optional and blocks until the flow reaches a terminal state (`completed`, `failed`, `cancelled`), including across human gates. You can inspect execution state on demand using `action: "snapshot"` (run status, events, steering requests, and notices) or `action: "node"` (individual node execution details and results).
+
+When a human gate begins waiting (`node.waiting`) or a flow reaches a terminal state (`run.completed`, `run.failed`, `run.cancelled`), Iolaus enqueues a synthetic notice to the owner session with `delivery: "queue"` and `resume: false`. These notices are admitted to the owner session's durable inbox without waking the model or triggering an unwanted continuation turn (they do not immediately write to persisted conversation history or claim the queued input is already consumed). Observed native subagent runs do not send notices.
+
+### Live steering (`action: "steer"`)
+
+An owner session can supplement an active child task without switching sessions or opening child dialogs via `action: "steer"`:
+
+```json
+{
+  "action": "steer",
+  "run_id": "run_01jf8x...",
+  "node_id": "visual-engineering",
+  "text": "Apply @fontsource/inter instead of linking to external fonts.",
+  "request_id": "steer-fontsource-01"
+}
+```
+
+- **Parameters**: `run_id`, `node_id`, `text`, and a required durable `request_id`. `text` supplements the child task; it never changes the child's agent or model.
+- **Idempotency**: Reusing a `request_id` with identical `node_id` and `text` inspects durable delivery state without resending. Reusing the ID with differing node or text fails validation.
+- **Node state limits**: Steering is accepted only on active, `running` session-backed agent nodes whose initial prompt has already been admitted. It refuses `pending`, `starting`, or settled nodes, gate nodes, judge nodes, observed subagent runs, and unpinned legacy executions.
+- **Identity verification**: Checks verify child execution identity (`token`, `agent`, `model`) to detect and refuse drift, without assuming immutable host identity or atomic pinning. Initial drift is refused before request creation; during admission and settlement, unconfirmed delivery or identity drift marks the request `unresolved`, cancels the child session, interrupts the node, and prevents stale outputs from reaching downstream nodes.
+- **Authorization limits**: Steering rechecks the owner's tier, role, and permissions (requiring explicit `allow` on `iolaus_flow` and `subagent` delegation for the child's lane). Planning sessions/children, Atlas sessions, and `/start-work` authorized plans cannot steer or be steered.
+- **Lifecycle restrictions**: Steered executions do not automatically retry, fall back across model chains, or escalate (`deep-low` to `deep-high`). Re-running a steered task requires launching a new flow with the complete requirements. Action `amend` refuses flows with active executions or unresolved steering, and invalidates cached outputs of steered nodes and their descendants.
+- **Owner interruption**: Once handed to the controller, steering admission, receipt finalization, and result tracking survive interruption of the owner's tool call. Interrupting the owner stops waiting; it does not cancel the supplement or child. Delivery ambiguity still fails closed.
+- **Delivery guarantees**: Deliveries are tracked conservatively; unconfirmed receipts or delivery ambiguities fail closed as `unresolved` rather than claiming host-spanning exactly-once delivery or atomic identity pinning.
+
 Native `subagent` calls stay native: follow-ups by `sessionID`, background runs and completion notices work as before. Iolaus also records each call as a node of the session's **Subagent calls** run, so the DAG view shows it with its agent, model, child session and result; calls a child makes hang under that child's node. That run is a record, not a schedule: it has no data-dependency edges and cannot be retried, resumed or amended. The agents are told to call `subagent` directly for simple delegation and to build an `iolaus_flow` definition only when the work needs dependency scheduling, retry/resume, a human gate or a conditional branch. The host allows one level of nesting unless `experimental.subagent_depth` says otherwise.
 
 A run is called a **flow**, in the TUI as in the `iolaus_flow` tool. The sidebar is a read-only overview: each active flow is a frame titled with its state and clock, followed by a progress bar and one line per node (status glyph, title, `⚖` for a judge, `◇` for a gate). Click a flow or node to open its details dialog, or use `<leader>d` (normally `Ctrl+X`, then `D`) or **Iolaus Flow: show details** in the command palette. The dialog draws the nodes as cards in dependency order, each with its status in the border; fork and join lines connect each row of cards to the next, and the selected card marks what it depends on (`↑`) and what depends on it (`↓`). The details pane shows the agent, model, dependencies, attempts, approval request and errors, and renders agent replies as Markdown; narrow terminals stack the two panes. Only inside the dialog do `j`/`k` or arrow keys select nodes, `Enter`/`o` open an agent session, and `a`/`r` approve or reject the selected waiting gate. `c` cancels the run after a confirmation prompt. `PageUp`/`PageDown` scroll details; retry is a clickable action. `Esc` closes the dialog and restores the input draft and cursor. Updates never open it automatically. The footer keeps a one-line summary and a waiting gate raises a desktop notification.
@@ -125,7 +156,9 @@ Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for set
 
 ## Development
 
-Run `node script/check-reference.mjs` to verify the offline source snapshot. Read `reference/README.md` for its scope and provenance.
+Run `bun test` to execute unit and regression suites (including steering, roles, and tier checks). Run `bun run typecheck` for type checking, `bun run check:package` to verify build outputs and active manifest hashes, and `node script/check-reference.mjs` (or `bun run check:reference`) to verify the 800 offline source snapshot files.
+
+Isolated host verification can be executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Verified evidence lives under `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, non-waking queued terminal notices, host-state isolation, and sandbox process cleanup. Compatibility claims are strictly bounded to verified evidence. Read `reference/README.md` for its scope and provenance.
 
 ## Independence and licensing
 

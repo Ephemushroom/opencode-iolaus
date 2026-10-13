@@ -36,6 +36,18 @@ export function openDatabase(path: string): Database {
       run_id TEXT PRIMARY KEY REFERENCES dag_runs(run_id) ON DELETE CASCADE,
       plan TEXT NOT NULL, atlas_nodes_json TEXT NOT NULL
     );
+    CREATE TABLE IF NOT EXISTS dag_node_runtime (
+      run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+      node_id TEXT NOT NULL, value_json TEXT NOT NULL, PRIMARY KEY (run_id, node_id)
+    );
+    CREATE TABLE IF NOT EXISTS dag_steering (
+      run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+      request_id TEXT NOT NULL, value_json TEXT NOT NULL, PRIMARY KEY (run_id, request_id)
+    );
+    CREATE TABLE IF NOT EXISTS dag_notices (
+      event_id TEXT PRIMARY KEY, run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+      value_json TEXT NOT NULL
+    );
     CREATE TABLE IF NOT EXISTS dag_actions (
       action_id TEXT PRIMARY KEY, run_id TEXT NOT NULL, node_id TEXT,
       kind TEXT NOT NULL, idempotency_key TEXT NOT NULL, payload_json TEXT,

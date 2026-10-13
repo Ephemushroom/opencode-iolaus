@@ -16,7 +16,7 @@
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-core-sections.ts",
       "path": "src/omo/agents/dynamic-agent-core-sections.ts",
       "sourceSha256": "57d4a93e5ab1dec1372180740d63b6e2db54b554dc9eb761884891fb6aea4b2c",
-      "activeSha256": "cce239acd4a3a15522a1d99bc8fdacc4158b8186cbcb2d8bb8ad49725baf08ef"
+      "activeSha256": "83484acb3cf1d3a8e0d1a5b7c835aef8271febcfcec6d1979a8da4e4fe22fa93"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-prompt-types.ts",

@@ -15,6 +15,8 @@ type DagInput = {
   readonly run_id?: unknown
   readonly node_id?: unknown
   readonly note?: unknown
+  readonly text?: unknown
+  readonly request_id?: unknown
   readonly definition?: unknown
   readonly template?: unknown
 }
@@ -22,10 +24,12 @@ type DagInput = {
 const inputSchema = {
   type: "object",
   properties: {
-    action: { type: "string", enum: ["create", "template", "snapshot", "node", "wait", "cancel", "retry", "resume", "approve", "reject", "amend"] },
+    action: { type: "string", enum: ["create", "template", "snapshot", "node", "wait", "cancel", "retry", "resume", "approve", "reject", "amend", "steer"] },
     run_id: { type: "string" },
     node_id: { type: "string" },
     note: { type: "string" },
+    text: { type: "string", minLength: 1, description: "Supplemental task information for an active scheduled child; never changes its agent or model." },
+    request_id: { type: "string", minLength: 1, description: "Required for steer. A stable unique request id; reuse only for the same node and text to inspect its durable delivery state without resending." },
     definition: { type: "object" },
     template: {
       type: "object",
@@ -72,7 +76,7 @@ function errorText(cause: unknown): string {
 export function createDagTool(controller: DagController): Tool.Info {
   return {
     name: FLOW_TOOL_NAME,
-    description: "Create and operate a durable Iolaus flow, a multi-Agent DAG. State lives in IOLAUS_HOME/iolaus.db and node results are retryable by generation. Give every node a short title (one line, in the user's language, saying what the node does); the TUI shows it next to the node id. Bind upstream results into a node with inputs: [{node: \"*\"}] to fan in every dependency with provenance; use action \"node\" to inspect one node's full result, agent, model and child sessionID. model is optional: omitted, the node runs on the model configured for that agent or category lane (e.g. quick, deep-low); set it only to override. Add when: {node, field?, equals|includes|matches|exists} (or all/any/not) to run a node only if an upstream result satisfies it; otherwise it is skipped and downstream still proceeds. Add kind: \"gate\" (prompt = message for the approver, no agent/model) to pause the run until a human approves or rejects; approve/reject take run_id, node_id and an optional note. Templates: action \"template\" with template: {template: \"plan-review\", task} returns a ready definition (Prometheus plans → Momus reviews → revise on FAIL → re-review → human gate → executor), and \"goal-review\" (executor works → Momus reviews → fix on FAIL → re-review → gate); \"ultrawork\" (executor works under the ultrawork prompt → Momus reviews → fix → re-review, up to iterations rounds → gate) and \"hyperplan\" (members analyse in parallel → cross-attack → defend → Metis distills → Prometheus plans → Momus reviews → gate); \"team\" (a lead splits the task into one assignment per member → members work in parallel, each in its own git worktree and branch → the lead merges the branches in an integration worktree and runs the checks → Momus reviews → gate; members may repeat a lane); pass the same object as template to \"create\" to run it directly. A node with worktree: true runs in its own git worktree on branch iolaus/<run>-<node>; a run-level directory (absolute, a worktree of this repository) moves every child there. When a node's model fails (provider error, failed session, empty reply) it moves to the next model of its lane's configured chain (fallbackModels) and retries; a deep-low node whose reply ends with the line \"ESCALATE: deep-high\" is rerun on deep-high with its findings. Iolaus primaries may target only their own primary or lower workers; lower workers cannot target primaries. Atlas requires top-level /start-work authorization. Templates have no exemption; plan-review's default Prometheus and Sisyphus nodes cannot run together from an Iolaus primary. Native top-level agents remain unrestricted. Routing is fail-closed: a node whose lane has no configured model is rejected at create with model_unavailable.",
+    description: "Create and operate a durable Iolaus flow, a multi-Agent DAG stored in IOLAUS_HOME/iolaus.db. Create returns while work continues; remain available for the user. Inspect snapshot/node on demand; wait is optional and blocks until terminal, including across gates. Committed gate and terminal notices are queued to the owner without waking it. Give each node a short title in the user's language. Omit model to use the configured agent lane. Bind inputs: [{node: \"*\"}] for fan-in with provenance. Conditions use when: {node, field?, equals|includes|matches|exists} or all/any/not; false branches skip without blocking dependents. Gate nodes have kind: \"gate\" and a prompt for the user, no agent/model; only approve/reject on the user's decision. Templates (action template expands, create runs): plan-review, goal-review, ultrawork, hyperplan, team. Team members run in their own worktrees, then the lead integrates and Momus reviews. A node's worktree:true creates an isolated branch; run directory must be an absolute worktree of this repository. Primary tier restrictions apply to all expanded nodes; Atlas requires top-level /start-work authorization. Missing lane models fail closed. Unsteered nodes support configured model fallbacks and deep-low's ESCALATE: deep-high. Action steer takes run_id, node_id, text and a durable request_id: supplement an active scheduled child without changing its agent/model. Reuse request_id only with identical node/text to inspect delivery without resending. V1 refuses pre-initial-admission, pending, settled, observed, judge, gate, planning, legacy unpinned and Atlas/authorized-plan targets. Identity drift and unresolved delivery are reported, never silently repaired or replayed. Steered executions are not retried/escalated automatically; use a new flow with the complete task for new execution. Amend refuses live executions or unresolved steering. No exactly-once guarantee across the host and Flow stores.",
     input: inputSchema,
     options: { codemode: false },
     execute: (raw: unknown, context: Tool.Context) => {
@@ -95,6 +99,7 @@ export function createDagTool(controller: DagController): Tool.Info {
           case "approve": return controller.approve(runID(), sessionID, nodeID(), note)
           case "reject": return controller.reject(runID(), sessionID, nodeID(), note)
           case "amend": return controller.amend(runID(), sessionID, definition(input.definition))
+          case "steer": return controller.steer(runID(), sessionID, nodeID(), requiredString(input.text, "text"), requiredString(input.request_id, "request_id"))
           default: return Effect.fail(new Error(`Unknown DAG action: ${action}`))
         }
       })

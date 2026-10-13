@@ -1,6 +1,6 @@
 import { Effect } from "effect"
 import type { DagController } from "./controller"
-import type { DagDefinition, DagNodeRecord, DagRunRecord, DagSnapshot } from "./types"
+import type { DagDefinition, DagNodeRecord, DagRunRecord, DagSnapshot, DagSteerRequest } from "./types"
 
 /** Promise view of a DagController for tests, QA scripts and non-Effect callers. Errors reject with the typed error instance. */
 export interface DagControllerPromise {
@@ -15,6 +15,7 @@ export interface DagControllerPromise {
   readonly approve: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly reject: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Promise<DagRunRecord>
   readonly amend: (runID: string, ownerSessionID: string, definition: DagDefinition) => Promise<DagRunRecord>
+  readonly steer: (runID: string, ownerSessionID: string, nodeID: string, text: string, requestID: string) => Promise<DagSteerRequest>
   readonly close: () => void
 }
 
@@ -32,6 +33,7 @@ export function promiseController(controller: DagController): DagControllerPromi
     approve: (r, o, n, note, g) => run(controller.approve(r, o, n, note, g)),
     reject: (r, o, n, note, g) => run(controller.reject(r, o, n, note, g)),
     amend: (r, o, d) => run(controller.amend(r, o, d)),
+    steer: (r, o, n, text, requestID) => run(controller.steer(r, o, n, text, requestID)),
     close: () => Effect.runSync(controller.close),
   }
 }

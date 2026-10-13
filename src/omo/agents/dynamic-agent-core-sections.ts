@@ -196,8 +196,9 @@ export function buildNonClaudePlannerSection(model: string): string {
 For multi-step work, create an \`iolaus_flow\` graph before implementation. Use
 explicit dependencies for execution nodes and use only your own primary
 as an internal worker, or a lower-tier agent. Prometheus planning and Atlas plan
-execution belong to the user's /hyperplan and /start-work. Read the
-graph snapshot and wait for the node result before reporting completion.`
+execution belong to the user's /hyperplan and /start-work. Creation returns while
+the flow runs; remain available for the user. Inspect committed node results via
+snapshot before reporting completion. Blocking wait is optional.`
 }
 
 export function buildParallelDelegationSection(
@@ -235,7 +236,7 @@ export function buildParallelDelegationSection(
 | You Want To Do | You MUST Do Instead |
 |---|---|
 | Track multi-step work with todos | Create an \`iolaus_flow\` graph |
-| Poll background task output | Wait on the DAG run or inspect its snapshot |
+| Poll background task output | Keep the conversation available; inspect the flow snapshot on demand |
 | Hide dependencies in prose | Declare \`dependsOn\` edges |
 
 **Your value is orchestration, decomposition, and quality control. Delegating with crystal-clear prompts IS your work.**`

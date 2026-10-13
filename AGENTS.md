@@ -37,7 +37,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Runtime
 
-- Iolaus is written against `@opencode/plugin/effect`. The entry is
+- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.0.27
+  (`@opencode/plugin: 2.0.27`, `@opencode/schema: 2.0.27`). The entry is
   `Plugin.define({ id, effect })`; every registration (`agent.transform`,
   `command.transform`, `mcp.transform`, `tool.transform`, `session.hook`,
   `tool.hook`, `rpc.register`) is an Effect in the plugin's `Scope`, and the
@@ -48,8 +49,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `Deferred`; launch fibers are forked into the controller scope so `close`
   interrupts them. `src/dag/promise.ts` is a Promise view for tests and QA;
   `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
-  the Effect editor. `effect@4.0.0-rc.112` is a peer dependency pinned to the
-  host's version and is external in the bundle.
+  the Effect editor. `effect@4.0.1` is an exact peer and dependency pinned to the
+  host's version and client peer contract (Effect 4.0.3 deferred), with
+  `@opentui/core` and `@opentui/solid` `>=0.5.17`. Bundled builds externalize
+  `effect`, `effect/*`, `@opencode/plugin`, and `@opentui/core` so runtime execution
+  consumes the host's singleton instances and avoids symbol/type mismatches across packages.
 
 - `src/dag/` is the active Iolaus durable DAG module. It uses shared SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
@@ -77,7 +81,49 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   dependencies, retry/resume, gates or conditional branches.
 - `iolaus_flow` (`FLOW_TOOL_NAME` in `src/dag/tool.ts`; formerly `iolaus_dag`, which
   `check:package` refuses in `dist/`) is the only model-facing orchestration tool in
-  the first runtime slice. It is owner-scoped and schema-validated.
+  the first runtime slice. It is owner-scoped and schema-validated. Action `create`
+  is nonblocking: it initializes the run and returns immediately while frontier
+  scheduling executes in the background, keeping the owner session available for user
+  interaction without forcing session switching. Calling `wait` is optional and
+  blocks until terminal state (`completed`, `failed`, `cancelled`), including across
+  human gates; `snapshot` and `node` inspect execution state and results on demand without blocking.
+- Committed gate and terminal notices (`src/dag/notices.ts`): when a gate pauses
+  for review (`node.waiting`) or a flow reaches a terminal state (`run.completed`,
+  `run.failed`, `run.cancelled`), Iolaus enqueues a synthetic notice to the owner
+  session via `session.synthetic` with `delivery: "queue"` and `resume: false`.
+  These notices are admitted to the owner session's durable inbox without waking
+  the model or triggering an unwanted continuation turn (they do not immediately
+  write to persisted conversation history or claim the queued input is already consumed).
+  Observed native subagent runs do not send notices.
+- Live steering (`action: "steer"` in `src/dag/controller.ts`, schema in `src/dag/tool.ts`,
+  runner dispatch in `src/dag/runner.ts`, authorization in `src/roles/steering.ts`):
+  allows the owner session to supplement an active child task without switching sessions
+  or opening child dialogs. Takes `run_id`, `node_id`, `text`, and a required durable `request_id`.
+  - Execution tokens and fencing: Each execution allocates a `DagExecutionIdentity`
+    (`token`, `agent`, `model`) on `DagExecutionRef` used to detect and refuse drift,
+    without assuming immutable host identity or atomic pinning. Initial drift is refused
+    before request creation; initial prompts are fenced until admission
+    (`DagExecutionState.initial: "admitted"`). `steer` advances `inputRevision`, records a
+    `DagSteerRequest` in SQLite (`state: "reserved"`), and dispatches via `runner.steer` using
+    synthetic prompt delivery and verification.
+  - Idempotency: `request_id` is a durable unique identifier. Reusing `request_id` with
+    identical `node_id` and `text` returns the stored request without duplicate dispatch.
+    Reusing the ID with differing node or text fails validation.
+  - V1 limits and refusals: Targets must be active, `running` session-backed agent nodes with
+    admitted initial prompts. Refuses `pending`, `starting`, `settled`, `gate`, `judge`,
+    `observed` native subagent runs, planning owners, and Atlas / authorized-plan flows. Rechecks
+    owner tier, role, `iolaus_flow` permission, and child `subagent` delegation permission. Child
+    agent and model cannot be altered mid-flight.
+  - Concurrency and failure semantics: Serialized under per-run lock and operating mutex.
+    If identity drifts or delivery fails, the request is marked `unresolved`, the child session
+    is cancelled, the node is interrupted, and stale results are blocked from reaching downstream
+    nodes. Steered executions do not automatically retry, fall back across model chains, or escalate
+    (`deep-low` to `deep-high`). Re-running a steered task requires launching a new flow with the
+    complete task. Action `amend` refuses flows with active executions or unresolved steering,
+    and invalidates cached outputs of steered nodes and their descendants.
+  - Guarantees: Neither atomic identity pinning nor host-spanning exactly-once delivery is
+    claimed; unconfirmed receipts or delivery ambiguities fail closed as `unresolved` rather
+    than silently replaying.
 - Node kinds: `agent` runs a child session; `judge` makes one `generate.text`
   call on the node's agent lane model with no session (its execution ref is
   `judge:<node>:<attempt>:<ts>`, the reply is returned by `wait`); `gate`
@@ -142,7 +188,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   and librarian deny `edit`, `subagent` and `iolaus_flow`; metis and momus deny
   only `edit`; multimodal-looker allows only `read`. Shell stays allowed, so
   read-only is the prompt's contract, as in OMO. Host names: `edit` covers
-  edit/write/patch, `subagent` is OMO's `task`.
+  edit/write/patch, `subagent` is OMO's `task`. OpenCode 2.0.27 dropped global
+  `external_directory` prompts from default rules; librarian explicitly adds
+  `external_directory: *` with `ask` to prompt for arbitrary external directories,
+  then grants `allow` for its temporary clone root (`$TMPDIR/iolaus-gh-*`),
+  preserving its clone-only boundary.
 - `src/gh/` registers a read-only `gh` Code Mode namespace when a `gh` binary
   answers `--version` and `gh auth status` shows a login (`IOLAUS_GH_BIN`, then
   PATH, then common prefixes; `gh: false` disables). Twelve tools: searchCode,
@@ -264,7 +314,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
   session that received `/ultrawork` or `/hyperplan` gets the OMO
   mode prompt plus an `<iolaus-mode-dag>` block telling it to `create` the
-  matching template and `wait`; a paused gate is the user's decision. The
+  matching template and remain available for user interaction (calling `wait`
+  is optional and blocks until terminal state, including across gates); a
+  paused gate is the user's decision. The
   `ultrawork` template unrolls the loop as `work` → `review` → `fix<n>` →
   `review<n>` guarded by the previous verdict (up to `iterations`, default 3),
   then an `accept` gate; worker prompts carry the ultrawork marker plus
@@ -306,8 +358,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Verification
 
-Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length.
+Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length. Standard test checks include `bun test` (unit and steering regression suites), `bun run typecheck`, `bun run check:package` (build and active manifest hashes), and `bun run check:reference` (800 snapshot files).
 
-Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Unit tests alone do not establish live compatibility.
+Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Claims of live compatibility are strictly bounded to verified evidence.
 
 Deliver changes through task-owned worktrees and pull requests. Preserve user changes and merge using merge commits after the relevant checks pass.
