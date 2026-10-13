@@ -2,7 +2,8 @@ import type { Database } from "bun:sqlite"
 import { randomUUID } from "node:crypto"
 import { canonicalProject, databasePath, openDatabase } from "../database"
 import { canonicalJson } from "./canonical-json"
-import type { DagAction, DagDefinition, DagEvent, DagNodeRecord, DagRunRecord, JsonValue } from "./types"
+import type { DagAction, DagDefinition, DagEvent, DagNodeRecord, DagNotice, DagRunRecord, DagSteerRequest, JsonValue } from "./types"
+import { noticeFor } from "./notices"
 
 type RunRow = { run_id: string; owner_session_id: string; name: string; definition_json: string; fingerprint: string; generation: number; status: DagRunRecord["status"]; created_at: number; updated_at: number }
 type NodeRow = { run_id: string; node_id: string; node_json: string; fingerprint: string; status: DagNodeRecord["status"]; attempt: number; result_json: string | null; error: string | null; execution_json: string | null; created_at: number; updated_at: number }
@@ -36,17 +37,21 @@ export class DagStore {
     })
   }
 
-  saveRun(run: DagRunRecord, events: readonly Omit<DagEvent, "eventID" | "sequence">[] = []): readonly DagEvent[] {
+  saveRun(run: DagRunRecord, events: readonly Omit<DagEvent, "eventID" | "sequence">[] = [], steering: readonly DagSteerRequest[] = [], notices = false): readonly DagEvent[] {
     if (!this.owns(run.runID)) throw new Error("Unknown DAG run in this project")
     const committed: DagEvent[] = []
     this.transaction(() => {
       this.db.run("UPDATE dag_runs SET definition_json = ?, fingerprint = ?, generation = ?, status = ?, updated_at = ? WHERE run_id = ? AND project = ?", [canonicalJson(run.definition), run.fingerprint, run.generation, run.status, run.updatedAt, run.runID, this.project])
       this.db.run("DELETE FROM dag_nodes WHERE run_id = ?", [run.runID])
+      this.db.run("DELETE FROM dag_node_runtime WHERE run_id = ?", [run.runID])
       for (const node of run.nodes) this.writeNode(run.runID, node)
+      for (const request of steering) this.saveSteering(request)
       for (const event of events) {
         const entry = this.appendEvent(event)
         this.appendAction({ runID: run.runID, nodeID: event.nodeID, kind: event.type,
           idempotencyKey: entry.eventID, payload: event.payload, createdAt: event.createdAt })
+        const notice = notices ? noticeFor(entry, run) : undefined
+        if (notice) this.saveNotice(notice)
         committed.push(entry)
       }
     })
@@ -58,6 +63,8 @@ export class DagStore {
     const row = (anyProject ? this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) : this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project)) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
+    const runtimeRows = this.db.query("SELECT node_id, value_json FROM dag_node_runtime WHERE run_id = ?").all(runID) as Array<{ node_id: string; value_json: string }>
+    const runtime = new Map(runtimeRows.map((row) => [row.node_id, parse<NonNullable<DagNodeRecord["runtime"]>>(row.value_json)]))
     const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null
     return {
       runID: row.run_id, ownerSessionID: row.owner_session_id, name: row.name,
@@ -67,6 +74,7 @@ export class DagStore {
       nodes: nodeRows.map((node) => ({
         definition: parse<DagNodeRecord["definition"]>(node.node_json), fingerprint: node.fingerprint,
         status: node.status, attempt: node.attempt,
+        ...(runtime.has(node.node_id) ? { runtime: runtime.get(node.node_id)! } : {}),
         ...(node.result_json ? { result: parse<NonNullable<DagNodeRecord["result"]>>(node.result_json) } : {}),
         ...(node.error ? { error: node.error } : {}),
         ...(node.execution_json ? { execution: parse<NonNullable<DagNodeRecord["execution"]>>(node.execution_json) } : {}),
@@ -80,6 +88,29 @@ export class DagStore {
       ? this.db.query("SELECT run_id FROM dag_runs WHERE project = ? ORDER BY updated_at DESC").all(this.project) as Array<{ run_id: string }>
       : this.db.query("SELECT run_id FROM dag_runs WHERE project = ? AND owner_session_id = ? ORDER BY updated_at DESC").all(this.project, ownerSessionID) as Array<{ run_id: string }>
     return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
+  }
+
+  steering(runID: string): readonly DagSteerRequest[] {
+    if (!this.owns(runID)) return []
+    const rows = this.db.query("SELECT value_json FROM dag_steering WHERE run_id = ? ORDER BY rowid").all(runID) as Array<{ value_json: string }>
+    return rows.map((row) => parse<DagSteerRequest>(row.value_json))
+  }
+
+  saveSteering(request: DagSteerRequest): void {
+    if (!this.owns(request.runID)) throw new Error("Unknown DAG run in this project")
+    this.db.run("INSERT INTO dag_steering VALUES (?, ?, ?) ON CONFLICT(run_id, request_id) DO UPDATE SET value_json = excluded.value_json", [request.runID, request.requestID, canonicalJson(request)])
+  }
+
+  notices(runID?: string): readonly DagNotice[] {
+    const rows = this.db.query(`SELECT n.value_json FROM dag_notices n JOIN dag_runs r ON r.run_id = n.run_id
+      WHERE r.project = ? AND (? IS NULL OR n.run_id = ?) ORDER BY n.rowid`).all(this.project, runID ?? null, runID ?? null) as Array<{ value_json: string }>
+    return rows.map((row) => parse<DagNotice>(row.value_json))
+  }
+
+  saveNotice(notice: DagNotice): void {
+    if (!this.owns(notice.runID)) throw new Error("Unknown DAG run in this project")
+    this.db.run("INSERT INTO dag_notices VALUES (?, ?, ?) ON CONFLICT(event_id) DO UPDATE SET value_json = excluded.value_json", [notice.eventID, notice.runID, canonicalJson(notice)])
+    if (notice.state === "admitted") this.db.run("UPDATE dag_events SET delivered_at = ? WHERE event_id = ? AND run_id = ?", [Date.now(), notice.eventID, notice.runID])
   }
 
   /** The observed-run node whose child is this session, newest first. */
@@ -116,6 +147,7 @@ export class DagStore {
   }
 
   private writeNode(runID: string, node: DagNodeRecord): void {
+    if (node.runtime) this.db.run("INSERT INTO dag_node_runtime VALUES (?, ?, ?)", [runID, node.definition.id, canonicalJson(node.runtime)])
     this.db.run("INSERT INTO dag_nodes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [runID, node.definition.id, canonicalJson(node.definition), node.fingerprint, node.status, node.attempt, node.result ? canonicalJson(node.result) : null, node.error ?? null, node.execution ? canonicalJson(node.execution) : null, node.createdAt ?? Date.now(), node.updatedAt ?? Date.now()])
   }
 

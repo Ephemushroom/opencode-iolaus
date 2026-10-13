@@ -57,18 +57,20 @@ function record(input: unknown): Record<string, unknown> | undefined {
 
 const appliesCodemod = (tool: string, input: unknown) => tool.startsWith("ast_grep") && record(input)?.apply === true
 const startsWork = (input: unknown) => ["create", "amend"].includes(String(record(input)?.action))
+const steersWork = (input: unknown) => record(input)?.action === "steer"
 const changes = (tool: string, input: unknown) => MUTATION_TOOLS.has(tool) || tool === "shell" || tool === "subagent" || appliesCodemod(tool, input)
 
 export const ATLAS_UNBOUND = "Atlas works only on a plan Prometheus wrote: plan with Prometheus into .iolaus/plans/<plan>/, then run /start-work <plan>. Until then Atlas may read but not edit, run shell, delegate or start DAG runs."
-export const ATLAS_ORCHESTRATOR = "This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the run with iolaus_flow (wait, snapshot, node, retry; approve or reject only on the user's word) instead of changing files here."
+export const ATLAS_ORCHESTRATOR = "This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the background run with iolaus_flow (snapshot, node, retry; optional blocking wait; approve or reject only on the user's word) instead of changing files or steering tickets here."
 
 export function denial(policy: Policy, tool: string, input: unknown, directory: string): string | undefined {
   switch (policy) {
     case "native":
     case "worker": return undefined
-    case "atlas-unbound": return changes(tool, input) || (tool === FLOW_TOOL_NAME && startsWork(input)) ? ATLAS_UNBOUND : undefined
-    case "atlas-orchestrator": return changes(tool, input) || (tool === FLOW_TOOL_NAME && startsWork(input)) ? ATLAS_ORCHESTRATOR : undefined
+    case "atlas-unbound": return changes(tool, input) || (tool === FLOW_TOOL_NAME && (startsWork(input) || steersWork(input))) ? ATLAS_UNBOUND : undefined
+    case "atlas-orchestrator": return changes(tool, input) || (tool === FLOW_TOOL_NAME && (startsWork(input) || steersWork(input))) ? ATLAS_ORCHESTRATOR : undefined
   }
+  if (tool === FLOW_TOOL_NAME && steersWork(input)) return "Planning sessions cannot steer live executions; steering is delegation, not a read-only operation."
   if (MUTATION_TOOLS.has(tool)) {
     const paths = mutatedPaths(input, directory)
     if (!paths.length) return "Planning sessions may only write plan and domain files, and this edit names no file path."

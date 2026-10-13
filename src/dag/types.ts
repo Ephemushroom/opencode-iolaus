@@ -61,6 +61,7 @@ export interface DagResolvedInput {
     readonly attempt: number
     readonly status: DagResultEnvelope["status"] | "skipped"
     readonly sessionID: string | null
+    readonly inputRevision?: number
   } | null
 }
 
@@ -157,6 +158,34 @@ export interface DagExecutionRef {
   readonly nodeID: string
   readonly attempt: number
   readonly sessionID: string
+  readonly identity?: DagExecutionIdentity
+}
+
+export interface DagExecutionIdentity {
+  readonly token: string
+  readonly agent: string
+  readonly model: string
+}
+
+export interface DagExecutionState {
+  readonly identity: DagExecutionIdentity
+  readonly initial: "pending" | "admitted" | "unresolved"
+  readonly inputRevision: number
+}
+
+export interface DagSteerRequest {
+  readonly runID: string
+  readonly nodeID: string
+  readonly requestID: string
+  readonly text: string
+  readonly execution: DagExecutionRef
+  readonly generation: number
+  readonly revision: number
+  readonly messageID: string
+  readonly receipt?: { readonly messageID: string }
+  readonly state: "reserved" | "admitted" | "delivered" | "unresolved"
+  readonly error?: string
+  readonly createdAt: number
 }
 
 export interface DagResultEnvelope {
@@ -165,6 +194,7 @@ export interface DagResultEnvelope {
   readonly nodeID: string
   readonly generation: number
   readonly attempt: number
+  readonly inputRevision?: number
   readonly status: "completed" | "failed" | "cancelled"
   readonly payload: JsonValue
   readonly provenance: {
@@ -184,6 +214,7 @@ export interface DagNodeRecord {
   readonly result?: DagResultEnvelope
   readonly error?: string
   readonly execution?: DagExecutionRef
+  readonly runtime?: DagExecutionState
   readonly createdAt?: number
   readonly updatedAt?: number
 }
@@ -230,6 +261,7 @@ export interface DagEvent {
     | "node.fallback"
     | "node.escalated"
     | "run.paused"
+    | "node.steering"
   readonly payload?: JsonValue
   readonly createdAt: number
 }
@@ -247,4 +279,17 @@ export interface DagAction {
 export interface DagSnapshot {
   readonly run: DagRunRecord
   readonly events: readonly DagEvent[]
+  readonly steering?: readonly DagSteerRequest[]
+  readonly notices?: readonly DagNotice[]
+}
+
+export interface DagNotice {
+  readonly eventID: string
+  readonly runID: string
+  readonly ownerSessionID: string
+  readonly messageID: string
+  readonly text: string
+  readonly state: "pending" | "reserved" | "admitted" | "unresolved"
+  readonly receipt?: { readonly messageID: string }
+  readonly error?: string
 }

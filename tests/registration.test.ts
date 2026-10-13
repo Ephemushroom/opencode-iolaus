@@ -201,7 +201,8 @@ test("ids and display names are the bare lane names; explore replaces the host a
   expect([...fixture.agents.keys()].some((id) => id.startsWith("iolaus-"))).toBe(false)
   // The host's explore rules are dropped: ours start from the host default and add the explore deny list.
   const rules = fixture.agents.get("explore")!.permissions
-  expect(rules.slice(0, 5)).toEqual(Agent.Info.default(Agent.ID.make("explore")).permissions)
+  const defaults = Agent.Info.default(Agent.ID.make("explore")).permissions
+  expect(rules.slice(0, defaults.length)).toEqual(defaults)
   expect(evaluate("shell", "*", rules)).toBe("allow")
   expect(evaluate("edit", "*", rules)).toBe("deny")
   // A second registration pass is a no-op.

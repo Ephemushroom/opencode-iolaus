@@ -100,6 +100,7 @@ export function registerAgents(
         if (name === "librarian") {
           // gh clones land under the OS temp dir; native read/grep there need external_directory.
           agent.permissions.push({ action: "gh", resource: "*", effect: "allow" },
+            { action: "external_directory", resource: "*", effect: "ask" },
             { action: "external_directory", resource: `${tmpdir()}/iolaus-gh-*`, effect: "allow" })
         }
         // Goal tools belong to Hephaestus; every other Iolaus lane has them hidden.

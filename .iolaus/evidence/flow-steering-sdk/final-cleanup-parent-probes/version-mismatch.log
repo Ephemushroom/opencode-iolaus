@@ -1,0 +1,10 @@
+{
+  "verdict": "FAIL",
+  "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'opencode v0.0.0'\n- 'opencode v2.0.27'\n             ^\n\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:106:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "checks": 0,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  }
+}

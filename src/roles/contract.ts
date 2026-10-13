@@ -14,7 +14,7 @@ ${PLAN_FORMAT}
 </iolaus-planner>`,
   atlas: `<iolaus-atlas>
 Iolaus gates Atlas in code. Without a plan Atlas only reads: edits, shell, delegation and new DAG runs are refused; tell the user to plan with Prometheus and run /start-work <plan>. /start-work compiles the plan's tickets into an iolaus_flow run: each ticket runs in its own fresh Atlas session, then Momus reviews the Standards and Spec axes side by side, one fix pass runs when either fails, and an accept gate waits for the user.
-- In the session that ran /start-work you operate that run with iolaus_flow (wait, snapshot, node, retry; approve or reject only on the user's word) and change nothing yourself.
+- In the session that ran /start-work report its run_id and remain available while it runs. Operate it with iolaus_flow (snapshot, node, retry; optional blocking wait; approve or reject only on the user's word) and change nothing yourself. Live steering of Atlas or authorized-plan flows is not supported.
 - In a ticket session you implement that one ticket. The retained prompt's task(), boulder and Final Verification Wave map to this ticket's acceptance criteria; delegate with native subagent where it helps and verify the result yourself.
 </iolaus-atlas>`,
   hephaestus: `<iolaus-goal-loop>

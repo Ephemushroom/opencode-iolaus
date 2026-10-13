@@ -1,0 +1,52 @@
+[
+  {
+    "name": "missing-binary",
+    "verdict": "PASS",
+    "failure": "Error: spawnSync /var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/missing ENOENT\n    at Object.spawnSync (node:internal/child_process:1160:20)\n    at spawnSync (node:child_process:928:24)\n    at execFileSync (node:child_process:971:15)\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:104:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "version-mismatch",
+    "verdict": "PASS",
+    "failure": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n+ actual - expected\n\n+ 'opencode v0.0.0'\n- 'opencode v2.0.27'\n             ^\n\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:106:10\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "partial-acquisition",
+    "verdict": "PASS",
+    "failure": "Error: QA_PARTIAL_COPY_FAILURE\n    at fs.cpSync (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/partial.cjs:1:58)\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:95:3\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "spawn-failure",
+    "verdict": "PASS",
+    "failure": "Error: spawn /var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/disappearing ENOENT\n    at ChildProcess._handle.onexit (node:internal/child_process:287:19)\n    at onErrorNT (node:internal/child_process:525:16)\n    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "cleanup-error",
+    "verdict": "PASS",
+    "failure": "Error: spawnSync /var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/missing ENOENT\n    at Object.spawnSync (node:internal/child_process:1160:20)\n    at spawnSync (node:child_process:928:24)\n    at execFileSync (node:child_process:971:15)\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:104:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\nmock: Error: QA_MOCK_CLEANUP_FAILURE\n    at Server.<anonymous> (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/cleanup.cjs:1:161)\n    at Server.wrapper (node:events:639:12)\n    at Server.emit (node:events:514:28)\n    at emitCloseNT (node:net:2875:8)\n    at process.processTicksAndRejections (node:internal/process/task_queues:89:21)\ncleanup failed",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  }
+]
