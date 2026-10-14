@@ -1,0 +1,444 @@
+{
+  "completed": {
+    "run": {
+      "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "judge-success",
+      "definition": {
+        "name": "judge-success",
+        "nodes": [
+          {
+            "agent": "momus",
+            "dependsOn": [],
+            "id": "work",
+            "kind": "judge",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:judge-success"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "b1edc0be75d2e770ff8cdffd1662963f07fbfc3300fdea4e57d803f1f0622a59",
+      "generation": 1,
+      "status": "completed",
+      "createdAt": 1791963941699,
+      "updatedAt": 1791963941724,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "momus",
+            "dependsOn": [],
+            "id": "work",
+            "kind": "judge",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:judge-success"
+          },
+          "fingerprint": "214fd0ebeabe9bac3d1b97a30586ccfbb1008ce33c42febb745362e34ba5464b",
+          "status": "completed",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "momus",
+              "model": "openai/A",
+              "token": "6fe264e0-d68e-4620-bf24-e4fd2a9117b7"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [],
+            "historyKnown": true
+          },
+          "result": {
+            "attempt": 1,
+            "createdAt": 1791963941724,
+            "generation": 1,
+            "inputRevision": 0,
+            "nodeID": "work",
+            "payload": {
+              "text": "VERDICT: PASS"
+            },
+            "provenance": {
+              "agent": "momus",
+              "execution": {
+                "attempt": 1,
+                "identity": {
+                  "agent": "momus",
+                  "model": "openai/A",
+                  "token": "6fe264e0-d68e-4620-bf24-e4fd2a9117b7"
+                },
+                "nodeID": "work",
+                "sessionID": "judge:work:1:1791963941723"
+              },
+              "model": "openai/A",
+              "parentNodeIDs": []
+            },
+            "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+            "schemaVersion": 1,
+            "status": "completed"
+          },
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "momus",
+              "model": "openai/A",
+              "token": "6fe264e0-d68e-4620-bf24-e4fd2a9117b7"
+            },
+            "nodeID": "work",
+            "sessionID": "judge:work:1:1791963941723"
+          },
+          "createdAt": 1791963941699,
+          "updatedAt": 1791963941724
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "4e1fa199-aad1-44f3-842f-f6ff30dc8f94",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963941699
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1f2b357e-f450-4f66-8ff8-206f944870d8",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963941700,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69e015cb-81fd-48c5-9610-f9cbf595d6ad",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963941723,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "bf955a4c-911a-4cea-8570-4125dfba4af6",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 4,
+        "type": "node.completed",
+        "generation": 1,
+        "createdAt": 1791963941724,
+        "nodeID": "work",
+        "payload": {
+          "text": "VERDICT: PASS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c231c729-c887-483b-bc0d-8cb2c86fdd5c",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 5,
+        "type": "run.completed",
+        "generation": 1,
+        "createdAt": 1791963941724
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "c231c729-c887-483b-bc0d-8cb2c86fdd5c",
+        "messageID": "msg_c231c729c887483bbc0d8cb2c86fdd5c",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_c231c729c887483bbc0d8cb2c86fdd5c"
+        },
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "state": "admitted",
+        "text": "Iolaus Flow notice c231c729-c887-483b-bc0d-8cb2c86fdd5c: \"judge-success\" (1d501501-ab20-4507-a35a-967d58caef89) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "retried": {
+    "run": {
+      "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "judge-success",
+      "definition": {
+        "name": "amended judge",
+        "nodes": [
+          {
+            "agent": "momus",
+            "dependsOn": [],
+            "id": "work",
+            "kind": "judge",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:judge-success AMENDED_JUDGE_TASK"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "9ce12472275d3828c7cf731c195cb889eaa6d017819bbd5b73e260eecbe2df55",
+      "generation": 3,
+      "status": "completed",
+      "createdAt": 1791963941699,
+      "updatedAt": 1791963941896,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "momus",
+            "dependsOn": [],
+            "id": "work",
+            "kind": "judge",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:judge-success AMENDED_JUDGE_TASK"
+          },
+          "fingerprint": "a408f3c3039e1284081cdd53055adab27bf11d5aca1c92efba926430bbb8b69b",
+          "status": "completed",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "momus",
+              "model": "openai/A",
+              "token": "7d259f3f-ac50-4e1f-90f5-0cd971bda339"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [],
+            "historyKnown": true
+          },
+          "result": {
+            "attempt": 2,
+            "createdAt": 1791963941895,
+            "generation": 3,
+            "inputRevision": 0,
+            "nodeID": "work",
+            "payload": {
+              "text": "VERDICT: PASS"
+            },
+            "provenance": {
+              "agent": "momus",
+              "execution": {
+                "attempt": 2,
+                "identity": {
+                  "agent": "momus",
+                  "model": "openai/A",
+                  "token": "7d259f3f-ac50-4e1f-90f5-0cd971bda339"
+                },
+                "nodeID": "work",
+                "sessionID": "judge:work:2:1791963941894"
+              },
+              "model": "openai/A",
+              "parentNodeIDs": []
+            },
+            "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+            "schemaVersion": 1,
+            "status": "completed"
+          },
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "momus",
+              "model": "openai/A",
+              "token": "7d259f3f-ac50-4e1f-90f5-0cd971bda339"
+            },
+            "nodeID": "work",
+            "sessionID": "judge:work:2:1791963941894"
+          },
+          "createdAt": 1791963941699,
+          "updatedAt": 1791963941895
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "4e1fa199-aad1-44f3-842f-f6ff30dc8f94",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963941699
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1f2b357e-f450-4f66-8ff8-206f944870d8",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963941700,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69e015cb-81fd-48c5-9610-f9cbf595d6ad",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963941723,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "bf955a4c-911a-4cea-8570-4125dfba4af6",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 4,
+        "type": "node.completed",
+        "generation": 1,
+        "createdAt": 1791963941724,
+        "nodeID": "work",
+        "payload": {
+          "text": "VERDICT: PASS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c231c729-c887-483b-bc0d-8cb2c86fdd5c",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 5,
+        "type": "run.completed",
+        "generation": 1,
+        "createdAt": 1791963941724
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c07e6c2b-c7a9-411c-810d-a5100ff139c3",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 6,
+        "type": "node.ready",
+        "generation": 2,
+        "createdAt": 1791963941811,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "09e82d39-6091-4e38-9ca1-12a1290297ea",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 7,
+        "type": "node.started",
+        "generation": 2,
+        "createdAt": 1791963941829,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "6c1b22d8-a740-4b31-92cc-a9c905741587",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 8,
+        "type": "node.completed",
+        "generation": 2,
+        "createdAt": 1791963941830,
+        "nodeID": "work",
+        "payload": {
+          "text": "VERDICT: PASS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9539f282-735c-4f6d-a14f-129804209107",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 9,
+        "type": "run.completed",
+        "generation": 2,
+        "createdAt": 1791963941830
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "a68ca7bb-afe2-4b32-81b2-7f13dcb53dc0",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 10,
+        "type": "node.retrying",
+        "generation": 3,
+        "createdAt": 1791963941864,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "6e6f1020-f41b-424e-97cb-216e2ef6f867",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 11,
+        "type": "node.ready",
+        "generation": 3,
+        "createdAt": 1791963941864,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f9f32cca-99ab-4424-bd9d-05256fa0f287",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 12,
+        "type": "node.started",
+        "generation": 3,
+        "createdAt": 1791963941894,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "6840c1a8-3a3a-4667-b76a-d13201911cd8",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 13,
+        "type": "node.completed",
+        "generation": 3,
+        "createdAt": 1791963941895,
+        "nodeID": "work",
+        "payload": {
+          "text": "VERDICT: PASS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "d142c50e-769c-42ee-a295-4dcc90f278f0",
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "sequence": 14,
+        "type": "run.completed",
+        "generation": 3,
+        "createdAt": 1791963941896
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "c231c729-c887-483b-bc0d-8cb2c86fdd5c",
+        "messageID": "msg_c231c729c887483bbc0d8cb2c86fdd5c",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_c231c729c887483bbc0d8cb2c86fdd5c"
+        },
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "state": "admitted",
+        "text": "Iolaus Flow notice c231c729-c887-483b-bc0d-8cb2c86fdd5c: \"judge-success\" (1d501501-ab20-4507-a35a-967d58caef89) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "9539f282-735c-4f6d-a14f-129804209107",
+        "messageID": "msg_9539f282735c4f6da14f129804209107",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_9539f282735c4f6da14f129804209107"
+        },
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 9539f282-735c-4f6d-a14f-129804209107: \"judge-success\" (1d501501-ab20-4507-a35a-967d58caef89) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "d142c50e-769c-42ee-a295-4dcc90f278f0",
+        "messageID": "msg_d142c50e769c42eea2954dcc90f278f0",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_d142c50e769c42eea2954dcc90f278f0"
+        },
+        "runID": "1d501501-ab20-4507-a35a-967d58caef89",
+        "state": "admitted",
+        "text": "Iolaus Flow notice d142c50e-769c-42ee-a295-4dcc90f278f0: \"judge-success\" (1d501501-ab20-4507-a35a-967d58caef89) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  }
+}

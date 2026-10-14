@@ -1,0 +1,30 @@
+{
+  "id": "ses_ec636c8a7ffe8N45wZJHpuQP2b",
+  "projectID": "04d6f99ec20289e14934b64e050cdf543fdd9bdc",
+  "agent": "build",
+  "model": {
+    "id": "claude-qa",
+    "providerID": "anthropic",
+    "variant": "default"
+  },
+  "cost": 0.0002035,
+  "tokens": {
+    "input": 30,
+    "output": 15,
+    "reasoning": 0,
+    "cache": {
+      "read": 0,
+      "write": 0
+    }
+  },
+  "outcome": "succeeded",
+  "time": {
+    "created": 1791970850651,
+    "updated": 1791970851483,
+    "idle": 1791970851484
+  },
+  "title": "PROBE_TITLE",
+  "location": {
+    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-same-session-zNLzTc/project"
+  }
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "name": "missing-binary",
+    "verdict": "PASS",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "version-mismatch",
+    "verdict": "PASS",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "partial-acquisition",
+    "verdict": "PASS",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  },
+  {
+    "name": "spawn-failure",
+    "verdict": "PASS",
+    "cleanup": {
+      "sandboxRemoved": true,
+      "processGone": true,
+      "mockClosed": true
+    }
+  }
+]

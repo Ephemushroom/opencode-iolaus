@@ -1,0 +1,31 @@
+{
+  "scope": "sandbox plugin bundle only after unmodified scenarios; no host patch changes or substitute inbox",
+  "originalHash": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010",
+  "injections": [
+    {
+      "label": "capture",
+      "match": "      const handoff = yield* Effect12.try({ try: () => checkpoint(input, messages)",
+      "replacement": "      if (input.ref.nodeID === 'capture') yield* Effect12.promise(() => __rescuePause(\"capture\", input.ref.sessionID));\n      const handoff = yield* Effect12.try({ try: () => checkpoint(input, messages)"
+    },
+    {
+      "label": "admission",
+      "match": "    const handoff = pendingHandoffs.get(ref.sessionID);",
+      "replacement": "    const handoff = pendingHandoffs.get(ref.sessionID);\n    if (handoff && ['admission-source', 'admission-child'].includes(ref.nodeID)) yield* Effect12.promise(() => __rescuePause(ref.nodeID, ref.sessionID));"
+    },
+    {
+      "label": "refinalization",
+      "match": "      const final = yield* Effect8.exit",
+      "replacement": "      if (nodeID === 'refinalization') yield* Effect8.promise(() => __rescuePause(\"refinalization\", live.execution.sessionID));\n      const final = yield* Effect8.exit"
+    },
+    {
+      "label": "reservation",
+      "match": "        event(updated, \"node.rescued\", nodeID, { decisionID: rescue.decisionID, from: live.definition.model, to: rescue.pinnedModel }, confirmed);",
+      "replacement": "        event(updated, \"node.rescued\", nodeID, { decisionID: rescue.decisionID, from: live.definition.model, to: rescue.pinnedModel }, confirmed);\n        if (['pinned', 'reserved-reload'].includes(nodeID)) yield* Effect8.promise(() => __rescuePause(nodeID, live.execution.sessionID));"
+    },
+    {
+      "label": "oldref",
+      "match": "      pendingPrompts.set(String(session.id), prompt);",
+      "replacement": "      if (input.handoff && input.node.id === 'oldref') yield* Effect12.promise(() => __rescuePause(\"oldref\", String(session.id)));\n      pendingPrompts.set(String(session.id), prompt);"
+    }
+  ]
+}

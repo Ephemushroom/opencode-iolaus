@@ -1,0 +1,13 @@
+{
+  "checks": [
+    "wait returns with failed outcome and unchanged context while a task-changing input remains queued",
+    "queued input does not resume the failed session",
+    "runtime session methods: hook, create, get, remove, switchAgent, switchModel, prompt, generate, command, compact, update, move, synthetic, interrupt, wait, context",
+    "pending input survives plugin reload",
+    "new plugin event subscription does not replay the pending admission",
+    "real host configuration hashes unchanged; sandbox process stopped"
+  ],
+  "requestCount": 4,
+  "hostStateUnchanged": true,
+  "serverStopped": true
+}

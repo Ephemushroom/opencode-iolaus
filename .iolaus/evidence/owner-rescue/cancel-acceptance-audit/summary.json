@@ -1,0 +1,16 @@
+{
+  "verifierExit": 0,
+  "verdict": "PASS",
+  "commands": 19,
+  "mismatchedCommands": [],
+  "unexpectedChanges": {
+    "protected": false,
+    "sources": false,
+    "fixture": false,
+    "sandboxes": false,
+    "processes": false,
+    "build": false
+  },
+  "temporaryRemoved": true,
+  "evidence": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance"
+}

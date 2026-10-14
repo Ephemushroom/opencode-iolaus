@@ -1,0 +1,286 @@
+{
+  "run": {
+    "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "atlas",
+    "definition": {
+      "name": "atlas",
+      "nodes": [
+        {
+          "agent": "atlas",
+          "dependsOn": [],
+          "fallbackModels": [
+            "openai/B",
+            "openai/C"
+          ],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "openai/A",
+          "prompt": "QA_CASE:atlas"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "207f6b10ae5f54aa5378b141338bb2181fca7a79330f721e530fe8a74a512c29",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963955327,
+    "updatedAt": 1791963955721,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "atlas",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "openai/C",
+          "prompt": "QA_CASE:atlas"
+        },
+        "fingerprint": "42209939274f3a1fc69e802527fb4980a5cea1e229fcba937bfbf90fdecb2ebb",
+        "status": "failed",
+        "attempt": 5,
+        "runtime": {
+          "identity": {
+            "agent": "atlas",
+            "model": "openai/C",
+            "token": "14aed652-bede-4450-839e-926aaa41717f"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "Iolaus DAG child session failed",
+        "execution": {
+          "attempt": 5,
+          "identity": {
+            "agent": "atlas",
+            "model": "openai/C",
+            "token": "14aed652-bede-4450-839e-926aaa41717f"
+          },
+          "nodeID": "work",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "eaa113d308310fd8d08ec1ddc7ac2f7ae42ab26149aab1a065e4fac442531f8c",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "QA_CASE:atlas"
+          },
+          "sessionID": "ses_ec69ffe3effeYCIFbXuqBlTvMD"
+        },
+        "createdAt": 1791963955327,
+        "updatedAt": 1791963955721
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "c736fd00-dd8e-4b8a-bee4-452957699471",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963955327
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "e3d3475f-d627-4c1f-b0d4-6cd782c97a16",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955328,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ca99b778-e606-41b4-8bbb-ac18a7512829",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955352,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "a3048e2f-dedc-4882-9ddd-abefda68a625",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 4,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963955436,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/A",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/B"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "e6b16c8c-c64e-4433-8605-8c1f09881d64",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 5,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955437,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ad94eb76-da08-4442-8488-34919aa8e2de",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 6,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955452,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "8d9bbae4-bd8f-4504-a323-13dab0f3f6d5",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 7,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963955503,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/B",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/C"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "99c3532e-ed67-41a4-8fbe-2f3784d0ef43",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 8,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955504,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "c433e9ec-3642-4617-ad3f-32ebef45ec3b",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 9,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955518,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "5ff43e8c-c1d0-4e5c-8697-b4b4640572c4",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 10,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963955579,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b125833f-d9d9-43a2-bcaa-0f883995cdbe",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 11,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955580,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "352918c3-e315-4ad6-9bd7-e58590df34ae",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 12,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955591,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "f48eae99-0baa-4a41-8979-f509e43c6784",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 13,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963955644,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "0508a752-e6f7-4ef3-b3d3-d98c9848d0cd",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 14,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955645,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "1a8ee9eb-12cb-4bb7-82cb-20e4390af282",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 15,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955668,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "568d6dcf-2ef7-41f1-b4be-e6e33d928b77",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 16,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963955721,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "e42eed2e-8860-49db-b197-2312a14a1c24",
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "sequence": 17,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963955721
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "e42eed2e-8860-49db-b197-2312a14a1c24",
+      "messageID": "msg_e42eed2e886049dbb1972312a14a1c24",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_e42eed2e886049dbb1972312a14a1c24"
+      },
+      "runID": "d04ee6b8-4921-400a-85b6-66a4e46dcf8d",
+      "state": "admitted",
+      "text": "Iolaus Flow notice e42eed2e-8860-49db-b197-2312a14a1c24: \"atlas\" (d04ee6b8-4921-400a-85b6-66a4e46dcf8d) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

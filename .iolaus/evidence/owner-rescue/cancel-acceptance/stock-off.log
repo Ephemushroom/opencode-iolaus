@@ -1,0 +1,11 @@
+{
+  "verdict": "PASS",
+  "checks": 3,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true,
+    "sockets": 0
+  },
+  "cleanupErrors": []
+}

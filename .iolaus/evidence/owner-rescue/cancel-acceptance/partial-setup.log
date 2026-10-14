@@ -1,0 +1,12 @@
+{
+  "verdict": "FAIL",
+  "checks": 0,
+  "failure": "Error: QA_PARTIAL_SETUP\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-owner-rescue-feature.mjs:112:55\n    at ModuleJob.run (node:internal/modules/esm/module_job:561:25)\n    at async node:internal/modules/esm/loader:647:26\n    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:101:5)",
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true,
+    "sockets": 0
+  },
+  "cleanupErrors": []
+}

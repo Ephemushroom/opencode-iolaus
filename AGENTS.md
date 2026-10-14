@@ -117,10 +117,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   - Concurrency and failure semantics: Serialized under per-run lock and operating mutex.
     If identity drifts or delivery fails, the request is marked `unresolved`, the child session
     is cancelled, the node is interrupted, and stale results are blocked from reaching downstream
-    nodes. Steered executions do not automatically retry, fall back across model chains, or escalate
-    (`deep-low` to `deep-high`). Re-running a steered task requires launching a new flow with the
-    complete task. Action `amend` refuses flows with active executions or unresolved steering,
-    and invalidates cached outputs of steered nodes and their descendants.
+    nodes. A model failure after every supplement was delivered falls back in the same child session (see
+    same-session continuation); otherwise steered executions are not retried or escalated automatically, and an
+    explicit retry of a steered node is refused: re-running it needs a new flow with the complete task. Action
+    `amend` refuses flows with active executions or unresolved steering, and invalidates cached outputs of steered
+    nodes and their descendants.
   - Guarantees: Neither atomic identity pinning nor host-spanning exactly-once delivery is
     claimed; unconfirmed receipts or delivery ambiguities fail closed as `unresolved` rather
     than silently replaying.
@@ -142,6 +143,32 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   in place to `deep-high` (lane model and fallbacks), its findings appended in
   `<iolaus-escalation>`, and rerun (`node.escalated`). Only when deep-high
   resolves to a model; admission re-checks the new agent at launch.
+- Same-session continuation (`src/dag/rescue.ts`, `continueFrom` in `src/dag/runner.ts`): a session-backed
+  agent node's model failure (failed child session or empty reply after its prompt was admitted) records the child
+  session as `recovery.continueFrom` (SQLite `dag_node_recovery`). The next attempt, on the next fallback model or a
+  remaining `maxAttempts` attempt on the last model, does not create a session: the runner waits for the child to
+  stop, checks its agent and execution token, calls `session.switchModel`, re-stamps `iolaus_execution_token` and
+  `iolaus_dag_attempt` with `session.update`, and queues an `<iolaus-continuation>` prompt with id
+  `msg_<token>`. The task, delivered supplements and completed tool effects stay in the host's history; the host
+  converts it across providers. `reattach` counts only the execution's own `msg_<token>` as its prompt. A failed
+  model turn that already received every supplement is reported with `deliveredRequests`, so a steered node falls
+  back in its session with the supplement delivered once. Without a continuable session (judge, failed
+  `session.create`, a host without `switchModel`/`update`) a retry is a fresh session and is refused for a node
+  that was ever steered. Explicit `retry`, `amend` and `cancel` drop `continueFrom`: a manual retry is a fresh
+  session from the planned chain. Stock OpenCode 2.0.28 supports this; no host patch is needed.
+- Owner-model rescue (`rescue: { ownerModel: boolean }` in `options.ts`, default off): after a node's fallback
+  chain and attempts are spent on model failures, one more same-session continuation runs on the owner session's
+  current model (`runner.ownerModel`), keeping the child's agent and permissions (`node.rescued`, a queued
+  non-waking notice). One per node lifetime: `recovery.rescue` survives retry, reload, amend and removal/re-addition,
+  and a spent, excluded or unavailable rescue emits `node.rescue-skipped` (`owner_rescue_spent`,
+  `owner_model_already_failed`, `rescue_role_excluded`, `owner_model_unavailable`). Never for judge, gate or observed
+  nodes, Atlas or `/start-work` flows, `prometheus`, planning-role owners or children, or non-model failures. A
+  rescued reply is the result (no escalation rerun); provenance records `rescue: { decisionID, model, from }`; retry
+  of a rescued escalated node restores `preRescueDefinition`. Live QA: `node script/qa-owner-rescue.mjs <dir>`
+  (`.iolaus/evidence/owner-rescue/same-session-live`); host contract probe:
+  `.iolaus/evidence/owner-rescue/same-session-probe/run3` (OpenAI→Anthropic switch on a failed session). The earlier
+  fresh-session handoff design and its `session.inbox.list` host patch are superseded; their evidence directories
+  are historical only.
 - Worktrees (`src/dag/worktree.ts`): a run-level `directory` (absolute, a
   worktree of the project's repository by `git rev-parse --git-common-dir`,
   checked at create/amend/growth) is every child's session location; a node's
@@ -360,6 +387,6 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length. Standard test checks include `bun test` (unit and steering regression suites), `bun run typecheck`, `bun run check:package` (build and active manifest hashes), and `bun run check:reference` (800 snapshot files).
 
-Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Claims of live compatibility are strictly bounded to verified evidence.
+Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Same-session fallback and owner-model rescue run on stock OpenCode 2.0.28 with no host patch: `node script/qa-owner-rescue.mjs <evidence-dir>` (evidence `.iolaus/evidence/owner-rescue/same-session-live`), host contract probe `.iolaus/evidence/owner-rescue/same-session-probe/run3`. The `host-contract/`, `upstream-inbox/` and `implementation-smoke/` directories record the superseded fresh-session handoff design and its `session.inbox.list` patch; they are historical only. Claims of live compatibility are strictly bounded to verified evidence.
 
 Deliver changes through task-owned worktrees and pull requests. Preserve user changes and merge using merge commits after the relevant checks pass.

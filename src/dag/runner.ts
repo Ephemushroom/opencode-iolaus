@@ -4,6 +4,7 @@ import type { Context } from "@opencode/plugin/effect/plugin"
 import { DagRunnerError } from "./errors"
 import type { DagExecutionIdentity, DagExecutionRef, DagNodeDefinition, DagSteerRequest, JsonValue } from "./types"
 import { defaultWorktreePath, ensureWorktree, repositoryRoot } from "./worktree"
+import { continuationPrompt, normalizedModel } from "./rescue"
 
 export interface DagExecutionResult {
   readonly payload: JsonValue
@@ -17,10 +18,19 @@ export interface DagRunnerStart {
   readonly identity?: DagExecutionIdentity
   /** The run's working directory; omitted, the plugin's project directory. */
   readonly directory?: string
+  /**
+   * A model-failure retry: switch this earlier execution's session to the node's model and tell it to continue,
+   * instead of creating a new session. Its history (task, supplements, completed tools) stays in place.
+   */
+  readonly continueFrom?: DagExecutionRef
 }
 
 /** Executes one DAG node. Every method is an Effect so the scheduler can compose, interrupt and retry it. */
 export interface DagRunner {
+  /** True when `start` honours `continueFrom` (same-session model switch); otherwise a retry is a new session. */
+  readonly continues?: boolean
+  /** The owner session's current model ("provider/model[#variant]"), for the one owner-model rescue. */
+  ownerModel?(ownerSessionID: string): Effect.Effect<string, DagRunnerError>
   start(input: DagRunnerStart): Effect.Effect<DagExecutionRef, DagRunnerError>
   wait(ref: DagExecutionRef, requests?: readonly DagSteerRequest[]): Effect.Effect<DagExecutionResult, DagRunnerError>
   admit?(ref: DagExecutionRef): Effect.Effect<void, DagRunnerError>
@@ -36,6 +46,8 @@ export interface DagRunner {
 
 /** Promise-shaped runner, used by tests and by hosts that are not Effect-native. */
 export interface DagRunnerPromise {
+  readonly continues?: boolean
+  ownerModel?(ownerSessionID: string): Promise<string>
   start(input: DagRunnerStart): Promise<DagExecutionRef>
   wait(ref: DagExecutionRef, requests?: readonly DagSteerRequest[]): Promise<DagExecutionResult>
   admit?(ref: DagExecutionRef): Promise<void>
@@ -52,6 +64,8 @@ function lift<A>(nodeID: string | undefined, run: () => Promise<A>): Effect.Effe
 
 export function runnerFromPromise(runner: DagRunnerPromise): DagRunner {
   return {
+    ...(runner.continues ? { continues: true } : {}),
+    ...(runner.ownerModel ? { ownerModel: (owner: string) => lift(undefined, () => runner.ownerModel!(owner)) } : {}),
     start: (input) => lift(input.node.id, () => runner.start(input)),
     wait: (ref, requests) => lift(ref.nodeID, () => runner.wait(ref, requests)),
     ...(runner.admit ? { admit: (ref: DagExecutionRef) => lift(ref.nodeID, () => runner.admit!(ref)) } : {}),
@@ -77,7 +91,8 @@ export function assistantText(messages: readonly unknown[]): string {
   return ""
 }
 
-type SessionApi = Pick<Context["session"], "create" | "prompt" | "synthetic" | "wait" | "get" | "context" | "interrupt">
+/** `switchModel` and `update` enable same-session continuation; without them a retry starts a new session. */
+type SessionApi = Pick<Context["session"], "create" | "prompt" | "synthetic" | "wait" | "get" | "context" | "interrupt"> & Partial<Pick<Context["session"], "switchModel" | "update">>
 type GenerateApi = Pick<Context["generate"], "text">
 
 function runnerError(nodeID: string, model = false) {
@@ -133,13 +148,41 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
       if (index < 0) return yield* new DagRunnerError({ message: `Steering delivery unresolved for ${request.requestID}; no delivered host message is visible. Nothing was replayed.`, nodeID: ref.nodeID })
       after = Math.max(after, index)
     }
+    // A failed model turn that already received every supplement is a model failure: the supplements are in the
+    // session's history, so continuing that session on another model keeps them.
+    if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID, model: true, deliveredRequests: requests.map((request) => request.requestID) })
     const text = assistantText(messages.slice(after + 1))
     if (requests.length && !text) return yield* new DagRunnerError({ message: "Steering result unresolved: no assistant reply follows the delivered supplement", nodeID: ref.nodeID })
-    if (session.outcome === "failed") return yield* new DagRunnerError({ message: "Iolaus DAG child session failed", nodeID: ref.nodeID, model: true })
     if (session.outcome === "interrupted") return yield* new DagRunnerError({ message: "Iolaus DAG child session was interrupted", nodeID: ref.nodeID })
     return { payload: { text } }
   })
+  const { switchModel, update } = ctx.session
+  /**
+   * Continues an earlier execution's session on the node's model: wait for it to stop, check it is still that
+   * execution, switch the model, re-stamp the execution token and queue a continue prompt for `admit`.
+   */
+  const resume = (input: DagRunnerStart, from: DagExecutionRef) => Effect.gen(function* () {
+    const sessionID = from.sessionID as never
+    const nodeID = input.node.id
+    yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(nodeID)))
+    const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(nodeID)))
+    if (session.agent !== input.node.agent || (from.identity && session.metadata?.iolaus_execution_token !== from.identity.token))
+      return yield* new DagRunnerError({ message: `Continuation session ${from.sessionID} changed agent or execution; nothing was continued`, nodeID, nonRetryable: true })
+    if (session.outcome !== "failed" && session.outcome !== "succeeded")
+      return yield* new DagRunnerError({ message: `Continuation session ${from.sessionID} ended ${session.outcome ?? "without an outcome"}; nothing was continued`, nodeID, nonRetryable: true })
+    const previous = from.identity?.model ?? (session.model ? normalizedModel(`${session.model.providerID}/${session.model.id}${session.model.variant ? `#${session.model.variant}` : ""}`) : "unknown")
+    yield* switchModel!({ sessionID, model: Model.Ref.parse(input.node.model!) }).pipe(Effect.mapError(runnerError(nodeID, true)))
+    yield* update!({ sessionID, metadata: { ...session.metadata, iolaus_dag_attempt: input.attempt, iolaus_execution_token: input.identity!.token } as never }).pipe(Effect.mapError(runnerError(nodeID)))
+    pendingPrompts.set(from.sessionID, continuationPrompt(previous, input.node.model!))
+    return { nodeID, attempt: input.attempt, sessionID: from.sessionID, identity: input.identity }
+  })
   return {
+    ...(switchModel && update ? { continues: true } : {}),
+    ownerModel: (owner) => Effect.gen(function* () {
+      const session = yield* ctx.session.get({ sessionID: owner as never }).pipe(Effect.mapError((cause) => new DagRunnerError({ message: `Owner session is unavailable: ${String(cause)}`, cause })))
+      if (!session.model) return yield* new DagRunnerError({ message: "Owner session has no model" })
+      return normalizedModel(`${session.model.providerID}/${session.model.id}${session.model.variant ? `#${session.model.variant}` : ""}`)
+    }),
     admit,
     verify,
     steer: (ref, request) => Effect.gen(function* () {
@@ -159,6 +202,7 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
         return { nodeID: input.node.id, attempt: input.attempt, sessionID: key, ...(input.identity ? { identity: input.identity } : {}) }
       }
       if (input.node.agent === undefined) return yield* new DagRunnerError({ message: `Iolaus DAG node ${input.node.id} has no execution target`, nodeID: input.node.id })
+      if (input.continueFrom && switchModel && update && input.node.model !== undefined && input.identity) return yield* resume(input, input.continueFrom)
       let directory = input.directory ?? ctx.location.directory
       let prompt = input.prompt
       if (input.node.worktree) {
@@ -192,7 +236,10 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
       if (ref.sessionID.startsWith(JUDGE_REF) || pendingPrompts.has(ref.sessionID)) return undefined
       yield* ctx.session.wait({ sessionID: ref.sessionID as never }).pipe(Effect.mapError(runnerError(ref.nodeID)))
       const messages = yield* ctx.session.context({ sessionID: ref.sessionID as never }).pipe(Effect.mapError(runnerError(ref.nodeID)))
-      const prompted = (messages as readonly unknown[]).some((message) => typeof message === "object" && message !== null && (message as { type?: unknown }).type === "user")
+      // A continued session already holds earlier executions' prompts; only this execution's own prompt counts.
+      const own = ref.identity ? `msg_${ref.identity.token.replaceAll("-", "")}` : undefined
+      const prompted = (messages as readonly unknown[]).some((message) => typeof message === "object" && message !== null && (message as { type?: unknown }).type === "user"
+        && (own === undefined || (message as { id?: unknown }).id === own))
       return prompted ? yield* finish(ref, requests) : undefined
     }),
     cancel: (ref) => Effect.gen(function* () {

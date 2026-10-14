@@ -1,4 +1,4 @@
-import { Effect } from "effect"
+import { Deferred, Effect, Stream } from "effect"
 import { Agent, Plugin } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import { parseOptions } from "./options"
@@ -27,7 +27,7 @@ import { registerSubagentObserver } from "./dag/observe"
 import { registerCompaction } from "./compaction"
 import { DagValidationError } from "./dag/errors"
 import { admitTier, tierSource, type TierSession } from "./roles/tier"
-import { admitSteering } from "./roles/steering"
+import { admitSteering, rescueRoleAllowed } from "./roles/steering"
 import { createOpenCodeDagNotifier } from "./dag/notices"
 
 /** Session directory for a call, falling back to the plugin's own location. */
@@ -79,10 +79,13 @@ export default Plugin.define({
     const getTierSession = (sessionID: string): Effect.Effect<TierSession, DagValidationError> => ctx.session.get({ sessionID: sessionID as never }).pipe(
       Effect.map((session) => session as TierSession), Effect.mapError(() => new DagValidationError("Session ancestry is unavailable")))
     const source = (sessionID: string) => tierSource(sessionID, getTierSession, (runID, nodeID, childID) => controller.lineage(runID, nodeID, childID))
+    const recoveryReady = yield* Deferred.make<void>()
     const controller = createDagController({
       directory: ctx.location.directory,
       databasePath: home.database,
       runner: createOpenCodeDagRunner(ctx),
+      rescue: options.rescue,
+      recoveryReady: Deferred.await(recoveryReady),
       defaultModel,
       fallbackModels,
       maxParallel: options.defaultConcurrency,
@@ -93,6 +96,7 @@ export default Plugin.define({
       }),
       trace,
       admitSteer: (owner, node) => admitSteering(ctx, state, owner, node),
+      rescueRoleAllowed: (sessionID) => rescueRoleAllowed(ctx, state, sessionID),
       notifier: createOpenCodeDagNotifier(ctx.session),
       onEvent: (event, sessionID) => emit?.(sessionID, event.runID, event.sequence, event.type),
     })
@@ -138,5 +142,11 @@ export default Plugin.define({
 
     const rpc = yield* registerDagRpc(ctx, controller).pipe(Effect.orDie)
     emit = (sessionID, runID, sequence, type) => rpc.events.emit("updated", { sessionID, runID, sequence, type })
+    yield* ctx.event.subscribe().pipe(
+      Stream.filter((event) => event.type === "plugin.updated" && event.location?.directory === ctx.location.directory && event.location.workspaceID === ctx.location.workspaceID),
+      Stream.take(1),
+      Stream.runForEach(() => Deferred.succeed(recoveryReady, undefined)),
+      Effect.forkScoped({ startImmediately: true }),
+    )
   }),
 })

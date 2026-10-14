@@ -1,0 +1,13 @@
+{
+  "argv": [
+    "node",
+    "script/qa-owner-rescue-verify.mjs",
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance"
+  ],
+  "cwd": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue",
+  "QA_OPENCODE_SOURCE": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+  "freshStockDownload": true,
+  "gitSHA": "9ad51bb76f1ada0b6059ab8c37c324a7ad7ddc45",
+  "bun": "1.4.3",
+  "node": "v24.20.0"
+}

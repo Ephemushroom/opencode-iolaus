@@ -1,0 +1,161 @@
+{
+  "run": {
+    "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "planning-owner",
+    "definition": {
+      "name": "planning-owner",
+      "nodes": [
+        {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 1,
+          "model": "openai/A",
+          "prompt": "QA_CASE:planning-owner"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "2e5f155c5616086045cf0fbcb00760f0bd77eb33a92f5b5f62e42f57af565379",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963955117,
+    "updatedAt": 1791963955218,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 1,
+          "model": "openai/A",
+          "prompt": "QA_CASE:planning-owner"
+        },
+        "fingerprint": "56ca1255559efe9b5ced156223bd45ed7b5ad23202747c130c2bf659ac2a5f61",
+        "status": "failed",
+        "attempt": 1,
+        "runtime": {
+          "identity": {
+            "agent": "quick",
+            "model": "openai/A",
+            "token": "a24ad877-0b99-4586-86da-511fb5874431"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "blocked": "Planning sessions cannot steer live executions; steering is delegation, not a read-only operation.",
+          "failedModels": [
+            "openai/A"
+          ],
+          "historyKnown": true,
+          "initialRoleAllowed": true
+        },
+        "error": "Iolaus DAG child session failed",
+        "execution": {
+          "attempt": 1,
+          "identity": {
+            "agent": "quick",
+            "model": "openai/A",
+            "token": "a24ad877-0b99-4586-86da-511fb5874431"
+          },
+          "nodeID": "work",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "QA_CASE:planning-owner"
+          },
+          "sessionID": "ses_ec6a00043ffed0Erts4zexEM52"
+        },
+        "createdAt": 1791963955117,
+        "updatedAt": 1791963955217
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "93cfcd15-8cdb-4ce5-9997-56a3d6459bd7",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963955117
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "aeb93ab0-350c-4630-a33d-b03d47a98e5c",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963955117,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "a1d0ecc2-2a96-4507-8fb4-9bd4621ff0c6",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963955145,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "97f08a50-bda4-48a6-89e6-b21c6e8585be",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 4,
+      "type": "node.rescue-skipped",
+      "generation": 1,
+      "createdAt": 1791963955217,
+      "nodeID": "work",
+      "payload": {
+        "reason": "Planning sessions cannot steer live executions; steering is delegation, not a read-only operation."
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ddb14bf5-dee1-4179-b97e-8679ade029f5",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 5,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963955217,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "afcd8438-a7be-49dc-837f-27297b6775e6",
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "sequence": 6,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963955218
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "afcd8438-a7be-49dc-837f-27297b6775e6",
+      "messageID": "msg_afcd8438a7be49dc837f27297b6775e6",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_afcd8438a7be49dc837f27297b6775e6"
+      },
+      "runID": "6108bcf7-b626-4503-8d17-5c1647e8327c",
+      "state": "admitted",
+      "text": "Iolaus Flow notice afcd8438-a7be-49dc-837f-27297b6775e6: \"planning-owner\" (6108bcf7-b626-4503-8d17-5c1647e8327c) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

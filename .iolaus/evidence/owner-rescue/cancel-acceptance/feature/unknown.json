@@ -1,0 +1,159 @@
+{
+  "run": {
+    "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "unknown",
+    "definition": {
+      "name": "unknown",
+      "nodes": [
+        {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 1,
+          "model": "openai/A",
+          "prompt": "QA_CASE:unknown"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "f35b274442b109f08ca77873f75f7e43d82a1f1a4ec305e521fbef95369a4d69",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963953001,
+    "updatedAt": 1791963953099,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 1,
+          "model": "openai/A",
+          "prompt": "QA_CASE:unknown"
+        },
+        "fingerprint": "05d1598ccfc93ba1c26bb3eebab3d553b476c293b3760a146b3e8419681470c7",
+        "status": "failed",
+        "attempt": 1,
+        "runtime": {
+          "identity": {
+            "agent": "quick",
+            "model": "openai/A",
+            "token": "315f4748-339c-48ef-b03b-70f342ef668c"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "blocked": "ineligible_or_unknown_history",
+          "failedModels": [],
+          "historyKnown": true,
+          "initialRoleAllowed": true
+        },
+        "error": "Iolaus DAG child session failed",
+        "execution": {
+          "attempt": 1,
+          "identity": {
+            "agent": "quick",
+            "model": "openai/A",
+            "token": "315f4748-339c-48ef-b03b-70f342ef668c"
+          },
+          "nodeID": "work",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "QA_CASE:unknown"
+          },
+          "sessionID": "ses_ec6a00883ffeF4971H1GvhWu9r"
+        },
+        "createdAt": 1791963953001,
+        "updatedAt": 1791963953099
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "4de71999-e5f9-4cbb-b3c9-60f6096759b6",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963953001
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "62a92aa1-9257-4a58-9a76-5a1a9a290943",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963953002,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "8c5e001f-93ca-4e6c-a40e-be11494163af",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963953039,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "96d49e2c-0aac-4d05-a800-7c87e7269b4b",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 4,
+      "type": "node.rescue-skipped",
+      "generation": 1,
+      "createdAt": 1791963953098,
+      "nodeID": "work",
+      "payload": {
+        "reason": "ineligible_or_unknown_history"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "50eabc3d-a994-43be-81d3-efff9f01eaa4",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 5,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963953099,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "dd5a771d-2d42-47bc-b753-87d382a01fa3",
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "sequence": 6,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963953099
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "dd5a771d-2d42-47bc-b753-87d382a01fa3",
+      "messageID": "msg_dd5a771d2d4247bcb75387d382a01fa3",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_dd5a771d2d4247bcb75387d382a01fa3"
+      },
+      "runID": "cc4debf6-978c-49f9-bdea-62e3ae0b995b",
+      "state": "admitted",
+      "text": "Iolaus Flow notice dd5a771d-2d42-47bc-b753-87d382a01fa3: \"unknown\" (cc4debf6-978c-49f9-bdea-62e3ae0b995b) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

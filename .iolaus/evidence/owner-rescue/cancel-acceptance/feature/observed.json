@@ -1,0 +1,106 @@
+{
+  "run": {
+    "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "Subagent calls",
+    "definition": {
+      "name": "Subagent calls",
+      "nodes": [
+        {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "1-observed-failure",
+          "model": "openai/A",
+          "prompt": "QA_CASE:observed",
+          "title": "observed failure"
+        }
+      ],
+      "observed": true,
+      "schemaVersion": 1
+    },
+    "fingerprint": "329dc0697b6c4a2d22a1cacf321350381551958c54ec09a79c58b6a9b16cf9ea",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963962473,
+    "updatedAt": 1791963962511,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "1-observed-failure",
+          "model": "openai/A",
+          "prompt": "QA_CASE:observed",
+          "title": "observed failure"
+        },
+        "fingerprint": "445a7a39584c911dc313d9df691904b2f43adc4d688a0d9d8c659066f23bdfda",
+        "status": "failed",
+        "attempt": 1,
+        "error": "The subagent session failed",
+        "execution": {
+          "attempt": 1,
+          "nodeID": "1-observed-failure",
+          "sessionID": "ses_ec69fe392ffevQV4cSOhOd2QKf"
+        },
+        "createdAt": 1791963962473,
+        "updatedAt": 1791963962511
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "b733491e-c36c-4708-af7f-724786653cee",
+      "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963962475
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "9dee2619-4a69-45cd-a812-fa8bb25be7c4",
+      "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+      "sequence": 2,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963962475,
+      "nodeID": "1-observed-failure"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "79de9856-e6e9-4271-be71-25d8c7389217",
+      "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963962478,
+      "nodeID": "1-observed-failure"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "df308bc4-22e1-4b64-949a-800198e45fb9",
+      "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+      "sequence": 4,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963962511,
+      "nodeID": "1-observed-failure",
+      "payload": {
+        "message": "The subagent session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "4e4d8a43-8333-413d-9cfa-b5b3af4aeeb6",
+      "runID": "713c5932-6d7b-4af5-bd13-8bf8e1a3d2f8",
+      "sequence": 5,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963962511
+    }
+  ],
+  "steering": [],
+  "notices": []
+}

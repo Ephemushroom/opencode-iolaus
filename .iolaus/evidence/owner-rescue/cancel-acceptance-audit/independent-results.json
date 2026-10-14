@@ -1,0 +1,179 @@
+{
+  "verdict": "PASS",
+  "commandCount": 19,
+  "commandExitMismatches": [],
+  "receipts": {
+    "feature": {
+      "verdict": "PASS",
+      "checks": 52,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true,
+        "sockets": 0
+      },
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal"
+      ],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv"
+    },
+    "steering": {
+      "verdict": "PASS",
+      "checks": 35,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true
+      },
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE/home/.iolaus/iolaus.db-wal"
+      ],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-kUHeyE"
+    },
+    "stock-off": {
+      "verdict": "PASS",
+      "checks": 3,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true,
+        "sockets": 0
+      },
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab/home/.iolaus/iolaus.db-wal"
+      ],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-dTVxab"
+    },
+    "stock-on": {
+      "verdict": "UNSUPPORTED",
+      "checks": 2,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true,
+        "sockets": 0
+      },
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-SXceiz/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-SXceiz/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-SXceiz/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-SXceiz/data/opencode/opencode.db-shm"
+      ],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-SXceiz"
+    },
+    "historical-blocked-probe": {
+      "verdict": "BLOCKED",
+      "checks": 5,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true
+      },
+      "databasePaths": [],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-owner-rescue-qa-3VQCQT"
+    },
+    "partial-setup": {
+      "verdict": "FAIL",
+      "checks": 0,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true,
+        "sockets": 0
+      },
+      "databasePaths": [],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-KkmzUI"
+    },
+    "spawn": {
+      "verdict": "FAIL",
+      "checks": 0,
+      "cleanup": {
+        "sandboxRemoved": true,
+        "processGone": true,
+        "mockClosed": true,
+        "sockets": 0
+      },
+      "databasePaths": [],
+      "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-TSRGfC"
+    }
+  },
+  "negativeCleanupCases": 6,
+  "cancellation": {
+    "cancel-fallback": {
+      "activeAttempt": 2,
+      "models": [
+        "A",
+        "B",
+        "B"
+      ],
+      "completedNativeWrites": 1,
+      "queuedRequirementPreserved": "PRESERVE_cancel-fallback_B_REQUIREMENT",
+      "durableStates": [
+        "cancelled",
+        "reloaded",
+        "disabled"
+      ],
+      "postCancellationChildRequestDelta": 0,
+      "sourceCheckpointUnchanged": true,
+      "lateOutcomePublished": false
+    },
+    "cancel-attempt": {
+      "activeAttempt": 2,
+      "models": [
+        "A",
+        "A",
+        "A"
+      ],
+      "completedNativeWrites": 1,
+      "queuedRequirementPreserved": "PRESERVE_cancel-attempt_B_REQUIREMENT",
+      "durableStates": [
+        "cancelled",
+        "reloaded",
+        "disabled"
+      ],
+      "postCancellationChildRequestDelta": 0,
+      "sourceCheckpointUnchanged": true,
+      "lateOutcomePublished": false
+    }
+  },
+  "excludedCancellationControl": {
+    "verdict": "PASS",
+    "ordinaryRequests": 3
+  },
+  "protectedPathCount": 17,
+  "sourceFingerprintCount": 215,
+  "currentBuildHash": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010",
+  "installedHost": {
+    "realpath": "/opt/homebrew/Cellar/opencode-v2/2.0.28/bin/opencode",
+    "sha256": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341"
+  },
+  "residualQASandboxes": [],
+  "residualQAProcesses": []
+}

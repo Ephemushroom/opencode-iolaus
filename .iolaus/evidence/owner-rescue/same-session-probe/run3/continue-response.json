@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "data": {
+    "data": {
+      "id": "msg_139c93a82001i9waRvvddpNKxS",
+      "sessionID": "ses_ec636c8a7ffe8N45wZJHpuQP2b",
+      "time": {
+        "created": 1791970851459
+      },
+      "type": "user",
+      "payload": {
+        "text": "PROBE_CONTINUE"
+      },
+      "delivery": "steer"
+    }
+  }
+}

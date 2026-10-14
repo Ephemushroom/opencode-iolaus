@@ -1,0 +1,52 @@
+[
+  {
+    "name": "host version",
+    "verdict": "PASS",
+    "version": "opencode v2.0.28",
+    "binary": "/opt/homebrew/bin/opencode"
+  },
+  {
+    "name": "first model turn ended after real tool effect",
+    "verdict": "PASS",
+    "outcome": "failed",
+    "agent": "build",
+    "model": {
+      "id": "gpt-5.5",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "progress": "STEP1_DONE",
+    "anthropicCallsSoFar": 0
+  },
+  {
+    "name": "switchModel on ended session",
+    "verdict": "PASS",
+    "status": 204
+  },
+  {
+    "name": "continuation result",
+    "verdict": "PASS",
+    "outcome": "succeeded",
+    "agent": "build",
+    "model": {
+      "id": "claude-qa",
+      "providerID": "anthropic",
+      "variant": "default"
+    },
+    "providerCallsAfterSwitch": [
+      {
+        "url": "/v1/messages?beta=true",
+        "model": "claude-qa"
+      }
+    ],
+    "anthropic": [
+      {
+        "seq": 5,
+        "sawTask": true,
+        "sawToolResult": true,
+        "sawSupplement": true,
+        "sawContinue": true
+      }
+    ]
+  }
+]
