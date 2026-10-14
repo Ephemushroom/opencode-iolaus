@@ -1,0 +1,15 @@
+$ bun run build && bun run script/check-package.ts
+$ bun run script/build.ts
+Built prompt-only Iolaus plugin and prompt library.
+{
+  "activeFiles": 100,
+  "packageFiles": [
+    "dist/index.js",
+    "dist/prompts.js",
+    "dist/tui.js",
+    "README.md",
+    "LICENSE.md",
+    "NOTICE.md"
+  ],
+  "verdict": "PASS"
+}

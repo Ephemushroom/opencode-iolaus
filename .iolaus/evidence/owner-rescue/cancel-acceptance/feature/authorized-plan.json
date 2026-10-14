@@ -1,0 +1,450 @@
+{
+  "run": {
+    "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+    "ownerSessionID": "ses_ec69feb61ffe7Axf3JD4sXwcqs",
+    "name": "start-work: rescue-qa",
+    "authorizedPlan": "rescue-qa",
+    "authorizedAtlasNodes": {
+      "fix": "77d634f5d33dc88e6255b9c7080d9de049df0b88e1b0a4857211d8a370697277",
+      "t01": "b5ef42f15a082500c01d2fa90ec5eeae157d0770e752936e22762b3d947da6bc"
+    },
+    "definition": {
+      "maxParallel": 1,
+      "name": "start-work: rescue-qa",
+      "nodes": [
+        {
+          "agent": "atlas",
+          "dependsOn": [],
+          "id": "t01",
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "<iolaus-plan-ticket plan=\"rescue-qa\" ticket=\"01\">\nImplement ticket 01 of the approved plan \"rescue-qa\" in this session, and only that ticket.\nRead the spec .iolaus/plans/rescue-qa/spec.md and your ticket .iolaus/plans/rescue-qa/tickets/01-work.md. Other tickets are context, not work: none.\nWork test-first at the seams the spec names: one failing test, the smallest change that passes it, repeat. Run the type checker and the tests you touched as you go and the full suite once at the end.\nReport the files you changed and, for every acceptance criterion in the ticket, the evidence that it holds (command and output).",
+          "title": "01: Authorized Exclusion"
+        },
+        {
+          "agent": "momus",
+          "dependsOn": [
+            "t01"
+          ],
+          "id": "review-standards",
+          "inputs": [
+            {
+              "node": "*"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "Review the implementation of plan \"rescue-qa\" on the Standards axis only: does the code follow this repository's documented standards (AGENTS.md, CLAUDE.md, CONTRIBUTING.md and similar, where present)? Read the change with git diff HEAD (and git status for new files). The ticket reports are in <iolaus-dag-inputs>.\nReport each violation with file, hunk and the rule it breaks; name baseline smells as judgement calls. Skip anything tooling already enforces. Do not judge whether the spec was met.\nSmell baseline (judgement calls; a documented repo standard overrides any of them): Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative Generality, Message Chains, Middle Man, Refused Bequest.\nEnd your reply with exactly one line, \"VERDICT: PASS\" or \"VERDICT: FAIL\". FAIL only for findings that must be fixed before the work can be accepted; list those first.",
+          "title": "Review against the standards"
+        },
+        {
+          "agent": "momus",
+          "dependsOn": [
+            "t01"
+          ],
+          "id": "review-spec",
+          "inputs": [
+            {
+              "node": "*"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "Review the implementation of plan \"rescue-qa\" on the Spec axis only: does the change do what .iolaus/plans/rescue-qa/spec.md and the tickets (.iolaus/plans/rescue-qa/tickets/01-work.md) ask? Read the change with git diff HEAD (and git status for new files). The ticket reports are in <iolaus-dag-inputs>.\nReport (a) requirements missing or partial, (b) behaviour that was not asked for, (c) requirements that look implemented but wrong, quoting the spec or ticket line for each. Do not judge code style.\nEnd your reply with exactly one line, \"VERDICT: PASS\" or \"VERDICT: FAIL\". FAIL only for findings that must be fixed before the work can be accepted; list those first.",
+          "title": "Review against the spec"
+        },
+        {
+          "agent": "atlas",
+          "dependsOn": [
+            "review-standards",
+            "review-spec"
+          ],
+          "id": "fix",
+          "inputs": [
+            {
+              "node": "review-standards"
+            },
+            {
+              "node": "review-spec"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "<iolaus-plan-ticket plan=\"rescue-qa\" ticket=\"review\">\nThe reviews of plan \"rescue-qa\" are in <iolaus-dag-inputs>. Fix every finding marked as blocking, within the plan's scope (.iolaus/plans/rescue-qa/spec.md), then re-run the affected tests and the full suite. Report each finding with what you changed and the evidence.",
+          "title": "Fix the review findings",
+          "when": {
+            "any": [
+              {
+                "field": "text",
+                "includes": "VERDICT: FAIL",
+                "node": "review-standards"
+              },
+              {
+                "field": "text",
+                "includes": "VERDICT: FAIL",
+                "node": "review-spec"
+              }
+            ]
+          }
+        },
+        {
+          "dependsOn": [
+            "review-standards",
+            "review-spec",
+            "fix"
+          ],
+          "id": "accept",
+          "inputs": [
+            {
+              "node": "review-standards"
+            },
+            {
+              "node": "review-spec"
+            },
+            {
+              "node": "fix"
+            }
+          ],
+          "kind": "gate",
+          "prompt": "Plan \"rescue-qa\" is implemented (1 tickets) and reviewed on the Standards and Spec axes. Approve to accept the work or reject to stop.",
+          "title": "Accept the plan's work"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "9d9706dc929ed12d32d2ffeebbf3373efa71d4e323929dd2bb8551ae2dc687a3",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963960493,
+    "updatedAt": 1791963960660,
+    "nodes": [
+      {
+        "definition": {
+          "dependsOn": [
+            "review-standards",
+            "review-spec",
+            "fix"
+          ],
+          "id": "accept",
+          "inputs": [
+            {
+              "node": "review-standards"
+            },
+            {
+              "node": "review-spec"
+            },
+            {
+              "node": "fix"
+            }
+          ],
+          "kind": "gate",
+          "prompt": "Plan \"rescue-qa\" is implemented (1 tickets) and reviewed on the Standards and Spec axes. Approve to accept the work or reject to stop.",
+          "title": "Accept the plan's work"
+        },
+        "fingerprint": "863e833676dbd707e4cd21f76f226a74c88e3d4d10ad89425e42ed50496ba81b",
+        "status": "blocked",
+        "attempt": 0,
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "A dependency did not complete successfully",
+        "createdAt": 1791963960493,
+        "updatedAt": 1791963960659
+      },
+      {
+        "definition": {
+          "agent": "atlas",
+          "dependsOn": [
+            "review-standards",
+            "review-spec"
+          ],
+          "id": "fix",
+          "inputs": [
+            {
+              "node": "review-standards"
+            },
+            {
+              "node": "review-spec"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "<iolaus-plan-ticket plan=\"rescue-qa\" ticket=\"review\">\nThe reviews of plan \"rescue-qa\" are in <iolaus-dag-inputs>. Fix every finding marked as blocking, within the plan's scope (.iolaus/plans/rescue-qa/spec.md), then re-run the affected tests and the full suite. Report each finding with what you changed and the evidence.",
+          "title": "Fix the review findings",
+          "when": {
+            "any": [
+              {
+                "field": "text",
+                "includes": "VERDICT: FAIL",
+                "node": "review-standards"
+              },
+              {
+                "field": "text",
+                "includes": "VERDICT: FAIL",
+                "node": "review-spec"
+              }
+            ]
+          }
+        },
+        "fingerprint": "79379292c2a199a82d384e6e7acfcb9567ae1371f27637d619515d0ac538fe6b",
+        "status": "blocked",
+        "attempt": 0,
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "A dependency did not complete successfully",
+        "createdAt": 1791963960493,
+        "updatedAt": 1791963960660
+      },
+      {
+        "definition": {
+          "agent": "momus",
+          "dependsOn": [
+            "t01"
+          ],
+          "id": "review-spec",
+          "inputs": [
+            {
+              "node": "*"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "Review the implementation of plan \"rescue-qa\" on the Spec axis only: does the change do what .iolaus/plans/rescue-qa/spec.md and the tickets (.iolaus/plans/rescue-qa/tickets/01-work.md) ask? Read the change with git diff HEAD (and git status for new files). The ticket reports are in <iolaus-dag-inputs>.\nReport (a) requirements missing or partial, (b) behaviour that was not asked for, (c) requirements that look implemented but wrong, quoting the spec or ticket line for each. Do not judge code style.\nEnd your reply with exactly one line, \"VERDICT: PASS\" or \"VERDICT: FAIL\". FAIL only for findings that must be fixed before the work can be accepted; list those first.",
+          "title": "Review against the spec"
+        },
+        "fingerprint": "7a0d9d27a9fabfa3aafa4377971f560c9f8d29983fe8955343d7eb2062bc1a99",
+        "status": "blocked",
+        "attempt": 0,
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "A dependency did not complete successfully",
+        "createdAt": 1791963960493,
+        "updatedAt": 1791963960659
+      },
+      {
+        "definition": {
+          "agent": "momus",
+          "dependsOn": [
+            "t01"
+          ],
+          "id": "review-standards",
+          "inputs": [
+            {
+              "node": "*"
+            }
+          ],
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "Review the implementation of plan \"rescue-qa\" on the Standards axis only: does the code follow this repository's documented standards (AGENTS.md, CLAUDE.md, CONTRIBUTING.md and similar, where present)? Read the change with git diff HEAD (and git status for new files). The ticket reports are in <iolaus-dag-inputs>.\nReport each violation with file, hunk and the rule it breaks; name baseline smells as judgement calls. Skip anything tooling already enforces. Do not judge whether the spec was met.\nSmell baseline (judgement calls; a documented repo standard overrides any of them): Mysterious Name, Duplicated Code, Feature Envy, Data Clumps, Primitive Obsession, Repeated Switches, Shotgun Surgery, Divergent Change, Speculative Generality, Message Chains, Middle Man, Refused Bequest.\nEnd your reply with exactly one line, \"VERDICT: PASS\" or \"VERDICT: FAIL\". FAIL only for findings that must be fixed before the work can be accepted; list those first.",
+          "title": "Review against the standards"
+        },
+        "fingerprint": "de896b51d066bf7ce7d32c4d75171a5d92108b699f967e757c9b0593df8c7805",
+        "status": "blocked",
+        "attempt": 0,
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "A dependency did not complete successfully",
+        "createdAt": 1791963960493,
+        "updatedAt": 1791963960659
+      },
+      {
+        "definition": {
+          "agent": "atlas",
+          "dependsOn": [],
+          "id": "t01",
+          "maxAttempts": 2,
+          "model": "openai/A",
+          "prompt": "<iolaus-plan-ticket plan=\"rescue-qa\" ticket=\"01\">\nImplement ticket 01 of the approved plan \"rescue-qa\" in this session, and only that ticket.\nRead the spec .iolaus/plans/rescue-qa/spec.md and your ticket .iolaus/plans/rescue-qa/tickets/01-work.md. Other tickets are context, not work: none.\nWork test-first at the seams the spec names: one failing test, the smallest change that passes it, repeat. Run the type checker and the tests you touched as you go and the full suite once at the end.\nReport the files you changed and, for every acceptance criterion in the ticket, the evidence that it holds (command and output).",
+          "title": "01: Authorized Exclusion"
+        },
+        "fingerprint": "b5ef42f15a082500c01d2fa90ec5eeae157d0770e752936e22762b3d947da6bc",
+        "status": "failed",
+        "attempt": 2,
+        "runtime": {
+          "identity": {
+            "agent": "atlas",
+            "model": "openai/A",
+            "token": "d3ada320-d3e2-4c00-81ed-bf65c488e31f"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "Iolaus DAG child session failed",
+        "execution": {
+          "attempt": 2,
+          "identity": {
+            "agent": "atlas",
+            "model": "openai/A",
+            "token": "d3ada320-d3e2-4c00-81ed-bf65c488e31f"
+          },
+          "nodeID": "t01",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "eaa113d308310fd8d08ec1ddc7ac2f7ae42ab26149aab1a065e4fac442531f8c",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "<iolaus-plan-ticket plan=\"rescue-qa\" ticket=\"01\">\nImplement ticket 01 of the approved plan \"rescue-qa\" in this session, and only that ticket.\nRead the spec .iolaus/plans/rescue-qa/spec.md and your ticket .iolaus/plans/rescue-qa/tickets/01-work.md. Other tickets are context, not work: none.\nWork test-first at the seams the spec names: one failing test, the smallest change that passes it, repeat. Run the type checker and the tests you touched as you go and the full suite once at the end.\nReport the files you changed and, for every acceptance criterion in the ticket, the evidence that it holds (command and output)."
+          },
+          "sessionID": "ses_ec69feaf8ffeOkdW5JTTDUbW57"
+        },
+        "createdAt": 1791963960493,
+        "updatedAt": 1791963960658
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "21b0a2f2-35ce-4892-916c-622f53e0e781",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963960493
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "4a13ec88-6fea-4475-a317-9c2986b23779",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963960494,
+      "nodeID": "t01"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "08ff7d97-55de-4d1e-841b-0b0e4ff019ba",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963960527,
+      "nodeID": "t01"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "84419098-629d-4368-a10b-e5b896617baa",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 4,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963960581,
+      "nodeID": "t01",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "c3efc06d-8bcb-4725-b55d-51be46a67453",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 5,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963960582,
+      "nodeID": "t01"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b7e68aec-09a1-41b2-add8-c0b1584ff633",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 6,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963960599,
+      "nodeID": "t01"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "2ae3c454-0fd2-4317-b0a7-355f3e28f1d9",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 7,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963960658,
+      "nodeID": "t01",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "c66a2fbb-c669-4671-851a-817f125f1cd1",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 8,
+      "type": "node.blocked",
+      "generation": 1,
+      "createdAt": 1791963960659,
+      "nodeID": "review-spec"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "d5968eeb-3046-48bf-8a7a-e26bd059eec0",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 9,
+      "type": "node.blocked",
+      "generation": 1,
+      "createdAt": 1791963960659,
+      "nodeID": "review-standards"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "81dbe770-4a00-4866-95de-3edc88204e20",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 10,
+      "type": "node.blocked",
+      "generation": 1,
+      "createdAt": 1791963960659,
+      "nodeID": "accept"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "db79180c-75ef-4f5d-8c60-0a8ae9f0b547",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 11,
+      "type": "node.blocked",
+      "generation": 1,
+      "createdAt": 1791963960660,
+      "nodeID": "fix"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "6a770a20-525f-4ee5-be64-4e9ad9242070",
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "sequence": 12,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963960660
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "6a770a20-525f-4ee5-be64-4e9ad9242070",
+      "messageID": "msg_6a770a20525f4ee5be644e9ad9242070",
+      "ownerSessionID": "ses_ec69feb61ffe7Axf3JD4sXwcqs",
+      "receipt": {
+        "messageID": "msg_6a770a20525f4ee5be644e9ad9242070"
+      },
+      "runID": "2215e78a-3903-4c19-99ef-92576764fae6",
+      "state": "admitted",
+      "text": "Iolaus Flow notice 6a770a20-525f-4ee5-be64-4e9ad9242070: \"start-work: rescue-qa\" (2215e78a-3903-4c19-99ef-92576764fae6) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

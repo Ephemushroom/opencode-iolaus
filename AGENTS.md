@@ -117,10 +117,15 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   - Concurrency and failure semantics: Serialized under per-run lock and operating mutex.
     If identity drifts or delivery fails, the request is marked `unresolved`, the child session
     is cancelled, the node is interrupted, and stale results are blocked from reaching downstream
-    nodes. Steered executions do not automatically retry, fall back across model chains, or escalate
-    (`deep-low` to `deep-high`). Re-running a steered task requires launching a new flow with the
-    complete task. Action `amend` refuses flows with active executions or unresolved steering,
-    and invalidates cached outputs of steered nodes and their descendants.
+    nodes. By default, steered executions do not automatically retry, fall back across model chains, or escalate
+    (`deep-low` to `deep-high`). Re-running a steered task requires launching a new flow with the complete task. Under
+    opt-in `rescue.ownerModel: true` on a supported host, a narrow continuation path admits fallback and rescue:
+    steering requests admitted with a receipt (`state: "admitted"`) are transcript-verified and marked delivered
+    (`state: "delivered"`) during inspection even if the provider failed; continuation requires all supplements to be
+    confirmed delivered, transcript-verified, and free of unresolved requests. Any unresolved steering, unverified
+    receipt, or delivery ambiguity halts execution immediately (`unresolved_steering` / `interrupted`), failing closed
+    without replay. Action `amend` refuses flows with active executions or unresolved steering/rescue, and invalidates
+    cached outputs of steered nodes and their descendants.
   - Guarantees: Neither atomic identity pinning nor host-spanning exactly-once delivery is
     claimed; unconfirmed receipts or delivery ambiguities fail closed as `unresolved` rather
     than silently replaying.
@@ -142,6 +147,50 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   in place to `deep-high` (lane model and fallbacks), its findings appended in
   `<iolaus-escalation>`, and rerun (`node.escalated`). Only when deep-high
   resolves to a model; admission re-checks the new agent at launch.
+- Terminal owner-model rescue (`rescue: { ownerModel: boolean }` in `options.ts`): opt-in last-resort
+  recovery on provider availability failures, default off (`rescue.ownerModel: false`).
+  - Configuration: Configured in `iolaus.json` via strict `"rescue": { "ownerModel": boolean }`; unknown
+    properties or non-boolean types throw a `TypeError`.
+  - Host requirement: Requires a patched OpenCode host providing read-only `session.inbox.list` on
+    `ctx.session.inbox` alongside location-scoped `agent`, `model`, and `permission` inspection. Stock
+    OpenCode 2.0.27 lacks `session.inbox.list` and cannot enable the feature; enabling `rescue.ownerModel` on an
+    unpatched host throws explicitly during runner creation (`rescue.ownerModel is unsupported by this host...`).
+    No installed host replacement or upstream PR has been performed; reference patch and verification live
+    under `.iolaus/evidence/owner-rescue/upstream-inbox/` (`upstream.patch`, `contract-proof.md`) and
+    `.iolaus/evidence/owner-rescue/implementation-smoke/` (`verification.md`).
+  - Fallback order and node-lifetime budget: Nodes first attempt execution on their planned model, then walk
+    their entire configured `fallbackModels` chain on model failures (the fallback chain is consumed first, bounded by
+    chain length rather than `maxAttempts`). Once the fallback chain is exhausted, remaining attempts in `maxAttempts`
+    run on the final model. Only after both lane fallbacks and the attempt budget are completely exhausted, if the
+    terminal failure is an eligible provider failure and safe handoff checks hold, rescue triggers as one extra
+    continuation on the pinned owner model (`rescue.pinnedModel`). Exactly one rescue attempt is permitted per node
+    lifetime (`recovery.rescue`, persisted in SQLite table `dag_node_recovery`); further rescue attempts throw
+    `owner_rescue_spent`. If the owner model itself already failed on that node, rescue is refused
+    (`owner_model_already_failed`) and `node.rescue-skipped` is emitted.
+  - Whitelist and eligibility: Limited strictly to provider availability failures (`provider.auth`,
+    `provider.quota`, `provider.rate-limit`, `provider.internal`, `provider.transport`, `provider.timeout`,
+    `provider.no-route`, `provider.invalid-output`). Targets must be session-backed agent nodes with admitted
+    initial prompts and known execution identities; ineligible targets that are never rescued include judge nodes,
+    excluded lanes (`atlas`, `prometheus`), observed native subagent runs, planning sessions/roles, Atlas sessions
+    and `/start-work` authorized plans, legacy unpinned executions, gate nodes, non-provider errors, and
+    non-retryable runner failures.
+  - Identity and security preservation: The child agent lane, permission ruleset, and working directory
+    (`recoveryDirectory` dev, inode, and branch checks) are strictly preserved. The owner model must be enabled,
+    tool-capable, text-compatible, and present in the child location's model catalog (`availableModel`);
+    cross-location catalog responses are refused.
+  - Bounded portable handoff: Checkpoints strip hidden reasoning and provider state, preserving plain text,
+    confirmed steering (`type: "steer"`), and completed safe native tools (`read`, `glob`, `grep`, `edit`,
+    `write`, `patch`) with text output. Bounded at ≤256 tool calls and ≤64 KiB for the entire rendered UTF-8 handoff
+    packet (including instruction prefix and JSON audit record). Continuation prompts instruct the model that
+    recorded effects already occurred in the directory and must not be replayed.
+  - Guarantees and refusals: Relies on point-in-time checks of idle source history, pending host inbox messages,
+    and pending permissions; neither external exactly-once delivery nor atomic handoff is promised. Delivery
+    ambiguities, pending host inputs, or history drift fail closed without replay. Settled completions record
+    rescue provenance (`provenance.rescue: { decisionID, model, from }`). Once settled, manual `retry` honors the
+    current task and restarts from its planned model chain (rather than unconditionally reverting to an outdated
+    definition), while keeping the node's lifetime rescue budget spent; for nodes whose lane escalated (`deep-low` to
+    `deep-high`), retry restores the pre-rescue escalated definition. Manual `retry` refuses if rescue history is
+    unresolved or blocked.
 - Worktrees (`src/dag/worktree.ts`): a run-level `directory` (absolute, a
   worktree of the project's repository by `git rev-parse --git-common-dir`,
   checked at create/amend/growth) is every child's session location; a node's
@@ -360,6 +409,6 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length. Standard test checks include `bun test` (unit and steering regression suites), `bun run typecheck`, `bun run check:package` (build and active manifest hashes), and `bun run check:reference` (800 snapshot files).
 
-Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Claims of live compatibility are strictly bounded to verified evidence.
+Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Host-contract investigation probes for stock host inbox blockers live under `.iolaus/evidence/owner-rescue/host-contract/`; isolated patched-host `session.inbox.list` contract proofs and the upstream patch live under `.iolaus/evidence/owner-rescue/upstream-inbox/` (`contract-proof.md`, `upstream.patch`, `final.json`); backend smoke verification on the isolated patched host lives under `.iolaus/evidence/owner-rescue/implementation-smoke/` (`verification.md`). Stock OpenCode 2.0.27 lacks `session.inbox.list` and cannot enable owner-model rescue without the patch; no installed host replacement or upstream PR has been done. Claims of live compatibility are strictly bounded to verified evidence.
 
 Deliver changes through task-owned worktrees and pull requests. Preserve user changes and merge using merge commits after the relevant checks pass.

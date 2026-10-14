@@ -1,0 +1,9 @@
+{
+  "verdict": "PASS",
+  "checks": 35,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  }
+}

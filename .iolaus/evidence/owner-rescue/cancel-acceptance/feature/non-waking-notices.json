@@ -1,0 +1,37 @@
+{
+  "notices": [
+    {
+      "id": "msg_151c85d19fd84f7884f8d3a0064dab9e",
+      "sessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "time": {
+        "created": 1791963948813
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "Iolaus Flow notice 151c85d1-9fd8-4f78-84f8-d3a0064dab9e: \"progress\" (27651864-6edd-489f-921b-0a8a555338d4) reserved its one owner-model rescue for work: {\"decisionID\":\"9db8ab4a-ed1b-4f50-9c65-184826e76ecf\",\"from\":\"openai/A\",\"to\":\"rescue/owner#actual\"}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate.",
+        "metadata": {
+          "iolaus_flow_notice": "151c85d1-9fd8-4f78-84f8-d3a0064dab9e",
+          "iolaus_dag_run": "27651864-6edd-489f-921b-0a8a555338d4"
+        }
+      },
+      "delivery": "queue"
+    },
+    {
+      "id": "msg_4ccf295f267d4b84b06e13251f7f855a",
+      "sessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "time": {
+        "created": 1791963948984
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "Iolaus Flow notice 4ccf295f-267d-4b84-b06e-13251f7f855a: \"progress\" (27651864-6edd-489f-921b-0a8a555338d4) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate.",
+        "metadata": {
+          "iolaus_flow_notice": "4ccf295f-267d-4b84-b06e-13251f7f855a",
+          "iolaus_dag_run": "27651864-6edd-489f-921b-0a8a555338d4"
+        }
+      },
+      "delivery": "queue"
+    }
+  ],
+  "providerRequestCount": 63
+}

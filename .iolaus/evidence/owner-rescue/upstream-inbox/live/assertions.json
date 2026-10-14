@@ -1,0 +1,57 @@
+{
+  "status": "PASS",
+  "checks": [
+    "effect before-reload: all four pending types visible, stable read, list only, missing session rejected",
+    "promise before-reload: all four pending types visible, stable read, list only, missing session rejected",
+    "effect after-reload: all four pending types visible, stable read, list only, missing session rejected",
+    "promise after-reload: all four pending types visible, stable read, list only, missing session rejected",
+    "failed outcome plus wait/context still hides pending requirements; plugin API now sees them without resuming or consuming"
+  ],
+  "requestCount": 3,
+  "before": {
+    "/Users/Bryan/.iolaus/iolaus.json": {
+      "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.iolaus/iolaus.json",
+      "sha256": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac"
+    },
+    "/Users/Bryan/.config/opencode/opencode.json": {
+      "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.config/opencode/opencode.json",
+      "sha256": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e"
+    },
+    "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+    "/Users/Bryan/.config/opencode/cli.json": {
+      "realpath": "/Users/Bryan/.config/opencode/cli.json",
+      "sha256": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+    },
+    "/opt/homebrew/bin/opencode": {
+      "realpath": "/opt/homebrew/Cellar/opencode-v2/2.0.27/bin/opencode",
+      "sha256": "7fa5c8659e57cae76b1da4f45edbc583aef93aae917246a0b3abb1ac1b3fb93c"
+    }
+  },
+  "cleanup": {
+    "errors": [],
+    "serverStopped": true,
+    "mockStopped": true,
+    "mockSocketsRemaining": 0,
+    "after": {
+      "/Users/Bryan/.iolaus/iolaus.json": {
+        "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.iolaus/iolaus.json",
+        "sha256": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac"
+      },
+      "/Users/Bryan/.config/opencode/opencode.json": {
+        "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.config/opencode/opencode.json",
+        "sha256": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e"
+      },
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.config/opencode/cli.json": {
+        "realpath": "/Users/Bryan/.config/opencode/cli.json",
+        "sha256": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+      },
+      "/opt/homebrew/bin/opencode": {
+        "realpath": "/opt/homebrew/Cellar/opencode-v2/2.0.27/bin/opencode",
+        "sha256": "7fa5c8659e57cae76b1da4f45edbc583aef93aae917246a0b3abb1ac1b3fb93c"
+      }
+    },
+    "hostStateUnchanged": true,
+    "sandboxRemoved": true
+  }
+}

@@ -16,6 +16,7 @@ export interface Options {
   gh: boolean
   /** `background_task.defaultConcurrency`: most DAG nodes one run may execute at once; a run's own `maxParallel` can only lower it. */
   defaultConcurrency: number
+  rescue: { ownerModel: boolean }
 }
 
 function selection<T extends string>(value: unknown, allowed: readonly T[], name: string): T[] {
@@ -27,7 +28,7 @@ function selection<T extends string>(value: unknown, allowed: readonly T[], name
 }
 
 export function parseOptions(input: Record<string, unknown>): Options {
-  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify", "gh", "background_task"].includes(key))
+  const unknown = Object.keys(input).filter((key) => !["enabled", "agents", "categories", "modes", "models", "astGrep", "mcps", "verify", "gh", "background_task", "rescue"].includes(key))
   if (unknown.length) throw new TypeError(`Unknown Iolaus options: ${unknown.join(", ")}`)
   if (input.enabled !== undefined && typeof input.enabled !== "boolean") {
     throw new TypeError("Iolaus enabled must be a boolean")
@@ -39,6 +40,12 @@ export function parseOptions(input: Record<string, unknown>): Options {
     throw new TypeError("Iolaus gh must be a boolean")
   }
   const background = input.background_task
+  const rescue = input.rescue
+  if (rescue !== undefined) {
+    if (typeof rescue !== "object" || rescue === null || Array.isArray(rescue)) throw new TypeError("Iolaus rescue must be an object")
+    if (Object.keys(rescue).some((key) => key !== "ownerModel")) throw new TypeError("Unknown Iolaus rescue option")
+    if ("ownerModel" in rescue && typeof rescue.ownerModel !== "boolean") throw new TypeError("Iolaus rescue.ownerModel must be a boolean")
+  }
   if (background !== undefined) {
     if (typeof background !== "object" || background === null || Array.isArray(background)) throw new TypeError("Iolaus background_task must be an object")
     const unknownBackground = Object.keys(background).filter((key) => key !== "defaultConcurrency")
@@ -61,5 +68,6 @@ export function parseOptions(input: Record<string, unknown>): Options {
     mcps: selection(input.mcps, MCP_NAMES, "mcps"),
     verify: input.verify === undefined ? true : (input.verify as boolean | Record<string, unknown>),
     defaultConcurrency: ((background as { defaultConcurrency?: number } | undefined)?.defaultConcurrency) ?? 5,
+    rescue: { ownerModel: typeof rescue === "object" && rescue !== null && "ownerModel" in rescue && rescue.ownerModel === true },
   }
 }

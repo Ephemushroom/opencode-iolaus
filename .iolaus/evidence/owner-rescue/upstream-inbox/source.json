@@ -1,0 +1,11 @@
+{
+  "source": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+  "tag": "v2.0.27",
+  "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+  "branch": "plugin-inbox-read",
+  "patchSha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0",
+  "lockSha256": "97b04a1407c4cf48ad4e3fc7c0c85932188e4d0e97ca8005309420062887f60f",
+  "bun": "1.4.3",
+  "node": "v24.20.0",
+  "dependenciesReused": true
+}

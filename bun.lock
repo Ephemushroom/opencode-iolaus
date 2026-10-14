@@ -11,6 +11,7 @@
         "zod": "4.1.8",
       },
       "devDependencies": {
+        "@opencode/client": "2.0.27",
         "@opencode/plugin": "2.0.27",
         "@opencode/schema": "2.0.27",
         "@opentui/solid": "0.5.17",

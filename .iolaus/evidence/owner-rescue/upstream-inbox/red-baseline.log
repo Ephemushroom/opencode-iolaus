@@ -1,0 +1,63 @@
+bun test v1.4.3 (c6da4a4d3)
+
+test/plugin/session-inbox.test.ts:
+[08:48:36.094] ERROR (#2): 13 |   Effect.gen(function* () {
+14 |     const plugins = yield* Plugin.Service
+15 |     const context = yield* PluginHost.make(plugins)
+16 |     expectTypeOf<keyof typeof context.session.inbox>().toEqualTypeOf<"list">()
+17 |     const created = yield* context.session.create({ title: "Pending requirements" })
+18 |     expect(yield* context.session.inbox.list({ sessionID: created.id })).toEqual([])
+                                       ^
+TypeError: undefined is not an object (evaluating 'context.session.inbox.list')
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core/test/plugin/session-inbox.test.ts:18:35
+
+13 |   Effect.gen(function* () {
+14 |     const plugins = yield* Plugin.Service
+15 |     const context = yield* PluginHost.make(plugins)
+16 |     expectTypeOf<keyof typeof context.session.inbox>().toEqualTypeOf<"list">()
+17 |     const created = yield* context.session.create({ title: "Pending requirements" })
+18 |     expect(yield* context.session.inbox.list({ sessionID: created.id })).toEqual([])
+                                       ^
+TypeError: undefined is not an object (evaluating 'context.session.inbox.list')
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core/test/plugin/session-inbox.test.ts:18:35
+      at ~effect/Effect/successCont (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at runInAsyncScope (node:async_hooks:207:23)
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/Effect.js:8166:9
+      at guarded (internal:shared:112:26)
+(fail) Effect plugins can read pending inbox requirements without consuming them [45.56ms]
+[08:48:36.120] ERROR (#365): 39 |     const created = yield* context.session.create({ title: "Promise pending requirements" })
+40 |     yield* PluginPromise.fromPromise({
+41 |       id: "test.session-inbox",
+42 |       async setup(ctx) {
+43 |         expectTypeOf<keyof typeof ctx.session.inbox>().toEqualTypeOf<"list">()
+44 |         expect(await ctx.session.inbox.list({ sessionID: created.id })).toEqual([])
+                                      ^
+TypeError: undefined is not an object (evaluating 'ctx.session.inbox.list')
+      at setup (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core/test/plugin/session-inbox.test.ts:44:34)
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/plugin/src/promise/adapter.ts:611:55
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:763:3
+
+39 |     const created = yield* context.session.create({ title: "Promise pending requirements" })
+40 |     yield* PluginPromise.fromPromise({
+41 |       id: "test.session-inbox",
+42 |       async setup(ctx) {
+43 |         expectTypeOf<keyof typeof ctx.session.inbox>().toEqualTypeOf<"list">()
+44 |         expect(await ctx.session.inbox.list({ sessionID: created.id })).toEqual([])
+                                      ^
+TypeError: undefined is not an object (evaluating 'ctx.session.inbox.list')
+      at setup (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core/test/plugin/session-inbox.test.ts:44:34)
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/plugin/src/promise/adapter.ts:611:55
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:763:3
+      at ~effect/Effect/evaluate (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:798:38)
+      at runLoop (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at runInAsyncScope (node:async_hooks:207:23)
+      at /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:802:17
+(fail) Promise plugins can read pending inbox requirements without consuming them [25.33ms]
+
+ 0 pass
+ 2 fail
+Ran 2 tests across 1 file. [597.00ms]

@@ -1,3 +1,5 @@
+import type { NodeRecovery, RecoveryOrigin } from "./rescue"
+
 export type JsonPrimitive = string | number | boolean | null
 export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonValue }
 
@@ -159,6 +161,7 @@ export interface DagExecutionRef {
   readonly attempt: number
   readonly sessionID: string
   readonly identity?: DagExecutionIdentity
+  readonly origin?: RecoveryOrigin
 }
 
 export interface DagExecutionIdentity {
@@ -202,6 +205,7 @@ export interface DagResultEnvelope {
     readonly execution?: DagExecutionRef
     readonly agent: string
     readonly model: string
+    readonly rescue?: { readonly decisionID: string; readonly model: string; readonly from: DagExecutionRef }
   }
   readonly createdAt: number
 }
@@ -215,6 +219,7 @@ export interface DagNodeRecord {
   readonly error?: string
   readonly execution?: DagExecutionRef
   readonly runtime?: DagExecutionState
+  readonly recovery?: NodeRecovery
   readonly createdAt?: number
   readonly updatedAt?: number
 }
@@ -262,6 +267,8 @@ export interface DagEvent {
     | "node.escalated"
     | "run.paused"
     | "node.steering"
+    | "node.rescued"
+    | "node.rescue-skipped"
   readonly payload?: JsonValue
   readonly createdAt: number
 }

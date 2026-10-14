@@ -1,0 +1,13 @@
+{
+  "verdict": "PASS",
+  "at": 1791964116.579115,
+  "activeSourceSetAndHashesUnchanged": true,
+  "protectedHashesUnchanged": true,
+  "buildHashesUnchanged": true,
+  "residualSandboxes": [],
+  "residualProcesses": [],
+  "verificationDocument": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/verification.md",
+    "sha256": "eb01e355f454f482a8e01bf1721a3d1a8902adda84c3a599426a31d2d422c2eb"
+  }
+}

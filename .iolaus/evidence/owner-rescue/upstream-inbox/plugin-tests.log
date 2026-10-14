@@ -1,0 +1,16 @@
+bun test v1.4.3 (c6da4a4d3)
+
+test/host.test.ts:
+(pass) Host.resolve > resolves conventional entrypoints without package.json [1.70ms]
+(pass) Host.resolve > resolves a TUI-only directory without an index or package.json [0.43ms]
+(pass) Host.resolve > resolves packages without exports using the default index [0.99ms]
+(pass) Host.resolve > resolves packages without exports using lib/backend.js [1.17ms]
+(pass) Host.resolve > resolves local conventional entrypoints with package.json but no exports [0.83ms]
+(pass) Host.resolve > honors exports and prefers the explicit server entrypoint over the root [0.94ms]
+(pass) Host.resolve > falls back to the root export and uses import rather than require conditions [1.41ms]
+(pass) Host.resolve > supports TUI-only exports without falling back to unexported files [1.18ms]
+(pass) Host.resolve > does not return an exported entrypoint whose file is missing [0.90ms]
+
+ 9 pass
+ 0 fail
+Ran 9 tests across 1 file. [23.00ms]

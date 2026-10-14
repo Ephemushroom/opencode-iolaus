@@ -1,0 +1,58 @@
+{
+  "type": "context",
+  "pid": 61181,
+  "version": "2.0.27",
+  "keys": [
+    "app",
+    "location",
+    "options",
+    "rpc",
+    "agent",
+    "aisdk",
+    "provider",
+    "model",
+    "command",
+    "event",
+    "experimental",
+    "generate",
+    "integration",
+    "mcp",
+    "permission",
+    "plugin",
+    "reference",
+    "skill",
+    "storage",
+    "shell",
+    "tool",
+    "vcs",
+    "websearch",
+    "worktree",
+    "session"
+  ],
+  "session": [
+    "hook",
+    "create",
+    "get",
+    "remove",
+    "switchAgent",
+    "switchModel",
+    "prompt",
+    "generate",
+    "command",
+    "compact",
+    "update",
+    "move",
+    "synthetic",
+    "interrupt",
+    "wait",
+    "context"
+  ],
+  "event": [
+    "subscribe"
+  ],
+  "app": [
+    "name",
+    "version",
+    "channel"
+  ]
+}

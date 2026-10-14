@@ -1,0 +1,193 @@
+{
+  "previous": {
+    "info": {
+      "id": "ses_ecc6e76eaffejmIusnb7I1lz2d",
+      "projectID": "c90e52b10497ee569f839537bf75d731dfc444a9",
+      "agent": "build",
+      "model": {
+        "id": "gpt-5.5",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "failed",
+      "time": {
+        "created": 1791866538264,
+        "updated": 1791866538568,
+        "idle": 1791866538570
+      },
+      "location": {
+        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-owner-rescue-contract-sYU2nm/project"
+      }
+    },
+    "context": [
+      {
+        "id": "msg_13391894c001bGhoe5vZZCnyoR",
+        "time": {
+          "created": 1791866538522
+        },
+        "text": "QA_ORIGINAL_TASK",
+        "type": "user"
+      },
+      {
+        "id": "msg_133918a23001ihxRA0aCKszGxm",
+        "time": {
+          "created": 1791866538545,
+          "completed": 1791866538568
+        },
+        "type": "assistant",
+        "agent": "build",
+        "model": {
+          "id": "gpt-5.5",
+          "providerID": "openai",
+          "variant": "default"
+        },
+        "content": [],
+        "finish": "error",
+        "error": {
+          "type": "provider.auth",
+          "message": "QA provider unavailable",
+          "status": 401,
+          "response": {
+            "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+          }
+        }
+      },
+      {
+        "id": "msg_133918a4a001jooTpoOOCShuLr",
+        "time": {
+          "created": 1791866538570
+        },
+        "type": "idle",
+        "outcome": "failed",
+        "error": {
+          "type": "provider.auth",
+          "message": "QA provider unavailable",
+          "status": 401,
+          "response": {
+            "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+          }
+        }
+      }
+    ],
+    "inbox": []
+  },
+  "queued": {
+    "data": {
+      "id": "msg_133918a63001VqKVbD293NoXnS",
+      "sessionID": "ses_ecc6e76eaffejmIusnb7I1lz2d",
+      "time": {
+        "created": 1791866538595
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+      },
+      "delivery": "queue"
+    }
+  },
+  "after": {
+    "info": {
+      "id": "ses_ecc6e76eaffejmIusnb7I1lz2d",
+      "projectID": "c90e52b10497ee569f839537bf75d731dfc444a9",
+      "agent": "build",
+      "model": {
+        "id": "gpt-5.5",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "cost": 0,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "outcome": "failed",
+      "time": {
+        "created": 1791866538264,
+        "updated": 1791866538595,
+        "idle": 1791866538570
+      },
+      "location": {
+        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-owner-rescue-contract-sYU2nm/project"
+      }
+    },
+    "context": [
+      {
+        "id": "msg_13391894c001bGhoe5vZZCnyoR",
+        "time": {
+          "created": 1791866538522
+        },
+        "text": "QA_ORIGINAL_TASK",
+        "type": "user"
+      },
+      {
+        "id": "msg_133918a23001ihxRA0aCKszGxm",
+        "time": {
+          "created": 1791866538545,
+          "completed": 1791866538568
+        },
+        "type": "assistant",
+        "agent": "build",
+        "model": {
+          "id": "gpt-5.5",
+          "providerID": "openai",
+          "variant": "default"
+        },
+        "content": [],
+        "finish": "error",
+        "error": {
+          "type": "provider.auth",
+          "message": "QA provider unavailable",
+          "status": 401,
+          "response": {
+            "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+          }
+        }
+      },
+      {
+        "id": "msg_133918a4a001jooTpoOOCShuLr",
+        "time": {
+          "created": 1791866538570
+        },
+        "type": "idle",
+        "outcome": "failed",
+        "error": {
+          "type": "provider.auth",
+          "message": "QA provider unavailable",
+          "status": 401,
+          "response": {
+            "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+          }
+        }
+      }
+    ],
+    "inbox": [
+      {
+        "id": "msg_133918a63001VqKVbD293NoXnS",
+        "sessionID": "ses_ecc6e76eaffejmIusnb7I1lz2d",
+        "time": {
+          "created": 1791866538595
+        },
+        "type": "synthetic",
+        "payload": {
+          "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+        },
+        "delivery": "queue"
+      }
+    ]
+  }
+}

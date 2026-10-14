@@ -1,0 +1,55 @@
+{
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/source.json": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/source.json",
+    "sha256": "4fb96c9e1722a250a1e1e427e42a3d6f7da7428f4737b7f20dac47188f6ce359"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/upstream.patch": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/upstream.patch",
+    "sha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+    "sha256": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/contract-proof.md": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/contract-proof.md",
+    "sha256": "16ee0c9bf285334b7ea3ef5ae91ba1c99ff95d391c7dde9f9b18fcb325e4434b"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs",
+    "sha256": "1d55bed5d760c33caf505b275b898a58cbaffccf5a8cc05a8cf85c1e4cdb0114"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/checks.py": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/checks.py",
+    "sha256": "67816181b9d7c7b3a4026d23c88d35419af5d978ae8124328c01dfad839cbbe2"
+  },
+  "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/lifecycle.py": {
+    "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/lifecycle.py",
+    "sha256": "4f0fd7d711f78db7838f1567852d80a214c7c5c0c6c4c78838bb5e5d3480bd40"
+  },
+  "/Users/Bryan/.iolaus/iolaus.json": {
+    "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.iolaus/iolaus.json",
+    "sha256": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac"
+  },
+  "/Users/Bryan/.config/opencode/opencode.json": {
+    "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.config/opencode/opencode.json",
+    "sha256": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e"
+  },
+  "/Users/Bryan/.config/opencode/opencode.jsonc": null,
+  "/Users/Bryan/.config/opencode/cli.json": {
+    "realpath": "/Users/Bryan/.config/opencode/cli.json",
+    "sha256": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+  },
+  "/Users/Bryan/.config/opencode/service.json": {
+    "realpath": "/Users/Bryan/.config/opencode/service.json",
+    "sha256": "b17dc60a90431c13d27916f40d9199562f7c754e89ff1d7bf52e4f2894b99d24"
+  },
+  "/Users/Bryan/.local/state/opencode/service.json": {
+    "realpath": "/Users/Bryan/.local/state/opencode/service.json",
+    "sha256": "98a6ced14fb80499a0fb7d5409e208c925532389b939a477debfd38e181103a9"
+  },
+  "/opt/homebrew/bin/opencode": {
+    "realpath": "/opt/homebrew/Cellar/opencode-v2/2.0.28/bin/opencode",
+    "sha256": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341"
+  }
+}
