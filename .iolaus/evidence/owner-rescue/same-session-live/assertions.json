@@ -1,0 +1,90 @@
+[
+  {
+    "name": "host version",
+    "verdict": "PASS",
+    "version": "opencode v2.0.29",
+    "binary": "/opt/homebrew/bin/opencode"
+  },
+  {
+    "name": "fallback and owner rescue continue one child session after a real tool effect",
+    "verdict": "PASS",
+    "sessionID": "ses_ec55cacc4ffeD0J8Py8nbMLuUv",
+    "events": [
+      "run.started",
+      "node.ready",
+      "node.started",
+      "node.fallback",
+      "node.ready",
+      "node.started",
+      "node.rescued",
+      "node.ready",
+      "node.started",
+      "node.completed",
+      "run.completed"
+    ],
+    "models": [
+      "gpt-a",
+      "gpt-b",
+      "gpt-owner"
+    ],
+    "sessionModel": {
+      "id": "gpt-owner",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "agent": "deep-low",
+    "progress": "STEP_A (once, not replayed)",
+    "historyInputs": [
+      "user",
+      "model-switched",
+      "user",
+      "model-switched",
+      "user"
+    ],
+    "provenance": {
+      "agent": "deep-low",
+      "execution": {
+        "attempt": 3,
+        "identity": {
+          "agent": "deep-low",
+          "model": "openai/gpt-owner",
+          "token": "90c641e9-d8b1-4c31-bcf0-5dd676448631"
+        },
+        "nodeID": "work",
+        "sessionID": "ses_ec55cacc4ffeD0J8Py8nbMLuUv"
+      },
+      "model": "openai/gpt-owner",
+      "parentNodeIDs": [],
+      "rescue": {
+        "decisionID": "ad8cc951-c806-4fd1-8906-6cd8622e2faa",
+        "from": "openai/gpt-b",
+        "model": "openai/gpt-owner"
+      }
+    }
+  },
+  {
+    "name": "a steered node falls back in the same session with its supplement delivered once",
+    "verdict": "PASS",
+    "sessionID": "ses_ec55cabd8ffe0PEUlw6mjMCaBr",
+    "events": [
+      "run.started",
+      "node.ready",
+      "node.started",
+      "node.steering",
+      "node.fallback",
+      "node.ready",
+      "node.started",
+      "node.completed",
+      "run.completed"
+    ],
+    "historyInputs": [
+      "user",
+      "synthetic",
+      "model-switched",
+      "user"
+    ],
+    "steering": [
+      "delivered"
+    ]
+  }
+]

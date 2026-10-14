@@ -10,7 +10,7 @@ export interface DagNotifier {
 
 export function noticeFor(event: DagEvent, run: DagRunRecord): DagNotice | undefined {
   if (run.definition.observed || !["node.waiting", "node.rescued", "run.completed", "run.failed", "run.cancelled"].includes(event.type)) return undefined
-  const status = event.type === "node.rescued" ? `reserved its one owner-model rescue for ${event.nodeID}: ${JSON.stringify(event.payload)}` : event.type === "node.waiting" ? `gate ${event.nodeID} is waiting for the user's decision` : event.type.slice(4)
+  const status = event.type === "node.rescued" ? `continues on the owner model for its one rescue: ${event.nodeID}: ${JSON.stringify(event.payload)}` : event.type === "node.waiting" ? `gate ${event.nodeID} is waiting for the user's decision` : event.type.slice(4)
   return { eventID: event.eventID, runID: run.runID, ownerSessionID: run.ownerSessionID, messageID: `msg_${event.eventID.replaceAll("-", "")}`, state: "pending",
     text: `Iolaus Flow notice ${event.eventID}: "${run.name}" (${run.runID}) ${status}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate.` }
 }

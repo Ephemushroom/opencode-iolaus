@@ -1,4 +1,4 @@
-import type { NodeRecovery, RecoveryOrigin } from "./rescue"
+import type { NodeRecovery } from "./rescue"
 
 export type JsonPrimitive = string | number | boolean | null
 export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: JsonValue }
@@ -161,7 +161,6 @@ export interface DagExecutionRef {
   readonly attempt: number
   readonly sessionID: string
   readonly identity?: DagExecutionIdentity
-  readonly origin?: RecoveryOrigin
 }
 
 export interface DagExecutionIdentity {
@@ -205,7 +204,8 @@ export interface DagResultEnvelope {
     readonly execution?: DagExecutionRef
     readonly agent: string
     readonly model: string
-    readonly rescue?: { readonly decisionID: string; readonly model: string; readonly from: DagExecutionRef }
+    /** Set when the owner-model rescue produced this result: `from` is the model it took over from. */
+    readonly rescue?: { readonly decisionID: string; readonly model: string; readonly from: string }
   }
   readonly createdAt: number
 }

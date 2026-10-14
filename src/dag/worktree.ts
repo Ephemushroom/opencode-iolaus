@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process"
-import { cpSync, existsSync, realpathSync, statSync } from "node:fs"
+import { cpSync, existsSync } from "node:fs"
 import { basename, dirname, join, resolve } from "node:path"
 import { canonicalProject } from "../database"
 
@@ -31,14 +31,6 @@ export function sameRepository(project: string, directory: string): boolean {
   const common = (dir: string) => { try { return canonicalProject(resolve(dir, git(dir, ["rev-parse", "--git-common-dir"]))) } catch { return undefined } }
   const expected = common(project)
   return expected !== undefined && expected === common(directory)
-}
-
-export function recoveryDirectory(directory: string): { readonly directoryIdentity: string; readonly branch?: string } {
-  const path = realpathSync(directory)
-  const stat = statSync(path)
-  if (!stat.isDirectory()) throw new Error("recovery_directory_missing")
-  const root = repositoryRoot(path)
-  return { directoryIdentity: JSON.stringify([path, stat.dev, stat.ino, root ?? null]), ...(root ? { branch: git(path, ["branch", "--show-current"]) } : {}) }
 }
 
 /** `<repo>-wt/<name>` beside the main worktree, the convention AGENTS.md uses for task-owned worktrees. */

@@ -1,0 +1,158 @@
+[
+  {
+    "id": "msg_139c9377c001GKqZhB1U0cDuMs",
+    "time": {
+      "created": 1791970850808
+    },
+    "text": "PROBE_TASK: write progress then finish",
+    "type": "user"
+  },
+  {
+    "id": "msg_139c93805001GbxSASZD7FrFqL",
+    "time": {
+      "created": 1791970850826,
+      "streamed": 1791970850840,
+      "completed": 1791970850865
+    },
+    "type": "assistant",
+    "agent": "build",
+    "model": {
+      "id": "gpt-5.5",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "content": [
+      {
+        "type": "tool",
+        "id": "o2",
+        "name": "shell",
+        "executed": false,
+        "providerState": {
+          "itemId": "o2"
+        },
+        "state": {
+          "status": "completed",
+          "input": {
+            "command": "echo STEP1_DONE > progress.txt && cat progress.txt",
+            "description": "probe step 1"
+          },
+          "content": [
+            {
+              "type": "text",
+              "text": "STEP1_DONE\n"
+            }
+          ],
+          "metadata": {
+            "status": "completed",
+            "truncated": false,
+            "exit": 0
+          }
+        },
+        "time": {
+          "created": 1791970850838,
+          "ran": 1791970850839,
+          "completed": 1791970850863
+        }
+      }
+    ],
+    "finish": "tool-calls",
+    "cost": 0.0002,
+    "tokens": {
+      "input": 10,
+      "output": 5,
+      "reasoning": 0,
+      "cache": {
+        "read": 0,
+        "write": 0
+      }
+    }
+  },
+  {
+    "id": "msg_139c93835001ghORK2qrUwhJ3w",
+    "time": {
+      "created": 1791970850872,
+      "completed": 1791970850913
+    },
+    "type": "assistant",
+    "agent": "build",
+    "model": {
+      "id": "gpt-5.5",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "content": [],
+    "finish": "error",
+    "error": {
+      "type": "provider.auth",
+      "message": "probe: provider auth failure",
+      "status": 401,
+      "response": {
+        "body": "{\"error\":{\"message\":\"probe: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+      }
+    }
+  },
+  {
+    "id": "msg_139c93861002QB74AvhO3n7l6A",
+    "time": {
+      "created": 1791970850913
+    },
+    "type": "idle",
+    "outcome": "failed",
+    "error": {
+      "type": "provider.auth",
+      "message": "probe: provider auth failure",
+      "status": 401,
+      "response": {
+        "body": "{\"error\":{\"message\":\"probe: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+      }
+    }
+  },
+  {
+    "id": "msg_139c93858001qvHyibuL6FJVO8",
+    "time": {
+      "created": 1791970850917
+    },
+    "text": "PROBE_SUPPLEMENT: also mention fontsource",
+    "type": "user"
+  },
+  {
+    "id": "msg_139c93868001ybXHOK1h410d93",
+    "time": {
+      "created": 1791970850924,
+      "completed": 1791970850927
+    },
+    "type": "assistant",
+    "agent": "build",
+    "model": {
+      "id": "gpt-5.5",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "content": [],
+    "finish": "error",
+    "error": {
+      "type": "provider.auth",
+      "message": "probe: provider auth failure",
+      "status": 401,
+      "response": {
+        "body": "{\"error\":{\"message\":\"probe: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+      }
+    }
+  },
+  {
+    "id": "msg_139c93870001cgs8gKd1iq7VF3",
+    "time": {
+      "created": 1791970850928
+    },
+    "type": "idle",
+    "outcome": "failed",
+    "error": {
+      "type": "provider.auth",
+      "message": "probe: provider auth failure",
+      "status": 401,
+      "response": {
+        "body": "{\"error\":{\"message\":\"probe: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+      }
+    }
+  }
+]

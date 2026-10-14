@@ -83,7 +83,7 @@ export default Plugin.define({
     const controller = createDagController({
       directory: ctx.location.directory,
       databasePath: home.database,
-      runner: createOpenCodeDagRunner(ctx, options.rescue),
+      runner: createOpenCodeDagRunner(ctx),
       rescue: options.rescue,
       recoveryReady: Deferred.await(recoveryReady),
       defaultModel,
