@@ -1,0 +1,16 @@
+{
+  "verdict": "PASS",
+  "results": [
+    "PASS a node whose model fails (provider error or empty reply) moves to the lane's next configured model; a pinned model does not",
+    "PASS a deep-low node ending with ESCALATE: deep-high is rerun on deep-high with its findings",
+    "PASS team: members build in their own worktrees, the lead integrates on a branch, the user's tree is untouched",
+    "PASS a run directory outside the project's repository is refused at create",
+    "PASS /start-work rejects an unknown option",
+    "PASS /start-work --make-pr works the tickets in a new worktree and opens the PR there after the accept gate",
+    "PASS compaction keeps the session's role and paused run in the summary request",
+    "PASS approving the gate runs the PR node in the worktree",
+    "PASS host state isolation",
+    "PASS cleanup",
+    "PASS mock protocol"
+  ]
+}

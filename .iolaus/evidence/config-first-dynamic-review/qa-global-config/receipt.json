@@ -1,0 +1,100 @@
+{
+  "results": [
+    {
+      "name": "explore uses only global model and variant; legacy DAG remains untouched",
+      "verdict": "PASS"
+    },
+    {
+      "name": "two projects create runs in one DB without creating project .iolaus",
+      "verdict": "PASS"
+    },
+    {
+      "name": "invalid-json rejects plugin setup without fallback",
+      "verdict": "PASS"
+    },
+    {
+      "name": "invalid-model rejects plugin setup without fallback",
+      "verdict": "PASS"
+    },
+    {
+      "name": "invalid-verify rejects plugin setup without fallback",
+      "verdict": "PASS"
+    },
+    {
+      "name": "host state isolation",
+      "verdict": "PASS"
+    },
+    {
+      "name": "process, mock and sandbox cleanup",
+      "verdict": "PASS"
+    }
+  ],
+  "processes": [
+    {
+      "name": "global-explore",
+      "pid": 98825,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "cross-alpha",
+      "pid": 98931,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "cross-beta",
+      "pid": 98957,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "cross-alpha-snapshot",
+      "pid": 99009,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "cross-beta-snapshot",
+      "pid": 99046,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "cross-alpha-foreign-snapshot",
+      "pid": 99094,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "invalid-json",
+      "pid": 99149,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "invalid-model",
+      "pid": 99186,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    },
+    {
+      "name": "invalid-verify",
+      "pid": 99245,
+      "closed": true,
+      "code": 0,
+      "signal": null
+    }
+  ],
+  "sandboxRemoved": true,
+  "mockClosed": true,
+  "requestCount": 22
+}

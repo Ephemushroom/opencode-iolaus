@@ -100,7 +100,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-role.ts",
       "path": "src/omo/agents/sisyphus-dynamic-prompt-role.ts",
       "sourceSha256": "38e8b605b274ca0e65cd425ca2e981520c42ddb0ca95e08ce83a51353c5ea3e8",
-      "activeSha256": "38e8b605b274ca0e65cd425ca2e981520c42ddb0ca95e08ce83a51353c5ea3e8"
+      "activeSha256": "d2a8e773fade3b9d36ef0ec7b5818367610f263c97b521bc50df46409c63de6a"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-dynamic-prompt-exploration.ts",
@@ -268,7 +268,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-5.ts",
       "path": "src/omo/agents/sisyphus/claude-opus-5.ts",
       "sourceSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4",
-      "activeSha256": "732ff0df71f0f64d8b7a1f3fb9f959079978eff2a1037a3a028b5fab49bcbd5c"
+      "activeSha256": "1d90365f48ceac41a117e332a5f00181fdc66cb6c8af3ce80a1295d7be2243af"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k2-6.ts",
@@ -280,7 +280,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/default.ts",
       "path": "src/omo/agents/sisyphus/default.ts",
       "sourceSha256": "8761fff6a61526811841142fa1a45d65eebfb5dae681b29331d0537ed6bde8b4",
-      "activeSha256": "457a4036222e88e1a95c54aa6e4c6b27132a51a1689fc73180c42fd038e00fb0"
+      "activeSha256": "a87b3d9c33d082434a8251a222fed2c7e15f44c2c1cca10e4f5a1444da57eea8"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/gemini.ts",
@@ -298,7 +298,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-4-7.ts",
       "path": "src/omo/agents/sisyphus/claude-opus-4-7.ts",
       "sourceSha256": "77c51f10f73443be01153af1cee49d97bf74ae17982aa43d65ae663ee527f840",
-      "activeSha256": "77c51f10f73443be01153af1cee49d97bf74ae17982aa43d65ae663ee527f840"
+      "activeSha256": "2b744cee25895e80c5b1f4ed3cf6c248b42924fa025526b888a0041d0beeaab3"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/grok-4.ts",
@@ -316,13 +316,13 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-fable-5.ts",
       "path": "src/omo/agents/sisyphus/claude-fable-5.ts",
       "sourceSha256": "3966945cb800f2adab36d9fdf430eeef21c566850834fb9ba827d9795a5c1228",
-      "activeSha256": "3966945cb800f2adab36d9fdf430eeef21c566850834fb9ba827d9795a5c1228"
+      "activeSha256": "16fd4c342859615f5ce2663211cd631264b277054cf78ce876ed529f2fb1c422"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-4-8.ts",
       "path": "src/omo/agents/sisyphus/claude-opus-4-8.ts",
       "sourceSha256": "d7d01d45aef9ef5f655e79d882d474136866bcff5b481bfb86bd99a0217d59ff",
-      "activeSha256": "d7d01d45aef9ef5f655e79d882d474136866bcff5b481bfb86bd99a0217d59ff"
+      "activeSha256": "f46ace7ccdcbfa4cccc812c54a20a9944c29730f1488f3da008245ffd7188e98"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/index.ts",
@@ -358,25 +358,25 @@
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/default.md",
       "path": "src/omo/modes/prompts/ultrawork/default.md",
       "sourceSha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6",
-      "activeSha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6"
+      "activeSha256": "c44d7efdee734b83c70e9bd9f323d30b80495f1775dd77cc0bc9185512d25399"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gpt.md",
       "path": "src/omo/modes/prompts/ultrawork/gpt.md",
       "sourceSha256": "4fb81febc9e6c9e8235228af2fd5d1e9dd0fb63b3b7367a79cf3b63f19b304e7",
-      "activeSha256": "92de9eee04043babec5c58fb913e5fdef4ff5425b05f6c9c79cfd5292adf03f3"
+      "activeSha256": "f67679fdea4ac35687308f0dca3b64608126f20023f0d5fd435956c5586e3d0a"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/codex.md",
       "path": "src/omo/modes/prompts/ultrawork/codex.md",
       "sourceSha256": "0dc0fa1b57be2511ffc64372c0a7a862c2f0465b41b8f3ac23ba058c6a138ded",
-      "activeSha256": "2cb4230bf0414eaaaf65ceb2d30851539c5a60281ea69528f8dc5ab983062b15"
+      "activeSha256": "acf804673c22d1abe48bb9a5161550c8c6219a3dfbb3d70044a969e0099ae6eb"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/glm.md",
       "path": "src/omo/modes/prompts/ultrawork/glm.md",
       "sourceSha256": "31ee2a75dee454265e00ed2018c7485073412bd64b87547e4a724b28acb159dd",
-      "activeSha256": "31ee2a75dee454265e00ed2018c7485073412bd64b87547e4a724b28acb159dd"
+      "activeSha256": "e88a0555b04bf08eaeb5f34637541aa46134c47983eb571146ab15bf9aa200a9"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/planner.md",
@@ -388,7 +388,7 @@
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gemini.md",
       "path": "src/omo/modes/prompts/ultrawork/gemini.md",
       "sourceSha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44",
-      "activeSha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44"
+      "activeSha256": "18c6aebff1e673ec2c97a46600c0f9a3b7dafc48a52c30ff66890871cad21b01"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/prometheus/default.md",
@@ -509,60 +509,6 @@
       "path": "src/prompts/sisyphus-route.ts",
       "sourceSha256": "bff4ee97a4ecd5a6353c41a85283cae53fdfb7513de924a53e7e430a68431c94",
       "activeSha256": "b9354087ffc1daa129a857166f71ed79d70942a5a8ec4c509d7e2742dd0d2740"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/model-requirement-types.ts",
-      "path": "packages/model-core/src/model-requirement-types.ts",
-      "sourceSha256": "48bf7a980c017b592af3c7d1eb137de67598348076682568c8edc8ff3a347f8d",
-      "activeSha256": "48bf7a980c017b592af3c7d1eb137de67598348076682568c8edc8ff3a347f8d"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/agent-model-requirements.ts",
-      "path": "packages/model-core/src/agent-model-requirements.ts",
-      "sourceSha256": "a9b7c5eca2bcda169ce0dfa14da8302f79d36625aca449500a6c701e6c1166fc",
-      "activeSha256": "43cb02693c089eeb3c8d346e63522afc3573baa73a0112cd57717e1745644ca2"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/category-model-requirements.ts",
-      "path": "packages/model-core/src/category-model-requirements.ts",
-      "sourceSha256": "b50335b54431a241053dd95ee3ec6c7c32a3d3a376badf21e3c1db022f0567ba",
-      "activeSha256": "0460573340fd2de423680e30ca3bf135afefb656f7f16a29911a804cc441720f"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/model-requirements.ts",
-      "path": "packages/model-core/src/model-requirements.ts",
-      "sourceSha256": "f34d8c98efe64c4d251da23710cf2f2905f60f1ca39f88ff8fed81ebbb76787e",
-      "activeSha256": "f34d8c98efe64c4d251da23710cf2f2905f60f1ca39f88ff8fed81ebbb76787e"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/model-resolution-pipeline.ts",
-      "path": "packages/model-core/src/model-resolution-pipeline.ts",
-      "sourceSha256": "4991f639463ff9426f2b5008abcc02ec110bb73689a636bd85c8bce46f4fd318",
-      "activeSha256": "4991f639463ff9426f2b5008abcc02ec110bb73689a636bd85c8bce46f4fd318"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/model-availability.ts",
-      "path": "packages/model-core/src/model-availability.ts",
-      "sourceSha256": "45caf3fe0d208eb40eb3a9d655df4a016cc573311d6760c68f2acde49a31ad10",
-      "activeSha256": "4653e0eff58129fbb0a03eafd075e314c4bf96ac34929dade4e6cc6e3fbb6adf"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/provider-model-id-transform.ts",
-      "path": "packages/model-core/src/provider-model-id-transform.ts",
-      "sourceSha256": "4fc093cca1bbd01086c93769383ef07e2b0658f48dab55e003fb7797b6813692",
-      "activeSha256": "4fc093cca1bbd01086c93769383ef07e2b0658f48dab55e003fb7797b6813692"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/model-normalization.ts",
-      "path": "packages/model-core/src/model-normalization.ts",
-      "sourceSha256": "e179b6020095ae9f240ac4374c6f9dfe1828d673c0a090a02d070e42cf2f9611",
-      "activeSha256": "e179b6020095ae9f240ac4374c6f9dfe1828d673c0a090a02d070e42cf2f9611"
-    },
-    {
-      "source": "reference/omo/packages/model-core/src/provider-cache.ts",
-      "path": "packages/model-core/src/provider-cache.ts",
-      "sourceSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180",
-      "activeSha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180"
     },
     {
       "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/sg-runner.ts",

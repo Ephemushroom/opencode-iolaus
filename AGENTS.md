@@ -10,8 +10,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 ## Boundaries
 
 - `src/omo/` contains locally owned OMO-derived prompt code. Preserve source attribution when changing it.
-- `packages/model-core/` is the locally owned copy of OMO's model-core subset: the agent and category model
-  requirement tables, the resolution pipeline and the model-family detectors. It is a Bun workspace package
+- `packages/model-core/` is the locally owned copy of OMO's model-family detectors, used to pick prompt variants.
+  Iolaus is config-first: it carries no requirement tables or default chains. It is a Bun workspace package
   (`@iolaus/model-core`) bundled into `dist/`. Sync it manually and record lineage in `reference/active-manifest.json`.
 - `packages/ast-grep-core/` (`@iolaus/ast-grep-core`) is the locally owned copy of OMO's `ast-grep-mcp` runner,
   pattern hints and search/rewrite/scan executors, without the MCP protocol layer. It postdates the reference
@@ -198,10 +198,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `/start-work` runs persist `authorizedPlan` and Atlas node fingerprints in
   `dag_authorizations`; `checkAtlas` rejects amended Atlas nodes.
 - Every Iolaus Agent and category lane is registered with a pinned model. The
-  model comes from global `IOLAUS_HOME/iolaus.json` `models` or, when unconfigured,
-  the first entry of the OMO requirement chain. Iolaus does not check provider
-  connectivity or subscription; a lane whose config and chain both name no
-  model is not registered. A DAG node may omit `model` to run on its lane's
+  model comes only from global `IOLAUS_HOME/iolaus.json` `models` (config-first, no
+  built-in default chain). Iolaus does not check provider connectivity or
+  subscription; a lane the config does not name is not registered. A DAG node may omit `model` to run on its lane's
   configured model.
 - Restart recovery never replays a prompt. When a controller starts (plugin
   reload or restart) it reattaches every starting/running node whose child
@@ -227,10 +226,12 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the same pass, so a node behind a skipped branch is not left pending.
 - `src/dag/templates.ts` expands `iolaus_flow` action `template` (or `create`
   with `template` and no `definition`) into ordinary definitions. `plan-review`:
-  `plan` (prometheus) → `review` (momus) → `revise` when the review
-  ends `VERDICT: FAIL` → `rereview` → `approve` gate → `execute` (default
-  sisyphus). `goal-review`: `work` (default hephaestus) → `review`
-  → `fix` → `rereview` → `accept` gate. `reviewer`, `executor`, `gate: false`
+  `plan` (prometheus) → `review` (momus judge) → `approve` gate → `execute`
+  (default sisyphus). `goal-review`: `work` (default hephaestus) → `review`
+  → `accept` gate. Both start with one review and carry a `loop` spec, like
+  `ultrawork`: a FAIL appends `plan<n>`/`work<n>` and a fresh `review<n>` (which
+  also receives the previous review) and rewires the tail (gate, executor) to it,
+  up to `iterations` rounds. `reviewer`, `executor`, `gate: false`, `iterations`
   and `maxAttempts` are overrides. Templates have no tier exemption: admission
   checks the expanded nodes, overrides included. `ultrawork` fits Sisyphus,
   `goal-review` Hephaestus, `hyperplan` Prometheus; `plan-review` mixes

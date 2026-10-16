@@ -22,6 +22,7 @@ import { renderAgent } from "../src/prompts/render"
 import { buildDynamicHephaestusPrompt } from "../src/omo/agents"
 import { SessionStateStore } from "../src/database"
 import { readRole, saveRole } from "../src/roles/register"
+import { ALL_LANES } from "./lanes"
 
 let directory: string | undefined
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
@@ -211,7 +212,7 @@ test("goal tools are hidden from every Iolaus lane but Hephaestus; Prometheus ma
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
   const ctx = { agent: { transform: (run: (editor: AgentEditor) => void) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }
-  await Effect.runPromise(Effect.scoped(registerAgents(ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(ctx, parseOptions({}), ALL_LANES)))
   const allow = (id: string, action: string, resource = "*") => evaluate(action, resource, agents.get(id)!.permissions)
   for (const tool of GOAL_TOOL_NAMES) {
     expect(allow("hephaestus", tool)).toBe("allow")

@@ -1,10 +1,3 @@
-import {
-  AGENT_MODEL_REQUIREMENTS,
-  CATEGORY_MODEL_REQUIREMENTS,
-  transformModelForProvider,
-  type FallbackEntry,
-  type ModelRequirement,
-} from "@iolaus/model-core"
 import { AGENT_NAMES, CATEGORY_NAMES, type AgentName, type CategoryName } from "./prompts/catalog"
 
 export type LaneName = AgentName | CategoryName
@@ -16,7 +9,7 @@ export interface ModelChoice {
 
 export interface LaneAssignment extends ModelChoice {
   readonly lane: LaneName
-  readonly source: "config" | "requirement"
+  readonly source: "config"
 }
 
 export type ModelEntry = string | { readonly model: string; readonly variant?: string }
@@ -84,37 +77,21 @@ export function parseModelsConfig(input: unknown): ModelsConfig {
 }
 
 /**
- * Iolaus follows the configured chain without checking provider connectivity
- * or subscription: the first chain entry is the lane's model. Global
- * iolaus.json overrides it per agent or category.
+ * Iolaus is config-first: a lane's model is the first entry of its global
+ * iolaus.json chain. There is no built-in default; an unconfigured lane resolves
+ * to nothing and is not registered. Provider connectivity is not checked.
  */
-export function firstChainChoice(requirement: ModelRequirement | undefined): ModelChoice | undefined {
-  const entry: FallbackEntry | undefined = requirement?.fallbackChain[0]
-  const provider = entry?.providers[0]
-  if (!entry || !provider) return undefined
-  const model = `${provider}/${transformModelForProvider(provider, entry.model)}`
-  const variant = entry.variant ?? requirement?.variant
-  return variant === undefined ? { model } : { model, variant }
-}
-
 export function resolveLane(lane: LaneName, config: ModelsConfig): LaneAssignment | undefined {
   const isCategory = (CATEGORY_NAMES as readonly string[]).includes(lane)
   const override = isCategory ? config.categories?.[lane] : config.agents?.[lane]
-  if (override !== undefined) return { lane, source: "config", ...parseModelChain(override, lane)[0] }
-  const requirement = isCategory ? CATEGORY_MODEL_REQUIREMENTS[lane] : AGENT_MODEL_REQUIREMENTS[lane]
-  const choice = firstChainChoice(requirement)
-  return choice ? { lane, source: "requirement", ...choice } : undefined
+  return override === undefined ? undefined : { lane, source: "config", ...parseModelChain(override, lane)[0] }
 }
 
 export function modelString(choice: ModelChoice): string {
   return choice.variant ? `${choice.model}#${choice.variant}` : choice.model
 }
 
-/**
- * Runtime fallbacks for a lane: the configured chain after its first model. The
- * OMO requirement chains name providers a user may not have, so only an explicit
- * iolaus.json chain falls back.
- */
+/** Runtime fallbacks for a lane: the configured chain after its first model. */
 export function laneFallbacks(lane: LaneName, config: ModelsConfig): string[] {
   const isCategory = (CATEGORY_NAMES as readonly string[]).includes(lane)
   const override = isCategory ? config.categories?.[lane] : config.agents?.[lane]

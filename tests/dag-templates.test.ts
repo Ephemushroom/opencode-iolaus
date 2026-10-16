@@ -38,7 +38,9 @@ function scriptedRunner(replies: Record<string, string[]>): DagRunnerPromise & {
 test("plan-review template expands to a valid definition and rejects bad input", () => {
   const def = expandTemplate({ template: "plan-review", task: "Add rate limiting to the API" })
   validateDefinition(applyDefaultModels(def, lanes))
-  expect(def.nodes.map((n) => n.id)).toEqual(["plan", "review", "revise", "rereview", "approve", "execute"])
+  // One review up front; a FAIL appends the next plan/review pair at run time.
+  expect(def.nodes.map((n) => n.id)).toEqual(["plan", "review", "approve", "execute"])
+  expect(def.loop).toMatchObject({ review: "review", fix: "plan", maxRounds: 3, tail: ["approve", "execute"] })
   expect(def.nodes.find((n) => n.id === "plan")?.agent).toBe("prometheus")
   expect(def.nodes.find((n) => n.id === "review")?.agent).toBe("momus")
   expect(def.nodes.find((n) => n.id === "approve")?.kind).toBe("gate")
@@ -49,7 +51,8 @@ test("plan-review template expands to a valid definition and rejects bad input",
   expect(noGate.nodes.find((n) => n.id === "execute")?.when).toBeDefined()
   const goal = expandTemplate({ template: "goal-review", task: "Make the tests green" })
   validateDefinition(applyDefaultModels(goal, lanes))
-  expect(goal.nodes.map((n) => n.id)).toEqual(["work", "review", "fix", "rereview", "accept"])
+  expect(goal.nodes.map((n) => n.id)).toEqual(["work", "review", "accept"])
+  expect(goal.loop).toMatchObject({ review: "review", fix: "work", maxRounds: 3, tail: ["accept"] })
   expect(goal.nodes.find((n) => n.id === "work")?.agent).toBe("hephaestus")
   expect(() => expandTemplate({ template: "nope", task: "x" })).toThrow(/Unknown DAG template/)
   expect(() => expandTemplate({ template: "plan-review" })).toThrow(/task/)
@@ -75,14 +78,14 @@ test("routing is fail-closed: a lane without a model is rejected as model_unavai
   const result = await call({ action: "create", template: { template: "plan-review", task: "x" } })
   expect(JSON.parse(String(result.content)).error).toMatch(/model_unavailable.*plan \(prometheus\)/)
   const expanded = await call({ action: "template", template: { template: "goal-review", task: "ship it" } })
-  expect(JSON.parse(String(expanded.content)).nodes.map((n: { id: string }) => n.id)).toEqual(["work", "review", "fix", "rereview", "accept"])
+  expect(JSON.parse(String(expanded.content)).nodes.map((n: { id: string }) => n.id)).toEqual(["work", "review", "accept"])
   controller.close()
 })
 
-test("plan-review run: reviewer fails once, planner revises, re-review passes, gate approves, executor runs", async () => {
+test("plan-review run: reviewer fails once, the graph grows a revision and a fresh review, gate approves, executor runs", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
   const runner = scriptedRunner({
-    plan: ["PLAN v1"], review: [`Step 2 is unverifiable.\n${REVIEW_VERDICT_FAIL}`], revise: ["PLAN v2"], rereview: [`Good.\n${REVIEW_VERDICT_PASS}`], execute: ["shipped"],
+    plan: ["PLAN v1"], review: [`Step 2 is unverifiable.\n${REVIEW_VERDICT_FAIL}`], plan1: ["PLAN v2"], review1: [`Good.\n${REVIEW_VERDICT_PASS}`], execute: ["shipped"],
   })
   const controller = createDagController({ directory, runner, defaultModel: lanes })
   const run = await controller.create(expandTemplate({ template: "plan-review", task: "Add rate limiting" }), "owner")
@@ -91,40 +94,44 @@ test("plan-review run: reviewer fails once, planner revises, re-review passes, g
   for (let i = 0; i < 50 && paused.status !== "paused"; i++) { await new Promise((r) => setTimeout(r, 20)); paused = (await controller.snapshot(run.runID, "owner")).run }
   expect(paused.status).toBe("paused")
   const status = (r: typeof paused) => Object.fromEntries(r.nodes.map((n) => [n.definition.id, n.status]))
-  expect(status(paused)).toEqual({ plan: "completed", review: "completed", revise: "completed", rereview: "completed", approve: "waiting_approval", execute: "pending" })
-  expect(runner.prompts.get("revise")).toContain("PLAN v1")
-  expect(runner.prompts.get("revise")).toContain("Step 2 is unverifiable")
-  expect(runner.prompts.get("rereview")).toContain("PLAN v2")
+  expect(status(paused)).toEqual({ plan: "completed", review: "completed", plan1: "completed", review1: "completed", approve: "waiting_approval", execute: "pending" })
+  expect(paused.definition.nodes.map((n) => n.id)).toEqual(["plan", "review", "plan1", "review1", "approve", "execute"])
+  expect(paused.definition.nodes.find((n) => n.id === "approve")?.dependsOn).toEqual(["review1"])
+  expect(runner.prompts.get("plan1")).toContain("PLAN v1")
+  expect(runner.prompts.get("plan1")).toContain("Step 2 is unverifiable")
+  // The fresh review sees the revision and the blockers the previous review cited.
+  expect(runner.prompts.get("review1")).toContain("PLAN v2")
+  expect(runner.prompts.get("review1")).toContain("Step 2 is unverifiable")
   await controller.approve(run.runID, "owner", "approve", "go")
   const finished = await controller.wait(run.runID, "owner")
   expect(finished.status).toBe("completed")
-  expect(runner.started).toEqual(["plan", "review", "revise", "rereview", "execute"])
+  expect(runner.started).toEqual(["plan", "review", "plan1", "review1", "execute"])
   expect(runner.prompts.get("execute")).toContain("PLAN v2")
   expect(finished.nodes.find((n) => n.definition.id === "plan")?.result?.provenance.model).toBe("anthropic/claude-fable-5-1")
   controller.close()
 })
 
-test("plan-review run: a passing first review skips revise and re-review", async () => {
+test("plan-review run: a passing first review grows nothing", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
   const runner = scriptedRunner({ review: [`Fine.\n${REVIEW_VERDICT_PASS}`] })
   const controller = createDagController({ directory, runner, defaultModel: lanes })
   const run = await controller.create(expandTemplate({ template: "plan-review", task: "t", gate: false }), "owner")
   const finished = await controller.wait(run.runID, "owner")
   expect(finished.status).toBe("completed")
-  expect(Object.fromEntries(finished.nodes.map((n) => [n.definition.id, n.status]))).toEqual({ plan: "completed", review: "completed", revise: "skipped", rereview: "skipped", execute: "completed" })
+  expect(Object.fromEntries(finished.nodes.map((n) => [n.definition.id, n.status]))).toEqual({ plan: "completed", review: "completed", execute: "completed" })
   expect(runner.started).toEqual(["plan", "review", "execute"])
   controller.close()
 })
 
-test("goal-review run: two failed reviews leave the run without an accepted result", async () => {
+test("goal-review run: failing every round up to iterations leaves the run without an accepted result", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
-  const runner = scriptedRunner({ review: [`Nope.\n${REVIEW_VERDICT_FAIL}`], rereview: [`Still no.\n${REVIEW_VERDICT_FAIL}`] })
+  const runner = scriptedRunner({ review: [`Nope.\n${REVIEW_VERDICT_FAIL}`], review1: [`Still no.\n${REVIEW_VERDICT_FAIL}`] })
   const controller = createDagController({ directory, runner, defaultModel: lanes })
-  const run = await controller.create(expandTemplate({ template: "goal-review", task: "t" }), "owner")
+  const run = await controller.create(expandTemplate({ template: "goal-review", task: "t", iterations: 2 }), "owner")
   const finished = await controller.wait(run.runID, "owner")
   expect(finished.status).toBe("completed")
-  expect(Object.fromEntries(finished.nodes.map((n) => [n.definition.id, n.status]))).toEqual({ work: "completed", review: "completed", fix: "completed", rereview: "completed", accept: "skipped" })
-  expect(runner.started).toEqual(["work", "review", "fix", "rereview"])
+  expect(Object.fromEntries(finished.nodes.map((n) => [n.definition.id, n.status]))).toEqual({ work: "completed", review: "completed", work1: "completed", review1: "completed", accept: "skipped" })
+  expect(runner.started).toEqual(["work", "review", "work1", "review1"])
   controller.close()
 })
 

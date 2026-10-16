@@ -10,6 +10,7 @@ import { createGhTools, GH_NAMESPACE, GH_PERMISSION } from "../src/gh/tools"
 import { parseOptions } from "../src/options"
 import { registerAgents } from "../src/registration"
 import { evaluate, type PermissionRule } from "../src/ast-grep/permissions"
+import { ALL_LANES } from "./lanes"
 
 const gh = resolveGhBinary()
 const live = gh?.authenticated ? test : test.skip
@@ -31,7 +32,7 @@ test("gh tools carry the gh permission, and only librarian is allowed it", async
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => {}, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}), ALL_LANES)))
   const rules = (id: string) => agents.get(id)!.permissions as readonly PermissionRule[]
   expect(evaluate("gh", "*", rules("librarian"))).toBe("allow")
   expect(evaluate("external_directory", `${tmpdir()}/iolaus-gh-abc/react`, rules("librarian"))).toBe("allow")

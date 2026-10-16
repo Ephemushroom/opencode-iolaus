@@ -1,0 +1,26 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.0.30"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/global-explore/iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/global-explore/project/.iolaus","created":["/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/global-explore/iolaus/README.md"]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":false,"startWork":false}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":true,"configured":true}
+{"event":"iolaus.agent.replaced","agent":"explore","previous":"Explore"}
+{"event":"iolaus.agent.model","agent":"explore","name":"Explore","model":"ds-bryan/deepseek-v4-flash","variant":"max","source":"config"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"quick","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.dag.run.started","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","generation":1,"nodeID":"1-global-model-route","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_ebc20f81dffedXsnqVA5b8iV5e","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","nodeID":"1-global-model-route","agent":"explore","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","generation":1,"nodeID":"1-global-model-route","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"explore","model":"ds-bryan/deepseek-v4-flash","sessionID":"ses_ebc20f6faffe68MMAyMVd9p6K2"}
+{"event":"iolaus.dag.node.completed","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","generation":1,"nodeID":"1-global-model-route","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"a415ce5f-360b-49b4-9701-6c9be30b5f00","generation":1,"sequence":5}

@@ -3,6 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "OMO-derived model requirement tables, resolution pipeline and model-family detectors retained by Iolaus.",
+  "description": "OMO-derived model-family detectors retained by Iolaus for prompt routing.",
   "exports": { ".": "./src/index.ts" }
 }
