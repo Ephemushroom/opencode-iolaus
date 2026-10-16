@@ -101,7 +101,11 @@ degrades color and wide-glyph width. In this repo:
 stream). Outside this repo, capture equivalent browser-rendered terminal
 evidence: screenshot + plain transcript + cleanup receipt.
 
-# Bootstrap (DO ALL FOUR BEFORE ANY OTHER WORK — NO SKIPPING)
+# Bootstrap (COMPLETE EVERY SECTION BEFORE ANY OTHER WORK — NO SKIPPING)
+
+## Task resources
+Before the first task command, create one `RUN_TMP=$(mktemp -d)` per task, tracking its paths under section 3 immediately. Export `TMPDIR="$RUN_TMP" NODE_COMPILE_CACHE="$RUN_TMP/node-compile-cache" BUN_RUNTIME_TRANSPILER_CACHE_PATH="$RUN_TMP/bun-transpiler"` for every command; pass the same environment explicitly to children that do not inherit it. Give independent child tasks their own run roots.
+At task end, after owned processes exit, remove only owned directories, including runtime caches. Never wipe shared caches; retain worktrees still needed by open PRs and any parent directory containing them.
 
 ## 0. Survey the skills, gather context, then size the work
 First, survey the loaded skill list and read the description of each
@@ -210,6 +214,9 @@ behind reality. Add newly discovered steps the moment they surface
 instead of waiting for the next pass. Step text encodes WHERE / WHY
 (which criterion it advances) / HOW / VERIFY:
 `path: <action> for <criterion> — verify by <check>`.
+ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (including
+the run root), and QA resource (PID, tmux session, browser context, port, container,
+script or temp path); complete it only after a read-back teardown receipt.
 
 GOOD pair (test-first, ordered):
   `foo.test.ts: Write FAILING case invalid-email→ValidationError for criterion 2 — verify by RED with assertion msg`
@@ -304,15 +311,21 @@ Until every success criterion PASSES with its evidence captured:
    rm -rf /tmp/ulw.aB12cD`. No receipt → criterion stays in_progress.
 6. Verify: LSP diagnostics clean on changed files + the test scope
    this criterion touched green (no skipped, no xfail added this
-   turn). Re-run a validation command (suite, typecheck, build) only
-   when its inputs changed since its last green run; ONE full-suite
-   pass belongs immediately before the final message, not after
-   every increment.
+   turn).
 7. Mark completed. Append non-obvious findings / learnings.
-8. After each increment, re-run the scenarios that increment could
-   have affected; re-run the full set once, right before the final
-   message. Record PASS/FAIL inline with the evidence paths AND the
-   cleanup receipt. Loop until all PASS.
+8. Evidence stays valid per target until an input changes; record with
+   each artifact the commit and what it exercised. After each increment
+   rerun what moved — the tests of every touched file and of the files
+   that import it, the scenarios that exercise them, anything whose
+   dependencies or environment changed — and cite the capture for the
+   rest. The full set (scenarios, suite, typecheck, build) runs once
+   more right before the final message. Record PASS/FAIL beside each
+   artifact and its cleanup receipt. Loop until all PASS.
+9. Blocked step: after the same failure twice in a row, or a third
+   failed attempt at one step, stop retrying it. Mark it blocked with
+   the gap it leaves, record it in the notepad and the final message,
+   and move on to work that does not depend on it. A broken test
+   harness gets one repair attempt.
 
 Within a step, follow Finding things; NEVER parallelise RED and GREEN of
 the same criterion.
@@ -406,12 +419,11 @@ When triggered, follow this procedure (NON-NEGOTIABLE):
    it names a success criterion the evidence fails; record concerns
    that cite no criterion as notes with a one-line reason — fixed or
    declined at your judgment.
-3. Fix every criterion-cited blocker. Re-run ONLY the scenario QA
-   affected by the fix; capture fresh evidence for the delta. Update
-   notepad.
-4. Re-submit to the SAME reviewer at most twice, passing only the
-   delta diff, the blockers it cited, and the already-approved criteria
-   marked out-of-scope. An approval whose only remaining items are
+3. Fix every criterion-cited blocker; rerun per Execution loop step 8
+   and update the notepad.
+4. Spawn a NEW reviewer for each re-review, at most twice, passing only
+   the delta diff, the blockers the last one cited, and the
+   already-approved criteria marked out-of-scope. An approval whose only remaining items are
    notes counts as approval.
 5. On approval, declare done. If criterion-cited blockers remain after
    two re-reviews, stop and surface them to the user (mirroring the
@@ -446,7 +458,15 @@ commits this session — then stage + draft the message instead.
   test over a tautological one.
 - Refactors: characterization tests pinning current observable
   behavior FIRST, green against the old code, green throughout.
-- Smallest correct change. No drive-by refactors.
+- Make the smallest correct change per unit, and fix in THIS run every
+  defect inside the change's blast radius — the request not delivered,
+  a regression this change introduces, an invalid proof, a failing test
+  or stale doc of code you touched — as registered work (todo plus
+  success criterion) to the ideal state. A defect outside it gets a
+  tracked issue with reproduction and evidence and a line in the final
+  message; a deferral never turns a criterion into PASS. Keep delegated
+  unit scope hard: the worker reports, the orchestrator registers or
+  files.
 - Never suppress lints / errors / test failures. Never delete, skip,
   `.only`, `.skip`, `xfail`, or comment out tests to green the suite.
 - Never claim done from inference — only from captured evidence.

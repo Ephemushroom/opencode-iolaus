@@ -11,6 +11,7 @@ import { AST_GREP_NAMESPACE, createAstGrepTools } from "../src/ast-grep/tools"
 import { parseOptions } from "../src/options"
 import { registerAgents } from "../src/registration"
 import { agentID } from "../src/prompts/catalog"
+import { ALL_LANES } from "./lanes"
 
 const sgPath = resolveAstGrepBinary()
 const withSg = test.skipIf(sgPath === undefined)
@@ -171,7 +172,7 @@ test("astGrep option is a boolean and read-only specialists may reach Code Mode"
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => undefined, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}), ALL_LANES)))
   const explore = agents.get(agentID("explore"))!.permissions as PermissionRule[]
   expect(evaluate("execute", "*", explore)).toBe("allow")
   expect(evaluate("grep", "*", explore)).toBe("allow")

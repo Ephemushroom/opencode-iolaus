@@ -2,8 +2,7 @@ import { expect, test } from "bun:test"
 import { Effect } from "effect"
 import { Agent, Model } from "@opencode/plugin"
 import type { AgentEditor } from "@opencode/plugin/effect/agent"
-import { AGENT_MODEL_REQUIREMENTS, CATEGORY_MODEL_REQUIREMENTS } from "@iolaus/model-core"
-import { firstChainChoice, modelString, parseModelsConfig, resolveLane } from "../src/models"
+import { modelString, parseModelsConfig, resolveLane } from "../src/models"
 import { AGENT_NAMES, CATEGORY_NAMES, agentID, categoryID } from "../src/prompts/catalog"
 import { parseOptions } from "../src/options"
 import { categoryMarker, planRegistration, registerAgents } from "../src/registration"
@@ -12,23 +11,9 @@ import { buildSisyphusJuniorPrompt } from "../src/omo/agents"
 import { applyDefaultModels } from "../src/dag/controller"
 import { validateDefinition, DagValidationError } from "../src/dag/graph"
 
-test("every Iolaus agent and category lane has an upstream requirement table entry", () => {
-  for (const name of AGENT_NAMES) expect(AGENT_MODEL_REQUIREMENTS[name]?.fallbackChain.length).toBeGreaterThan(0)
-  expect([...CATEGORY_NAMES].map(String).sort()).toEqual(Object.keys(CATEGORY_MODEL_REQUIREMENTS).sort())
-  for (const requirement of [...Object.values(AGENT_MODEL_REQUIREMENTS), ...Object.values(CATEGORY_MODEL_REQUIREMENTS)]) {
-    for (const entry of requirement.fallbackChain) {
-      expect(entry.providers.length).toBeGreaterThan(0)
-      expect(entry.model.length).toBeGreaterThan(0)
-    }
-  }
-})
-
-test("lanes follow the first chain entry without checking connectivity, and config overrides win", () => {
-  expect(firstChainChoice(AGENT_MODEL_REQUIREMENTS.sisyphus)).toEqual({ model: "anthropic/claude-opus-5-5", variant: "max" })
-  expect(resolveLane("explore", {})).toEqual({ lane: "explore", source: "requirement", model: "kimi-for-coding/kimi-for-coding-highspeed", variant: "off" })
-  expect(resolveLane("quick", {})).toEqual({ lane: "quick", source: "requirement", model: "openai/gpt-6-luna-fast", variant: "low" })
-  expect(resolveLane("deep-high", {})).toEqual({ lane: "deep-high", source: "requirement", model: "openai/gpt-6-astra", variant: "xhigh" })
-  expect(resolveLane("writing", {})?.model).toBe("anthropic/claude-fable-5-1")
+test("lanes are config-first: an unconfigured lane has no model, and the first configured entry wins", () => {
+  for (const lane of ["sisyphus", "explore", "quick", "deep-high", "writing"] as const) expect(resolveLane(lane, {})).toBeUndefined()
+  expect(resolveLane("quick", parseModelsConfig({ categories: { quick: ["a/one#low", "b/two"] } }))).toEqual({ lane: "quick", source: "config", model: "a/one", variant: "low" })
   const config = parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high", sisyphus: { model: "proxy-cc/claude-opus-5-5", variant: "max" } }, categories: { quick: "openai/gpt-5.5" } })
   expect(resolveLane("oracle", config)).toEqual({ lane: "oracle", source: "config", model: "openai/gpt-5.5", variant: "high" })
   expect(resolveLane("sisyphus", config)).toEqual({ lane: "sisyphus", source: "config", model: "proxy-cc/claude-opus-5-5", variant: "max" })
@@ -69,21 +54,22 @@ test("registration pins every agent and category lane from config and hides lane
   const plan = await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), parseModelsConfig({ agents: { oracle: "openai/gpt-5.5#high", explore: "ds-bryan/deepseek-v4-flash#max" }, categories: { writing: "proxy-cc/claude-opus-5-5" } }))))
   expect(fixture.agents.get(agentID("oracle"))?.model).toEqual(Model.Ref.parse("openai/gpt-5.5#high"))
   expect(fixture.agents.get(agentID("explore"))?.model).toEqual(Model.Ref.parse("ds-bryan/deepseek-v4-flash#max"))
-  expect(fixture.agents.get(agentID("hephaestus"))?.model).toEqual(Model.Ref.parse("openai/gpt-6-sol#medium"))
-  for (const name of CATEGORY_NAMES) {
+  // Unconfigured lanes are not registered: there is no built-in default chain.
+  expect(fixture.agents.has(agentID("hephaestus"))).toBe(false)
+  expect(fixture.agents.has(categoryID("quick"))).toBe(false)
+  for (const name of ["writing"] as const) {
     const agent = fixture.agents.get(categoryID(name))
     expect(agent?.mode).toBe("subagent")
     expect(agent?.system).toBe(categoryMarker(name))
     expect(agent?.permissions.some((rule) => rule.action === "subagent" && rule.effect === "deny")).toBe(true)
   }
   expect(fixture.agents.get(categoryID("writing"))?.model).toEqual(Model.Ref.parse("proxy-cc/claude-opus-5-5"))
-  expect(fixture.agents.get(categoryID("quick"))?.model).toEqual(Model.Ref.parse("openai/gpt-6-luna-fast#low"))
   expect(plan.categories.get("writing")?.source).toBe("config")
   expect(fixture.agents.get("build")?.model).toBeUndefined()
 
   const again = registry()
   const options = parseOptions({ categories: ["quick"] })
-  const emptyChain = { agents: {}, categories: {} }
+  const emptyChain = parseModelsConfig({ categories: { quick: "a/quick" } })
   await Effect.runPromise(Effect.scoped(registerAgents(again.ctx, options, emptyChain)))
   expect(again.agents.has(categoryID("quick"))).toBe(true)
   expect(again.agents.has(categoryID("writing"))).toBe(false)
@@ -96,7 +82,7 @@ test("a lane whose chain names no model is hidden and a user-owned lane is left 
   const fixture = registry()
   fixture.agents.set(categoryID("quick"), { ...Agent.Info.default(Agent.ID.make(categoryID("quick"))), system: "user-owned" })
   const plan = planRegistration(parseOptions({}), {})
-  expect(plan.categories.get("quick")?.source).toBe("requirement")
+  expect(plan.categories.get("quick")).toBeUndefined()
   await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), {})))
   expect(fixture.agents.get(categoryID("quick"))?.system).toBe("user-owned")
   expect(fixture.agents.get(categoryID("quick"))?.model).toBeUndefined()

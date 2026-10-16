@@ -91,8 +91,8 @@ const server = http.createServer(async (req, res) => {
      } else if (active.template && messageText.includes("You are the reviewer node")) {
        // Scripted reviewer: first review fails, the re-review passes.
        call = undefined
-       text = messageText.includes("This is the revised plan") ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
-     } else if (active.template && (messageText.includes("Write the work plan") || messageText.includes("The reviewer rejected the plan"))) {
+       text = /this is the revised plan/i.test(messageText) ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
+     } else if (active.template && (messageText.includes("Write the work plan") || /the reviewer rejected the plan/i.test(messageText))) {
        call = undefined; text = messageText.includes("rejected") ? "IOLAUS_PLAN_V2" : "IOLAUS_PLAN_V1"
      } else if (active.template && messageText.includes("Execute the approved plan")) {
        call = undefined; text = "IOLAUS_EXECUTED"
@@ -182,6 +182,9 @@ try {
   server.listen(0, "127.0.0.1"); await once(server, "listening")
   const mockURL = `http://127.0.0.1:${server.address().port}/v1`
   const only = process.env.IOLAUS_QA_ONLY ? new Set(process.env.IOLAUS_QA_ONLY.split(",")) : undefined
+  // Iolaus is config-first: a scenario without its own models gets every lane on the mock model.
+  const DEFAULT_MODELS = { agents: Object.fromEntries(["sisyphus", "hephaestus", "prometheus", "atlas", "sisyphus-junior", "oracle", "librarian", "explore", "metis", "momus", "multimodal-looker"].map((name) => [name, "openai/gpt-5.5"])),
+    categories: Object.fromEntries(["visual-engineering", "ultrabrain", "deep-low", "deep-high", "artistry", "quick", "unspecified-low", "unspecified-high", "writing"].map((name) => [name, "openai/gpt-5.5"])) }
   for (const scenario of [
     { name: "native", enabled: true, agent: "build", nativeRead: true },
     { name: "agent", enabled: true, agent: "sisyphus", nativeRead: true },
@@ -238,7 +241,7 @@ try {
     const iolausHome = join(home, ".iolaus")
     mkdirSync(iolausHome, { recursive: true })
     env.IOLAUS_HOME = iolausHome
-    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), ...(scenario.models ? { models: scenario.models } : {}), ...(scenario.concurrency ? { background_task: { defaultConcurrency: scenario.concurrency } } : {}) }))
+    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: scenario.enabled, mcps: scenario.mcps ?? [], ...(scenario.ghOption === undefined ? {} : { gh: scenario.ghOption }), ...(scenario.verifyOption === undefined ? {} : { verify: scenario.verifyOption }), models: scenario.models ?? DEFAULT_MODELS, ...(scenario.concurrency ? { background_task: { defaultConcurrency: scenario.concurrency } } : {}) }))
     const settings = { plugins: [{ package: join(root,"dist") }],
       model: "openai/gpt-5.5", default_agent: "build", ...(scenario.agentPermissions ? {} : { permissions: [{ action: "*", resource: "*", effect: "allow" }] }),
       provider: { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }
@@ -282,10 +285,13 @@ try {
        if (scenario.enabled) {
          // Display names drop the namespace; ids keep it; the host's own Explore keeps ours distinguishable.
          const named = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, t.name]))
-         assert.equal(named["sisyphus"], "Sisyphus", `sisyphus display name: ${named["sisyphus"]}`)
-         assert.equal(named["deep-high"], "Deep High", `deep-high display name: ${named["deep-high"]}`)
-         assert.equal(named["explore"], "Explore", `explore display name: ${named["explore"]}`)
-         assert.ok(traces.some((t) => t.event === "iolaus.agent.replaced" && t.agent === "explore"), "Iolaus did not take over the host's explore agent")
+         // Config-first: only configured lanes register, so names are checked on the default all-lanes config.
+         if (!scenario.models) {
+           assert.equal(named["sisyphus"], "Sisyphus", `sisyphus display name: ${named["sisyphus"]}`)
+           assert.equal(named["deep-high"], "Deep High", `deep-high display name: ${named["deep-high"]}`)
+           assert.equal(named["explore"], "Explore", `explore display name: ${named["explore"]}`)
+           assert.ok(traces.some((t) => t.event === "iolaus.agent.replaced" && t.agent === "explore"), "Iolaus did not take over the host's explore agent")
+         }
          // agent-home: the user layer is provisioned under the sandbox HOME only, and every rendered prompt carries the home contract.
          const ready = traces.find((t) => t.event === "iolaus.home.ready")
          assert.ok(ready, "iolaus.home.ready trace missing")
@@ -412,9 +418,11 @@ try {
          const pinned = Object.fromEntries(traces.filter((t) => t.event === "iolaus.agent.model").map((t) => [t.agent, `${t.model}${t.variant ? `#${t.variant}` : ""}|${t.source}`]))
          assert.equal(pinned["oracle"], "openai/gpt-5.6-sol#xhigh|config", "oracle lane did not follow models config")
          assert.equal(pinned["quick"], "openai/gpt-6-luna-fast#low|config", "quick lane did not follow models config")
-         assert.equal(pinned["sisyphus"], "anthropic/claude-opus-5-5#max|requirement", "sisyphus lane did not follow the requirement table")
-         assert.equal(pinned["deep-high"], "openai/gpt-6-astra#xhigh|requirement", "deep-high lane missing")
-         assert.ok(!traces.some((t) => t.event === "iolaus.category.hidden" || t.event === "iolaus.agent.hidden"), "No lane should be hidden when every chain names a model")
+         // Config-first: lanes the config does not name have no built-in default and are not registered.
+         assert.equal(pinned["sisyphus"], undefined, "an unconfigured agent lane must not be pinned")
+         assert.equal(pinned["deep-high"], undefined, "an unconfigured category lane must not be pinned")
+         assert.ok(traces.some((t) => t.event === "iolaus.agent.hidden" && t.agent === "sisyphus"), "unconfigured sisyphus lane was not hidden")
+         assert.ok(traces.some((t) => t.event === "iolaus.category.hidden" && t.category === "deep-high"), "unconfigured deep-high lane was not hidden")
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
          const quick = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_QUICK"))
          const oracle = captured.find((r) => messageText(r).includes("IOLAUS_DAG_NODE_ORACLE"))
@@ -444,12 +452,14 @@ try {
          const messageText = (r) => JSON.parse(r.input).filter((item) => item?.type === "message").flatMap((item) => item.content ?? []).map((part) => part?.text ?? "").join("\n")
          const texts = captured.map(messageText)
          const order = traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.nodeID)
-         assert.deepEqual(order.slice(0, 4), ["plan", "review", "revise", "rereview"], `template nodes ran out of order: ${order}`)
+         // One review up front; the FAIL grows plan1/review1 at run time.
+         assert.deepEqual(order.slice(0, 4), ["plan", "review", "plan1", "review1"], `template nodes ran out of order: ${order}`)
+         assert.deepEqual(traces.filter((t) => t.event === "iolaus.dag.loop.grown").map((t) => t.nodeID), ["review"], "plan-review did not grow exactly one round")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.waiting" && t.nodeID === "approve"), "gate did not wait after the passing re-review")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.node.approved" && t.nodeID === "approve"), "gate was not approved")
          assert.ok(order.includes("execute"), "executor did not run after approval")
          assert.ok(traces.some((t) => t.event === "iolaus.dag.run.completed"), "template run did not complete")
-         const revise = texts.find((text) => text.includes("The reviewer rejected the plan"))
+         const revise = texts.find((text) => /the reviewer rejected the plan/i.test(text))
          assert.ok(revise && revise.includes("IOLAUS_PLAN_V1") && revise.includes("Step 2 has no verification"), "revise prompt lacks plan and review inputs")
          const execute = texts.find((text) => text.includes("Execute the approved plan"))
          assert.ok(execute && execute.includes("IOLAUS_PLAN_V2"), "execute prompt lacks the revised plan")
@@ -458,6 +468,7 @@ try {
          assert.ok(created, "create with template returned no run")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "prometheus")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").model, "openai/gpt-5.5", "plan node did not get the configured Prometheus model")
+         assert.deepEqual(created.definition.nodes.map((n) => n.id), ["plan", "review", "approve", "execute"], "plan-review must start with a single review")
        }
        if (scenario.template === "ultrawork") {
          // `opencode run "/ultrawork ..."` resolves the command client-side, so the plugin command's execute (and its

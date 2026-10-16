@@ -10,6 +10,7 @@ import { FLOW_TOOL_NAME } from "../src/dag/tool"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
+import { ALL_LANES } from "./lanes"
 import { bindNative, renderAgent, renderMode } from "../src/prompts/render"
 import {
   EXPLORE_PROMPT_METADATA, LIBRARIAN_PROMPT_METADATA, MULTIMODAL_LOOKER_PROMPT_METADATA, ORACLE_PROMPT_METADATA,
@@ -38,7 +39,7 @@ test("registrations keep native agents and user definitions, and take over only 
   const fixture = registry()
   fixture.editor.update("oracle", (agent) => { agent.system = "user-owned" })
   const before = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   for (const value of before.filter((agent) => agent.id !== "explore")) expect(fixture.agents.get(String(value.id))).toEqual(value)
   const explore = fixture.agents.get("explore")!
   expect(explore.system).toBe(agentMarker("explore"))
@@ -48,13 +49,13 @@ test("registrations keep native agents and user definitions, and take over only 
   for (const name of AGENT_NAMES) expect(fixture.agents.has(agentID(name))).toBe(true)
   expect(fixture.agents.get("sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
   const once = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   expect([...fixture.agents.values()]).toEqual(once)
 })
 
 test("specialists follow OMO's per-agent deny lists", async () => {
   const fixture = registry()
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   const permission = (name: string, action: string) => evaluate(action, "*", fixture.agents.get(name)!.permissions)
   for (const name of ["oracle", "explore", "librarian", "metis", "momus"]) {
     expect(permission(name, "edit")).toBe("deny")
@@ -190,7 +191,7 @@ test("ultrawork, hyperplan and team render a DAG instruction for the commanding 
 
 test("ids and display names are the bare lane names; explore replaces the host agent with its own rules", async () => {
   const fixture = registry()
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   const name = (id: string) => String(fixture.agents.get(id)?.name)
   expect(name("sisyphus")).toBe("Sisyphus")
   expect(name("sisyphus-junior")).toBe("Sisyphus Junior")
@@ -206,7 +207,7 @@ test("ids and display names are the bare lane names; explore replaces the host a
   expect(evaluate("edit", "*", rules)).toBe("deny")
   // A second registration pass is a no-op.
   const once = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   expect([...fixture.agents.values()]).toEqual(once)
 })
 

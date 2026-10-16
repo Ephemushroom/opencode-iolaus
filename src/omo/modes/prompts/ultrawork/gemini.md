@@ -186,7 +186,15 @@ task(subagent_type="plan", load_skills=[], run_in_background=false, prompt="<gat
 
 ---
 
+## Task resources
+Before the first task command, create and record one `RUN_TMP=$(mktemp -d)` per task. Export `TMPDIR="$RUN_TMP" NODE_COMPILE_CACHE="$RUN_TMP/node-compile-cache" BUN_RUNTIME_TRANSPILER_CACHE_PATH="$RUN_TMP/bun-transpiler"` for every command; pass the same environment explicitly to children that do not inherit it. Give independent child tasks their own run roots.
+At task end, after owned processes exit, remove only owned directories, including runtime caches. Never wipe shared caches; retain worktrees still needed by open PRs and any parent directory containing them.
+ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (including the run root), and QA resource (PID, tmux session, browser context, port, container, script or temp path); complete it only after a read-back teardown receipt.
+
 ## EXECUTION RULES
+- **BLAST RADIUS**: Make the smallest correct change, and fix in THIS run every defect inside the change's blast radius — the request not delivered, a regression this change introduces, an invalid proof, a failing test or stale doc of code you touched. A defect outside it gets a tracked issue (or a line in the final message) with reproduction and evidence; a deferral never turns a criterion into PASS.
+- **EVIDENCE PER TARGET**: Evidence stays valid per target until an input changes. After each increment rerun what moved — the tests of every touched file and of the files that import it, the scenarios that exercise them — and cite the earlier capture for the rest. The full set runs once more right before the final message.
+- **BLOCKED CHECKPOINT**: After the same failure twice in a row, or a third failed attempt at one step, stop retrying it: mark it blocked with the gap it leaves, record it for the final message, and move on to work that does not depend on it. A broken test harness gets one repair attempt.
 - **TODO**: Track EVERY step. Mark complete IMMEDIATELY after each.
 - **PARALLEL**: Fire independent agent calls simultaneously via task(run_in_background=true) - NEVER wait sequentially.
 - **BACKGROUND FIRST**: Use task for exploration/research agents (10+ concurrent if needed).
@@ -268,7 +276,7 @@ If ANY answer is no → GO BACK AND DO IT. Do not claim completion.
 
 ### REVIEWER GATE (triggered, not optional)
 
-Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task touches 3+ files OR ran 20+ turns OR 30+ min, or refactor/migration/perf/security. Spawn a high-rigor reviewer via `task` with: goal, scenarios, evidence paths, full diff, notepad path. A concern blocks only when it names a success criterion the evidence fails; others are notes. Fix cited blockers, re-run the affected scenario QA, capture fresh delta evidence, and resubmit at most twice; an approval with only notes left counts as approval. Remaining cited blockers after two re-reviews go to the user.
+Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task touches 3+ files OR ran 20+ turns OR 30+ min, or refactor/migration/perf/security. Spawn a high-rigor reviewer via `task` with: goal, scenarios, evidence paths, full diff, notepad path. A concern blocks only when it names a success criterion the evidence fails; others are notes. Fix cited blockers, rerun per EVIDENCE PER TARGET, and send the delta to a NEW reviewer each re-review, at most twice; an approval with only notes left counts as approval. Remaining cited blockers after two re-reviews go to the user.
 
 <MANUAL_QA_MANDATE>
 ### YOU MUST EXECUTE MANUAL QA. THIS IS NOT OPTIONAL. DO NOT SKIP THIS.
@@ -292,7 +300,7 @@ Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task
 | Adds a new tool/hook/feature | Test it end-to-end in a real scenario. |
 | Modifies config handling | Load the config. Verify it parses correctly. |
 
-**NAME THE EXACT TOOL + EXACT INVOCATION** per scenario — the literal `curl` / `send-keys` / `page.click` with inputs and the binary observable. **REGISTER EVERY QA-SPAWNED RESOURCE TEARDOWN AS ITS OWN TODO** (scripts, tmux assets, browser / agent-browser sessions, PIDs, ports, temp dirs), execute it, capture the receipt. A leftover process / tmux session / browser context = NOT done.
+**NAME THE EXACT TOOL + EXACT INVOCATION** per scenario — the literal `curl` / `send-keys` / `page.click` with inputs and the binary observable. Tear down QA scripts, tmux assets, browser / agent-browser sessions, PIDs, ports, containers and QA temp paths inside `$RUN_TMP` before recording QA; leftover QA resources mean NOT done. Remove the run root and eligible worktrees at task end under Task resources.
 
 **UNACCEPTABLE (WILL BE REJECTED):**
 - "This should work" - DID YOU RUN IT? NO? THEN RUN IT.

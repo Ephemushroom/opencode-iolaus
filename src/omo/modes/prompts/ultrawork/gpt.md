@@ -120,6 +120,17 @@ At start, run `NOTE=$(mktemp -t ulw-$(date +%Y%m%d-%H%M%S).XXXXXX.md)` and echo 
 
 When a `create_goal` tool exists, check `get_goal` first (continue a matching active goal; never duplicate), then register the run's goal before implementation with exactly `objective`, outcome-first: the concrete outcome that will be true (never an activity), named deliverable surfaces, the scenario contract as criteria that can fail, scope bounds, and the WHEN TO STOP line. No invented budgets or deadlines. No tool → record the same contract in the notepad and treat it as binding.
 
+## Task resources
+Before the first task command, create and record one `RUN_TMP=$(mktemp -d)` per task. Export `TMPDIR="$RUN_TMP" NODE_COMPILE_CACHE="$RUN_TMP/node-compile-cache" BUN_RUNTIME_TRANSPILER_CACHE_PATH="$RUN_TMP/bun-transpiler"` for every command; pass the same environment explicitly to children that do not inherit it. Give independent child tasks their own run roots.
+At task end, after owned processes exit, remove only owned directories, including runtime caches. Never wipe shared caches; retain worktrees still needed by open PRs and any parent directory containing them.
+ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (including the run root), and QA resource (PID, tmux session, browser context, port, container, script or temp path); complete it only after a read-back teardown receipt.
+
+## SCOPE AND RETRIES
+
+- **BLAST RADIUS**: Make the smallest correct change, and fix in THIS run every defect inside the change's blast radius — the request not delivered, a regression this change introduces, an invalid proof, a failing test or stale doc of code you touched. A defect outside it gets a tracked issue (or a line in the final message) with reproduction and evidence; a deferral never turns a criterion into PASS.
+- **EVIDENCE PER TARGET**: Evidence stays valid per target until an input changes. After each increment rerun what moved — the tests of every touched file and of the files that import it, the scenarios that exercise them — and cite the earlier capture for the rest. The full set runs once more right before the final message.
+- **BLOCKED CHECKPOINT**: After the same failure twice in a row, or a third failed attempt at one step, stop retrying it: mark it blocked with the gap it leaves, record it for the final message, and move on to work that does not depend on it. A broken test harness gets one repair attempt.
+
 ## TODO DISCIPLINE
 
 Maintain a live todo list for every multi-step task: one atomic item per action (`path: <action> for <scenario> — verify by <check>`), exactly one in_progress, transitions marked the instant they happen, discovered work inserted immediately. Never batch completions.
@@ -172,12 +183,12 @@ lsp_diagnostics catches type errors only. Logic bugs, missing behavior, broken f
 | Adds tool/hook/feature | Test end-to-end in a real scenario. |
 | Modifies config handling | Load config. Verify parsed shape. |
 
-Name the exact tool + exact invocation per scenario (literal `curl` / `send-keys` / `page.click` + inputs + binary observable). Register every QA-spawned resource teardown as its own todo (scripts, tmux, browser / agent-browser, PIDs, ports, temp dirs), execute it, capture the receipt. "This should work" / "tests pass" / "lsp clean" / a leftover process are NOT done — the surface artifact + clean teardown are.
+Name the exact tool + exact invocation per scenario (literal `curl` / `send-keys` / `page.click` + inputs + binary observable). Tear down QA scripts, tmux, browser / agent-browser, PIDs, ports, containers and QA temp paths inside `$RUN_TMP` before recording QA; remove the run root and eligible worktrees at task end under Task resources. "This should work" / "tests pass" / "lsp clean" / a leftover process are NOT done — the surface artifact + clean teardown are.
 </MANUAL_QA_MANDATE>
 
 ## REVIEWER GATE (triggered)
 
-Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task touches 3+ files OR ran 20+ turns OR 30+ min, or it's a refactor/migration/perf/security change. Spawn a high-rigor reviewer via `task` with goal + scenarios + evidence + diff. A concern blocks only when it cites a success criterion the evidence fails — others are notes. Fix cited blockers, re-run only the affected QA, and re-submit the delta at most twice; an approval with only notes left counts as approval. If cited blockers remain after two re-reviews, surface them to the user before declaring done.
+Trigger if user said "엄밀"/"strictly"/"rigorously"/"properly review", or task touches 3+ files OR ran 20+ turns OR 30+ min, or it's a refactor/migration/perf/security change. Spawn a high-rigor reviewer via `task` with goal + scenarios + evidence + diff. A concern blocks only when it cites a success criterion the evidence fails — others are notes. Fix cited blockers, rerun per EVIDENCE PER TARGET, and send the delta to a NEW reviewer each re-review, at most twice; an approval with only notes left counts as approval. If cited blockers remain after two re-reviews, surface them to the user before declaring done.
 
 ## STOP RULES
 

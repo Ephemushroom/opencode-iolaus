@@ -1,0 +1,9 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.0.30",
+  "requestCount": 4,
+  "omittedLocationReproducedEmpty": true,
+  "explicitRoutingFoundBothRuns": true,
+  "actionOnlyChangedProjectB": true,
+  "unrelatedOwnerHidden": true
+}

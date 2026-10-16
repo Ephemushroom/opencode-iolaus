@@ -171,7 +171,15 @@ task(category="quick", load_skills=["git-master"], run_in_background=true)
 
 ---
 
+## Task resources
+Before the first task command, create and record one `RUN_TMP=$(mktemp -d)` per task. Export `TMPDIR="$RUN_TMP" NODE_COMPILE_CACHE="$RUN_TMP/node-compile-cache" BUN_RUNTIME_TRANSPILER_CACHE_PATH="$RUN_TMP/bun-transpiler"` for every command; pass the same environment explicitly to children that do not inherit it. Give independent child tasks their own run roots.
+At task end, after owned processes exit, remove only owned directories, including runtime caches. Never wipe shared caches; retain worktrees still needed by open PRs and any parent directory containing them.
+ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (including the run root), and QA resource (PID, tmux session, browser context, port, container, script or temp path); complete it only after a read-back teardown receipt.
+
 ## EXECUTION RULES
+- **BLAST RADIUS**: Make the smallest correct change, and fix in THIS run every defect inside the change's blast radius — the request not delivered, a regression this change introduces, an invalid proof, a failing test or stale doc of code you touched. A defect outside it gets a tracked issue (or a line in the final message) with reproduction and evidence; a deferral never turns a criterion into PASS.
+- **EVIDENCE PER TARGET**: Evidence stays valid per target until an input changes. After each increment rerun what moved — the tests of every touched file and of the files that import it, the scenarios that exercise them — and cite the earlier capture for the rest. The full set runs once more right before the final message.
+- **BLOCKED CHECKPOINT**: After the same failure twice in a row, or a third failed attempt at one step, stop retrying it: mark it blocked with the gap it leaves, record it for the final message, and move on to work that does not depend on it. A broken test harness gets one repair attempt.
 - **TODO format**: `path: <action> for <scenario-id> — verify by <check>` encoding WHERE / WHY (which scenario it advances) / HOW / VERIFY. Exactly ONE in_progress at a time. Mark completed IMMEDIATELY — never batch.
   - GOOD pair (test-first, ordered): `module.test: Write FAILING case invalid-email→ValidationError for S2 - verify by RED with assertion msg` → `src/module: Implement validateEmail() for S2 - verify by module.test GREEN + curl 400 body`
   - BAD: "Implement feature" / "Fix bug" / "Add tests later" / production code before its failing test → rewrite.
@@ -271,7 +279,7 @@ The real-surface artifact is always required. A test is required only where a co
 
 **NAME THE EXACT TOOL + EXACT INVOCATION** for every scenario — the literal `curl ...`, `tmux send-keys ...`, `page.click(...)` with concrete inputs and the binary observable. "run it" / "open the page" is not a scenario.
 
-**CLEANUP IS PART OF QA — TRACK IT AS TODOS.** The moment a QA scenario spawns any resource, add a teardown todo for it (QA scripts, tmux assets, browser / agent-browser sessions, PIDs, ports, containers, temp dirs). Execute every teardown todo and capture the receipt before declaring done. A leftover process / tmux session / browser context / bound port / temp dir = NOT done.
+**CLEANUP IS PART OF THE TASK — TRACK IT AS TODOS.** Tear down QA scripts, tmux assets, browser / agent-browser sessions, PIDs, ports, containers and QA temp paths inside `$RUN_TMP` before recording QA; leftover QA resources mean NOT done. Remove the run root and eligible worktrees at task end under Task resources.
 </MANUAL_QA_MANDATE>
 
 ### TDD Workflow (MANDATORY on every production code change with a test seam)
@@ -314,8 +322,8 @@ Trigger when ANY apply: user said "엄밀" / "strictly" / "rigorously" / "proper
 Procedure (non-negotiable):
 1. Spawn a reviewer via `task(category="ultrabrain", subagent_type="plan", load_skills=[...], run_in_background=false, prompt="<goal + scenarios + evidence + diff + notepad path>")` — or any high-rigor reviewer agent available.
 2. Verify each reviewer concern yourself. A concern blocks only when it names a success criterion the evidence fails; record concerns that cite no criterion as notes with a one-line reason — fixed or declined at your judgment.
-3. Fix every criterion-cited blocker. Re-run ONLY the scenario QA affected by the fix; capture fresh evidence for the delta. Update notepad.
-4. Re-submit to the SAME reviewer at most twice, passing only the delta diff, the blockers it cited, and the already-approved criteria marked out-of-scope. An approval whose only remaining items are notes counts as approval.
+3. Fix every criterion-cited blocker; rerun per EVIDENCE PER TARGET and update the notepad.
+4. Spawn a NEW reviewer for each re-review, at most twice, passing only the delta diff, the blockers the last one cited, and the already-approved criteria marked out-of-scope. An approval whose only remaining items are notes counts as approval.
 5. On approval, declare done. If criterion-cited blockers remain after two re-reviews, stop and surface them to the user — do not loop further.
 
 ## ZERO TOLERANCE FAILURES
