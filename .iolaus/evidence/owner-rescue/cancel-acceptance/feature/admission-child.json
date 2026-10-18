@@ -1,0 +1,293 @@
+{
+  "value": {
+    "run": {
+      "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "admission-child",
+      "definition": {
+        "name": "admission-child",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "admission-child",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:admission-child"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "35b48c1579ce283969e9810a969377778ccfd9e562aa7c33e09f8bcf7275f481",
+      "generation": 1,
+      "status": "failed",
+      "createdAt": 1791963968492,
+      "updatedAt": 1791963968722,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "admission-child",
+            "maxAttempts": 1,
+            "model": "rescue/owner#actual",
+            "prompt": "QA_CASE:admission-child"
+          },
+          "fingerprint": "eee22371729ae24be89304c56b648dc74c33b165c7fbe42ba56636e9937944c3",
+          "status": "failed",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "rescue/owner#actual",
+              "token": "056ed1e2-e750-4edb-9046-63e86a74f3d9"
+            },
+            "initial": "unresolved",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "ineligible_or_unknown_history",
+            "failedModels": [
+              "openai/A"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "b6c88dde8078f1feee474b4797bd327a64d9e00383be1baf1ec2e6ed2ec9d36f",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/A",
+                      "token": "66a6a261-5b57-4bdf-a2db-dbbb44d53f53"
+                    },
+                    "nodeID": "admission-child",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                      "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_CASE:admission-child"
+                    },
+                    "sessionID": "ses_ec69fcc07ffeFV7fyhU2CAhzpL"
+                  }
+                }
+              ],
+              "task": "QA_CASE:admission-child",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "initialRoleAllowed": true,
+            "rescue": {
+              "decidedAt": 1791963968610,
+              "decisionID": "cd88f072-04e1-4ac9-84c6-506893e8e47c",
+              "execution": {
+                "attempt": 2,
+                "identity": {
+                  "agent": "quick",
+                  "model": "rescue/owner#actual",
+                  "token": "056ed1e2-e750-4edb-9046-63e86a74f3d9"
+                },
+                "nodeID": "admission-child",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                  "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                  },
+                  "permissions": [],
+                  "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:admission-child\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fcc07ffeFV7fyhU2CAhzpL\",\"token\":\"66a6a261-5b57-4bdf-a2db-dbbb44d53f53\",\"parts\":[]}]}"
+                },
+                "sessionID": "ses_ec69fcb88ffe6AJ0CI8y4lDykq"
+              },
+              "from": {
+                "attempt": 1,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/A",
+                  "token": "66a6a261-5b57-4bdf-a2db-dbbb44d53f53"
+                },
+                "nodeID": "admission-child",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                  "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                  },
+                  "permissions": [],
+                  "prompt": "QA_CASE:admission-child"
+                },
+                "sessionID": "ses_ec69fcc07ffeFV7fyhU2CAhzpL"
+              },
+              "launchToken": "056ed1e2-e750-4edb-9046-63e86a74f3d9",
+              "pinnedModel": "rescue/owner#actual",
+              "preRescueDefinition": {
+                "agent": "quick",
+                "dependsOn": [],
+                "id": "admission-child",
+                "maxAttempts": 1,
+                "model": "openai/A",
+                "prompt": "QA_CASE:admission-child"
+              },
+              "state": "settled"
+            }
+          },
+          "error": "pending_host_input",
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "rescue/owner#actual",
+              "token": "056ed1e2-e750-4edb-9046-63e86a74f3d9"
+            },
+            "nodeID": "admission-child",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:admission-child\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fcc07ffeFV7fyhU2CAhzpL\",\"token\":\"66a6a261-5b57-4bdf-a2db-dbbb44d53f53\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ec69fcb88ffe6AJ0CI8y4lDykq"
+          },
+          "createdAt": 1791963968492,
+          "updatedAt": 1791963968722
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "d9254cdf-6f6b-49d0-92d0-1c3fca621b54",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963968493
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "6c6b5068-8cd4-4e53-b6ec-bfac777cc833",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963968493,
+        "nodeID": "admission-child"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "5df4fbd0-5f70-4a70-bcec-bc63aaa35089",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963968522,
+        "nodeID": "admission-child"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "edfb7a95-7ff2-4c77-9756-8b31478cc767",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 4,
+        "type": "node.rescued",
+        "generation": 1,
+        "createdAt": 1791963968610,
+        "nodeID": "admission-child",
+        "payload": {
+          "decisionID": "cd88f072-04e1-4ac9-84c6-506893e8e47c",
+          "from": "openai/A",
+          "to": "rescue/owner#actual"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f0751fa2-cfdc-4bb5-b984-eb14a958f656",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963968610,
+        "nodeID": "admission-child"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c9b934cf-2fb2-414c-a123-6f20851c7dfd",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963968648,
+        "nodeID": "admission-child"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "bfaaf25f-a34f-4c6d-9b17-581dc0b32f6d",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 7,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963968722,
+        "nodeID": "admission-child",
+        "payload": {
+          "message": "pending_host_input",
+          "status": "failed"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "749440f2-d382-4edd-a187-adc53dc7fe33",
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "sequence": 8,
+        "type": "run.failed",
+        "generation": 1,
+        "createdAt": 1791963968722
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "edfb7a95-7ff2-4c77-9756-8b31478cc767",
+        "messageID": "msg_edfb7a957ff24c7797568b31478cc767",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_edfb7a957ff24c7797568b31478cc767"
+        },
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "state": "admitted",
+        "text": "Iolaus Flow notice edfb7a95-7ff2-4c77-9756-8b31478cc767: \"admission-child\" (361a2eea-faa6-49c9-ac8d-be82c10f24c0) reserved its one owner-model rescue for admission-child: {\"decisionID\":\"cd88f072-04e1-4ac9-84c6-506893e8e47c\",\"from\":\"openai/A\",\"to\":\"rescue/owner#actual\"}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "749440f2-d382-4edd-a187-adc53dc7fe33",
+        "messageID": "msg_749440f2d3824edda187adc53dc7fe33",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_749440f2d3824edda187adc53dc7fe33"
+        },
+        "runID": "361a2eea-faa6-49c9-ac8d-be82c10f24c0",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 749440f2-d382-4edd-a187-adc53dc7fe33: \"admission-child\" (361a2eea-faa6-49c9-ac8d-be82c10f24c0) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "inbox": [
+    {
+      "id": "msg_1396034aa001x1U3LgVyILbW3u",
+      "sessionID": "ses_ec69fcb88ffe6AJ0CI8y4lDykq",
+      "time": {
+        "created": 1791963968682
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "PRESERVE_admission-child"
+      },
+      "delivery": "queue"
+    }
+  ]
+}

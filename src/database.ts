@@ -40,6 +40,10 @@ export function openDatabase(path: string): Database {
       run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
       node_id TEXT NOT NULL, value_json TEXT NOT NULL, PRIMARY KEY (run_id, node_id)
     );
+    CREATE TABLE IF NOT EXISTS dag_node_recovery (
+      run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+      node_id TEXT NOT NULL, value_json TEXT NOT NULL, PRIMARY KEY (run_id, node_id)
+    );
     CREATE TABLE IF NOT EXISTS dag_steering (
       run_id TEXT NOT NULL REFERENCES dag_runs(run_id) ON DELETE CASCADE,
       request_id TEXT NOT NULL, value_json TEXT NOT NULL, PRIMARY KEY (run_id, request_id)

@@ -1,0 +1,1169 @@
+bun test v1.4.3 (c6da4a4d3)
+
+test/plugin.test.ts:
+(pass) starts only the appended plugin [35.09ms]
+(pass) restarts the suffix after an insertion [8.26ms]
+(pass) restarts the suffix after a revision changes [6.99ms]
+(pass) stops only the removed trailing plugin [6.16ms]
+(pass) updates inventory metadata without restarting an unchanged generation [5.46ms]
+(pass) loads a local plugin with its configured options [25.76ms]
+(pass) unloading a plugin removes its commands and runs cleanup [6.05ms]
+(pass) reports a failed plugin without blocking a healthy plugin [13.69ms]
+(pass) disables a plugin whose transform fails after setup without publishing its partial edits [12.53ms]
+(pass) keeps the suffix after a failed plugin alive across identical activations [6.61ms]
+(pass) attributes replay failure to the broken plugin rather than a later plugin reading the registry [5.66ms]
+(pass) disables plugins after runtime reload failures without retrying an unchanged generation [5.88ms]
+(pass) disables plugins after replay failures discovered during setup without restoring the old generation [5.54ms]
+(pass) does not let asynchronous plugin cleanup block recovered registry readiness [5.75ms]
+(pass) retains Promise plugin groups for later registrations and ignores a disabled group's attempts [5.99ms]
+(pass) normalizes Promise plugin API inputs through JSON [11.63ms]
+(pass) creates child sessions from a plugin at the parent's location [9.74ms]
+(pass) reloading a plugin replaces its command implementation [5.65ms]
+[00:02:00.000] INFO (#6628): credential updated {
+  credentialID: "cred_134730ae8001POSlQUDUMkTYC5",
+  integrationID: "refresh-fixture",
+  valueChanged: true,
+  labelChanged: false,
+}
+(pass) refreshes expired OAuth credentials through the context during activation [8.94ms]
+
+test/plugin-failure.test.ts:
+(pass) removes a failed plugin's hooks and RPC handlers without affecting healthy plugins [6.92ms]
+(pass) does not join queued failed-plugin cleanup during reload [10.29ms]
+(pass) does not join queued failed-plugin cleanup during teardown [5.22ms]
+(pass) does not restore a disabled generation with a pending failure when its replacement fails setup [5.24ms]
+(pass) preserves pending failures when an earlier plugin changes [8.89ms]
+(pass) preserves reported failures when an earlier plugin changes [5.96ms]
+(pass) continues failure reporting and cleanup after a plugin update observer fails [5.17ms]
+(pass) settles readiness before shutdown joins a disabled plugin's finalizers [5.53ms]
+
+test/plugin/provider-azure.test.ts:
+(pass) AzurePlugin connecting > hides Azure CLI authentication when the Azure CLI is not installed [8.98ms]
+(pass) AzurePlugin connecting > offers the resources the Azure CLI can reach and accepts a typed resource name [24.76ms]
+(pass) AzurePlugin connecting > asks for the resource name as text when the Azure CLI lists no resources [13.74ms]
+(pass) AzurePlugin startup > starts without calling Azure, then lists deployments [20.03ms]
+(pass) AzurePlugin discovery > shows the deployments listed with an API key, named after the deployment [17.11ms]
+(pass) AzurePlugin discovery > lists Azure CLI deployments through the management API before the resource's own list [16.02ms]
+(pass) AzurePlugin discovery > falls back to the resource's own list when the Azure CLI cannot read the management API [16.13ms]
+(pass) AzurePlugin discovery > keeps the catalog for a custom endpoint without listing deployments [64.74ms]
+(pass) AzurePlugin discovery > publishes the management list only after its last page [18.29ms]
+(pass) AzurePlugin discovery > keeps the last complete list when a later page fails [43.80ms]
+(pass) AzurePlugin discovery > never sends the management token to a page link outside the management endpoint [41.30ms]
+(pass) AzurePlugin discovery > keeps a model that is configured explicitly [17.48ms]
+(pass) AzurePlugin switching accounts > shows the new account without waiting for the previous account's discovery [45.60ms]
+(pass) AzurePlugin requests > authorizes Azure, Foundry, and WebSocket requests with a token for their audience [8.44ms]
+(pass) AzurePlugin resource name > reads AZURE_RESOURCE_NAME [6.28ms]
+(pass) AzurePlugin resource name > reads the legacy AZURE_COGNITIVE_SERVICES_RESOURCE_NAME [5.63ms]
+(pass) AzurePlugin resource name > prefers configuration over the environment [6.66ms]
+(pass) AzurePlugin resource name > ignores a whitespace configured name [6.31ms]
+(pass) AzurePlugin resource name > prefers the connection's resource over configuration, as requests do [7.23ms]
+(pass) AzurePlugin resource name > reads the resource of an API key imported from V1 [6.08ms]
+(pass) AzurePlugin resource name > expands provider and model resource URLs [6.07ms]
+(pass) AzurePlugin transport > prefers WebSockets on the provider for the Azure Responses API only [9.57ms]
+
+test/plugin/provider-gitlab.test.ts:
+(pass) GitLabPlugin > discovers workflow models for the location and exposes their refs in the model registry [15.65ms]
+(pass) GitLabPlugin > uses OAuth access tokens for discovery [11.88ms]
+(pass) GitLabPlugin > does not discover with only an ambient GITLAB_TOKEN or configured apiKey [12.31ms]
+(pass) GitLabPlugin > discovers with a stored login without replacing configured model definitions [12.79ms]
+(pass) GitLabPlugin > scopes the SDK discovery cache to the active account [22.31ms]
+(pass) GitLabPlugin > gives up on unresponsive discovery so later account switches still load [28.07ms]
+(pass) GitLabPlugin > skips unauthenticated discovery and refreshes after credential changes, including failures [40.45ms]
+(pass) GitLabPlugin > creates SDKs with legacy default instance URL, token env, headers, and feature flags [5.17ms]
+(pass) GitLabPlugin > uses GITLAB_INSTANCE_URL when instanceUrl is not configured [4.75ms]
+(pass) GitLabPlugin > keeps configured instance URL, apiKey, aiGatewayHeaders, and featureFlags over env/defaults [4.46ms]
+(pass) GitLabPlugin > ignores non-GitLab SDK packages [4.82ms]
+(pass) GitLabPlugin > uses workflowChat for duo workflow models and preserves selectedModelRef [5.44ms]
+(pass) GitLabPlugin > uses exact static workflow model ids when the provider recognizes them [6.26ms]
+(pass) GitLabPlugin > uses provider feature flags instead of model settings feature flags [6.13ms]
+(pass) GitLabPlugin > uses agenticChat with provider aiGatewayHeaders and feature flags for normal models [4.67ms]
+
+test/plugin/provider-llmgateway.test.ts:
+(pass) LLMGatewayPlugin > is registered so legacy referer headers can be applied [0.02ms]
+(pass) LLMGatewayPlugin > applies legacy referer headers only to enabled llmgateway [9.13ms]
+(pass) LLMGatewayPlugin > does not apply legacy headers to a disabled llmgateway provider [6.58ms]
+
+test/plugin/provider-xai.test.ts:
+(pass) XAIPlugin > registers device OAuth and API key methods [5.04ms]
+(pass) XAIPlugin > migrates browser OAuth credentials to the device method [5.79ms]
+(pass) XAIPlugin > enables xAI Responses WebSockets [5.08ms]
+
+test/plugin/provider-opencode.test.ts:
+(pass) OpencodePlugin > registers account and service account methods [6.55ms]
+(pass) OpencodePlugin > uses a canonical custom server throughout device authorization [14.81ms]
+(pass) OpencodePlugin > rejects malformed device verification URLs [12.03ms]
+(pass) OpencodePlugin > uses the device token organization during authorization: org-z [13.64ms]
+(pass) OpencodePlugin > uses the device token organization during authorization: undefined [12.10ms]
+(pass) OpencodePlugin > uses the device token organization during authorization: null [13.66ms]
+(pass) OpencodePlugin > uses the device token organization during authorization: org-missing [12.09ms]
+(pass) OpencodePlugin > persists rotated credentials for org-z [12.16ms]
+(pass) OpencodePlugin > persists rotated credentials for undefined [11.56ms]
+(pass) OpencodePlugin > persists rotated credentials for null [11.48ms]
+(pass) OpencodePlugin > persists rotated credentials for org-missing [11.83ms]
+(pass) OpencodePlugin > persists rotated credentials for org-z with discovery unavailable [11.87ms]
+(pass) OpencodePlugin > persists rotated credentials for org-a with discovery unavailable [11.86ms]
+(pass) OpencodePlugin > rejects non-HTTP OpenCode servers [5.83ms]
+(pass) OpencodePlugin > rejects non-string OpenCode servers [4.92ms]
+(pass) OpencodePlugin > loads native V2 providers and models from the connected OpenCode server [15.13ms]
+(pass) OpencodePlugin > refreshes hosted search with Console config, retains it on failure, and skips unchanged snapshots [52.35ms]
+(pass) OpencodePlugin > registers the Console's MCP servers as sent, attaching the credential only where asked [23.82ms]
+(pass) OpencodePlugin > ignores unsupported managed actions and keys while enforcing supported policies [12.73ms]
+(pass) OpencodePlugin > refreshes past future-only policies while retaining config on malformed supported statements [91.43ms]
+(pass) OpencodePlugin > keeps policy statements bound to the connected Console account [49.13ms]
+(pass) OpencodePlugin > reports Console SSO sign-in, keeps the last config, and clears once Console accepts again [31.37ms]
+(pass) OpencodePlugin > explains rejected Console inference with the sign-in the connection needs [14.67ms]
+(pass) OpencodePlugin > ignores 403 responses that are not a Console SSO error [30.98ms]
+(pass) OpencodePlugin > releases unread Console config responses when the fetch completes [20.10ms]
+(pass) OpencodePlugin > reports a rejected Console refresh token as signed out without removing the credential [18.44ms]
+(pass) OpencodePlugin > reports a Console session rejected before its token expires as signed out [25.85ms]
+(pass) OpencodePlugin > loads and executes hosted web search from the connected OpenCode server [20.16ms]
+(pass) OpencodePlugin > derives hosted search identity and the default Console endpoint locally [12.59ms]
+(pass) OpencodePlugin > does not forward hosted search credentials through redirects [18.01ms]
+(pass) OpencodePlugin > closes a rejected hosted search response without waiting for its body [18.59ms]
+(pass) OpencodePlugin > preserves native Console OpenAI variant bodies in inference requests [32.31ms]
+(pass) OpencodePlugin > uses a public key and disables paid models without credentials [6.27ms]
+(pass) OpencodePlugin > keeps free models without credentials [5.53ms]
+(pass) OpencodePlugin > treats output-only cost as free without credentials [5.24ms]
+(pass) OpencodePlugin > uses OPENCODE_API_KEY as credentials [6.12ms]
+(pass) OpencodePlugin > uses configured provider env vars as credentials [5.53ms]
+(pass) OpencodePlugin > uses configured apiKey as credentials [5.85ms]
+(pass) OpencodePlugin > ignores non-opencode providers and models [6.39ms]
+
+test/plugin/vcs-init.test.ts:
+(pass) Promise VCS initializer reaches the registered provider with its location scope [0.68ms]
+
+test/plugin/verbosity.test.ts:
+(pass) sets known OpenAI Responses defaults without overriding configured or unknown models [5.90ms]
+
+test/plugin/session-compact.test.ts:
+(pass) Effect plugins can admit session compaction [9.21ms]
+(pass) Promise plugins can admit session compaction [12.69ms]
+
+test/plugin/supervisor-reload.test.ts:
+[08:48:38.638] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.638] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.661] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.662] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.662] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.663] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.793] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.794] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.798] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.798] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.799] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:38.799] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.031] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.031] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.035] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.036] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-clMEca/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.036] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.037] INFO (#41822): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-i5ESb8/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > reloads helper-defined RPC methods on a helper-only save [540.45ms]
+[08:48:39.100] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.100] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.105] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.114] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.114] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.115] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.234] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.234] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.237] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.238] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.238] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.238] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.494] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.494] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ow8FbI/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.498] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.499] INFO (#42895): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-EkRPy1/config/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > reloads helper-defined RPC methods when the entrypoint also changes [442.90ms]
+[08:48:39.545] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.546] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.549] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.549] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.550] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.550] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.674] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.674] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.678] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.678] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.678] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.679] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.930] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.930] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.934] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.935] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-B0fHDV/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.935] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.936] INFO (#43949): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jI6HPq/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > reloads helper-defined RPC methods outside the configured plugin directory [454.99ms]
+[08:48:39.999] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:39.999] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.002] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.003] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.003] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.003] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.017] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.017] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.019] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.020] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-OWLH4Z/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.020] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.021] INFO (#45018): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-7fUHwu/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > retains a discovered plugin change during initial activation [78.74ms]
+[08:48:40.081] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.082] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.085] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.085] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.086] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.086] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.102] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.103] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.106] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.106] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-jftA84/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.107] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.107] INFO (#46027): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-bwcqDT/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > retains a configured plugin change during initial activation [85.74ms]
+[08:48:40.161] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-IdyXao/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.161] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-RVY7AP/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.164] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-IdyXao/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.165] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-IdyXao/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.165] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-RVY7AP/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.165] INFO (#47035): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-RVY7AP/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.194] INFO (#47165): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-IdyXao/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.195] INFO (#47165): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-IdyXao/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.195] INFO (#47165): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-RVY7AP/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.196] INFO (#47165): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-RVY7AP/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > keeps the running generation when an updated local plugin fails to import [216.62ms]
+[08:48:40.405] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-D7ll6M/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.405] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-Qww3Df/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.412] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-D7ll6M/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.413] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-D7ll6M/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.413] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-Qww3Df/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.413] INFO (#48002): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-Qww3Df/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.440] INFO (#48130): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-D7ll6M/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.441] INFO (#48130): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-D7ll6M/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.442] INFO (#48130): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-Qww3Df/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:40.443] INFO (#48130): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-Qww3Df/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) PluginSupervisor reload > serializes the periodic refresh behind an in-flight reload [715.22ms]
+[08:48:41.096] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.096] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.100] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.100] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.100] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.101] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.124] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.125] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.127] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.128] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.191] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.191] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.192] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.193] INFO (#49119): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.296] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.296] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.303] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.304] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.305] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.305] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.402] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.402] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.405] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.406] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.406] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.406] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.528] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.528] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/AGENTS.md",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.531] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.532] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-qL8akW/config/skills",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.532] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skill",
+  type: "file",
+  ignores: 0,
+}
+[08:48:41.533] INFO (#48991): watcher subscribe {
+  path: "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/opencode-core-test-ON12F3/.opencode/skills",
+  type: "file",
+  ignores: 0,
+}
+(pass) applies organization integration changes to running external plugins [493.54ms]
+
+test/plugin/provider-vllm.test.ts:
+(pass) VLLMPlugin > waits for readiness and discovers official vLLM model metadata [37.91ms]
+(pass) VLLMPlugin > refreshes inventory while retaining the last success through transient failures [56.97ms]
+(pass) VLLMPlugin > replaces and restores same-ID Models.dev entries after an empty success [18.27ms]
+(pass) VLLMPlugin > reloads layered custom endpoint and bearer authentication settings [14.05ms]
+
+test/plugin/command.test.ts:
+(pass) CommandPlugin.Plugin > registers built-in init and review commands [2.97ms]
+
+test/plugin/provider-sap-ai-core.test.ts:
+(pass) SapAICorePlugin > copies serviceKey option into AICORE_SERVICE_KEY but keeps SDK options to deployment metadata [5.18ms]
+(pass) SapAICorePlugin > preserves existing AICORE_SERVICE_KEY over serviceKey option [4.30ms]
+(pass) SapAICorePlugin > omits deployment and resourceGroup SDK options when no service key is available [3.98ms]
+(pass) SapAICorePlugin > uses the callable SDK for language selection [3.91ms]
+(pass) SapAICorePlugin > ignores non-SAP AI Core providers [3.74ms]
+
+test/plugin/websearch.test.ts:
+(pass) built-in web search providers > releases rate-limited HTTP requests for opencode.websearch.exa before caching their errors [4.22ms]
+(pass) built-in web search providers > releases rate-limited HTTP requests for opencode.websearch.parallel before caching their errors [3.62ms]
+(pass) built-in web search providers > releases rate-limited HTTP requests for opencode.websearch.firecrawl before caching their errors [2.87ms]
+(pass) built-in web search providers > releases rate-limited HTTP requests for opencode.websearch.tavily before caching their errors [3.22ms]
+(pass) built-in web search providers > releases rate-limited HTTP requests for opencode.websearch.tinyfish before caching their errors [2.79ms]
+(pass) built-in web search providers > registers a provider without an integration [2.39ms]
+(pass) built-in web search providers > registers Firecrawl with the standard key method [2.62ms]
+(pass) built-in web search providers > registers Exa with its MCP schema [6.38ms]
+(pass) built-in web search providers > registers Parallel and keeps its credential in the authorization header [3.69ms]
+(pass) built-in web search providers > registers Tavily with keyless and keyed Search API access [3.03ms]
+(pass) built-in web search providers > registers TinyFish with keyless and keyed MCP search access [3.36ms]
+
+test/plugin/provider-nvidia.test.ts:
+(pass) NvidiaPlugin > is registered so legacy referer headers can be applied [0.02ms]
+(pass) NvidiaPlugin > applies NVIDIA tracking headers only to nvidia [5.06ms]
+(pass) NvidiaPlugin > adds billing origin for custom NVIDIA endpoints [3.93ms]
+(pass) NvidiaPlugin > preserves an explicit NVIDIA billing origin header [4.63ms]
+
+test/plugin/provider-kilo.test.ts:
+(pass) KiloPlugin > is registered so legacy referer headers can be applied [0.02ms]
+(pass) KiloPlugin > applies legacy referer headers only to Kilo endpoints [5.04ms]
+(pass) KiloPlugin > uses the exact legacy Kilo header casing and set [4.36ms]
+(pass) KiloPlugin > uses endpoint package matching instead of a provider ID guard [6.57ms]
+
+test/plugin/provider-cloudflare-ai-gateway.test.ts:
+(pass) CloudflareAIGatewayPlugin > registers account and gateway forms when the environment does not provide them [4.68ms]
+(pass) CloudflareAIGatewayPlugin > uses environment account and gateway values without requesting form fields [4.73ms]
+(pass) CloudflareAIGatewayPlugin > requests only the gateway ID when the environment provides the account ID [4.64ms]
+(pass) CloudflareAIGatewayPlugin > gives the provider its environment account and gateway IDs [4.88ms]
+(pass) CloudflareAIGatewayPlugin > prefers configured IDs over environment IDs [5.46ms]
+(pass) CloudflareAIGatewayPlugin > leaves a configured endpoint URL untouched [4.84ms]
+
+test/plugin/tool-input-repair.test.ts:
+(pass) tool input repair plugin > preserves valid input identity, nested containers, and unknown properties [0.61ms]
+(pass) tool input repair plugin > parses root objects and repairs nested stringified containers [0.29ms]
+(pass) tool input repair plugin > removes extras only from explicitly closed objects without mutating inputs [0.14ms]
+(pass) tool input repair plugin > preserves unknown keys when patterned ownership cannot be determined [0.07ms]
+(pass) tool input repair plugin > preserves properties that may belong to composed object schemas [0.12ms]
+(pass) tool input repair plugin > removes only optional nonnullable nulls and non-object empty placeholders [0.11ms]
+(pass) tool input repair plugin > preserves nulls whose validity is hidden inside compositions [0.07ms]
+(pass) tool input repair plugin > preserves optional-looking nulls when the parent composes requirements [0.11ms]
+(pass) tool input repair plugin > coerces numeric and boolean strings while preserving invalid and existing values [0.10ms]
+(pass) tool input repair plugin > wraps compatible scalars after repairing array items [0.11ms]
+(pass) tool input repair plugin > repairs nested question-like inputs without mutating original containers [0.09ms]
+(pass) tool input repair plugin > repairs unique nullable alternatives while preserving accepted union values [0.10ms]
+(pass) tool input repair plugin > repairs tuple positions and rest items while preserving valid array identity [0.09ms]
+(pass) tool input repair plugin > repairs typed dictionaries and straightforward local references [0.13ms]
+(pass) tool input repair plugin > leaves ambiguous unions, compositions, and unsupported roots unchanged [0.13ms]
+
+test/plugin/provider-ollama.test.ts:
+(pass) OllamaPlugin > skips unconfigured default local discovery when the location has no local execution plane [26.45ms]
+(pass) OllamaPlugin > discovers local completion models and native metadata [13.36ms]
+(pass) OllamaPlugin > refreshes changed digests and retains inventory through transient failures [56.20ms]
+(pass) OllamaPlugin > replaces and restores the same-ID Models.dev provider [19.00ms]
+(pass) OllamaPlugin > reloads layered endpoint and bearer authentication settings [17.20ms]
+
+test/plugin/identity.test.ts:
+(pass) formats the model identity part [0.13ms]
+(pass) inserts the structured model block after the agent prompt [4.89ms]
+
+test/plugin/provider-openai.test.ts:
+(pass) OpenAIPlugin > registers browser and headless ChatGPT OAuth methods [5.25ms]
+(pass) OpenAIPlugin > filters the OpenAI catalog to codex-eligible models under a ChatGPT connection [12.45ms]
+(pass) OpenAIPlugin > keeps the full OpenAI catalog under an API key connection [7.47ms]
+(pass) OpenAIPlugin > omits the default output limit from OpenAI steps and compaction [5.62ms]
+(pass) OpenAIPlugin > selects WebSocket only from explicit policy [7.52ms]
+
+test/plugin/provider-github-copilot.test.ts:
+(pass) GithubCopilotPlugin > prefers the account-specific Copilot API endpoint [0.05ms]
+(pass) GithubCopilotPlugin > rejects accounts without Copilot chat access [0.04ms]
+(pass) GithubCopilotPlugin > only blocks on an explicit entitlement denial
+(pass) GithubCopilotPlugin > registers GitHub Copilot device OAuth [5.70ms]
+(pass) GithubCopilotPlugin > removes the generic key method [5.29ms]
+(pass) GithubCopilotPlugin > adds Copilot authentication and request metadata headers [5.18ms]
+(pass) GithubCopilotPlugin > adds Copilot authentication to native Anthropic requests [6.19ms]
+(pass) GithubCopilotPlugin > classifies main-loop steps as agent interactions [8.17ms]
+(pass) GithubCopilotPlugin > classifies child-session steps as subagent interactions [9.07ms]
+(pass) GithubCopilotPlugin > classifies title generation as a background interaction [10.21ms]
+(pass) GithubCopilotPlugin > classifies compaction requests by kind rather than agent [8.91ms]
+(pass) GithubCopilotPlugin > does not classify by agent name [8.41ms]
+(pass) GithubCopilotPlugin > ignores other providers' model requests [8.48ms]
+(pass) GithubCopilotPlugin > names sessions with the utility model as a free background request [4.62ms]
+(pass) GithubCopilotPlugin > fails the utility title on rate limits so the billable path can run [4.19ms]
+(pass) GithubCopilotPlugin > fails the utility title on an empty completion [3.56ms]
+(pass) GithubCopilotPlugin > keeps a declared agent initiator when the body looks user-initiated [3.61ms]
+(pass) GithubCopilotPlugin > classifies session generation requests as agent interactions [8.16ms]
+(pass) GithubCopilotPlugin > creates the bundled Copilot SDK for the GitHub Copilot package [28.36ms]
+(pass) GithubCopilotPlugin > rewrites models.dev fallback models to the GitHub Copilot package [6.99ms]
+(pass) GithubCopilotPlugin > selects languageModel when responses and chat are absent [6.07ms]
+(pass) GithubCopilotPlugin > selects languageModel with the API model ID when responses and chat are absent [5.11ms]
+(pass) GithubCopilotPlugin > uses responses for gpt-5 models except gpt-5-mini [5.44ms]
+(pass) GithubCopilotPlugin > uses responses for Grok and MAI Code models and chat for Gemini [5.38ms]
+(pass) GithubCopilotPlugin > uses advertised Copilot endpoint metadata before model ID fallbacks [5.78ms]
+(pass) GithubCopilotPlugin > uses the API model ID when selecting responses or chat [5.41ms]
+(pass) GithubCopilotPlugin > disables gpt-5-chat-latest before Copilot language selection [6.34ms]
+(pass) GithubCopilotPlugin > does not disable gpt-5-chat-latest for non-Copilot providers [5.01ms]
+(pass) GithubCopilotPlugin > ignores non-Copilot providers [4.35ms]
+
+test/plugin/provider-lmstudio.test.ts:
+(pass) LMStudioPlugin > is registered as a built-in provider plugin [0.02ms]
+(pass) LMStudioPlugin > discovers local language models with their capabilities and effective context [12.72ms]
+(pass) LMStudioPlugin > refreshes the catalog when LM Studio models change [17.36ms]
+(pass) LMStudioPlugin > discovers from configured endpoints with bearer authentication [15.55ms]
+(pass) LMStudioPlugin > shares discovery requests across plugin instances [13.30ms]
+(pass) LMStudioPlugin > replaces the credential-gated Models.dev catalog when discovery succeeds [17.42ms]
+
+test/plugin/optimize.test.ts:
+(pass) OptimizePlugin > enables prompt plugins without model-specific tool optimization [0.03ms]
+(pass) OptimizePlugin > selects model-lab prompts through session context hooks [8.64ms]
+(pass) OptimizePlugin > renders the OpenAI prompt without changing tools or project instructions [5.16ms]
+(pass) OptimizePlugin > appends the Anthropic prompt to the baseline without changing tools or project instructions [4.86ms]
+(pass) OptimizePlugin > curates search tools across providers without changing editing tools [7.33ms]
+(pass) OptimizePlugin > can disable OpenAI tool optimization while retaining its prompt and Anthropic tool optimization [6.74ms]
+(pass) OptimizePlugin > uses catalog names in Meta prompts for Muse model IDs [7.36ms]
+(pass) OptimizePlugin > preserves tools and an explicit agent system prompt by default [7.53ms]
+(pass) OptimizePlugin > still curates tools when agent lookup fails [9.41ms]
+(pass) OptimizePlugin > allows one model-lab optimization plugin to be enabled independently [6.48ms]
+(pass) OptimizePlugin > preserves tools for model aliases and catalog-ID prompt selection by default [7.23ms]
+
+test/plugin/provider-snowflake-cortex.test.ts:
+(pass) browser OAuth supplies the native endpoint/token and refreshes a rejected token once [59.01ms]
+(pass) manual PAT uses its account and native compatibility rather than an SDK request rewrite [11.67ms]
+(pass) rejects a mismatched callback state before token exchange [17.97ms]
+(pass) uses environment tokens rather than the account identifier and bypasses expired stored OAuth [12.56ms]
+(pass) requires a token separately from the account and supports environment PATs [10.96ms]
+(pass) refreshes expired OAuth during native model resolution and persists rotated credentials [9.30ms]
+
+test/plugin/provider-chatgpt.test.ts:
+(pass) ChatGPTPlugin > loads only visible API-supported ChatGPT models [10.52ms]
+(pass) ChatGPTPlugin > verifies a signed ID token against OpenAI's issuer, client ID, expiry, and sign-in nonce [151.04ms]
+(pass) ChatGPTPlugin > registers the ChatGPT OAuth method [6.19ms]
+(pass) ChatGPTPlugin > keeps the Codex browser and headless methods alongside token sharing [5.31ms]
+(pass) ChatGPTPlugin > stops retries for ChatGPT usage limits from http failures [11.03ms]
+(pass) ChatGPTPlugin > stops retries for ChatGPT usage limits from stream failures [7.45ms]
+(pass) ChatGPTPlugin > leaves API-key OpenAI retries alone [6.27ms]
+(pass) ChatGPTPlugin > stops deterministic ChatGPT stream failures while retrying temporary unavailability [6.88ms]
+(pass) ChatGPTPlugin > registers a new ChatGPT agent on first sign-in with a loopback callback [13.12ms]
+(pass) ChatGPTPlugin > waits to show browser success until the sign-in callback succeeds [11.73ms]
+(pass) ChatGPTPlugin > reauthorizes with the client ID issued to an existing ChatGPT connection [10.93ms]
+(pass) ChatGPTPlugin > rejects a reauthorization callback that returns a different client ID [12.51ms]
+(pass) ChatGPTPlugin > moves only token-sharing credentials to the new method ID and caches their saved models [6.81ms]
+(pass) ChatGPTPlugin > routes ChatGPT over HTTP with only the listed catalog fallback models [12.41ms]
+(pass) ChatGPTPlugin > keeps the full OpenAI catalog under an API key connection [6.95ms]
+(pass) ChatGPTPlugin > switches between token-sharing and Codex credentials without mixing their routes [9.48ms]
+(pass) ChatGPTPlugin > omits the default output limit from OpenAI steps and compaction [5.57ms]
+(pass) ChatGPTPlugin > chatgpt compaction uses plugin defaults but allows later model and variant overrides [11.36ms]
+(pass) ChatGPTPlugin > key compaction uses plugin defaults but allows later model and variant overrides [8.90ms]
+(pass) ChatGPTPlugin > chatgpt sends mid-session reasoning effort switches in a form its backend accepts [9.76ms]
+(pass) ChatGPTPlugin > key sends mid-session reasoning effort switches in a form its backend accepts [7.61ms]
+(pass) ChatGPTPlugin > selects WebSocket only from explicit policy [6.90ms]
+
+test/plugin/provider-vercel.test.ts:
+(pass) VercelPlugin > applies legacy lower-case referer headers [4.39ms]
+(pass) VercelPlugin > does not add legacy upper-case referer headers [4.75ms]
+(pass) VercelPlugin > creates @ai-sdk/vercel SDKs for custom provider IDs [14.26ms]
+(pass) VercelPlugin > ignores non-Vercel providers [5.33ms]
+
+test/plugin/provider-zenmux.test.ts:
+(pass) ZenmuxPlugin > is registered so legacy referer headers can be applied [0.02ms]
+(pass) ZenmuxPlugin > applies the exact legacy Zenmux headers [4.84ms]
+(pass) ZenmuxPlugin > merges legacy Zenmux headers with existing headers [4.84ms]
+(pass) ZenmuxPlugin > lets configured Zenmux legacy headers override defaults [6.06ms]
+(pass) ZenmuxPlugin > guards legacy Zenmux headers to the exact zenmux provider id [4.46ms]
+
+test/plugin/provider-factory.test.ts:
+(pass) cohere loads only its exact package [7.84ms]
+(pass) perplexity loads only its exact package [7.30ms]
+
+test/plugin/module.test.ts:
+(pass) watches creation of an external helper with missing parent directories [30.15ms]
+(pass) interrupts pending watcher setup when the loader scope closes during module evaluation [63.05ms]
+[08:48:43.160] INFO (#92522): setup log from plugin
+(pass) loads plugins and their transitive dependencies against the host's Effect and @opencode/plugin instances [216.95ms]
+(pass) redirects plugin dependencies with a nested Effect 3 installation to the host, allows effect/package.json, and fails loudly on unprovided subpaths [11.57ms]
+(pass) discovers exported specifiers from the resolved tree even when dist/ exists, and validates barrel loader routing, async loader dedup, and Windows foreign filters [35.74ms]
+(pass) blocks a local plugin before module initialization and honors replacement policies [7.62ms]
+(pass) blocks versioned package policy-fixture@1.2.3 before npm resolution or installation [5.29ms]
+(pass) blocks versioned package @scope/policy-fixture@1.2.3 before npm resolution or installation [4.89ms]
+
+test/plugin/provider-openrouter.test.ts:
+(pass) OpenRouterPlugin > is registered so legacy OpenRouter behavior can be applied [0.02ms]
+(pass) OpenRouterPlugin > applies legacy referer headers only to openrouter [7.04ms]
+(pass) OpenRouterPlugin > filters OpenRouter's gpt-5 chat alias [5.54ms]
+(pass) OpenRouterPlugin > does not disable gpt-5-chat-latest for non-OpenRouter providers [5.02ms]
+
+test/plugin/promise-tool.test.ts:
+(pass) Promise tool executors receive interruption through their AbortSignal [7.38ms]
+
+test/plugin/plan.test.ts:
+(pass) plan plugin reminders > injects enter and leave reminders on agent switches [1.74ms]
+(pass) plan plugin reminders > reconciles a missing enter reminder into the request and persists it [0.28ms]
+(pass) plan plugin reminders > does nothing when the transcript already has a live enter reminder [0.25ms]
+(pass) plan plugin reminders > reconciles a stale enter reminder with a leave reminder [0.17ms]
+(pass) plan plugin reminders > does nothing for non-plan sessions without plan history [0.08ms]
+(pass) plan plugin reminders > does nothing when a leave reminder already follows the enter reminder [0.17ms]
+(pass) plan plugin reminders > treats reminder text quoted inside a larger message as not live [0.15ms]
+(pass) plan plugin mutations > does not create the Plan directory during activation [0.27ms]
+(pass) plan plugin mutations > allows edits only inside the Plan directory [0.16ms]
+(pass) plan plugin mutations > allows external directories without asking [0.09ms]
+(pass) plan plugin mutations > rewrites blocked mutation failures with the Plan directory [0.54ms]
+(pass) plan plugin mutations > preserves mutation failures unrelated to permissions [0.10ms]
+
+test/plugin/models-dev.test.ts:
+(pass) ModelsDevPlugin > shares definitions between Locations while provider and model edits own their copies [12.32ms]
+(pass) ModelsDevPlugin > replaces its snapshot reference on refresh without touching the sibling Location [9.44ms]
+(pass) ModelsDevPlugin > adopts a refresh that completes between its initial read and its subscription [5.38ms]
+(pass) ModelsDevPlugin > keeps the retained definition unchanged across model replay [5.64ms]
+(pass) ModelsDevPlugin > keeps the shared snapshot pristine while provider and model transforms mutate owned records [4.41ms]
+(pass) ModelsDevPlugin > projects normalized definitions for available providers [3.49ms]
+(pass) ModelsDevPlugin > omits deprecated and non-text model definitions [3.43ms]
+(pass) ModelsDevPlugin > registers key methods for providers with environment variables [4.33ms]
+(pass) ModelsDevPlugin > preserves provider and model URL templates in the catalog [3.17ms]
+(pass) ModelsDevPlugin > copies model request bodies without reinterpreting literal __proto__ keys [3.66ms]
+(pass) ModelsDevPlugin > omits legacy provider aliases [3.36ms]
+(pass) ModelsDevPlugin > registers every listed environment variable for provider plugins to narrow [2.80ms]
+(pass) ModelsDevPlugin > converts reasoning options into settings variants [5.57ms]
+
+test/plugin/skill.test.ts:
+(pass) SkillPlugin.Plugin > registers built-in skills [2.45ms]
+(pass) SkillPlugin.Plugin > reports canonical configured plugin sources with existing labels and ordering [2.69ms]
+
+test/plugin/provider-dynamic.test.ts:
+(pass) DynamicProviderPlugin > creates an SDK from a provider factory export [4.30ms]
+(pass) DynamicProviderPlugin > does not override an SDK already supplied by an earlier plugin [4.58ms]
+(pass) DynamicProviderPlugin > loads npm packages through their resolved import entrypoint [5.94ms]
+(pass) DynamicProviderPlugin > wraps missing npm entrypoint failures as AISDK init errors [4.81ms]
+(pass) DynamicProviderPlugin > wraps dynamic import failures as AISDK init errors [4.50ms]
+(pass) DynamicProviderPlugin > wraps missing provider factory exports as AISDK init errors [5.16ms]
+(pass) DynamicProviderPlugin > uses the model modelID for the default language model [3.96ms]
+
+test/plugin/worktree.test.ts:
+(pass) Promise worktree callbacks receive interruption through their AbortSignal [0.83ms]
+
+test/plugin/provider-google-vertex.test.ts:
+(pass) GoogleVertexPlugin > ignores OpenAI-compatible providers that are not Google Vertex [7.03ms]
+(pass) GoogleVertexPlugin > resolves project and location from env using legacy precedence [7.01ms]
+(pass) GoogleVertexPlugin > enables the provider when a project resolves and leaves it automatic otherwise [7.07ms]
+(pass) GoogleVertexPlugin > enables the provider when a project resolves from env [5.46ms]
+(pass) GoogleVertexPlugin > resolves the advertised GOOGLE_VERTEX_PROJECT env for provider updates and SDKs [6.19ms]
+(pass) GoogleVertexPlugin > keeps configured project and location over env and uses global endpoint [14.46ms]
+(pass) GoogleVertexPlugin > keeps OpenAI-compatible Vertex endpoint templates regional for eu [13.00ms]
+(pass) GoogleVertexPlugin > expands endpoint templates on Vertex chat models [8.87ms]
+(pass) GoogleVertexPlugin > defaults location to global when only project is configured [13.09ms]
+
+test/plugin/provider-poe.test.ts:
+(pass) registers Poe browser OAuth alongside generic key and environment methods without fetching [8.64ms]
+(pass) exchanges a PKCE code for a native Poe credential (expiry: 3600) [26.42ms]
+(pass) exchanges a PKCE code for a native Poe credential (expiry: null) [22.07ms]
+(pass) exchanges a PKCE code for a native Poe credential (expiry: undefined) [33.72ms]
+(pass) isolates overlapping login attempts and closes cancelled listeners [20.33ms]
+(pass) rejects invalid or denied callbacks ({"state":""}) [30.20ms]
+(pass) rejects invalid or denied callbacks ({"iss":"https://other.example","error":"access_denied"}) [25.42ms]
+(pass) rejects invalid or denied callbacks ({"iss":"https://poe.com/"}) [21.95ms]
+(pass) rejects invalid or denied callbacks ({"iss":""}) [21.11ms]
+(pass) rejects invalid or denied callbacks ({"code":""}) [26.23ms]
+(pass) rejects invalid or denied callbacks ({"error":"access_denied","error_description":"User declined access"}) [26.68ms]
+(pass) preserves the active connection after a failed token exchange (400: {"error":"invalid_grant","error_description":"Code expired"}) [25.03ms]
+(pass) preserves the active connection after a failed token exchange (400: {"error":"invalid_grant"}) [45.85ms]
+(pass) preserves the active connection after a failed token exchange (502: Bad gateway) [24.53ms]
+(pass) preserves the active connection after a failed token exchange (400: {"error_description":"Rejected auth-code"}) [16.83ms]
+(pass) preserves the active connection after a failed token exchange (200: {}) [15.01ms]
+(pass) preserves the active connection after a failed token exchange (200: {) [14.15ms]
+(pass) preserves the active connection after a failed token exchange (200: {"api_key":"   "}) [12.59ms]
+(pass) preserves the active connection after a failed token exchange (200: {"api_key":"poe-key","api_key_expires_in":-1}) [12.14ms]
+(pass) preserves the active connection after a failed token exchange (200: {"api_key":"poe-key","api_key_expires_in":1.5}) [10.91ms]
+(pass) preserves the active connection after a failed token exchange (200: {"api_key":"poe-key","api_key_expires_in":1e309}) [11.29ms]
+(pass) preserves the active connection after a failed token exchange (200: {"api_key":"poe-key","api_key_expires_in":8640000000000}) [10.82ms]
+(pass) waits for the token exchange and consumes the callback once (cancel: false) [13.18ms]
+(pass) waits for the token exchange and consumes the callback once (cancel: true) [11.00ms]
+(pass) keeps near-expiry keys usable and requires a new login after expiry [6.52ms]
+
+test/plugin/provider-amazon-bedrock.test.ts:
+(pass) AmazonBedrockPlugin > moves endpoint setting to baseURL [6.33ms]
+(pass) AmazonBedrockPlugin > keeps an explicit baseURL over endpoint [5.31ms]
+(pass) AmazonBedrockPlugin > only treats the bearer token env var as a key credential [5.09ms]
+(pass) AmazonBedrockPlugin > leaves activation on auto without ambient AWS configuration [4.82ms]
+(pass) AmazonBedrockPlugin > enables the provider when AWS_PROFILE is set [5.43ms]
+(pass) AmazonBedrockPlugin > enables the provider when AWS_ACCESS_KEY_ID is set [5.14ms]
+(pass) AmazonBedrockPlugin > enables the provider when AWS_WEB_IDENTITY_TOKEN_FILE is set [5.24ms]
+(pass) AmazonBedrockPlugin > enables the provider when AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is set [4.77ms]
+(pass) AmazonBedrockPlugin > enables the provider when AWS_CONTAINER_CREDENTIALS_FULL_URI is set [4.59ms]
+(pass) AmazonBedrockPlugin > enables the provider when a profile is configured [5.06ms]
+(pass) AmazonBedrockPlugin > does not override a disabled provider [5.16ms]
+(pass) AmazonBedrockPlugin > fills region from AWS_REGION then AWS_DEFAULT_REGION without overriding config [5.06ms]
+(pass) AmazonBedrockPlugin > falls back to AWS_DEFAULT_REGION then us-east-1 [4.87ms]
+(pass) AmazonBedrockPlugin > applies to Mantle and native Bedrock packages [4.72ms]
+
+test/plugin/supervisor.test.ts:
+(pass) PluginSupervisor > reports a duplicate plugin ID as a failure without dropping the generation [48.19ms]
+(pass) PluginSupervisor > activates the initial generation without waiting for the reload debounce [50.99ms]
+(pass) PluginSupervisor > refreshes every 24 hours without adding an immediate reload [106.93ms]
+(pass) PluginSupervisor > reloads for a trigger published while the initial generation is activating [66.47ms]
+(pass) PluginSupervisor > keeps policy enforcement and the Console connection through plugin removals: opencode.config.policy,opencode.provider.opencode,opencode.config.agent [51.67ms]
+(pass) PluginSupervisor > keeps policy enforcement and the Console connection through plugin removals: * [10.87ms]
+(pass) PluginSupervisor > coalesces a burst of reload triggers after the initial generation into one activation [55.59ms]
+
+test/plugin/provider-digitalocean.test.ts:
+(pass) DigitalOceanPlugin > is registered alongside the other provider plugins [0.02ms]
+(pass) DigitalOceanPlugin > registers browser OAuth alongside generic key and environment methods [4.82ms]
+(pass) DigitalOceanPlugin > refreshes routers, retains the latest success on errors, and accepts an empty inventory [68.95ms]
+(pass) DigitalOceanPlugin > loads on credential changes and clears the previous account's routers [54.37ms]
+(pass) DigitalOceanPlugin > stops discovery when the token expires while retaining its last successful inventory [26.52ms]
+(pass) DigitalOceanPlugin > completes browser OAuth independently of router discovery and releases the listener [19.85ms]
+(pass) DigitalOceanPlugin > rejects mismatched state and releases the listener [14.96ms]
+(pass) DigitalOceanPlugin > rejects missing token and releases the listener [15.01ms]
+(pass) DigitalOceanPlugin > rejects malformed JSON and releases the listener [13.68ms]
+(pass) DigitalOceanPlugin > rejects provider denial and releases the listener [14.88ms]
+(pass) DigitalOceanPlugin > rejects provider denial without a description and releases the listener [13.13ms]
+
+test/plugin/mcp-codemode-defaults.test.ts:
+(pass) applies Code Mode defaults for known MCP servers unless codemode is configured [0.50ms]
+
+test/plugin/tool-input-repair-integration.test.ts:
+(pass) repairs tool input before validating its original schema [6.35ms]
+(pass) repairs namespaced inner tool input called from Code Mode [12.07ms]
+
+test/plugin/session-inbox.test.ts:
+(pass) Effect plugins can read pending inbox requirements without consuming them [8.10ms]
+(pass) Promise plugins can read pending inbox requirements without consuming them [8.41ms]
+
+test/plugin/session-remove.test.ts:
+(pass) Effect plugins can remove sessions and their children [10.02ms]
+(pass) Promise plugins can remove sessions and their children [9.08ms]
+
+test/plugin/provider-cerebras.test.ts:
+(pass) CerebrasPlugin > applies the legacy integration header [4.99ms]
+(pass) CerebrasPlugin > ignores non-Cerebras providers [4.53ms]
+(pass) CerebrasPlugin > applies the integration header to custom native Cerebras providers [4.90ms]
+
+test/plugin/provider-cloudflare-workers-ai.test.ts:
+(pass) CloudflareWorkersAIPlugin > registers an account form when the environment does not provide one [4.70ms]
+(pass) CloudflareWorkersAIPlugin > routes the OpenAI-compatible package to the native Workers AI package [5.08ms]
+(pass) CloudflareWorkersAIPlugin > gives the native Workers AI package its account ID [4.64ms]
+(pass) CloudflareWorkersAIPlugin > preserves a configured endpoint URL instead of deriving one from account ID [4.49ms]
+(pass) CloudflareWorkersAIPlugin > uses configured account ID over env account ID [4.84ms]
+
+test/plugin/provider-gitlab-oauth.test.ts:
+(pass) GitLabPlugin OAuth > is registered alongside the other provider plugins [3.41ms]
+(pass) GitLabPlugin OAuth > registers PKCE OAuth alongside the generic key/env methods from ModelsDevPlugin [5.60ms]
+(pass) GitLabPlugin OAuth > exchanges a PKCE code for a native GitLab OAuth credential against gitlab.com by default [13.40ms]
+(pass) GitLabPlugin OAuth > uses the answered self-managed instance URL, including a relative URL root [11.56ms]
+(pass) GitLabPlugin OAuth > fails early for self-managed instances without GITLAB_OAUTH_CLIENT_ID [5.87ms]
+(pass) GitLabPlugin OAuth > refreshes an OAuth credential using its stored instance URL and includes redirect_uri [6.26ms]
+(pass) GitLabPlugin OAuth > shares one token exchange between concurrent refreshes of the same credential [57.38ms]
+(pass) GitLabPlugin OAuth > refreshes credentials without a client ID with the opencode-gitlab-auth application [6.28ms]
+(pass) GitLabPlugin OAuth > refreshes only with the recorded client ID when the credential has one [5.98ms]
+(pass) GitLabPlugin OAuth > reports a revoked refresh token with a sign-in-again hint instead of authorization-code hints [6.14ms]
+(pass) GitLabPlugin OAuth > rejects invalid or denied callbacks ({"state":""}) [11.36ms]
+(pass) GitLabPlugin OAuth > rejects invalid or denied callbacks ({"code":""}) [9.49ms]
+(pass) GitLabPlugin OAuth > rejects invalid or denied callbacks ({"error":"access_denied","error_description":"User declined access"}) [10.46ms]
+(pass) GitLabPlugin OAuth > rejects invalid or denied callbacks ({"error":"access_denied"}) [9.14ms]
+(pass) GitLabPlugin OAuth > preserves the active connection after a failed token exchange (400) [12.36ms]
+(pass) GitLabPlugin OAuth > preserves the active connection after a failed token exchange (400) [11.40ms]
+(pass) GitLabPlugin OAuth > preserves the active connection after a failed token exchange (502) [11.44ms]
+(pass) GitLabPlugin OAuth > reports EADDRINUSE with a clear message when the callback port is occupied [8.98ms]
+(pass) GitLabPlugin OAuth > honors GITLAB_OAUTH_CLIENT_ID for self-managed applications [10.71ms]
+
+ 416 pass
+ 0 fail
+ 1738 expect() calls
+Ran 416 tests across 50 files. [8.37s]

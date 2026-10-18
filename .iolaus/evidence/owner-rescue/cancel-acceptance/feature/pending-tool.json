@@ -1,0 +1,265 @@
+{
+  "permissions": [
+    {
+      "id": "per_139601d680012AwZJgnl2u2GiX",
+      "sessionID": "ses_ec69fe2e2ffeFUlrxXHWgecXhY",
+      "action": "edit",
+      "resources": [
+        "pending.txt"
+      ],
+      "save": [
+        "*"
+      ],
+      "metadata": {
+        "files": [
+          {
+            "file": "pending.txt",
+            "patch": "Index: pending.txt\n===================================================================\n--- pending.txt\n+++ pending.txt\n@@ -0,0 +1,1 @@\n+MUST_NOT_EXIST\n\\ No newline at end of file\n",
+            "status": "added",
+            "additions": 1,
+            "deletions": 0
+          }
+        ]
+      },
+      "source": {
+        "type": "tool",
+        "messageID": "msg_139601d4d001LxFcfYLyvQ4ovN",
+        "id": "qa_381"
+      }
+    }
+  ],
+  "pendingSnapshot": {
+    "run": {
+      "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "pending-tool",
+      "definition": {
+        "name": "pending-tool",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:pending-tool"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "ed859283e8ebc0d5ac7e3ff4427f74c62700f55e02424bb92a72e295169c1248",
+      "generation": 1,
+      "status": "failed",
+      "createdAt": 1791963962643,
+      "updatedAt": 1791963962766,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:pending-tool"
+          },
+          "fingerprint": "554cedaf948779284a2632970550ff7072bbb15459b1c29aa57aaf16713b0230",
+          "status": "failed",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "e4bbc71d-c746-43cd-94fa-356b51672172"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "ineligible_or_unknown_history",
+            "failedModels": [],
+            "historyKnown": true,
+            "initialRoleAllowed": true
+          },
+          "error": "Iolaus DAG child session was interrupted",
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "e4bbc71d-c746-43cd-94fa-356b51672172"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "QA_CASE:pending-tool"
+            },
+            "sessionID": "ses_ec69fe2e2ffeFUlrxXHWgecXhY"
+          },
+          "createdAt": 1791963962643,
+          "updatedAt": 1791963962766
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "03445317-d669-41c7-a6f9-09c19fe8605a",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963962643
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "a153d4cb-6651-4970-9252-9fcff37522b9",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963962644,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "2fc8ba45-bd45-4a3d-9c65-5d7ea4c44149",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963962675,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f3870aaf-4274-420c-96da-f397a863c03a",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 4,
+        "type": "node.rescue-skipped",
+        "generation": 1,
+        "createdAt": 1791963962765,
+        "nodeID": "work",
+        "payload": {
+          "reason": "ineligible_or_unknown_history"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7ce12b13-0b67-47fb-9f04-b213dd2afd14",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 5,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963962766,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session was interrupted",
+          "status": "failed"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "ab6e397b-9029-40fe-b641-1c7f25ba27e9",
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "sequence": 6,
+        "type": "run.failed",
+        "generation": 1,
+        "createdAt": 1791963962766
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "ab6e397b-9029-40fe-b641-1c7f25ba27e9",
+        "messageID": "msg_ab6e397b902940feb6411c7f25ba27e9",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_ab6e397b902940feb6411c7f25ba27e9"
+        },
+        "runID": "539796dc-62a7-4f63-9cdc-5d674ddcd3d8",
+        "state": "admitted",
+        "text": "Iolaus Flow notice ab6e397b-9029-40fe-b641-1c7f25ba27e9: \"pending-tool\" (539796dc-62a7-4f63-9cdc-5d674ddcd3d8) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "context": [
+    {
+      "id": "msg_e4bbc71dc74643cd94fa356b51672172",
+      "time": {
+        "created": 1791963962700
+      },
+      "text": "QA_CASE:pending-tool",
+      "type": "user"
+    },
+    {
+      "id": "msg_139601d4d001LxFcfYLyvQ4ovN",
+      "time": {
+        "created": 1791963962704,
+        "streamed": 1791963962724,
+        "completed": 1791963962742
+      },
+      "type": "assistant",
+      "agent": "quick",
+      "model": {
+        "id": "A",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "tool",
+          "id": "qa_381",
+          "name": "write",
+          "executed": false,
+          "providerState": {
+            "itemId": "qa_381"
+          },
+          "state": {
+            "status": "error",
+            "input": {
+              "path": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project/pending.txt",
+              "content": "MUST_NOT_EXIST"
+            },
+            "error": {
+              "type": "aborted",
+              "message": "Tool execution interrupted"
+            }
+          },
+          "time": {
+            "created": 1791963962722,
+            "ran": 1791963962724,
+            "completed": 1791963962742
+          }
+        }
+      ],
+      "finish": "error",
+      "cost": 0,
+      "tokens": {
+        "input": 10,
+        "output": 5,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "error": {
+        "type": "aborted",
+        "message": "Step interrupted"
+      }
+    },
+    {
+      "id": "msg_139601d77002sF8hjORVUdqe3j",
+      "time": {
+        "created": 1791963962743
+      },
+      "type": "idle",
+      "outcome": "interrupted"
+    }
+  ]
+}

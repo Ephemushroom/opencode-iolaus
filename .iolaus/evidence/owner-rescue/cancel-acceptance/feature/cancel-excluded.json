@@ -1,0 +1,524 @@
+{
+  "active": {
+    "run": {
+      "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+      "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+      "name": "cancel-excluded",
+      "definition": {
+        "name": "cancel-excluded",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "b7d42b88a6e092210d840ef0d81bff2770012ae2e44f5f41c4bfdec33d93e4fc",
+      "generation": 1,
+      "status": "running",
+      "createdAt": 1791963966533,
+      "updatedAt": 1791963966578,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          },
+          "fingerprint": "901245a124378c1ec0e05f589237493a56b66903f174947d9acb98a86c6f72cf",
+          "status": "running",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "b36c239b-a52f-4ace-9bbf-46ed9a3a4a4b"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [],
+            "historyKnown": true,
+            "initialRoleAllowed": false
+          },
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "b36c239b-a52f-4ace-9bbf-46ed9a3a4a4b"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+            },
+            "sessionID": "ses_ec69fd3b0ffeW2cAtJbo5ZbBKX"
+          },
+          "createdAt": 1791963966533,
+          "updatedAt": 1791963966557
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "5edcc094-65a3-47a7-9524-fb3d3cbd09bc",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963966535
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1839a622-c0c0-4092-9f4a-67a62e921271",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963966535,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1cff4d86-6c9b-4fa4-abac-c60b516aa0a2",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963966557,
+        "nodeID": "work"
+      }
+    ],
+    "steering": [],
+    "notices": []
+  },
+  "cancelled": {
+    "run": {
+      "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+      "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+      "name": "cancel-excluded",
+      "definition": {
+        "name": "cancel-excluded",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "b7d42b88a6e092210d840ef0d81bff2770012ae2e44f5f41c4bfdec33d93e4fc",
+      "generation": 1,
+      "status": "cancelled",
+      "createdAt": 1791963966533,
+      "updatedAt": 1791963966644,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          },
+          "fingerprint": "901245a124378c1ec0e05f589237493a56b66903f174947d9acb98a86c6f72cf",
+          "status": "cancelled",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "b36c239b-a52f-4ace-9bbf-46ed9a3a4a4b"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [],
+            "historyKnown": true,
+            "initialRoleAllowed": false
+          },
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "b36c239b-a52f-4ace-9bbf-46ed9a3a4a4b"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "QA_CASE:cancel-excluded\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+            },
+            "sessionID": "ses_ec69fd3b0ffeW2cAtJbo5ZbBKX"
+          },
+          "createdAt": 1791963966533,
+          "updatedAt": 1791963966644
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "5edcc094-65a3-47a7-9524-fb3d3cbd09bc",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963966535
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1839a622-c0c0-4092-9f4a-67a62e921271",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963966535,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1cff4d86-6c9b-4fa4-abac-c60b516aa0a2",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963966557,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "411d2c81-61ac-488c-9c93-d1fbc3f767eb",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 4,
+        "type": "run.cancelled",
+        "generation": 1,
+        "createdAt": 1791963966644
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "411d2c81-61ac-488c-9c93-d1fbc3f767eb",
+        "messageID": "msg_411d2c8161ac488c9c93d1fbc3f767eb",
+        "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+        "receipt": {
+          "messageID": "msg_411d2c8161ac488c9c93d1fbc3f767eb"
+        },
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 411d2c81-61ac-488c-9c93-d1fbc3f767eb: \"cancel-excluded\" (a6196bea-8ccc-4dd8-a168-661931fe7355) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "retried": {
+    "run": {
+      "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+      "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+      "name": "cancel-excluded",
+      "definition": {
+        "name": "cancel-excluded",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded AMENDED_TASK\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "9522f17e0bb935a96b84436c0a2bd12adcfd3c85bcd49893067ae5f5eace0096",
+      "generation": 3,
+      "status": "completed",
+      "createdAt": 1791963966533,
+      "updatedAt": 1791963966955,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 1,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-excluded AMENDED_TASK\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+          },
+          "fingerprint": "98de8aafc2a23602332f03626f29c1b52ab3c88455f77bf3957954ab8ebf1317",
+          "status": "completed",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "7002cf43-b16b-4d98-8f2d-402326a133ee"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [],
+            "historyKnown": true,
+            "initialRoleAllowed": false
+          },
+          "result": {
+            "attempt": 1,
+            "createdAt": 1791963966954,
+            "generation": 3,
+            "inputRevision": 0,
+            "nodeID": "work",
+            "payload": {
+              "text": "QA_EXCLUDED_CANCEL_SUCCESS"
+            },
+            "provenance": {
+              "agent": "quick",
+              "execution": {
+                "attempt": 1,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/A",
+                  "token": "7002cf43-b16b-4d98-8f2d-402326a133ee"
+                },
+                "nodeID": "work",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                  "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                  },
+                  "permissions": [],
+                  "prompt": "QA_CASE:cancel-excluded AMENDED_TASK\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+                },
+                "sessionID": "ses_ec69fd261ffeoxGGdQLsaWEgsF"
+              },
+              "model": "openai/A",
+              "parentNodeIDs": []
+            },
+            "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+            "schemaVersion": 1,
+            "status": "completed"
+          },
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "7002cf43-b16b-4d98-8f2d-402326a133ee"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "QA_CASE:cancel-excluded AMENDED_TASK\n\n<iolaus-planning>\nThis session consults for a planning run and is read-only: Iolaus blocks file edits and shell here. Report findings and recommendations; do not implement."
+            },
+            "sessionID": "ses_ec69fd261ffeoxGGdQLsaWEgsF"
+          },
+          "createdAt": 1791963966533,
+          "updatedAt": 1791963966954
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "5edcc094-65a3-47a7-9524-fb3d3cbd09bc",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963966535
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1839a622-c0c0-4092-9f4a-67a62e921271",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963966535,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1cff4d86-6c9b-4fa4-abac-c60b516aa0a2",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963966557,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "411d2c81-61ac-488c-9c93-d1fbc3f767eb",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 4,
+        "type": "run.cancelled",
+        "generation": 1,
+        "createdAt": 1791963966644
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c8506ad1-7a8a-4e19-af36-e445c028da4a",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 5,
+        "type": "node.retrying",
+        "generation": 2,
+        "createdAt": 1791963966763,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "4f8ae283-68ab-461a-834e-c30395dcc3f0",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 6,
+        "type": "node.ready",
+        "generation": 2,
+        "createdAt": 1791963966763,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9da4f454-b3d1-4b13-93b9-d4a39b546435",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 7,
+        "type": "node.started",
+        "generation": 2,
+        "createdAt": 1791963966783,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "a801714b-745b-49af-be53-ced9e507e3bb",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 8,
+        "type": "node.completed",
+        "generation": 2,
+        "createdAt": 1791963966840,
+        "nodeID": "work",
+        "payload": {
+          "text": "QA_EXCLUDED_CANCEL_SUCCESS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f597f528-255b-4add-b527-281f8b496f48",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 9,
+        "type": "run.completed",
+        "generation": 2,
+        "createdAt": 1791963966841
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1dfd7c49-aacc-426f-836e-1bfe4b17d9a5",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 10,
+        "type": "node.ready",
+        "generation": 3,
+        "createdAt": 1791963966870,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "3183811f-ce56-4302-b888-f29793539f58",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 11,
+        "type": "node.started",
+        "generation": 3,
+        "createdAt": 1791963966890,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "eed4c76e-06e3-499b-bff6-c51dd0a677e1",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 12,
+        "type": "node.completed",
+        "generation": 3,
+        "createdAt": 1791963966954,
+        "nodeID": "work",
+        "payload": {
+          "text": "QA_EXCLUDED_CANCEL_SUCCESS"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7c91fe62-5183-4fba-b4bf-dfdfa7c613a6",
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "sequence": 13,
+        "type": "run.completed",
+        "generation": 3,
+        "createdAt": 1791963966955
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "411d2c81-61ac-488c-9c93-d1fbc3f767eb",
+        "messageID": "msg_411d2c8161ac488c9c93d1fbc3f767eb",
+        "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+        "receipt": {
+          "messageID": "msg_411d2c8161ac488c9c93d1fbc3f767eb"
+        },
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 411d2c81-61ac-488c-9c93-d1fbc3f767eb: \"cancel-excluded\" (a6196bea-8ccc-4dd8-a168-661931fe7355) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "f597f528-255b-4add-b527-281f8b496f48",
+        "messageID": "msg_f597f528255b4addb527281f8b496f48",
+        "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+        "receipt": {
+          "messageID": "msg_f597f528255b4addb527281f8b496f48"
+        },
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "state": "admitted",
+        "text": "Iolaus Flow notice f597f528-255b-4add-b527-281f8b496f48: \"cancel-excluded\" (a6196bea-8ccc-4dd8-a168-661931fe7355) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "7c91fe62-5183-4fba-b4bf-dfdfa7c613a6",
+        "messageID": "msg_7c91fe6251834fbab4bfdfdfa7c613a6",
+        "ownerSessionID": "ses_ec69ff8c6ffeTkIMidHI74Qoo1",
+        "receipt": {
+          "messageID": "msg_7c91fe6251834fbab4bfdfdfa7c613a6"
+        },
+        "runID": "a6196bea-8ccc-4dd8-a168-661931fe7355",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 7c91fe62-5183-4fba-b4bf-dfdfa7c613a6: \"cancel-excluded\" (a6196bea-8ccc-4dd8-a168-661931fe7355) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  }
+}

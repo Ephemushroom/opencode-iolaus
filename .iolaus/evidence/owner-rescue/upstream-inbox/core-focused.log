@@ -1,0 +1,18 @@
+bun test v1.4.3 (c6da4a4d3)
+
+test/plugin/session-compact.test.ts:
+(pass) Effect plugins can admit session compaction [57.97ms]
+(pass) Promise plugins can admit session compaction [28.64ms]
+
+test/plugin/session-inbox.test.ts:
+(pass) Effect plugins can read pending inbox requirements without consuming them [12.48ms]
+(pass) Promise plugins can read pending inbox requirements without consuming them [10.96ms]
+
+test/plugin/session-remove.test.ts:
+(pass) Effect plugins can remove sessions and their children [15.38ms]
+(pass) Promise plugins can remove sessions and their children [13.22ms]
+
+ 6 pass
+ 0 fail
+ 29 expect() calls
+Ran 6 tests across 3 files. [460.00ms]

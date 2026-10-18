@@ -1,0 +1,259 @@
+{
+  "verdict": "PASS",
+  "stock": {
+    "url": "https://opencode.ai/files/bin/2.0.27/opencode-darwin-arm64.zip",
+    "archiveHash": "391b1061dc3f1f4394b7fd19513b2e6ff12f31739ee12f33880506ed6ee008bc",
+    "binaryHash": "7fa5c8659e57cae76b1da4f45edbc583aef93aae917246a0b3abb1ac1b3fb93c"
+  },
+  "commands": [
+    {
+      "name": "download-stock",
+      "argv": [
+        "curl",
+        "--fail",
+        "--location",
+        "https://opencode.ai/files/bin/2.0.27/opencode-darwin-arm64.zip",
+        "--output",
+        "/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-verification-x8614O/stock.zip"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 9059
+    },
+    {
+      "name": "syntax-qa-owner-rescue-feature.mjs",
+      "argv": [
+        "node",
+        "--check",
+        "script/qa-owner-rescue-feature.mjs"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 31
+    },
+    {
+      "name": "syntax-qa-owner-rescue-verify.mjs",
+      "argv": [
+        "node",
+        "--check",
+        "script/qa-owner-rescue-verify.mjs"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 26
+    },
+    {
+      "name": "syntax-qa-owner-rescue.mjs",
+      "argv": [
+        "node",
+        "--check",
+        "script/qa-owner-rescue.mjs"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 25
+    },
+    {
+      "name": "syntax-qa-owner-rescue-cleanup.mjs",
+      "argv": [
+        "node",
+        "--check",
+        "script/qa-owner-rescue-cleanup.mjs"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 26
+    },
+    {
+      "name": "syntax-qa-flow-steering.mjs",
+      "argv": [
+        "node",
+        "--check",
+        "script/qa-flow-steering.mjs"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 27
+    },
+    {
+      "name": "reference",
+      "argv": [
+        "bun",
+        "run",
+        "check:reference"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 177
+    },
+    {
+      "name": "package",
+      "argv": [
+        "bun",
+        "run",
+        "check:package"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 427
+    },
+    {
+      "name": "typecheck",
+      "argv": [
+        "bun",
+        "run",
+        "typecheck"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 2490
+    },
+    {
+      "name": "bun-tests",
+      "argv": [
+        "bun",
+        "test"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 18447
+    },
+    {
+      "name": "historical-cleanup",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-cleanup.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/historical-cleanup"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 303
+    },
+    {
+      "name": "stock-on",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-feature.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/stock-on"
+      ],
+      "controls": {
+        "QA_OPENCODE_BIN": "/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-verification-x8614O/opencode",
+        "QA_HOST_MODE": "stock-on"
+      },
+      "exit": 2,
+      "expected": 2,
+      "durationMs": 1088
+    },
+    {
+      "name": "historical-blocked-probe",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/historical-blocked-probe"
+      ],
+      "controls": {
+        "QA_OPENCODE_BIN": "/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-verification-x8614O/opencode"
+      },
+      "exit": 2,
+      "expected": 2,
+      "durationMs": 1255
+    },
+    {
+      "name": "stock-off",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-feature.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/stock-off"
+      ],
+      "controls": {
+        "QA_OPENCODE_BIN": "/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-verification-x8614O/opencode",
+        "QA_HOST_MODE": "stock-off"
+      },
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 1469
+    },
+    {
+      "name": "steering",
+      "argv": [
+        "node",
+        "script/qa-flow-steering.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/steering"
+      ],
+      "controls": {
+        "QA_OPENCODE_BIN": "/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-verification-x8614O/opencode"
+      },
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 8682
+    },
+    {
+      "name": "feature",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-feature.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/feature"
+      ],
+      "controls": {
+        "QA_HOST_MODE": "patched"
+      },
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 32566
+    },
+    {
+      "name": "partial-setup",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-feature.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/partial-setup"
+      ],
+      "controls": {
+        "QA_FAULT": "partial-setup",
+        "QA_HOST_MODE": "patched"
+      },
+      "exit": 1,
+      "expected": 1,
+      "durationMs": 199
+    },
+    {
+      "name": "spawn",
+      "argv": [
+        "node",
+        "script/qa-owner-rescue-feature.mjs",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/spawn"
+      ],
+      "controls": {
+        "QA_FAULT": "spawn",
+        "QA_HOST_MODE": "patched"
+      },
+      "exit": 1,
+      "expected": 1,
+      "durationMs": 285
+    },
+    {
+      "name": "diff-check",
+      "argv": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "controls": {},
+      "exit": 0,
+      "expected": 0,
+      "durationMs": 21
+    }
+  ],
+  "temporaryRemoved": true
+}

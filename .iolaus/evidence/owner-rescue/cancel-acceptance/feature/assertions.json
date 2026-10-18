@@ -1,0 +1,222 @@
+[
+  {
+    "name": "patched default flow baseline",
+    "verdict": "PASS"
+  },
+  {
+    "name": "actual plugin session.inbox.list exists; no external HTTP bridge",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sessionless judge completes, amends and retries without blocked recovery or owner rescue",
+    "verdict": "PASS"
+  },
+  {
+    "name": "A B C C C then exactly one actual owner variant across two providers, not lane default",
+    "verdict": "PASS"
+  },
+  {
+    "name": "retry after settled rescue restores the planned A B C chain without another owner extra",
+    "verdict": "PASS"
+  },
+  {
+    "name": "amend then retry preserves the amended task and B C chain with spent rescue budget",
+    "verdict": "PASS"
+  },
+  {
+    "name": "rescue and terminal notices queue without auto-waking owner",
+    "verdict": "PASS"
+  },
+  {
+    "name": "one real native edit and two confirmed steers survive fresh-model handoff without raw tools or foreign reasoning",
+    "verdict": "PASS"
+  },
+  {
+    "name": "failed rescue never recurses; retry reload amend removal and re-add preserve spent budget",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hidden-failure refuses rescue preserving queued requirement",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hidden-reload refuses rescue preserving queued requirement",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hidden-fallback refuses rescue preserving queued requirement",
+    "verdict": "PASS"
+  },
+  {
+    "name": "persisted unsafe history remains non-replayable after disabling rescue and reloading",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hidden-attempt refuses rescue preserving queued requirement",
+    "verdict": "PASS"
+  },
+  {
+    "name": "unknown history/error refused",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opaque history/error refused",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opaque-fallback history/error refused",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opaque-attempt history/error refused",
+    "verdict": "PASS"
+  },
+  {
+    "name": "actual denied native edit proves inherited restrictions on rescue child",
+    "verdict": "PASS"
+  },
+  {
+    "name": "canonical failed owner deduplication (omitted variant)",
+    "verdict": "PASS"
+  },
+  {
+    "name": "canonical failed owner deduplication (default variant)",
+    "verdict": "PASS"
+  },
+  {
+    "name": "auth-flow rechecked at recovery",
+    "verdict": "PASS"
+  },
+  {
+    "name": "auth-delegate rechecked at recovery",
+    "verdict": "PASS"
+  },
+  {
+    "name": "planning owner refused at recovery",
+    "verdict": "PASS"
+  },
+  {
+    "name": "atlas execution excluded",
+    "verdict": "PASS"
+  },
+  {
+    "name": "atlas excluded failure keeps explicit retry and planned chain",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus execution excluded",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus excluded failure keeps explicit retry and planned chain",
+    "verdict": "PASS"
+  },
+  {
+    "name": "judge execution excluded",
+    "verdict": "PASS"
+  },
+  {
+    "name": "judge excluded failure keeps explicit retry and planned chain",
+    "verdict": "PASS"
+  },
+  {
+    "name": "atlas initial exclusion preserves successful fallback, retry and amend without handoff",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus initial exclusion preserves successful fallback, retry and amend without handoff",
+    "verdict": "PASS"
+  },
+  {
+    "name": "quick initial exclusion preserves successful fallback, retry and amend without handoff",
+    "verdict": "PASS"
+  },
+  {
+    "name": "initial planning authority keeps ordinary failure budget, unlike later role drift",
+    "verdict": "PASS"
+  },
+  {
+    "name": "authorized Atlas plan failure never launches owner rescue",
+    "verdict": "PASS"
+  },
+  {
+    "name": "authorized success keeps Atlas and session-backed ordinary reviewers on their configured chains",
+    "verdict": "PASS"
+  },
+  {
+    "name": "authorized failure keeps Atlas and session-backed ordinary reviewers on their configured chains",
+    "verdict": "PASS"
+  },
+  {
+    "name": "native observed failure never launches owner rescue",
+    "verdict": "PASS"
+  },
+  {
+    "name": "actual pending native edit is interrupted without rescue or effect",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cancel spends rescue and fences late provider response",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cancel-fallback cancellation preserves B work and queued input, blocks stale A replay across reload and rescue disable with zero extra child requests",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cancel-attempt cancellation preserves B work and queued input, blocks stale A replay across reload and rescue disable with zero extra child requests",
+    "verdict": "PASS"
+  },
+  {
+    "name": "initial planning exclusion still cancels, retries and amends normally without unsafe-history poisoning",
+    "verdict": "PASS"
+  },
+  {
+    "name": "reload reattaches admitted rescue without prompt replay",
+    "verdict": "PASS"
+  },
+  {
+    "name": "capture hidden queue refuses continuation/publication without consumption",
+    "verdict": "PASS"
+  },
+  {
+    "name": "admission-source hidden queue refuses continuation/publication without consumption",
+    "verdict": "PASS"
+  },
+  {
+    "name": "admission-child hidden queue refuses continuation/publication without consumption",
+    "verdict": "PASS"
+  },
+  {
+    "name": "refinalization hidden queue refuses continuation/publication without consumption",
+    "verdict": "PASS"
+  },
+  {
+    "name": "pinned keeps pinned model after owner selection changes",
+    "verdict": "PASS"
+  },
+  {
+    "name": "reserved-reload keeps pinned model after owner selection changes",
+    "verdict": "PASS"
+  },
+  {
+    "name": "cancel fences late-created rescue reference before prompt admission",
+    "verdict": "PASS"
+  },
+  {
+    "name": "private host opened only sandbox databases",
+    "verdict": "PASS",
+    "databasePaths": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal"
+    ]
+  }
+]

@@ -1,0 +1,2063 @@
+{
+  "source": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+  "started": "2026-10-13T09:05:42.007Z",
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/api/session",
+      "body": {
+        "title": "Inbox contract QA",
+        "agent": "build",
+        "model": {
+          "providerID": "openai",
+          "id": "gpt-5.5"
+        },
+        "location": {
+          "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+          "agent": "build",
+          "model": {
+            "id": "gpt-5.5",
+            "providerID": "openai",
+            "variant": "default"
+          },
+          "cost": 0,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          },
+          "time": {
+            "created": 1791882344340,
+            "updated": 1791882344340
+          },
+          "title": "Inbox contract QA",
+          "location": {
+            "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+          }
+        }
+      },
+      "requestCount": 0
+    },
+    {
+      "method": "GET",
+      "path": "/api/plugin?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "status": 200,
+      "response": {
+        "location": {
+          "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        },
+        "data": []
+      },
+      "requestCount": 0
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 0
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 0
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/prompt",
+      "body": {
+        "text": "QA_ORIGINAL_TASK"
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "msg_13482b889001EgQRqL1fuzfJIi",
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "time": {
+            "created": 1791882344586
+          },
+          "type": "user",
+          "payload": {
+            "text": "QA_ORIGINAL_TASK"
+          },
+          "delivery": "steer"
+        }
+      },
+      "requestCount": 0
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/synthetic",
+      "body": {
+        "text": "QA_CONTROL_WAKE_BARRIER",
+        "delivery": "queue",
+        "resume": false
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "time": {
+            "created": 1791882344654
+          },
+          "type": "synthetic",
+          "payload": {
+            "text": "QA_CONTROL_WAKE_BARRIER"
+          },
+          "delivery": "queue"
+        }
+      },
+      "requestCount": 2
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/compact",
+      "body": {
+        "delivery": "queue"
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "time": {
+            "created": 1791882344660
+          },
+          "type": "compaction",
+          "payload": {},
+          "delivery": "queue"
+        }
+      },
+      "requestCount": 2
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/move",
+      "body": {
+        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project",
+        "delivery": "queue"
+      },
+      "status": 204,
+      "response": null,
+      "requestCount": 2
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/inbox",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344654
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_CONTROL_WAKE_BARRIER"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 2
+    },
+    {
+      "method": "POST",
+      "path": "/api/experimental/session/ses_ecb7d486fffeW0XwSKJD1irwoW/wait",
+      "status": 204,
+      "response": null,
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+          "agent": "build",
+          "model": {
+            "id": "gpt-5.5",
+            "providerID": "openai",
+            "variant": "default"
+          },
+          "cost": 0,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          },
+          "outcome": "failed",
+          "time": {
+            "created": 1791882344340,
+            "updated": 1791882344693,
+            "idle": 1791882344694
+          },
+          "title": "Inbox contract QA",
+          "location": {
+            "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+          }
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/context",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b889001EgQRqL1fuzfJIi",
+            "time": {
+              "created": 1791882344600
+            },
+            "text": "QA_ORIGINAL_TASK",
+            "type": "user"
+          },
+          {
+            "id": "msg_13482b8ae001hDuUO1tJHnSVRX",
+            "time": {
+              "created": 1791882344629,
+              "completed": 1791882344675
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8e5001pFCyXo2WN1Yncn",
+            "time": {
+              "created": 1791882344677
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+            "time": {
+              "created": 1791882344683
+            },
+            "text": "QA_CONTROL_WAKE_BARRIER",
+            "type": "synthetic"
+          },
+          {
+            "id": "msg_13482b8ee0012j5af7DVykaudh",
+            "time": {
+              "created": 1791882344689,
+              "completed": 1791882344693
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8f6001qyUv8rW4itvZWH",
+            "time": {
+              "created": 1791882344694
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/inbox",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/synthetic",
+      "body": {
+        "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP",
+        "delivery": "queue",
+        "resume": false
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "msg_13482b9060012Eq7apZOtTnLh1",
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "time": {
+            "created": 1791882344711
+          },
+          "type": "synthetic",
+          "payload": {
+            "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+          },
+          "delivery": "queue"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/prompt",
+      "body": {
+        "text": "QA_PENDING_USER",
+        "delivery": "queue",
+        "resume": false
+      },
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "time": {
+            "created": 1791882344716
+          },
+          "type": "user",
+          "payload": {
+            "text": "QA_PENDING_USER"
+          },
+          "delivery": "queue"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/experimental/session/ses_ecb7d486fffeW0XwSKJD1irwoW/wait",
+      "status": 204,
+      "response": null,
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/context",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b889001EgQRqL1fuzfJIi",
+            "time": {
+              "created": 1791882344600
+            },
+            "text": "QA_ORIGINAL_TASK",
+            "type": "user"
+          },
+          {
+            "id": "msg_13482b8ae001hDuUO1tJHnSVRX",
+            "time": {
+              "created": 1791882344629,
+              "completed": 1791882344675
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8e5001pFCyXo2WN1Yncn",
+            "time": {
+              "created": 1791882344677
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+            "time": {
+              "created": 1791882344683
+            },
+            "text": "QA_CONTROL_WAKE_BARRIER",
+            "type": "synthetic"
+          },
+          {
+            "id": "msg_13482b8ee0012j5af7DVykaudh",
+            "time": {
+              "created": 1791882344689,
+              "completed": 1791882344693
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8f6001qyUv8rW4itvZWH",
+            "time": {
+              "created": 1791882344694
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/inbox",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "payload": {
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                },
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": ""
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "payload": {
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                },
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": ""
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_missing_qa"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "error": {
+            "_tag": "Session.NotFoundError",
+            "sessionID": "ses_missing_qa"
+          },
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "delivery": "queue",
+              "payload": {
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": "",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                }
+              }
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "delivery": "queue",
+              "payload": {
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": "",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                }
+              }
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_missing_qa"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "error": {
+            "message": "Session.NotFoundError",
+            "tag": "Session.NotFoundError"
+          },
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/location/reload",
+      "status": 204,
+      "response": null,
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/context",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b889001EgQRqL1fuzfJIi",
+            "time": {
+              "created": 1791882344600
+            },
+            "text": "QA_ORIGINAL_TASK",
+            "type": "user"
+          },
+          {
+            "id": "msg_13482b8ae001hDuUO1tJHnSVRX",
+            "time": {
+              "created": 1791882344629,
+              "completed": 1791882344675
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8e5001pFCyXo2WN1Yncn",
+            "time": {
+              "created": 1791882344677
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+            "time": {
+              "created": 1791882344683
+            },
+            "text": "QA_CONTROL_WAKE_BARRIER",
+            "type": "synthetic"
+          },
+          {
+            "id": "msg_13482b8ee0012j5af7DVykaudh",
+            "time": {
+              "created": 1791882344689,
+              "completed": 1791882344693
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8f6001qyUv8rW4itvZWH",
+            "time": {
+              "created": 1791882344694
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "payload": {
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                },
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": ""
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "959a7732-d8b9-460e-90a7-7617199db7f7",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "payload": {
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                },
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": ""
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "959a7732-d8b9-460e-90a7-7617199db7f7",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-effect/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_missing_qa"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "error": {
+            "_tag": "Session.NotFoundError",
+            "sessionID": "ses_missing_qa"
+          },
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "959a7732-d8b9-460e-90a7-7617199db7f7",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "delivery": "queue",
+              "payload": {
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": "",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                }
+              }
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "93845b30-5597-4966-82cc-e28a5fe195ae",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "items": [
+            {
+              "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344660
+              },
+              "type": "compaction",
+              "payload": {},
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344666
+              },
+              "type": "move",
+              "delivery": "queue",
+              "payload": {
+                "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+                "subpath": "",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+                }
+              }
+            },
+            {
+              "id": "msg_13482b9060012Eq7apZOtTnLh1",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344711
+              },
+              "type": "synthetic",
+              "payload": {
+                "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+              },
+              "delivery": "queue"
+            },
+            {
+              "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+              "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+              "time": {
+                "created": 1791882344716
+              },
+              "type": "user",
+              "payload": {
+                "text": "QA_PENDING_USER"
+              },
+              "delivery": "queue"
+            }
+          ],
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "93845b30-5597-4966-82cc-e28a5fe195ae",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "POST",
+      "path": "/api/rpc/inbox-promise/read?location%5Bdirectory%5D=%2Fprivate%2Fvar%2Ffolders%2Fcy%2Fqc1d9pgd1hq599hhhw_z2l2w0000gn%2FT%2Fopencode%2Finbox-live-fx2Ix7%2Fproject",
+      "body": {
+        "input": {
+          "sessionID": "ses_missing_qa"
+        }
+      },
+      "status": 200,
+      "response": {
+        "output": {
+          "error": {
+            "message": "Session.NotFoundError",
+            "tag": "Session.NotFoundError"
+          },
+          "methods": [
+            "list"
+          ],
+          "pid": 4464,
+          "instance": "93845b30-5597-4966-82cc-e28a5fe195ae",
+          "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/inbox",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW/context",
+      "status": 200,
+      "response": {
+        "data": [
+          {
+            "id": "msg_13482b889001EgQRqL1fuzfJIi",
+            "time": {
+              "created": 1791882344600
+            },
+            "text": "QA_ORIGINAL_TASK",
+            "type": "user"
+          },
+          {
+            "id": "msg_13482b8ae001hDuUO1tJHnSVRX",
+            "time": {
+              "created": 1791882344629,
+              "completed": 1791882344675
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8e5001pFCyXo2WN1Yncn",
+            "time": {
+              "created": 1791882344677
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8ce001evbywtR6J0d5Nh",
+            "time": {
+              "created": 1791882344683
+            },
+            "text": "QA_CONTROL_WAKE_BARRIER",
+            "type": "synthetic"
+          },
+          {
+            "id": "msg_13482b8ee0012j5af7DVykaudh",
+            "time": {
+              "created": 1791882344689,
+              "completed": 1791882344693
+            },
+            "type": "assistant",
+            "agent": "build",
+            "model": {
+              "id": "gpt-5.5",
+              "providerID": "openai",
+              "variant": "default"
+            },
+            "content": [],
+            "finish": "error",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b8f6001qyUv8rW4itvZWH",
+            "time": {
+              "created": 1791882344694
+            },
+            "type": "idle",
+            "outcome": "failed",
+            "error": {
+              "type": "provider.auth",
+              "message": "QA provider unavailable",
+              "status": 401,
+              "response": {
+                "body": "{\"error\":{\"message\":\"QA provider unavailable\",\"type\":\"invalid_api_key\",\"code\":\"invalid_api_key\"}}"
+              }
+            }
+          }
+        ]
+      },
+      "requestCount": 3
+    },
+    {
+      "method": "GET",
+      "path": "/api/session/ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "status": 200,
+      "response": {
+        "data": {
+          "id": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+          "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+          "agent": "build",
+          "model": {
+            "id": "gpt-5.5",
+            "providerID": "openai",
+            "variant": "default"
+          },
+          "cost": 0,
+          "tokens": {
+            "input": 0,
+            "output": 0,
+            "reasoning": 0,
+            "cache": {
+              "read": 0,
+              "write": 0
+            }
+          },
+          "outcome": "failed",
+          "time": {
+            "created": 1791882344340,
+            "updated": 1791882344716,
+            "idle": 1791882344694
+          },
+          "title": "Inbox contract QA",
+          "location": {
+            "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+          }
+        }
+      },
+      "requestCount": 3
+    }
+  ],
+  "reads": [
+    {
+      "phase": "before-reload",
+      "mode": "effect",
+      "result": {
+        "items": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "payload": {
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              },
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": ""
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ],
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      },
+      "missing": {
+        "error": {
+          "_tag": "Session.NotFoundError",
+          "sessionID": "ses_missing_qa"
+        },
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "6e452041-422e-4e70-898a-974698fc98f8",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      }
+    },
+    {
+      "phase": "before-reload",
+      "mode": "promise",
+      "result": {
+        "items": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ],
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      },
+      "missing": {
+        "error": {
+          "message": "Session.NotFoundError",
+          "tag": "Session.NotFoundError"
+        },
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "41e0d4a9-6dce-4836-9612-1c6fbf384f06",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      }
+    },
+    {
+      "phase": "after-reload",
+      "mode": "effect",
+      "result": {
+        "items": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "payload": {
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              },
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": ""
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ],
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "959a7732-d8b9-460e-90a7-7617199db7f7",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      },
+      "missing": {
+        "error": {
+          "_tag": "Session.NotFoundError",
+          "sessionID": "ses_missing_qa"
+        },
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "959a7732-d8b9-460e-90a7-7617199db7f7",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      }
+    },
+    {
+      "phase": "after-reload",
+      "mode": "promise",
+      "result": {
+        "items": [
+          {
+            "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344660
+            },
+            "type": "compaction",
+            "payload": {},
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344666
+            },
+            "type": "move",
+            "delivery": "queue",
+            "payload": {
+              "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+              "subpath": "",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+              }
+            }
+          },
+          {
+            "id": "msg_13482b9060012Eq7apZOtTnLh1",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344711
+            },
+            "type": "synthetic",
+            "payload": {
+              "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+            },
+            "delivery": "queue"
+          },
+          {
+            "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+            "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+            "time": {
+              "created": 1791882344716
+            },
+            "type": "user",
+            "payload": {
+              "text": "QA_PENDING_USER"
+            },
+            "delivery": "queue"
+          }
+        ],
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "93845b30-5597-4966-82cc-e28a5fe195ae",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      },
+      "missing": {
+        "error": {
+          "message": "Session.NotFoundError",
+          "tag": "Session.NotFoundError"
+        },
+        "methods": [
+          "list"
+        ],
+        "pid": 4464,
+        "instance": "93845b30-5597-4966-82cc-e28a5fe195ae",
+        "location": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+      }
+    }
+  ],
+  "mockRequests": [
+    {
+      "method": "GET",
+      "url": "/v1/responses",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "url": "/v1/responses",
+      "status": 401
+    },
+    {
+      "method": "POST",
+      "url": "/v1/responses",
+      "status": 401
+    }
+  ],
+  "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+  "env": {
+    "PATH": "/opt/zerobrew/bin:/Users/Bryan/.sdkman/candidates/maven/current/bin:/Users/Bryan/.sdkman/candidates/java/current/bin:/Users/Bryan/.sdkman/candidates/gradle/current/bin:/Users/Bryan/.local/state/fnm_multishells/2522_1791800200005/bin:/Users/Bryan/Library/pnpm/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/Bryan/.local/bin:/Users/Bryan/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/zerobrew/bin:/opt/zerobrew/prefix/bin:/Users/Bryan/.cargo/bin:/Users/Bryan/Library/Application Support/JetBrains/Toolbox/scripts:/Applications/Obsidian.app/Contents/MacOS:/Users/Bryan/.orbstack/bin",
+    "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/home",
+    "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/home",
+    "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7",
+    "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/config",
+    "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/data",
+    "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/cache",
+    "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/state",
+    "IOLAUS_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/home/.iolaus",
+    "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/home",
+    "QA_SANDBOX": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7",
+    "QA_OPENCODE_SOURCE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+    "OPENCODE_DISABLE_AUTOUPDATE": "1",
+    "OPENCODE_DISABLE_MODELS_FETCH": "1"
+  },
+  "version": "opencode vlocal",
+  "help": "DESCRIPTION\n  OpenCode command line interface\n\nUSAGE\n  opencode <subcommand> [flags] [<directory>]\n\nARGUMENTS\n  directory string    Directory to start OpenCode in (optional)\n\nFLAGS\n  --standalone            Run with a private server instead of the background service\n  --server string         Connect to a server URL instead of the background service\n  --auto                  Auto-approve permissions that are not explicitly denied\n  --continue, -c          Continue the last session\n  --session, -s string    Session ID to continue, or to create if it does not exist\n  --prompt string         Prompt to use\n\nGLOBAL FLAGS\n  --help, -h                                                          Show help information\n  --version, -v                                                       Show version information\n  --wizard                                                            Start wizard mode for a command\n  --completions <bash|zsh|fish|sh>                                    Print shell completion script (choices: bash, zsh, fish, sh)\n  --log-level <all|trace|debug|info|warn|warning|error|fatal|none>    Sets the minimum log level (choices: all, trace, debug, info, warn, warning, error, fatal, none)\n  --print-logs                                                        Print logs to stderr (server logs require --standalone)\n\nSUBCOMMANDS\n  upgrade, update    Upgrade OpenCode to the latest or a specific version\n  uninstall          Uninstall OpenCode, keeping session data, configuration, and state\n  acp                Start an Agent Client Protocol server\n  api                Make a request to the running server\n  debug              Debugging and troubleshooting tools\n  auth               manage integrations and credentials\n  mcp                Manage MCP (Model Context Protocol) servers\n  plugin             Manage plugins\n  models             List all available models\n  stats              Show shareable usage statistics\n  mini               Start the minimal interactive interface\n  run                Run OpenCode with a message\n  session            Manage sessions\n  service            Manage the background server\n  reload             Reload configuration\n  pair               Print one-time links to connect a browser or app\n  serve              Start the v2 API and web server\n",
+  "launch": {
+    "binary": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+    "args": [
+      "serve",
+      "--hostname",
+      "127.0.0.1",
+      "--port",
+      "0"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+  },
+  "serverPID": 4464,
+  "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+  "plugins": {
+    "location": {
+      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+    },
+    "data": []
+  },
+  "setup": "compact/move always wake in v2.0.27. Admit controls behind a disposable queued input during a held request. Release 401; the coalesced wake consumes that input and fails again, leaving both controls pending. Then admit user/synthetic with resume:false. Reads must not wake or consume any of the four.",
+  "requestsAfterFailure": 3,
+  "pending": [
+    {
+      "id": "msg_13482b8d3001GyW9j4oqTh7P8d",
+      "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "time": {
+        "created": 1791882344660
+      },
+      "type": "compaction",
+      "payload": {},
+      "delivery": "queue"
+    },
+    {
+      "id": "msg_13482b8da0012nOZcf5R9GrJFE",
+      "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "time": {
+        "created": 1791882344666
+      },
+      "type": "move",
+      "delivery": "queue",
+      "payload": {
+        "projectID": "a5f1ba2ed4fa3fe0e53da0ab044e5bccee1942be",
+        "subpath": "",
+        "location": {
+          "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-live-fx2Ix7/project"
+        }
+      }
+    },
+    {
+      "id": "msg_13482b9060012Eq7apZOtTnLh1",
+      "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "time": {
+        "created": 1791882344711
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "QA_QUEUED_REQUIREMENT_DO_NOT_DROP"
+      },
+      "delivery": "queue"
+    },
+    {
+      "id": "msg_13482b90b0013h8Zl6zmUsSOb7",
+      "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+      "time": {
+        "created": 1791882344716
+      },
+      "type": "user",
+      "payload": {
+        "text": "QA_PENDING_USER"
+      },
+      "delivery": "queue"
+    }
+  ]
+}

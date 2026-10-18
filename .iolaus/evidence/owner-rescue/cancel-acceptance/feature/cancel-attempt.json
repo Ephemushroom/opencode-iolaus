@@ -1,0 +1,855 @@
+{
+  "active": {
+    "run": {
+      "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "cancel-attempt",
+      "definition": {
+        "name": "cancel-attempt",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "cb9b729fc2287b6b25672866d6cdbfc5b903de90056d265f55846aa275a0b9d4",
+      "generation": 1,
+      "status": "running",
+      "createdAt": 1791963964923,
+      "updatedAt": 1791963965127,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          },
+          "fingerprint": "9f7bff597198160f189c0cc6345f61d5aebbb5f57db09adc8697aea2fcebe0fb",
+          "status": "running",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [
+              "openai/A"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "e6ffd3e7f47736bcc819cdf8844447478736104e5eabed5d8c528ed33d48ad8e",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/A",
+                      "token": "a4b5c40a-1154-472e-aacd-1d6d7c892502"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                      "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_CASE:cancel-attempt"
+                    },
+                    "sessionID": "ses_ec69fd9f3ffewnbz9vZVvkuQLT"
+                  }
+                }
+              ],
+              "task": "QA_CASE:cancel-attempt",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "initialRoleAllowed": true
+          },
+          "error": "Iolaus DAG child session failed",
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:cancel-attempt\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fd9f3ffewnbz9vZVvkuQLT\",\"token\":\"a4b5c40a-1154-472e-aacd-1d6d7c892502\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ec69fd973ffew9HLwIBBh2kb9d"
+          },
+          "createdAt": 1791963964923,
+          "updatedAt": 1791963965082
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "d15f1a3d-47f6-48d1-ad3b-193720c5897e",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963964925
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69dc81f7-d292-4af8-92b2-f73858d92ab1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963964926,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9b2a0c3c-aae7-492b-89f9-2b1dfc9b1c9d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963964954,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "79545319-873f-4af6-b7eb-0e3b309250de",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 4,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session failed",
+          "status": "needs_retry"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "ed780bf4-4326-4957-9a0c-a7a62ed175c6",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7c4942b7-514d-422f-a8f3-fe241de88cc1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963965082,
+        "nodeID": "work"
+      }
+    ],
+    "steering": [],
+    "notices": []
+  },
+  "cancelled": {
+    "run": {
+      "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "cancel-attempt",
+      "definition": {
+        "name": "cancel-attempt",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "cb9b729fc2287b6b25672866d6cdbfc5b903de90056d265f55846aa275a0b9d4",
+      "generation": 1,
+      "status": "cancelled",
+      "createdAt": 1791963964923,
+      "updatedAt": 1791963965274,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          },
+          "fingerprint": "9f7bff597198160f189c0cc6345f61d5aebbb5f57db09adc8697aea2fcebe0fb",
+          "status": "cancelled",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "cancelled_continuation",
+            "failedModels": [
+              "openai/A"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "e6ffd3e7f47736bcc819cdf8844447478736104e5eabed5d8c528ed33d48ad8e",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/A",
+                      "token": "a4b5c40a-1154-472e-aacd-1d6d7c892502"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                      "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_CASE:cancel-attempt"
+                    },
+                    "sessionID": "ses_ec69fd9f3ffewnbz9vZVvkuQLT"
+                  }
+                }
+              ],
+              "task": "QA_CASE:cancel-attempt",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "initialRoleAllowed": true
+          },
+          "error": "Iolaus DAG child session failed",
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:cancel-attempt\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fd9f3ffewnbz9vZVvkuQLT\",\"token\":\"a4b5c40a-1154-472e-aacd-1d6d7c892502\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ec69fd973ffew9HLwIBBh2kb9d"
+          },
+          "createdAt": 1791963964923,
+          "updatedAt": 1791963965274
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "d15f1a3d-47f6-48d1-ad3b-193720c5897e",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963964925
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69dc81f7-d292-4af8-92b2-f73858d92ab1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963964926,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9b2a0c3c-aae7-492b-89f9-2b1dfc9b1c9d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963964954,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "79545319-873f-4af6-b7eb-0e3b309250de",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 4,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session failed",
+          "status": "needs_retry"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "ed780bf4-4326-4957-9a0c-a7a62ed175c6",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7c4942b7-514d-422f-a8f3-fe241de88cc1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963965082,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 7,
+        "type": "run.cancelled",
+        "generation": 1,
+        "createdAt": 1791963965274
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d"
+        },
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "state": "admitted",
+        "text": "Iolaus Flow notice f009c1b0-5ba5-4836-a5a8-c4a17affef4d: \"cancel-attempt\" (bb377339-3af8-494e-8a88-fbbc41661caf) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "reloaded": {
+    "run": {
+      "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "cancel-attempt",
+      "definition": {
+        "name": "cancel-attempt",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "cb9b729fc2287b6b25672866d6cdbfc5b903de90056d265f55846aa275a0b9d4",
+      "generation": 1,
+      "status": "cancelled",
+      "createdAt": 1791963964923,
+      "updatedAt": 1791963965274,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          },
+          "fingerprint": "9f7bff597198160f189c0cc6345f61d5aebbb5f57db09adc8697aea2fcebe0fb",
+          "status": "cancelled",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "cancelled_continuation",
+            "failedModels": [
+              "openai/A"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "e6ffd3e7f47736bcc819cdf8844447478736104e5eabed5d8c528ed33d48ad8e",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/A",
+                      "token": "a4b5c40a-1154-472e-aacd-1d6d7c892502"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                      "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_CASE:cancel-attempt"
+                    },
+                    "sessionID": "ses_ec69fd9f3ffewnbz9vZVvkuQLT"
+                  }
+                }
+              ],
+              "task": "QA_CASE:cancel-attempt",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "initialRoleAllowed": true
+          },
+          "error": "Iolaus DAG child session failed",
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:cancel-attempt\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fd9f3ffewnbz9vZVvkuQLT\",\"token\":\"a4b5c40a-1154-472e-aacd-1d6d7c892502\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ec69fd973ffew9HLwIBBh2kb9d"
+          },
+          "createdAt": 1791963964923,
+          "updatedAt": 1791963965274
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "d15f1a3d-47f6-48d1-ad3b-193720c5897e",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963964925
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69dc81f7-d292-4af8-92b2-f73858d92ab1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963964926,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9b2a0c3c-aae7-492b-89f9-2b1dfc9b1c9d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963964954,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "79545319-873f-4af6-b7eb-0e3b309250de",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 4,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session failed",
+          "status": "needs_retry"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "ed780bf4-4326-4957-9a0c-a7a62ed175c6",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7c4942b7-514d-422f-a8f3-fe241de88cc1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963965082,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 7,
+        "type": "run.cancelled",
+        "generation": 1,
+        "createdAt": 1791963965274
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d"
+        },
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "state": "admitted",
+        "text": "Iolaus Flow notice f009c1b0-5ba5-4836-a5a8-c4a17affef4d: \"cancel-attempt\" (bb377339-3af8-494e-8a88-fbbc41661caf) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "disabled": {
+    "run": {
+      "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "name": "cancel-attempt",
+      "definition": {
+        "name": "cancel-attempt",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "cb9b729fc2287b6b25672866d6cdbfc5b903de90056d265f55846aa275a0b9d4",
+      "generation": 1,
+      "status": "cancelled",
+      "createdAt": 1791963964923,
+      "updatedAt": 1791963965274,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "maxAttempts": 2,
+            "model": "openai/A",
+            "prompt": "QA_CASE:cancel-attempt"
+          },
+          "fingerprint": "9f7bff597198160f189c0cc6345f61d5aebbb5f57db09adc8697aea2fcebe0fb",
+          "status": "cancelled",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "cancelled_continuation",
+            "failedModels": [
+              "openai/A"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "e6ffd3e7f47736bcc819cdf8844447478736104e5eabed5d8c528ed33d48ad8e",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/A",
+                      "token": "a4b5c40a-1154-472e-aacd-1d6d7c892502"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                      "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_CASE:cancel-attempt"
+                    },
+                    "sessionID": "ses_ec69fd9f3ffewnbz9vZVvkuQLT"
+                  }
+                }
+              ],
+              "task": "QA_CASE:cancel-attempt",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "initialRoleAllowed": true
+          },
+          "error": "Iolaus DAG child session failed",
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/A",
+              "token": "946f3fd0-75f7-43e5-8ca7-2dd216f57d9e"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+              "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:cancel-attempt\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fd9f3ffewnbz9vZVvkuQLT\",\"token\":\"a4b5c40a-1154-472e-aacd-1d6d7c892502\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ec69fd973ffew9HLwIBBh2kb9d"
+          },
+          "createdAt": 1791963964923,
+          "updatedAt": 1791963965274
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "d15f1a3d-47f6-48d1-ad3b-193720c5897e",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791963964925
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "69dc81f7-d292-4af8-92b2-f73858d92ab1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963964926,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "9b2a0c3c-aae7-492b-89f9-2b1dfc9b1c9d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963964954,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "79545319-873f-4af6-b7eb-0e3b309250de",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 4,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session failed",
+          "status": "needs_retry"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "ed780bf4-4326-4957-9a0c-a7a62ed175c6",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791963965042,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7c4942b7-514d-422f-a8f3-fe241de88cc1",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791963965082,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "sequence": 7,
+        "type": "run.cancelled",
+        "generation": 1,
+        "createdAt": 1791963965274
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "f009c1b0-5ba5-4836-a5a8-c4a17affef4d",
+        "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d",
+        "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+        "receipt": {
+          "messageID": "msg_f009c1b05ba54836a5a8c4a17affef4d"
+        },
+        "runID": "bb377339-3af8-494e-8a88-fbbc41661caf",
+        "state": "admitted",
+        "text": "Iolaus Flow notice f009c1b0-5ba5-4836-a5a8-c4a17affef4d: \"cancel-attempt\" (bb377339-3af8-494e-8a88-fbbc41661caf) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "history": [
+    {
+      "id": "msg_946f3fd075f743e58ca72dd216f57d9e",
+      "time": {
+        "created": 1791963965132
+      },
+      "text": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:cancel-attempt\",\"checkpoints\":[{\"sessionID\":\"ses_ec69fd9f3ffewnbz9vZVvkuQLT\",\"token\":\"a4b5c40a-1154-472e-aacd-1d6d7c892502\",\"parts\":[]}]}",
+      "type": "user"
+    },
+    {
+      "id": "msg_1396026ce001gVfCcXvzVilq3e",
+      "time": {
+        "created": 1791963965137,
+        "streamed": 1791963965141,
+        "completed": 1791963965143
+      },
+      "type": "assistant",
+      "agent": "quick",
+      "model": {
+        "id": "A",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "tool",
+          "id": "qa_434",
+          "name": "write",
+          "executed": false,
+          "providerState": {
+            "itemId": "qa_434"
+          },
+          "state": {
+            "status": "completed",
+            "input": {
+              "path": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project/cancel-attempt.txt",
+              "content": "B_NATIVE_WORK\n"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "Created file successfully: cancel-attempt.txt"
+              }
+            ],
+            "metadata": {
+              "truncated": false
+            }
+          },
+          "time": {
+            "created": 1791963965140,
+            "ran": 1791963965141,
+            "completed": 1791963965142
+          }
+        }
+      ],
+      "finish": "tool-calls",
+      "cost": 0,
+      "tokens": {
+        "input": 10,
+        "output": 5,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    }
+  ],
+  "inbox": [
+    {
+      "id": "msg_13960273c001qsvmWM6IAB3YOB",
+      "sessionID": "ses_ec69fd973ffew9HLwIBBh2kb9d",
+      "time": {
+        "created": 1791963965244
+      },
+      "type": "synthetic",
+      "payload": {
+        "text": "PRESERVE_cancel-attempt_B_REQUIREMENT"
+      },
+      "delivery": "queue"
+    }
+  ],
+  "childRequests": 3
+}

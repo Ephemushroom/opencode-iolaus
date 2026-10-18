@@ -1,0 +1,14 @@
+{
+  "source": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+  "tag": "v2.0.27",
+  "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+  "branch": "plugin-inbox-read",
+  "patchSha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0",
+  "lockSha256": "97b04a1407c4cf48ad4e3fc7c0c85932188e4d0e97ca8005309420062887f60f",
+  "bun": "1.4.3",
+  "node": "v24.20.0",
+  "dependenciesReused": true,
+  "launcher": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+  "launcherHash": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b",
+  "buildHash": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010"
+}

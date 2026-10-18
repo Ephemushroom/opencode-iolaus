@@ -1,0 +1,35 @@
+{
+  "verdict": "PASS",
+  "gitSHA": "9ad51bb76f1ada0b6059ab8c37c324a7ad7ddc45",
+  "sourceCount": 215,
+  "build": {
+    "dist/index.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/index.js",
+      "sha256": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010"
+    },
+    "dist/prompts.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/prompts.js",
+      "sha256": "eebac521bfaddedb9f3ee2e78e911f9ab046d575ca13ccd1cd686066b15625a0"
+    },
+    "dist/tui.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/tui.js",
+      "sha256": "a69e4c56a6efeb6dc50a294d77428f5d174323b2e790487b5f112911050996e1"
+    }
+  },
+  "featureSource": {
+    "source": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+    "tag": "v2.0.27",
+    "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+    "branch": "plugin-inbox-read",
+    "patchSha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0",
+    "lockSha256": "97b04a1407c4cf48ad4e3fc7c0c85932188e4d0e97ca8005309420062887f60f",
+    "bun": "1.4.3",
+    "node": "v24.20.0",
+    "dependenciesReused": true,
+    "launcher": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+    "launcherHash": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b",
+    "buildHash": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010"
+  },
+  "unmodifiedSandboxBuildHash": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010",
+  "beforeAfterUnchanged": true
+}

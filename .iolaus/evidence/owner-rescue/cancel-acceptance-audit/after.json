@@ -1,0 +1,951 @@
+{
+  "at": 1791963971.964839,
+  "protected": {
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/source.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/source.json",
+      "sha256": "4fb96c9e1722a250a1e1e427e42a3d6f7da7428f4737b7f20dac47188f6ce359"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/upstream.patch": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/upstream.patch",
+      "sha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+      "sha256": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/contract-proof.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/contract-proof.md",
+      "sha256": "16ee0c9bf285334b7ea3ef5ae91ba1c99ff95d391c7dde9f9b18fcb325e4434b"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs",
+      "sha256": "1d55bed5d760c33caf505b275b898a58cbaffccf5a8cc05a8cf85c1e4cdb0114"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/checks.py": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/checks.py",
+      "sha256": "67816181b9d7c7b3a4026d23c88d35419af5d978ae8124328c01dfad839cbbe2"
+    },
+    "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/lifecycle.py": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/lifecycle.py",
+      "sha256": "4f0fd7d711f78db7838f1567852d80a214c7c5c0c6c4c78838bb5e5d3480bd40"
+    },
+    "/Users/Bryan/.iolaus/iolaus.json": {
+      "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.iolaus/iolaus.json",
+      "sha256": "7ef3a683d3514e283b137781aa4a23dc2fff077ba43b0f30559f6c4dc2a3a783"
+    },
+    "/Users/Bryan/.config/opencode/opencode.json": {
+      "realpath": "/Users/Bryan/Programme/dotfiles/MacOS/.config/opencode/opencode.json",
+      "sha256": "3a5379e6197705e00a82fe7aa86de2075f12a4a31ae122de72aa9d1fd111f2ee"
+    },
+    "/Users/Bryan/.config/opencode/opencode.jsonc": null,
+    "/Users/Bryan/.config/opencode/cli.json": {
+      "realpath": "/Users/Bryan/.config/opencode/cli.json",
+      "sha256": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381"
+    },
+    "/Users/Bryan/.config/opencode/service.json": {
+      "realpath": "/Users/Bryan/.config/opencode/service.json",
+      "sha256": "b17dc60a90431c13d27916f40d9199562f7c754e89ff1d7bf52e4f2894b99d24"
+    },
+    "/Users/Bryan/.local/state/opencode/service.json": {
+      "realpath": "/Users/Bryan/.local/state/opencode/service.json",
+      "sha256": "98a6ced14fb80499a0fb7d5409e208c925532389b939a477debfd38e181103a9"
+    },
+    "/opt/homebrew/bin/opencode": {
+      "realpath": "/opt/homebrew/Cellar/opencode-v2/2.0.28/bin/opencode",
+      "sha256": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341"
+    },
+    "/Users/Bryan/.iolaus/dist/index.js": null,
+    "/Users/Bryan/.iolaus/dist/prompts.js": null,
+    "/Users/Bryan/.iolaus/dist/tui.js": null
+  },
+  "sources": {
+    "AGENTS.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/AGENTS.md",
+      "sha256": "0a42eb3feeb3e94a114ee16314b1bf7e73f00a1a7658da2ed155af9f2ff3530f"
+    },
+    "README.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/README.md",
+      "sha256": "5c98d72b537aa8ceae724fc8ee8102e1916368d4206cb141edf6b10f726f81f7"
+    },
+    "bun.lock": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/bun.lock",
+      "sha256": "a0f9fe5a126391ad00c4f3b644f219f1f5e47c9af212e28b589463f5b58da15e"
+    },
+    "package.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/package.json",
+      "sha256": "31759b9819f1c62103849e2d74ed9483696d1a3179bef0bf96075395848d2d3d"
+    },
+    "packages/ast-grep-core/package.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/package.json",
+      "sha256": "23a62537a7ee3893c9cd2609eab309d228fc5763f44c4b4f71c600c62a471a39"
+    },
+    "packages/ast-grep-core/src/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/index.ts",
+      "sha256": "aa0bc83665397cf68778ca5089310f902ea047ea52189c835ee3470ab7ea9683"
+    },
+    "packages/ast-grep-core/src/normalize.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/normalize.ts",
+      "sha256": "8a6388aae9966c8261d247ac3136a83410db1c8b0cb9997d4bbfc5fae86d8fae"
+    },
+    "packages/ast-grep-core/src/pattern-hints.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/pattern-hints.ts",
+      "sha256": "da9ce37050621f68867532578237598b9bf66619f6015d9b32741066fe6f4133"
+    },
+    "packages/ast-grep-core/src/sg-runner.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/sg-runner.ts",
+      "sha256": "f81740186a819763aaac81afb11f237dc77e256a7b847d192686fa352a61491e"
+    },
+    "packages/ast-grep-core/src/tools/rewrite.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/tools/rewrite.ts",
+      "sha256": "071580b6b36f1e6b0f97f05e2383be13f1cd0c85977aa78b8fd39d603d3cc8c9"
+    },
+    "packages/ast-grep-core/src/tools/scan.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/tools/scan.ts",
+      "sha256": "dfe5ff0933d34594ef42f17a45f4c310c830338f1f8b4a2ddd2550d22b22a04b"
+    },
+    "packages/ast-grep-core/src/tools/search.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/ast-grep-core/src/tools/search.ts",
+      "sha256": "6eb625f2bbfb18d51c321aeffc2b8a0f8cb843226eec07653b6e39aa19a7b0f4"
+    },
+    "packages/model-core/package.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/package.json",
+      "sha256": "ab8358a53efe7a6c62c7b0096af2026d27182a6d9039cbfd0e735b4c4a13bd1e"
+    },
+    "packages/model-core/src/agent-model-requirements.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/agent-model-requirements.ts",
+      "sha256": "43cb02693c089eeb3c8d346e63522afc3573baa73a0112cd57717e1745644ca2"
+    },
+    "packages/model-core/src/category-model-requirements.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/category-model-requirements.ts",
+      "sha256": "0460573340fd2de423680e30ca3bf135afefb656f7f16a29911a804cc441720f"
+    },
+    "packages/model-core/src/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/index.ts",
+      "sha256": "e77698b1412e346620d9c1c6bb9bc9ee121456d62141ed9bef9432c480d43855"
+    },
+    "packages/model-core/src/model-availability.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-availability.ts",
+      "sha256": "4653e0eff58129fbb0a03eafd075e314c4bf96ac34929dade4e6cc6e3fbb6adf"
+    },
+    "packages/model-core/src/model-family-detectors.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-family-detectors.ts",
+      "sha256": "eab5d5c9b97276caf83e0d51a61fae9208899960e96d9f16ffec81520e5ae6fb"
+    },
+    "packages/model-core/src/model-normalization.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-normalization.ts",
+      "sha256": "e179b6020095ae9f240ac4374c6f9dfe1828d673c0a090a02d070e42cf2f9611"
+    },
+    "packages/model-core/src/model-requirement-types.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-requirement-types.ts",
+      "sha256": "48bf7a980c017b592af3c7d1eb137de67598348076682568c8edc8ff3a347f8d"
+    },
+    "packages/model-core/src/model-requirements.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-requirements.ts",
+      "sha256": "f34d8c98efe64c4d251da23710cf2f2905f60f1ca39f88ff8fed81ebbb76787e"
+    },
+    "packages/model-core/src/model-resolution-pipeline.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/model-resolution-pipeline.ts",
+      "sha256": "4991f639463ff9426f2b5008abcc02ec110bb73689a636bd85c8bce46f4fd318"
+    },
+    "packages/model-core/src/provider-cache.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/provider-cache.ts",
+      "sha256": "509983c864f6c5ff7034532a7c87bf3e6b7a90494f59f9654839e8cb5d530180"
+    },
+    "packages/model-core/src/provider-model-id-transform.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/packages/model-core/src/provider-model-id-transform.ts",
+      "sha256": "4fc093cca1bbd01086c93769383ef07e2b0658f48dab55e003fb7797b6813692"
+    },
+    "reference/active-manifest.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/reference/active-manifest.json",
+      "sha256": "8ef93610b585cf1eecf75b3a26db6069bdb9e792dad2ff18dc6c790104daad16"
+    },
+    "script/build.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/build.ts",
+      "sha256": "9bdb358f3413c8655616ad01fba230af951dd3c02c0ca621fa2131cddc89d311"
+    },
+    "script/check-package.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/check-package.ts",
+      "sha256": "ae6fe0beb8c658a1baeb0a836153c73d3ac49434cf4f2e468fb83c9426215709"
+    },
+    "script/check-reference.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/check-reference.mjs",
+      "sha256": "1fea7110db8983e130a36439d05db7187aa0b36e92edff5682cf490e0a492cc1"
+    },
+    "script/qa-borrows.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-borrows.mjs",
+      "sha256": "72397605b5058f567e859d985d2290a67b6700647d5cad1e7059db32ac4a756e"
+    },
+    "script/qa-dag-recover.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-dag-recover.mjs",
+      "sha256": "4d29ab5ea5c4e00b50d775bf61c088887d56daa0b438c4cfdf263c6d078a76fe"
+    },
+    "script/qa-flow-steering-cleanup.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-flow-steering-cleanup.mjs",
+      "sha256": "fca46613030b5daba7dce28f725c1a0755b04ed9b9c4e57ee9e2f174143a680f"
+    },
+    "script/qa-flow-steering.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-flow-steering.mjs",
+      "sha256": "0a021f7eeb83c68d3b979dca22983cb7d61ca731b4c18b9bd307702a5d64a7f3"
+    },
+    "script/qa-global-config.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-global-config.mjs",
+      "sha256": "7800b5c488db9fcb424b18e132f5bd5d867fec0936cd54327542ceed5bf536e8"
+    },
+    "script/qa-live.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-live.mjs",
+      "sha256": "24f03cf439f111a544c9b789072ee4818f7b1b86222f6a36395014d4baacee0f"
+    },
+    "script/qa-owner-rescue-cleanup.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-owner-rescue-cleanup.mjs",
+      "sha256": "fedcabac978d8ecd6218353a3330c54e1209513a7ac51cb1bb918b60fff041cc"
+    },
+    "script/qa-owner-rescue-feature.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-owner-rescue-feature.mjs",
+      "sha256": "4b66b0ab9f2705bbf3111fe5a2e57a6ce8d6aebe56b7b08f70a8ff9cd340efbb"
+    },
+    "script/qa-owner-rescue-verify.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-owner-rescue-verify.mjs",
+      "sha256": "9daa85118cd2d746b601438351bef15a4870d917654a623c9d1ca1a88a4117da"
+    },
+    "script/qa-owner-rescue.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-owner-rescue.mjs",
+      "sha256": "0c8155bd36e210aca69033c501c00e8258015f95dd64d539148f57cdf39f95ce"
+    },
+    "script/qa-roles.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-roles.mjs",
+      "sha256": "71020d7c83bd6562073ea6c4078d0ba3507231253207411c26522b975e27704b"
+    },
+    "script/qa-tui-responsive.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-tui-responsive.mjs",
+      "sha256": "e4259eb70427d5fb1716fc197f41262c5771fb1a04d1e40a7cf72e4f5ba1ff74"
+    },
+    "script/qa-tui-routing.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-tui-routing.mjs",
+      "sha256": "47c777152aad6dde8602c1de587a4adb2661ab7a8cdc8eb39eaa27bcb43189b4"
+    },
+    "script/qa-tui.mjs": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/script/qa-tui.mjs",
+      "sha256": "c7e933d64344109ae2be2ca47fc0512883a4665cd37d8d64cc1b0b3a1c149c53"
+    },
+    "src/ast-grep/binary.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/ast-grep/binary.ts",
+      "sha256": "349ca260c94fc37265967d961e963c18d7758f45f8252193c067c6a8f741cfc1"
+    },
+    "src/ast-grep/permissions.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/ast-grep/permissions.ts",
+      "sha256": "28917564c1b10935361635448f8f11d600d2282afbaba8b43ee34c4ca6f6bf30"
+    },
+    "src/ast-grep/tools.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/ast-grep/tools.ts",
+      "sha256": "23f0830cf0b9368049691afc755de745fa240fde76ced4420a2770276782facb"
+    },
+    "src/compaction.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/compaction.ts",
+      "sha256": "edefbc942644173682bbff01dbf9e6f4f403c3bd23be756e3f0c426d4c1029ea"
+    },
+    "src/context.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/context.ts",
+      "sha256": "e651832197362d0620701771dd1bc49179b5a4b627eb8e8d86ac22d4071ebf42"
+    },
+    "src/dag/canonical-json.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/canonical-json.ts",
+      "sha256": "ceeccd7ee8b0732972cc4a12bda17dec3a5a08b2dc3dc94c291003e5fba08ceb"
+    },
+    "src/dag/condition.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/condition.ts",
+      "sha256": "5dc68a03d74c2505a4ca442ad3921a838ce1234492c562472d6ad5ace9fe606b"
+    },
+    "src/dag/controller.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/controller.ts",
+      "sha256": "ab75b3fdde3a5a418152c22e9784632e7a668b2b7597add16229188569d7f0b5"
+    },
+    "src/dag/errors.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/errors.ts",
+      "sha256": "9f05fa14e4e20647905d57aa3b6872979fbfbe4bade365cdc35a140b9092c4a0"
+    },
+    "src/dag/fingerprint.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/fingerprint.ts",
+      "sha256": "4c22af770e4256e5386766d5918a4c341f70861b939d89f700119836daed6a6e"
+    },
+    "src/dag/graph-error.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/graph-error.ts",
+      "sha256": "eff35001556c98c8471ad3af5b80627e7710dfcd96944ad88c0b90c37e0a6af1"
+    },
+    "src/dag/graph.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/graph.ts",
+      "sha256": "ff1c79e1e1b3de219db4c5f029e60b28fb394c1125c165be874c2467eb6891d6"
+    },
+    "src/dag/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/index.ts",
+      "sha256": "8bc323cd8b270b43b851ebfd3efa4fab4028c0f715f873a9d3cf04f7ed26c4a6"
+    },
+    "src/dag/loop.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/loop.ts",
+      "sha256": "9502def13966a5b9d03f7e47dc067b9a499dca5779f327f49082867373126ec9"
+    },
+    "src/dag/notices.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/notices.ts",
+      "sha256": "f29a122de365c46b82c618859c93dea71190ec614453f97f432ee3b19687b23a"
+    },
+    "src/dag/observe.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/observe.ts",
+      "sha256": "11daad8b65c2ab348d34dbe9b5a035c07cc2c90f4f9a373ac3fd88ae9c6d1a35"
+    },
+    "src/dag/promise.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/promise.ts",
+      "sha256": "a281bfa2c2ee4c664b5824665bbe7445f8b4ff51156290f36e738d0e39931c32"
+    },
+    "src/dag/register-rpc.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/register-rpc.ts",
+      "sha256": "df6d9831e25abe0ba3aea40a7580cac27621c31d562b4f528bbe4ab5e505d659"
+    },
+    "src/dag/rescue.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/rescue.ts",
+      "sha256": "41b1786bc356ed741527c85a29b5fc40d9c59053ea23764a6e7a169419003fad"
+    },
+    "src/dag/rpc.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/rpc.ts",
+      "sha256": "bf710225c095ed3662d80aa4fa985bb85e18e9c62f8e831c752776e22ff593d8"
+    },
+    "src/dag/runner.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/runner.ts",
+      "sha256": "445a9a36676e69d5bcd4ddce701d3256a147f25ea99b7e2ef634e948df589437"
+    },
+    "src/dag/store.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/store.ts",
+      "sha256": "5875958fad323c729f974d8b42e19d5879bd511cc9161eab9db2e2111ae84fce"
+    },
+    "src/dag/templates.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/templates.ts",
+      "sha256": "ed25fe8bbb85b6bbd133da8941bac40762322e9587acf12137563b7fd7665616"
+    },
+    "src/dag/tool.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/tool.ts",
+      "sha256": "b1444c7dfb3a2f7cc84d91501477ef2c396f948f7586dfee66c5bfb50546b710"
+    },
+    "src/dag/types.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/types.ts",
+      "sha256": "db28b8fd72fb0cfe9840f1f4f18a914eab370d1d0abf23c5798a3e6ed2338724"
+    },
+    "src/dag/worktree.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/dag/worktree.ts",
+      "sha256": "18f9a7bd128d504ba6a0ab922d7ed91b396cc98bfa9314fe0dcb73edacf3feb5"
+    },
+    "src/database.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/database.ts",
+      "sha256": "cdb8114e9270ad5bb51e35f6cc9813f37ae03796ca4ae48c5a5ced2c885de757"
+    },
+    "src/effect-bridge.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/effect-bridge.ts",
+      "sha256": "0b428fab3c6fedf4bfda57884e67c8b336a2f990b2853c0039bf763d62f5b490"
+    },
+    "src/gh/binary.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/gh/binary.ts",
+      "sha256": "f9e0890e458fd63878711077af241e675acfe57e83594fe99a7dc9c0669187ca"
+    },
+    "src/gh/tools.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/gh/tools.ts",
+      "sha256": "6cee21851bcececfe5ac0b96b8a0fd51dcf09ec25deb1ea70551f2932cb10af1"
+    },
+    "src/global-config.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/global-config.ts",
+      "sha256": "506a9415aac096a231b4c3f2b5f64e7e6f68c81299d9de5f4a8d09a9fb718b63"
+    },
+    "src/home.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/home.ts",
+      "sha256": "1bbf96b9e919cf71434978b9212234a40a771ec1a3c9b40f84eb7b2733838cdd"
+    },
+    "src/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/index.ts",
+      "sha256": "c200e410d11dc1d176976406a016114faabd1cf8fe83c9a60317bcf40a940108"
+    },
+    "src/markdown.d.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/markdown.d.ts",
+      "sha256": "a996623d9029c2e09371e5e9db4489ab585b2a70a2b2cd3d36156a1f4309a77c"
+    },
+    "src/mcp.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/mcp.ts",
+      "sha256": "81c56e596df6856cb0030953c409feb694d5b9486eccfc030c13a48316b08aff"
+    },
+    "src/models.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/models.ts",
+      "sha256": "42cbe6fa0cfbbdbf00ea66b1e318e01a5c81eeb4f13c92eecddec96491465c2a"
+    },
+    "src/omo/agents/builtin-agents/resolve-file-uri.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/builtin-agents/resolve-file-uri.ts",
+      "sha256": "2816e485f58cd6c1cc768a37557a22a8e243a5b865c94e7bd9c78bc8172441a8"
+    },
+    "src/omo/agents/dynamic-agent-category-skills-guide.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-category-skills-guide.ts",
+      "sha256": "29d2409727f1d324d5b1bb5bdb25f83987672d88723ac6cc17cfa565b1189692"
+    },
+    "src/omo/agents/dynamic-agent-core-sections.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-core-sections.ts",
+      "sha256": "83484acb3cf1d3a8e0d1a5b7c835aef8271febcfcec6d1979a8da4e4fe22fa93"
+    },
+    "src/omo/agents/dynamic-agent-policy-sections.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-policy-sections.ts",
+      "sha256": "65ea2dde70eb4e805f3097fbdc4361525fa25f2b5393cbc9ed37027b01ab28ba"
+    },
+    "src/omo/agents/dynamic-agent-prompt-builder.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-prompt-builder.ts",
+      "sha256": "9a221551d67a23cf9d2c0d31f10eba6da809b8877788ca51f58f0780c41de086"
+    },
+    "src/omo/agents/dynamic-agent-prompt-types.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-prompt-types.ts",
+      "sha256": "ad07980db42d06de36cd66466ccb2a3959cc47486dcfaaf14211c6efe167b090"
+    },
+    "src/omo/agents/dynamic-agent-tool-categorization.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/dynamic-agent-tool-categorization.ts",
+      "sha256": "b9e6d97587a889d27fb58a2660c8ccd3b1f05bfee43c87d71e6a033c5ed32b35"
+    },
+    "src/omo/agents/gpt-apply-patch-guard.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/gpt-apply-patch-guard.ts",
+      "sha256": "f936911e7ab6d34b0703964a38e347f522977a6915bc90f2fbc4f7b973c0887b"
+    },
+    "src/omo/agents/gpt-prompt-identity.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/gpt-prompt-identity.ts",
+      "sha256": "8ca6a81c3a97067d2440ddeed36431e8e8ee5c995587b38b1fdb7046a10f01c5"
+    },
+    "src/omo/agents/hephaestus/gpt-5-4.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/hephaestus/gpt-5-4.ts",
+      "sha256": "fc01891a68dcf4bfa55aa46cf1ddd470c711ade51935a952df495f3ae859d4cd"
+    },
+    "src/omo/agents/hephaestus/gpt-5-5.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/hephaestus/gpt-5-5.ts",
+      "sha256": "f3e57be0cf8aefc9e3712a5dec8a9960dee7f1ed4e008295036f12d7eac01d05"
+    },
+    "src/omo/agents/hephaestus/gpt-5-6.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/hephaestus/gpt-5-6.ts",
+      "sha256": "ae1651de7dcf7448b4af887cfeda154489b1733779bd5be253209392e5b53944"
+    },
+    "src/omo/agents/hephaestus/gpt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/hephaestus/gpt.ts",
+      "sha256": "0bd1580813c4686945ee80206156790719f1a4550ef58b71e6224496d7f63e11"
+    },
+    "src/omo/agents/hephaestus/prompt-router.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/hephaestus/prompt-router.ts",
+      "sha256": "254b65abd8a6a3429fbf805b4639a80b2620a03af69e29c17ca198481dc3e314"
+    },
+    "src/omo/agents/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/index.ts",
+      "sha256": "eaaa835ce32b01064fc4237ead775164dd8382a85ac2deffe72a881b8007d369"
+    },
+    "src/omo/agents/kimi-tool-loop-guard.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/kimi-tool-loop-guard.ts",
+      "sha256": "0f80c7032103709e6e398ae95a958148b9ead5b0e87e0bff89e69965db97dac1"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-builder.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-builder.ts",
+      "sha256": "0487f6e4ba0ce01ff96c255330439b3751aef9058c84463ef3cfed9544605eb1"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-execution.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-execution.ts",
+      "sha256": "e22da9dd9c2adc2199f3f802eed9b0ec3f5f9bfb431177c922ddea9ab97b8da8"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-exploration.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-exploration.ts",
+      "sha256": "93591b0653c489c7a930c632a4b0055f4388d281863f65f13e4e7d015e47d1b2"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-role.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-role.ts",
+      "sha256": "38e8b605b274ca0e65cd425ca2e981520c42ddb0ca95e08ce83a51353c5ea3e8"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-sections.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-sections.ts",
+      "sha256": "d4d1612d608365d1516937427cd96cd61d1cb3834789eec1e19ee7386bde6c4d"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt-style.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt-style.ts",
+      "sha256": "5fc529b140b7b52fc13539b1eeef0831a83fe4577129a09fc3338e043dd0dcbb"
+    },
+    "src/omo/agents/sisyphus-dynamic-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-dynamic-prompt.ts",
+      "sha256": "9a3da04c45180e7bcf6178d1fb521ba4301ba820e4f5ef530af8b6da2d98cc6e"
+    },
+    "src/omo/agents/sisyphus-gemini-fallback-overrides.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-gemini-fallback-overrides.ts",
+      "sha256": "02da036915b6083e3fe1620f0062cdda19a468b369775a209b7eefed4e665549"
+    },
+    "src/omo/agents/sisyphus-junior/default.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/default.ts",
+      "sha256": "0f5b7500150e7ccec22e255182b995f738c1dfe0c88e7b16958ba38f28854ac7"
+    },
+    "src/omo/agents/sisyphus-junior/gemini.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/gemini.ts",
+      "sha256": "f6c9c0076c25200af04192b17e29e1339c3896eb113f157cc984daf233e12333"
+    },
+    "src/omo/agents/sisyphus-junior/glm-5-2.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/glm-5-2.ts",
+      "sha256": "fc1968684be4b69f904a8a7f10edf48326fbf80b6519ea7c853f7b246a393fdf"
+    },
+    "src/omo/agents/sisyphus-junior/gpt-5-4.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/gpt-5-4.ts",
+      "sha256": "01c2d3ada2c31038cc3aeb718835d2d20e3920f49a4b6e7979c3fcbe467a2289"
+    },
+    "src/omo/agents/sisyphus-junior/gpt-5-5.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/gpt-5-5.ts",
+      "sha256": "c3b883aa140de6038018c6692f647265da9279a21b27d8fb31cfcc5afe8bfe35"
+    },
+    "src/omo/agents/sisyphus-junior/gpt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/gpt.ts",
+      "sha256": "abb42e868ec02e6f32c7bc24f3de498e3f92e4eff63455338d7304afc5307ea6"
+    },
+    "src/omo/agents/sisyphus-junior/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/index.ts",
+      "sha256": "ad6c64a21463c6943ce590ab5abf5cb8c20273de145a12447ddd90ae66c78b35"
+    },
+    "src/omo/agents/sisyphus-junior/kimi-k2-6.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/kimi-k2-6.ts",
+      "sha256": "45543c473593c8a0f0d2cc6727833b687e58aab0001df3ab03075ebe58652113"
+    },
+    "src/omo/agents/sisyphus-junior/kimi-k2-7.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/kimi-k2-7.ts",
+      "sha256": "5735a947e600c0ed9600b124f510a8ca8616bef896f034463a44b5ae76179865"
+    },
+    "src/omo/agents/sisyphus-junior/kimi-k3.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/kimi-k3.ts",
+      "sha256": "dcca7e432795521a0474c0be57f5fb48c72775f50954fdb16ddd073e8cf7b9c5"
+    },
+    "src/omo/agents/sisyphus-junior/prompt-router.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus-junior/prompt-router.ts",
+      "sha256": "c1873f55907f84aa675e9d8ba2db82fa307d812f94455c7278328c2d32694b57"
+    },
+    "src/omo/agents/sisyphus/claude-fable-5.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/claude-fable-5.ts",
+      "sha256": "3966945cb800f2adab36d9fdf430eeef21c566850834fb9ba827d9795a5c1228"
+    },
+    "src/omo/agents/sisyphus/claude-opus-4-7.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/claude-opus-4-7.ts",
+      "sha256": "77c51f10f73443be01153af1cee49d97bf74ae17982aa43d65ae663ee527f840"
+    },
+    "src/omo/agents/sisyphus/claude-opus-4-8.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/claude-opus-4-8.ts",
+      "sha256": "d7d01d45aef9ef5f655e79d882d474136866bcff5b481bfb86bd99a0217d59ff"
+    },
+    "src/omo/agents/sisyphus/claude-opus-5.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/claude-opus-5.ts",
+      "sha256": "732ff0df71f0f64d8b7a1f3fb9f959079978eff2a1037a3a028b5fab49bcbd5c"
+    },
+    "src/omo/agents/sisyphus/default.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/default.ts",
+      "sha256": "457a4036222e88e1a95c54aa6e4c6b27132a51a1689fc73180c42fd038e00fb0"
+    },
+    "src/omo/agents/sisyphus/gemini.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/gemini.ts",
+      "sha256": "379c340cb347c0a92c7ca3aa67271a6d979b28992ea368fb908a71f870a986b1"
+    },
+    "src/omo/agents/sisyphus/glm-5-2.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/glm-5-2.ts",
+      "sha256": "e3297aeeec85395f57168b289fc29cc7958390cd66c333031275760ede987bf7"
+    },
+    "src/omo/agents/sisyphus/gpt-5-4.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/gpt-5-4.ts",
+      "sha256": "9fbd81076730faff9d13b8815f5b8b119ed7e5d36a64bfc0cbb76587e17c558e"
+    },
+    "src/omo/agents/sisyphus/gpt-5-5.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/gpt-5-5.ts",
+      "sha256": "1a3c2f9ab2c423d615eb50977e0d9056b016c8c7cd5c863a779c3e089b66a966"
+    },
+    "src/omo/agents/sisyphus/gpt-task-system-guide.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/gpt-task-system-guide.ts",
+      "sha256": "4644137ffec7fa8601d88b5fbfdd9b41fa6dca3bbb4b84f50fa0f791d2948e5f"
+    },
+    "src/omo/agents/sisyphus/grok-4.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/grok-4.ts",
+      "sha256": "fb94ce98ca0d9d04c3840d3d9b5aec172a13e1e1544770bc82af01cffd2332e4"
+    },
+    "src/omo/agents/sisyphus/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/index.ts",
+      "sha256": "793952d8a0ad614d0677f46525bf39e6278b69100114bb383daf37b83ba4c87d"
+    },
+    "src/omo/agents/sisyphus/kimi-k2-6.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/kimi-k2-6.ts",
+      "sha256": "d268cb7bfb8f716cb4fbff7eb10ee6e754dbd594bbbd84e5e0ea4082e702e8bf"
+    },
+    "src/omo/agents/sisyphus/kimi-k2-7.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/kimi-k2-7.ts",
+      "sha256": "45586fcb80733827dca79dc787933855a0ab4639b65cc03e3da8c4989a32204b"
+    },
+    "src/omo/agents/sisyphus/kimi-k3.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/sisyphus/kimi-k3.ts",
+      "sha256": "64956832332bdb1163f69f19e718dbe274633661f60e27c479c650436e5c7f85"
+    },
+    "src/omo/agents/specialists/explore-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/explore-prompt.ts",
+      "sha256": "bf886123d5e6f8ce5f405227b99f85481d5440b22854c6a29dfc3902d0113db5"
+    },
+    "src/omo/agents/specialists/librarian-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/librarian-prompt.ts",
+      "sha256": "009b660c5708fa156030cb12a9c524e278684199c2c7d5393b6e312e67e9a7b1"
+    },
+    "src/omo/agents/specialists/metis-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/metis-prompt.ts",
+      "sha256": "31cd6c1cc17313c41f3db5aacce43353791297a9e9f5d26f823469dfe72cacf4"
+    },
+    "src/omo/agents/specialists/momus-gpt-5-6.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/momus-gpt-5-6.ts",
+      "sha256": "4a1c68ddbd92e19a20949fceb9ae87864dc395680d2349ff62de15d98440fc4b"
+    },
+    "src/omo/agents/specialists/momus-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/momus-prompt.ts",
+      "sha256": "37aab3cb59c2181fa4e3de354d314ae1ca39ba1713083572847110dfd2583393"
+    },
+    "src/omo/agents/specialists/multimodal-looker-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/multimodal-looker-prompt.ts",
+      "sha256": "f79237acf2ac36c917b258135db94c71854540b9a3305ca98012858f0892779e"
+    },
+    "src/omo/agents/specialists/oracle-prompt.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/specialists/oracle-prompt.ts",
+      "sha256": "94d67937ceb15a3a6f5c41d668fa393db9c0e9b646e18de303926264b2a52b7b"
+    },
+    "src/omo/agents/types.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/agents/types.ts",
+      "sha256": "2c11599d0f84ca7737793d255b4d24646d1faa204ca2847c0c8ce940a8ddf48b"
+    },
+    "src/omo/frontmatter.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/frontmatter.ts",
+      "sha256": "adcb289d4c6ad4eca3fef97a58fbf23f549b1e78951db71d69145b196f6ec710"
+    },
+    "src/omo/modes/prompts/atlas/default.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/default.md",
+      "sha256": "34091b2464e616f84706784a168769f8245615cc0f87dfbb2c02d2c1c992eac1"
+    },
+    "src/omo/modes/prompts/atlas/gemini.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/gemini.md",
+      "sha256": "cb2b1574d929ee4dfd0a7c90951fdd41098ef16d6d659503df9d5bc871e1d6e1"
+    },
+    "src/omo/modes/prompts/atlas/glm.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/glm.md",
+      "sha256": "1c6e1e3def3a8f12756f252a99daeb31584b00027f3390b2dc70857ee4c15ed3"
+    },
+    "src/omo/modes/prompts/atlas/gpt.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/gpt.md",
+      "sha256": "f1f3870cd054c75e9a10d139f12f0bc8d67151b8d68c3352b429d77588da56e2"
+    },
+    "src/omo/modes/prompts/atlas/kimi-k2-7.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/kimi-k2-7.md",
+      "sha256": "211f23c73269e1f3e62027c8f39558b31a62af134aa9e823c5d7de2ef04f67ff"
+    },
+    "src/omo/modes/prompts/atlas/kimi-k3.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/kimi-k3.md",
+      "sha256": "99d06e0775f352c72bae1a1dce8ff76b91478cd803d8a2f716ebea7460f1c36d"
+    },
+    "src/omo/modes/prompts/atlas/kimi.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/kimi.md",
+      "sha256": "1e6250bd3a2062e2485aab3cff4f753d0f5e9187544cd438533defab2bcee262"
+    },
+    "src/omo/modes/prompts/atlas/opus-4-7.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/atlas/opus-4-7.md",
+      "sha256": "22c4cb0f76f22bb18a9383b7b17d091a5418d6f5c5365a7bf369f02db027cd34"
+    },
+    "src/omo/modes/prompts/mode/hyperplan.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/mode/hyperplan.md",
+      "sha256": "2700405641cf91557bb04eafa8d98771510aafa2a51aeb090ffd540699075ab5"
+    },
+    "src/omo/modes/prompts/mode/team.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/mode/team.md",
+      "sha256": "5e7ab9391fcd43ebf9471de3de7babff6af228f17bbffa47685f47877f380a87"
+    },
+    "src/omo/modes/prompts/prometheus/default.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/prometheus/default.md",
+      "sha256": "d06f3cf42f60889d8244c3462e2a004761f20c30db99a4663b467e7f92478d0e"
+    },
+    "src/omo/modes/prompts/ultrawork/codex.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/codex.md",
+      "sha256": "2cb4230bf0414eaaaf65ceb2d30851539c5a60281ea69528f8dc5ab983062b15"
+    },
+    "src/omo/modes/prompts/ultrawork/default.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/default.md",
+      "sha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6"
+    },
+    "src/omo/modes/prompts/ultrawork/gemini.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/gemini.md",
+      "sha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44"
+    },
+    "src/omo/modes/prompts/ultrawork/glm.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/glm.md",
+      "sha256": "31ee2a75dee454265e00ed2018c7485073412bd64b87547e4a724b28acb159dd"
+    },
+    "src/omo/modes/prompts/ultrawork/gpt.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/gpt.md",
+      "sha256": "92de9eee04043babec5c58fb913e5fdef4ff5425b05f6c9c79cfd5292adf03f3"
+    },
+    "src/omo/modes/prompts/ultrawork/planner.md": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/prompts/ultrawork/planner.md",
+      "sha256": "a083b8374753e3b0bd9b19702ffaa6d60c6541f7884fd574cf11ba538f9e51f9"
+    },
+    "src/omo/modes/src/atlas-prompts.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/atlas-prompts.ts",
+      "sha256": "e764da28662f3d859b88f9e3cedb8eabefefae45bf4e2d3b9b29c31573febdf7"
+    },
+    "src/omo/modes/src/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/index.ts",
+      "sha256": "5194d81aae5d5850a01900efb7fb42b60d53965bff2e813686a0eeadc5930717"
+    },
+    "src/omo/modes/src/loader.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/loader.ts",
+      "sha256": "28dfd56e06e381aa273f8c673449d3d0664a074f2c5accaa77804257c397966f"
+    },
+    "src/omo/modes/src/mode-prompts.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/mode-prompts.ts",
+      "sha256": "8cd95cc798798d235f01a115f843ca35278c1d627e1fdc988cfcd9216b4ae78e"
+    },
+    "src/omo/modes/src/prometheus-prompts.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/prometheus-prompts.ts",
+      "sha256": "5d1869a0b38e4d7c0ad330ea7d72c422708efbf9f254628bfd47a2bbab5deeb9"
+    },
+    "src/omo/modes/src/types.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/types.ts",
+      "sha256": "86f34dbab09fd7fba42a5b01625db61664edaec0fb4efdcacc908bcf279ac6a1"
+    },
+    "src/omo/modes/src/ultrawork-prompts.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/ultrawork-prompts.ts",
+      "sha256": "5298322e012ffcf0c7a8399d3dd6ba974021766c7f412a1c264e61c9f432b731"
+    },
+    "src/omo/modes/src/variant-resolver.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/omo/modes/src/variant-resolver.ts",
+      "sha256": "818c5b1b92b7e404fed1f7e2b837d453fc3da80185c72b8918f97de406f7fe5d"
+    },
+    "src/options.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/options.ts",
+      "sha256": "54aaaa4b0c1b3c02881a6cebc43392f6768bd1489442b5dc6e9942bfa105bf2b"
+    },
+    "src/plugin.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/plugin.ts",
+      "sha256": "1698c7c9419de91093e80c1579540ce88fe78e6b69bec4fe66b7537d443646f6"
+    },
+    "src/prompts/catalog.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/catalog.ts",
+      "sha256": "78bf92748e628e4b7aed8d5354016e612d1c8e6cee811739fd149bc91b6b71c0"
+    },
+    "src/prompts/index.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/index.ts",
+      "sha256": "2a11d591dbda6a38a97c3c5d63b7b9ec06e189401ba15c7d8afbc574dae06714"
+    },
+    "src/prompts/mode-dag.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/mode-dag.ts",
+      "sha256": "eb84eea6c79d71487ceb1620a925cbc2fa09bf5ed354825260c3a3731f5b100d"
+    },
+    "src/prompts/native-bindings.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/native-bindings.ts",
+      "sha256": "fae0375f076e54cbe06d6d7c5481720b04da916d47f87b36d7798beed85a164c"
+    },
+    "src/prompts/render.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/render.ts",
+      "sha256": "9d3278a4cce2c973ba4a46816ebc20493b293b81e326b5340b3ddcddcd359ac8"
+    },
+    "src/prompts/sisyphus-route.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/prompts/sisyphus-route.ts",
+      "sha256": "b9354087ffc1daa129a857166f71ed79d70942a5a8ec4c509d7e2742dd0d2740"
+    },
+    "src/registration.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/registration.ts",
+      "sha256": "bd535c37294e5562746f36f8b2c62676374aefee018f72cd78b2255505b0df72"
+    },
+    "src/roles/command.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/command.ts",
+      "sha256": "d8565022665fb2379d76542b6d76574dd503de4c7125f4ed563d867a075bfeb9"
+    },
+    "src/roles/contract.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/contract.ts",
+      "sha256": "cdc398146146c158c2799456710c65e3649cbd580a2efc3de9fa3efbcc991b5c"
+    },
+    "src/roles/goal.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/goal.ts",
+      "sha256": "b2bc0b1e9dbe1a094c1e98a3fcf38552a97ba525932b2b244cd544191a5d7cf8"
+    },
+    "src/roles/guard.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/guard.ts",
+      "sha256": "cf78b978fc24b9acf3907b54ecde484ee76edf9568252042b988944b6d2d6def"
+    },
+    "src/roles/plan.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/plan.ts",
+      "sha256": "2af8c06b0ef221559354153f37eb9bc52f37b650f37a2f4f8e8fbb462b02ce07"
+    },
+    "src/roles/register.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/register.ts",
+      "sha256": "9122dfd71afd5935e3e17fb57a56c49eaf2e2bfa4d16cc91050810dabe64b67f"
+    },
+    "src/roles/startwork.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/startwork.ts",
+      "sha256": "af607db0df9f9d96eed4ac922591029fdbee5b5a179a5db672b8ac19f6e7bb84"
+    },
+    "src/roles/steering.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/steering.ts",
+      "sha256": "63ecf2d0f2e09939ac275322a29cb866085bec666eaadaaec4e94207d490dee5"
+    },
+    "src/roles/tier.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/roles/tier.ts",
+      "sha256": "ee636185c138c8903341c52b4cb1a257d11f42185851185b6e44d1291c27188b"
+    },
+    "src/trace.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/trace.ts",
+      "sha256": "353b5d3b86a32a59b8b9b166dd3b09005eeb92a552757786657eafda62591403"
+    },
+    "src/tui.tsx": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui.tsx",
+      "sha256": "fae8d08177d034cf1e328335b782f6e61bc2d59d1ddb04b6c2e1a67a3aebb61a"
+    },
+    "src/tui/data.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/data.ts",
+      "sha256": "9db15517b63d18b68060582909d264465d281610f19cc1ff9b22287e14734313"
+    },
+    "src/tui/dialog.tsx": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/dialog.tsx",
+      "sha256": "bb9528ce0dc1c97987ee977555077c1aa03bb90a9222281d5437235577fc4b39"
+    },
+    "src/tui/hooks.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/hooks.ts",
+      "sha256": "7bbcf9beedb0cf004f7c7c1495932c8b0c3567121edf528c8fafe1ecc590a703"
+    },
+    "src/tui/layout.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/layout.ts",
+      "sha256": "fa8c61d6bb49bccfb045645f34fd9b67f313d00568c7fe971901fa58be06bbb6"
+    },
+    "src/tui/presence.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/presence.ts",
+      "sha256": "c0d8bd15fcaecae8902b2e21757ad01b62e9d3d5cc7b684ee7a467209eb311e1"
+    },
+    "src/tui/view.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/tui/view.ts",
+      "sha256": "7116972272bd68ca39264a03ad1c476d7c76e52b8579e7baf8346e45bb6c7c43"
+    },
+    "src/verify/config.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/verify/config.ts",
+      "sha256": "e15ede846ff584ceb66c8bc8eda4f579ea8d2382c016c097f781934e50afc9a3"
+    },
+    "src/verify/hook.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/verify/hook.ts",
+      "sha256": "16f44fff51fa77bf33b7748ecfc869ceaaa5e74456f6feaa436a3c9628532849"
+    },
+    "src/verify/run.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/src/verify/run.ts",
+      "sha256": "7ebb8ea700d1279e449fab2811a02deb48b7a10d9ba0f12184ce120c17e471bf"
+    },
+    "tests/ast-grep.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/ast-grep.test.ts",
+      "sha256": "76f0e3a31b76a4e647bd4fbe7da7193a337a5e25a0ff77ae2aff53312b9a9caa"
+    },
+    "tests/borrows.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/borrows.test.ts",
+      "sha256": "95fe1ffc67561b609c982c7fd8f96c68158977aed662614b967d91e234e85985"
+    },
+    "tests/dag-steering.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/dag-steering.test.ts",
+      "sha256": "c3bd6395f3d7f288827d19f2e061cb6a5fa9eeac99611d1a450d5bac6575fba9"
+    },
+    "tests/dag-templates.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/dag-templates.test.ts",
+      "sha256": "9809d38d2b9d7c5dbdda5380502db347515bbba2cdf28030921a6ab44c038a2f"
+    },
+    "tests/dag-view.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/dag-view.test.ts",
+      "sha256": "cca6010ee102ab6dec77e55b71c76a1b46d3bcc2973b0635d7b8857a0e7a82ee"
+    },
+    "tests/dag.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/dag.test.ts",
+      "sha256": "4d722da7fbe740313b3793fe9241c039d74bd069a94fab20eb18002c98ef5d8f"
+    },
+    "tests/gh.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/gh.test.ts",
+      "sha256": "7df696099fb604b63c48ae9031ac9fbcd734afe339cf1b378c5bf0d194a1af0b"
+    },
+    "tests/home.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/home.test.ts",
+      "sha256": "fcf04e20d7199994ab578c4a61440c5e36278f08c1515f5a973fdee5843bbebf"
+    },
+    "tests/mcp.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/mcp.test.ts",
+      "sha256": "76f06413f807c7aa623f114d9717144d9f23e6cd1f09f4969cfd328045f47437"
+    },
+    "tests/models.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/models.test.ts",
+      "sha256": "5505be12fb76817d6a63f9328c8468aee93ad9530d68188e90d1c2fdc46895c5"
+    },
+    "tests/no-omo-paths.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/no-omo-paths.test.ts",
+      "sha256": "480e01ae89b459f8c51ff00b73cb58250334c593316472b11dbda6776d5bbc46"
+    },
+    "tests/owner-rescue-runner.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/owner-rescue-runner.test.ts",
+      "sha256": "f75861998ddd7c779a919a6f657a3f30870e0c9674fb31b49166ec8a4dc8b5dc"
+    },
+    "tests/owner-rescue.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/owner-rescue.test.ts",
+      "sha256": "cda68149d509cfab0366abefab9d48241091d16b8ae6430b5570d1283ff6551e"
+    },
+    "tests/preload.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/preload.ts",
+      "sha256": "47f72be1462fa62b6f8e90008ca2f39ce954c056c76c6a8be00ccc48d191155c"
+    },
+    "tests/registration.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/registration.test.ts",
+      "sha256": "953744baecb5117f446d2dffa64926963254f7a7e25c5bdb462d4be9e8bb953c"
+    },
+    "tests/roles.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/roles.test.ts",
+      "sha256": "4bb5730b89db02a4a138276846ed758842c23a21f6dc387b3fedcdefc326554e"
+    },
+    "tests/routing.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/routing.test.ts",
+      "sha256": "460f4f76a766ede531823d7359af5e1055d5360e0dfe859714727577cd08cda7"
+    },
+    "tests/tier.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/tier.test.ts",
+      "sha256": "435f3f09644d9274323883364bd7bd9ab33360b67145f1a3e17d3c7072f93400"
+    },
+    "tests/tui-data.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/tui-data.test.ts",
+      "sha256": "308cdd2afd96b2f6933f1b965833fbfc2d0d3d9b54c92d9dc46a6cbc54126e3c"
+    },
+    "tests/tui-layout.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/tui-layout.test.ts",
+      "sha256": "936a507eb59c7cf82e9061783376a45eef43abda52f23a497636eecf7ee12d4b"
+    },
+    "tests/tui-presence.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/tui-presence.test.ts",
+      "sha256": "d37d955d8dafe9ae1232ab9f46d09dae7d27b792d1b10f5ad7bccc4e4ede5aa7"
+    },
+    "tests/tui-view.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/tui-view.test.ts",
+      "sha256": "dfc416642a749d301b1fe4d50cd0fb20d1916a523f13775edbc5797ad577bda7"
+    },
+    "tests/verify.test.ts": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tests/verify.test.ts",
+      "sha256": "342a4b5feb04e6109573eb3abd6ef0b55ddc366a19615aed56d36c066be47171"
+    },
+    "tsconfig.json": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/tsconfig.json",
+      "sha256": "151c556633fa2a844e46d9e7a480396b3c67cfae5db3d56e2c838997c18b8e01"
+    }
+  },
+  "build": {
+    "dist/index.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/index.js",
+      "sha256": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010"
+    },
+    "dist/prompts.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/prompts.js",
+      "sha256": "eebac521bfaddedb9f3ee2e78e911f9ab046d575ca13ccd1cd686066b15625a0"
+    },
+    "dist/tui.js": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/dist/tui.js",
+      "sha256": "a69e4c56a6efeb6dc50a294d77428f5d174323b2e790487b5f112911050996e1"
+    }
+  },
+  "fixture": {
+    "source": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+    "realpath": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+    "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+    "patchSha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0",
+    "lockSha256": "97b04a1407c4cf48ad4e3fc7c0c85932188e4d0e97ca8005309420062887f60f",
+    "launcher": {
+      "realpath": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+      "sha256": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b"
+    },
+    "status": "M packages/core/src/plugin/host.ts\n M packages/core/test/plugin/host.ts\n M packages/plugin/src/effect/session.ts\n M packages/plugin/src/promise/adapter.ts\n M packages/plugin/src/promise/session.ts\n?? packages/core/test/plugin/session-inbox.test.ts"
+  },
+  "sandboxes": [],
+  "processes": []
+}

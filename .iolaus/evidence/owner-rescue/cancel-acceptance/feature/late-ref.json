@@ -1,0 +1,215 @@
+{
+  "run": {
+    "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "oldref",
+    "definition": {
+      "name": "oldref",
+      "nodes": [
+        {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "oldref",
+          "maxAttempts": 1,
+          "model": "openai/A",
+          "prompt": "QA_CASE:oldref"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "0b2ee272cb3c97c73fe31bb1497ee369ee218edd7e3f72d8385b28946429be2c",
+    "generation": 1,
+    "status": "cancelled",
+    "createdAt": 1791963970638,
+    "updatedAt": 1791963970836,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "oldref",
+          "maxAttempts": 1,
+          "model": "rescue/owner#actual",
+          "prompt": "QA_CASE:oldref"
+        },
+        "fingerprint": "d9280dd5406ff90a35d2ef085a7e801e849bef255ccf9979ff46eb995081bfa3",
+        "status": "cancelled",
+        "attempt": 2,
+        "runtime": {
+          "identity": {
+            "agent": "quick",
+            "model": "rescue/owner#actual",
+            "token": "580aeb10-fb9a-450b-8bf7-5b740e46db30"
+          },
+          "initial": "pending",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "blocked": "cancelled_continuation",
+          "failedModels": [
+            "openai/A"
+          ],
+          "handoff": {
+            "checkpoints": [
+              {
+                "contextHash": "76ca50f04aa3de29e2466464d4b4e17f32c2b3a168569d43dc91afa37752833d",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 1,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/A",
+                    "token": "d06c0dea-5b68-4e93-bf2d-9ba626e5019c"
+                  },
+                  "nodeID": "oldref",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "QA_CASE:oldref"
+                  },
+                  "sessionID": "ses_ec69fc3a5ffe9rH67kR3PZWWtx"
+                }
+              }
+            ],
+            "task": "QA_CASE:oldref",
+            "tools": 0
+          },
+          "historyKnown": true,
+          "initialRoleAllowed": true,
+          "rescue": {
+            "decidedAt": 1791963970748,
+            "decisionID": "5159f7ae-e82a-4b8d-ac49-38399800dd83",
+            "from": {
+              "attempt": 1,
+              "identity": {
+                "agent": "quick",
+                "model": "openai/A",
+                "token": "d06c0dea-5b68-4e93-bf2d-9ba626e5019c"
+              },
+              "nodeID": "oldref",
+              "origin": {
+                "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                },
+                "permissions": [],
+                "prompt": "QA_CASE:oldref"
+              },
+              "sessionID": "ses_ec69fc3a5ffe9rH67kR3PZWWtx"
+            },
+            "launchToken": "580aeb10-fb9a-450b-8bf7-5b740e46db30",
+            "pinnedModel": "rescue/owner#actual",
+            "preRescueDefinition": {
+              "agent": "quick",
+              "dependsOn": [],
+              "id": "oldref",
+              "maxAttempts": 1,
+              "model": "openai/A",
+              "prompt": "QA_CASE:oldref"
+            },
+            "state": "settled"
+          }
+        },
+        "error": "Iolaus DAG child session failed",
+        "createdAt": 1791963970638,
+        "updatedAt": 1791963970836
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "ea7884e2-4b7d-4a4a-a5df-94ff16b31178",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963970638
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ae1996e9-b6bf-42d2-8722-04c9fc40b099",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963970638,
+      "nodeID": "oldref"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "3ff64b01-e1a8-49c4-8641-15d08d6ec97e",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963970666,
+      "nodeID": "oldref"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "2c8dcd72-86af-4e63-abfa-6ca4b346171a",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 4,
+      "type": "node.rescued",
+      "generation": 1,
+      "createdAt": 1791963970748,
+      "nodeID": "oldref",
+      "payload": {
+        "decisionID": "5159f7ae-e82a-4b8d-ac49-38399800dd83",
+        "from": "openai/A",
+        "to": "rescue/owner#actual"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "578b875e-d9e8-47ca-88e2-71246bef53e9",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 5,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963970749,
+      "nodeID": "oldref"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "d64ad70a-06f5-4a64-aaea-21a7b1ce538d",
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "sequence": 6,
+      "type": "run.cancelled",
+      "generation": 1,
+      "createdAt": 1791963970836
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "2c8dcd72-86af-4e63-abfa-6ca4b346171a",
+      "messageID": "msg_2c8dcd7286af4e63abfa6ca4b346171a",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_2c8dcd7286af4e63abfa6ca4b346171a"
+      },
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "state": "admitted",
+      "text": "Iolaus Flow notice 2c8dcd72-86af-4e63-abfa-6ca4b346171a: \"oldref\" (3a6945cb-d3c5-4373-95a9-35e9ed6ac18e) reserved its one owner-model rescue for oldref: {\"decisionID\":\"5159f7ae-e82a-4b8d-ac49-38399800dd83\",\"from\":\"openai/A\",\"to\":\"rescue/owner#actual\"}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    },
+    {
+      "eventID": "d64ad70a-06f5-4a64-aaea-21a7b1ce538d",
+      "messageID": "msg_d64ad70a06f54a64aaea21a7b1ce538d",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_d64ad70a06f54a64aaea21a7b1ce538d"
+      },
+      "runID": "3a6945cb-d3c5-4373-95a9-35e9ed6ac18e",
+      "state": "admitted",
+      "text": "Iolaus Flow notice d64ad70a-06f5-4a64-aaea-21a7b1ce538d: \"oldref\" (3a6945cb-d3c5-4373-95a9-35e9ed6ac18e) cancelled. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

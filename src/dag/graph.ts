@@ -14,6 +14,7 @@ export function isJudge(node: DagNodeDefinition): boolean {
 }
 
 export function validateDefinition(definition: DagDefinition): void {
+  if ("rescue" in definition || "ownerModel" in definition) throw new DagValidationError("Owner-model rescue is a global option, not a flow option")
   if (definition.schemaVersion !== 1) throw new DagValidationError("Unsupported DAG schema version")
   if (!definition.name.trim()) throw new DagValidationError("DAG name must be nonempty")
   if (definition.nodes.length === 0) throw new DagValidationError("DAG must contain at least one node")
@@ -24,6 +25,7 @@ export function validateDefinition(definition: DagDefinition): void {
     throw new DagValidationError("DAG directory must be an absolute path")
   const nodes = new Map<string, DagNodeDefinition>()
   for (const node of definition.nodes) {
+    if ("rescue" in node || "ownerModel" in node) throw new DagValidationError("Owner-model rescue is a global option, not a node option")
     if (!node.id.trim()) throw new DagValidationError("DAG node id must be nonempty")
     if (node.title !== undefined && typeof node.title !== "string") throw new DagValidationError(`DAG node title must be a string: ${node.id}`)
     if (nodes.has(node.id)) throw new DagValidationError(`Duplicate DAG node: ${node.id}`)

@@ -1,0 +1,219 @@
+{
+  "run": {
+    "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "judge",
+    "definition": {
+      "name": "judge",
+      "nodes": [
+        {
+          "agent": "momus",
+          "dependsOn": [],
+          "fallbackModels": [
+            "openai/B",
+            "openai/C"
+          ],
+          "id": "work",
+          "kind": "judge",
+          "maxAttempts": 5,
+          "model": "openai/A",
+          "prompt": "QA_CASE:judge"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "c307dd8263a1446b240bc69df4e0106c516b63649ec5d98b4e278d978674569c",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963956841,
+    "updatedAt": 1791963956898,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "momus",
+          "dependsOn": [],
+          "id": "work",
+          "kind": "judge",
+          "maxAttempts": 5,
+          "model": "openai/C",
+          "prompt": "QA_CASE:judge"
+        },
+        "fingerprint": "98a959bebad59d02d3a523cad5d42671925fb3630af72c515dae783f538c2327",
+        "status": "failed",
+        "attempt": 5,
+        "runtime": {
+          "identity": {
+            "agent": "momus",
+            "model": "openai/C",
+            "token": "c96e335c-001d-497f-bc3e-ab5f717b7494"
+          },
+          "initial": "pending",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "QA deterministic terminal provider failure",
+        "createdAt": 1791963956841,
+        "updatedAt": 1791963956897
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "23c81b99-e5b2-4a21-b928-02806c26a7f1",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963956841
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "88809206-1788-498b-a698-ea7506c35fde",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956841,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "49c3a0d5-53ee-40b2-bb10-1714d161bbe8",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 3,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963956864,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/A",
+        "message": "QA deterministic terminal provider failure",
+        "to": "openai/B"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "d372b0d2-d307-40d5-8b54-9feaf5623a7a",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 4,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956864,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "bb356ce9-4ea3-4783-83dc-094bb60c25f5",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 5,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963956872,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/B",
+        "message": "QA deterministic terminal provider failure",
+        "to": "openai/C"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "a82083c6-683a-4cdb-949f-f2b3e6c50871",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 6,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956872,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "2906fdd9-0732-4cfc-834b-c5f77fa3447b",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 7,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956886,
+      "nodeID": "work",
+      "payload": {
+        "message": "QA deterministic terminal provider failure",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "50bf796b-0aaa-44a0-850b-5bc28ed16e5c",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 8,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956887,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "96acb1a9-500d-4b5f-9683-97b51e52f8ef",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 9,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956893,
+      "nodeID": "work",
+      "payload": {
+        "message": "QA deterministic terminal provider failure",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "81b4d8eb-bff9-46e0-a5c8-409649718d13",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 10,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956893,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b3b4893c-adcc-42b5-9acb-86b3ceac2d69",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 11,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956897,
+      "nodeID": "work",
+      "payload": {
+        "message": "QA deterministic terminal provider failure",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b4f8947d-1734-4164-8d36-36f8392741be",
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "sequence": 12,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963956898
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "b4f8947d-1734-4164-8d36-36f8392741be",
+      "messageID": "msg_b4f8947d173441648d3636f8392741be",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_b4f8947d173441648d3636f8392741be"
+      },
+      "runID": "c9261c94-47e0-46a1-a474-e8362be9d1dc",
+      "state": "admitted",
+      "text": "Iolaus Flow notice b4f8947d-1734-4164-8d36-36f8392741be: \"judge\" (c9261c94-47e0-46a1-a474-e8362be9d1dc) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

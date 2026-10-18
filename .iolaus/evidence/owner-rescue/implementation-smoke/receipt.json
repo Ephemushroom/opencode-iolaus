@@ -1,0 +1,562 @@
+{
+  "verdict": "PASS",
+  "success": {
+    "run": {
+      "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+      "ownerSessionID": "ses_ecb43077fffemZHr2tCQv89bmt",
+      "name": "QA_RESCUE_CHILD",
+      "definition": {
+        "name": "QA_RESCUE_CHILD",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "model": "openai/gpt-5.4",
+            "prompt": "QA_RESCUE_CHILD"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "82b021055bee3d4d783e8c7ec35a86edc6bbd439afda64abd67f3252785e2f32",
+      "generation": 1,
+      "status": "completed",
+      "createdAt": 1791886162310,
+      "updatedAt": 1791886162710,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "model": "openai/gpt-5.5",
+            "prompt": "QA_RESCUE_CHILD"
+          },
+          "fingerprint": "d4e003ff6f05ebb284b5341d03340813b8f2737f516f8e383b512a876dffe99b",
+          "status": "completed",
+          "attempt": 2,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/gpt-5.5",
+              "token": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "failedModels": [
+              "openai/gpt-5.4"
+            ],
+            "handoff": {
+              "checkpoints": [
+                {
+                  "contextHash": "24376ccce95995dce7af1cc1626282c4c6a019946a6e3d128c6da9d1e2f27aa7",
+                  "outcome": "failed",
+                  "parts": [],
+                  "source": {
+                    "attempt": 1,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/gpt-5.4",
+                      "token": "63600043-a45c-41aa-9c50-48c813ed828a"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                      "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                      },
+                      "permissions": [],
+                      "prompt": "QA_RESCUE_CHILD"
+                    },
+                    "sessionID": "ses_ecb430669ffeRA1IZ39k6umI1u"
+                  }
+                },
+                {
+                  "contextHash": "0c3473ecc840d3698609b437b648dea3795ce5ffd5bd76fab35bf7b5d46d05f4",
+                  "outcome": "succeeded",
+                  "parts": [
+                    {
+                      "text": "QA_RESCUED_RESULT",
+                      "type": "assistant"
+                    }
+                  ],
+                  "source": {
+                    "attempt": 2,
+                    "identity": {
+                      "agent": "quick",
+                      "model": "openai/gpt-5.5",
+                      "token": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d"
+                    },
+                    "nodeID": "work",
+                    "origin": {
+                      "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                      "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                      "location": {
+                        "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                      },
+                      "permissions": [],
+                      "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_RESCUE_CHILD\",\"checkpoints\":[{\"sessionID\":\"ses_ecb430669ffeRA1IZ39k6umI1u\",\"token\":\"63600043-a45c-41aa-9c50-48c813ed828a\",\"parts\":[]}]}"
+                    },
+                    "sessionID": "ses_ecb430592ffe32nQf2Pls55qbY"
+                  }
+                }
+              ],
+              "task": "QA_RESCUE_CHILD",
+              "tools": 0
+            },
+            "historyKnown": true,
+            "rescue": {
+              "decidedAt": 1791886162508,
+              "decisionID": "e3c7e789-b5b8-4919-b1a8-58fff8bc160b",
+              "execution": {
+                "attempt": 2,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/gpt-5.5",
+                  "token": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d"
+                },
+                "nodeID": "work",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                  "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                  },
+                  "permissions": [],
+                  "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_RESCUE_CHILD\",\"checkpoints\":[{\"sessionID\":\"ses_ecb430669ffeRA1IZ39k6umI1u\",\"token\":\"63600043-a45c-41aa-9c50-48c813ed828a\",\"parts\":[]}]}"
+                },
+                "sessionID": "ses_ecb430592ffe32nQf2Pls55qbY"
+              },
+              "from": {
+                "attempt": 1,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/gpt-5.4",
+                  "token": "63600043-a45c-41aa-9c50-48c813ed828a"
+                },
+                "nodeID": "work",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                  "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                  },
+                  "permissions": [],
+                  "prompt": "QA_RESCUE_CHILD"
+                },
+                "sessionID": "ses_ecb430669ffeRA1IZ39k6umI1u"
+              },
+              "launchToken": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d",
+              "pinnedModel": "openai/gpt-5.5",
+              "preRescueDefinition": {
+                "agent": "quick",
+                "dependsOn": [],
+                "id": "work",
+                "model": "openai/gpt-5.4",
+                "prompt": "QA_RESCUE_CHILD"
+              },
+              "state": "settled"
+            }
+          },
+          "result": {
+            "attempt": 2,
+            "createdAt": 1791886162709,
+            "generation": 1,
+            "inputRevision": 0,
+            "nodeID": "work",
+            "payload": {
+              "text": "QA_RESCUED_RESULT"
+            },
+            "provenance": {
+              "agent": "quick",
+              "execution": {
+                "attempt": 2,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/gpt-5.5",
+                  "token": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d"
+                },
+                "nodeID": "work",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                  "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                  },
+                  "permissions": [],
+                  "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_RESCUE_CHILD\",\"checkpoints\":[{\"sessionID\":\"ses_ecb430669ffeRA1IZ39k6umI1u\",\"token\":\"63600043-a45c-41aa-9c50-48c813ed828a\",\"parts\":[]}]}"
+                },
+                "sessionID": "ses_ecb430592ffe32nQf2Pls55qbY"
+              },
+              "model": "openai/gpt-5.5",
+              "parentNodeIDs": [],
+              "rescue": {
+                "decisionID": "e3c7e789-b5b8-4919-b1a8-58fff8bc160b",
+                "from": {
+                  "attempt": 1,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/gpt-5.4",
+                    "token": "63600043-a45c-41aa-9c50-48c813ed828a"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+                    "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+                    },
+                    "permissions": [],
+                    "prompt": "QA_RESCUE_CHILD"
+                  },
+                  "sessionID": "ses_ecb430669ffeRA1IZ39k6umI1u"
+                },
+                "model": "openai/gpt-5.5"
+              }
+            },
+            "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+            "schemaVersion": 1,
+            "status": "completed"
+          },
+          "execution": {
+            "attempt": 2,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/gpt-5.5",
+              "token": "7241b091-4a4f-489a-8eb5-1f6f7c005f1d"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+              "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+              },
+              "permissions": [],
+              "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_RESCUE_CHILD\",\"checkpoints\":[{\"sessionID\":\"ses_ecb430669ffeRA1IZ39k6umI1u\",\"token\":\"63600043-a45c-41aa-9c50-48c813ed828a\",\"parts\":[]}]}"
+            },
+            "sessionID": "ses_ecb430592ffe32nQf2Pls55qbY"
+          },
+          "createdAt": 1791886162310,
+          "updatedAt": 1791886162710
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "397ebccb-367e-4b2a-ae1c-255ce9bf0360",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791886162310
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "1309ea95-3abb-43d3-b777-6361c054fcf1",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791886162312,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "c59513c2-e885-4e9c-b96d-b56ab0329a76",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791886162403,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "e89dcbe0-67e3-4afb-9f54-23c64ef878b5",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 4,
+        "type": "node.rescued",
+        "generation": 1,
+        "createdAt": 1791886162508,
+        "nodeID": "work",
+        "payload": {
+          "decisionID": "e3c7e789-b5b8-4919-b1a8-58fff8bc160b",
+          "from": "openai/gpt-5.4",
+          "to": "openai/gpt-5.5"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "31a8d765-d9f2-41b1-99e6-0101631a6249",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 5,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791886162511,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "6fc988ec-4c25-4525-9abd-28b17c990c7c",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 6,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791886162554,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "0acc7091-e5d3-4d5f-82d1-8692f881bcea",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 7,
+        "type": "node.completed",
+        "generation": 1,
+        "createdAt": 1791886162710,
+        "nodeID": "work",
+        "payload": {
+          "text": "QA_RESCUED_RESULT"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7ef3ca51-cdc3-4666-bad8-0a80157b47b5",
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "sequence": 8,
+        "type": "run.completed",
+        "generation": 1,
+        "createdAt": 1791886162710
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "e89dcbe0-67e3-4afb-9f54-23c64ef878b5",
+        "messageID": "msg_e89dcbe067e34afb9f5423c64ef878b5",
+        "ownerSessionID": "ses_ecb43077fffemZHr2tCQv89bmt",
+        "receipt": {
+          "messageID": "msg_e89dcbe067e34afb9f5423c64ef878b5"
+        },
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "state": "admitted",
+        "text": "Iolaus Flow notice e89dcbe0-67e3-4afb-9f54-23c64ef878b5: \"QA_RESCUE_CHILD\" (4921c8c3-0458-4a37-ad94-bbbcf481e173) reserved its one owner-model rescue for work: {\"decisionID\":\"e3c7e789-b5b8-4919-b1a8-58fff8bc160b\",\"from\":\"openai/gpt-5.4\",\"to\":\"openai/gpt-5.5\"}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      },
+      {
+        "eventID": "7ef3ca51-cdc3-4666-bad8-0a80157b47b5",
+        "messageID": "msg_7ef3ca51cdc34666bad80a80157b47b5",
+        "ownerSessionID": "ses_ecb43077fffemZHr2tCQv89bmt",
+        "receipt": {
+          "messageID": "msg_7ef3ca51cdc34666bad80a80157b47b5"
+        },
+        "runID": "4921c8c3-0458-4a37-ad94-bbbcf481e173",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 7ef3ca51-cdc3-4666-bad8-0a80157b47b5: \"QA_RESCUE_CHILD\" (4921c8c3-0458-4a37-ad94-bbbcf481e173) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "negative": {
+    "run": {
+      "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+      "ownerSessionID": "ses_ecb43077fffemZHr2tCQv89bmt",
+      "name": "QA_PENDING_CHILD",
+      "definition": {
+        "name": "QA_PENDING_CHILD",
+        "nodes": [
+          {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "model": "openai/gpt-5.4",
+            "prompt": "QA_PENDING_CHILD"
+          }
+        ],
+        "schemaVersion": 1
+      },
+      "fingerprint": "2e88bdaa7ec31d63b90bd64fff882371e9948405bc7a0a2b4e268228ff7f5ca2",
+      "generation": 1,
+      "status": "failed",
+      "createdAt": 1791886163089,
+      "updatedAt": 1791886163236,
+      "nodes": [
+        {
+          "definition": {
+            "agent": "quick",
+            "dependsOn": [],
+            "id": "work",
+            "model": "openai/gpt-5.4",
+            "prompt": "QA_PENDING_CHILD"
+          },
+          "fingerprint": "225a78a75812fbfac67feef40b135dad8232fc36bfb5e68159d0dd738cd9e9e6",
+          "status": "failed",
+          "attempt": 1,
+          "runtime": {
+            "identity": {
+              "agent": "quick",
+              "model": "openai/gpt-5.4",
+              "token": "3cf5552f-8dff-4c2b-b7aa-f64c5b8f5db8"
+            },
+            "initial": "admitted",
+            "inputRevision": 0
+          },
+          "recovery": {
+            "blocked": "pending_host_input",
+            "failedModels": [
+              "openai/gpt-5.4"
+            ],
+            "historyKnown": true
+          },
+          "error": "Iolaus DAG child session failed",
+          "execution": {
+            "attempt": 1,
+            "identity": {
+              "agent": "quick",
+              "model": "openai/gpt-5.4",
+              "token": "3cf5552f-8dff-4c2b-b7aa-f64c5b8f5db8"
+            },
+            "nodeID": "work",
+            "origin": {
+              "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project\",16777233,221797126,null]",
+              "laneHash": "eed6ddd3a8da87a1cec0dcd33cd91dfe024953a2d9a53b00a282fec98ff856ab",
+              "location": {
+                "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/project"
+              },
+              "permissions": [],
+              "prompt": "QA_PENDING_CHILD"
+            },
+            "sessionID": "ses_ecb430364ffeNboshbLd8Ei98n"
+          },
+          "createdAt": 1791886163089,
+          "updatedAt": 1791886163236
+        }
+      ]
+    },
+    "events": [
+      {
+        "schemaVersion": 1,
+        "eventID": "7d878ef9-09ee-4e07-a7a3-67aafe107370",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 1,
+        "type": "run.started",
+        "generation": 1,
+        "createdAt": 1791886163089
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "119f467e-451b-4573-98ff-9b2e2ecd8b35",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 2,
+        "type": "node.ready",
+        "generation": 1,
+        "createdAt": 1791886163089,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "a91c7cdf-6206-4f09-bfde-dded500873b7",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 3,
+        "type": "node.started",
+        "generation": 1,
+        "createdAt": 1791886163116,
+        "nodeID": "work"
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "bb6898d0-0813-4573-867c-04dbb856e21c",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 4,
+        "type": "node.rescue-skipped",
+        "generation": 1,
+        "createdAt": 1791886163235,
+        "nodeID": "work",
+        "payload": {
+          "reason": "pending_host_input"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "b6133504-e7b3-48ca-b8c6-b6dc9a3b31d5",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 5,
+        "type": "node.failed",
+        "generation": 1,
+        "createdAt": 1791886163236,
+        "nodeID": "work",
+        "payload": {
+          "message": "Iolaus DAG child session failed",
+          "status": "failed"
+        }
+      },
+      {
+        "schemaVersion": 1,
+        "eventID": "7117cbb3-0502-4a6e-8301-ee5632c4dd99",
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "sequence": 6,
+        "type": "run.failed",
+        "generation": 1,
+        "createdAt": 1791886163236
+      }
+    ],
+    "steering": [],
+    "notices": [
+      {
+        "eventID": "7117cbb3-0502-4a6e-8301-ee5632c4dd99",
+        "messageID": "msg_7117cbb305024a6e8301ee5632c4dd99",
+        "ownerSessionID": "ses_ecb43077fffemZHr2tCQv89bmt",
+        "receipt": {
+          "messageID": "msg_7117cbb305024a6e8301ee5632c4dd99"
+        },
+        "runID": "d3fac34c-65c7-40b2-8d44-90b5e221c9ef",
+        "state": "admitted",
+        "text": "Iolaus Flow notice 7117cbb3-0502-4a6e-8301-ee5632c4dd99: \"QA_PENDING_CHILD\" (d3fac34c-65c7-40b2-8d44-90b5e221c9ef) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+      }
+    ]
+  },
+  "owner": "ses_ecb43077fffemZHr2tCQv89bmt",
+  "child": "ses_ecb430364ffeNboshbLd8Ei98n",
+  "sandbox": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY",
+  "env": {
+    "PATH": "/opt/zerobrew/bin:/Users/Bryan/.sdkman/candidates/maven/current/bin:/Users/Bryan/.sdkman/candidates/java/current/bin:/Users/Bryan/.sdkman/candidates/gradle/current/bin:/Users/Bryan/.local/state/fnm_multishells/2522_1791800200005/bin:/Users/Bryan/Library/pnpm/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/Bryan/.local/bin:/Users/Bryan/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/zerobrew/bin:/opt/zerobrew/prefix/bin:/Users/Bryan/.cargo/bin:/Users/Bryan/Library/Application Support/JetBrains/Toolbox/scripts:/Applications/Obsidian.app/Contents/MacOS:/Users/Bryan/.orbstack/bin",
+    "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/home",
+    "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/home",
+    "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY",
+    "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/config",
+    "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/data",
+    "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/cache",
+    "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/state",
+    "IOLAUS_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/home/.iolaus",
+    "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY/home",
+    "QA_SANDBOX": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/rescue-smoke-CVylIY",
+    "QA_OPENCODE_SOURCE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+    "OPENCODE_DISABLE_AUTOUPDATE": "1",
+    "OPENCODE_DISABLE_MODELS_FETCH": "1",
+    "IOLAUS_TRACE": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/implementation-smoke/trace.ndjson"
+  },
+  "serverPID": 36250,
+  "before": {
+    "/Users/Bryan/.iolaus/iolaus.json": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac",
+    "/Users/Bryan/.config/opencode/opencode.json": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e",
+    "/Users/Bryan/.config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381",
+    "/opt/homebrew/bin/opencode": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341"
+  },
+  "source": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+  "limits": "Smoke only: actual plugin, native flow tool, provider auth rescue and pending-synthetic refusal. Full live matrix remains separate; no atomic or exactly-once claim.",
+  "cleanupErrors": [],
+  "cleanup": {
+    "sandboxRemoved": true,
+    "serverStopped": true,
+    "mockStopped": true,
+    "sockets": 0
+  },
+  "after": {
+    "/Users/Bryan/.iolaus/iolaus.json": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac",
+    "/Users/Bryan/.config/opencode/opencode.json": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e",
+    "/Users/Bryan/.config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381",
+    "/opt/homebrew/bin/opencode": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341"
+  }
+}
