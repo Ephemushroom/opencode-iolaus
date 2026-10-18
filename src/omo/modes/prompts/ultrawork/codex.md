@@ -200,29 +200,6 @@ the WHOLE notepad FIRST before any other action, then resume from
 state from the notepad; do not re-plan from scratch or re-run completed
 steps.
 
-## 3. Register obsessive todos via `update_plan`
-The todo tool is Codex `update_plan` — your live, user-visible
-checklist. Translate every action from the plan into one `update_plan`
-step — one step per atomic work unit: an edit plus its verification, a
-QA scenario run, a teardown. Keep each step small enough to finish
-within a few tool calls.
-Call `update_plan` on EVERY state transition — the instant a step starts
-(mark it `in_progress`) and the instant it finishes (mark it `completed`
-and the next `in_progress`). Exactly ONE `in_progress` at a time. Mark
-completed IMMEDIATELY — never batch, never let the rendered plan lag
-behind reality. Add newly discovered steps the moment they surface
-instead of waiting for the next pass. Step text encodes WHERE / WHY
-(which criterion it advances) / HOW / VERIFY:
-`path: <action> for <criterion> — verify by <check>`.
-ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (including
-the run root), and QA resource (PID, tmux session, browser context, port, container,
-script or temp path); complete it only after a read-back teardown receipt.
-
-GOOD pair (test-first, ordered):
-  `foo.test.ts: Write FAILING case invalid-email→ValidationError for criterion 2 — verify by RED with assertion msg`
-  `src/foo/bar.ts: Implement validateEmail() RFC-5322-lite for criterion 2 — verify by foo.test.ts GREEN + curl 400 body`
-BAD: "Implement feature" / "Fix bug" / "Add tests later" / writing
-production code before its failing test → rewrite.
 
 # Finding things (lead with these, code-mode the first wave)
 Never guess from memory — locate with the right tool, and re-read before
@@ -379,7 +356,7 @@ as approval/pass, close it if safe, and respawn a smaller
 `fork_context: false` task with the missing deliverable.
 
 # Subagent-dependent transition barrier
-Do not mark an `update_plan` step `completed` while an active child owns
+Do not mark a flow node `completed` while an active child owns
 evidence for that step. Do not start dependent implementation until the
 audit, research, or review result is integrated or explicitly recorded
 as inconclusive. Do not generate a plan before spawned research lanes
@@ -387,7 +364,7 @@ that feed the plan have returned or been closed as inconclusive.
 Spawn every independent child for the current wave first. After the wave
 is launched, run `multi_agent_v1.wait_agent` for each spawned child until
 each reaches terminal status (`completed`, `failed`, `blocked`, or
-explicitly recorded inconclusive) before any dependent `update_plan`
+explicitly recorded inconclusive) before any dependent flow node
 transition, `create_goal` continuation, implementation tool call, plan
 drafting, approval-gate work, PR handoff, or final response. A timeout is
 not terminal status.

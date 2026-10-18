@@ -10,7 +10,7 @@ export function buildHardBlocksSection(): string {
     "- Commit without explicit request - **Never**",
     "- Speculate about unread code - **Never**",
     "- Leave code in broken state after failures - **Never**",
-    "- `background_cancel(all=true)` - **Never.** Always cancel individually by taskId.",
+    "- Waiting on output you will not read - **Never.** There is no cancel tool; simply do not await disposable work.",
     "- Delivering final answer before collecting Oracle result - **Never.**",
   ]
 
@@ -26,7 +26,7 @@ export function buildAntiPatternsSection(): string {
     '- **Testing**: Deleting failing tests to "pass"',
     "- **Search**: Firing agents for single-line typos or obvious syntax errors",
     "- **Debugging**: Shotgun debugging, random changes",
-    "- **Background Tasks**: Polling `background_output` on running tasks - end response and wait for notification",
+    "- **Background Children**: Polling a running child - end your response and wait for its completion notice",
     "- **Delegation Duplication**: Delegating exploration to explore/librarian and then manually doing the same search yourself",
     "- **Oracle**: Delivering answer without collecting Oracle results",
   ]
@@ -48,7 +48,7 @@ When you need to call a tool:
 4. The system handles tool call formatting automatically
 
 **CORRECT**: Invoke the tool through the tool call interface
-**WRONG**: Writing \`assistant to=functions.todowrite\` or \`json\n{...}\` as text
+**WRONG**: Writing \`assistant to=functions.read\` or \`json\n{...}\` as text
 
 Your tool calls are processed automatically. Just invoke the tool - do not format the call yourself.`
 }
@@ -148,7 +148,7 @@ When you need the delegated results but they're not ready:
 
 1. **End your response** - do NOT continue with work that depends on those results
 2. **Wait for the completion notification** - the system will trigger your next turn
-3. **Then** collect results via \`background_output(task_id="bg_...")\`
+3. **Then** read the child's result from its completion notice, and continue it with \`sessionID\`
 4. **Do NOT** impatiently re-search the same topics while waiting
 
 ### Why This Matters:
@@ -161,11 +161,11 @@ When you need the delegated results but they're not ready:
 
 \`\`\`typescript
 // WRONG: After delegating, re-doing the search
-task(subagent_type="explore", run_in_background=true, ...)
+subagent({agent: "explore", background: true, ...})
 // Then immediately grep for the same thing yourself - FORBIDDEN
 
 // CORRECT: Continue non-overlapping work
-task(subagent_type="explore", run_in_background=true, ...)
+subagent({agent: "explore", background: true, ...})
 // Work on a different, unrelated file while they search
 // End your response and wait for the notification
 \`\`\`

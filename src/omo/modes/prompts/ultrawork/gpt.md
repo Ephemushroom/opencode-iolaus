@@ -59,11 +59,11 @@ Before acting, survey the skills available in this system: scan their descriptio
 
 | Resource | When to Use | How to Use |
 |----------|-------------|------------|
-| explore agent | Need codebase patterns you don't have | `task(subagent_type="explore", load_skills=[], run_in_background=true, ...)` |
-| librarian agent | External library docs, OSS examples | `task(subagent_type="librarian", load_skills=[], run_in_background=true, ...)` |
-| oracle agent | Stuck on architecture/debugging after 2+ attempts | `task(subagent_type="oracle", load_skills=[], run_in_background=true, ...)` |
-| plan agent | Discovery leaves unresolved design uncertainty: unclear boundaries, competing decompositions, or uncertain dependency order | `task(subagent_type="plan", load_skills=[], run_in_background=true, ...)` |
-| task category | Specialized work matching a category | `task(category="...", load_skills=[...], run_in_background=true)` |
+| explore agent | Need codebase patterns you don't have | `subagent({agent: "explore", background: true, ...})` |
+| librarian agent | External library docs, OSS examples | `subagent({agent: "librarian", background: true, ...})` |
+| oracle agent | Stuck on architecture/debugging after 2+ attempts | `subagent({agent: "oracle", background: true, ...})` |
+| plan agent | Discovery leaves unresolved design uncertainty: unclear boundaries, competing decompositions, or uncertain dependency order | `subagent({agent: "plan", background: true, ...})` |
+| task category | Specialized work matching a category | `subagent({agent: "...", background: true})` |
 
 <tool_usage_rules>
 - Prefer tools over internal knowledge for fresh or user-specific data
@@ -84,15 +84,15 @@ Before acting, survey the skills available in this system: scan their descriptio
 **ALWAYS run both tracks in parallel:**
 ```
 // Fire background agents for deep exploration
-task(subagent_type="explore", load_skills=[], prompt="CONTEXT: implementing [TASK]; gap: [KNOWLEDGE GAP]. GOAL: find [X] patterns in the codebase - file paths, implementation approach, conventions, module connections - to unblock [DOWNSTREAM DECISION]. Focus on production code in src/. STOP WHEN: the findings answer the gap or two search rounds add nothing new. EVIDENCE: file:line refs with one-line descriptions.", run_in_background=true)
-task(subagent_type="librarian", load_skills=[], prompt="CONTEXT: working with [TECHNOLOGY]; need [SPECIFIC INFO]. GOAL: official docs and production examples for [Y] - API reference, configuration, recommended patterns, pitfalls - to unblock [DECISION THIS INFORMS]. Skip tutorials. STOP WHEN: the cited sources answer [SPECIFIC INFO] or sources repeat. EVIDENCE: source links with the claim each supports.", run_in_background=true)
+subagent({agent: "explore", prompt: "CONTEXT: implementing [TASK]; gap: [KNOWLEDGE GAP]. GOAL: find [X] patterns in the codebase - file paths, implementation approach, conventions, module connections - to unblock [DOWNSTREAM DECISION]. Focus on production code in src/. STOP WHEN: the findings answer the gap or two search rounds add nothing new. EVIDENCE: file:line refs with one-line descriptions.", background: true})
+subagent({agent: "librarian", prompt: "CONTEXT: working with [TECHNOLOGY]; need [SPECIFIC INFO]. GOAL: official docs and production examples for [Y] - API reference, configuration, recommended patterns, pitfalls - to unblock [DECISION THIS INFORMS]. Skip tutorials. STOP WHEN: the cited sources answer [SPECIFIC INFO] or sources repeat. EVIDENCE: source links with the claim each supports.", background: true})
 
 // WHILE THEY RUN - use direct tools for immediate context
 grep(pattern="relevant_pattern", path="src/")
 read_file(filePath="known/important/file")
 
 // Collect background results when ready
-deep_context = background_output(task_id=...)
+deep_context = subagent({agent: "explore", prompt: "...", sessionID: "ses_..."})
 
 // Merge ALL findings for comprehensive understanding
 ```
@@ -131,9 +131,6 @@ ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (includ
 - **EVIDENCE PER TARGET**: Evidence stays valid per target until an input changes. After each increment rerun what moved — the tests of every touched file and of the files that import it, the scenarios that exercise them — and cite the earlier capture for the rest. The full set runs once more right before the final message.
 - **BLOCKED CHECKPOINT**: After the same failure twice in a row, or a third failed attempt at one step, stop retrying it: mark it blocked with the gap it leaves, record it for the final message, and move on to work that does not depend on it. A broken test harness gets one repair attempt.
 
-## TODO DISCIPLINE
-
-Maintain a live todo list for every multi-step task: one atomic item per action (`path: <action> for <scenario> — verify by <check>`), exactly one in_progress, transitions marked the instant they happen, discovered work inserted immediately. Never batch completions.
 
 ## SCENARIO CONTRACT (binding, defined BEFORE coding)
 

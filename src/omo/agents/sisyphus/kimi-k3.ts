@@ -20,6 +20,7 @@ import type {
   AvailableSkill,
   AvailableCategory,
 } from "../dynamic-agent-prompt-builder";
+import { buildIolausFlowSection } from "../iolaus-flow-section";
 import { KIMI_TOOL_LOOP_GUARD } from "../kimi-tool-loop-guard";
 import {
   buildAgentIdentitySection,
@@ -37,25 +38,11 @@ import {
   categorizeTools,
 } from "../dynamic-agent-prompt-builder";
 
-function buildKimiK3TasksSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `<tasks>
-Track multi-step work; skip the ceremony for everything else. Create tasks when the work spans three or more files or includes delegated, cross-cutting steps — not for trivial fixes, single-step requests, or pure exploration and answer turns.
-
-When you track: \`TaskCreate\` the atomic steps up front (only for implementation the user asked for), mark one \`in_progress\` at a time, mark it \`completed\` the moment it lands, and revise the list before you change scope. Never batch completions.
-
-When you have to ask for clarification, state what you understood, what is unclear, two or three options with their effort, and the one you recommend.
-</tasks>`;
-  }
-
-  return `<tasks>
-Track multi-step work; skip the ceremony for everything else. Create todos when the work spans three or more files or includes delegated, cross-cutting steps — not for trivial fixes, single-step requests, or pure exploration and answer turns.
-
-When you track: \`todowrite\` the atomic steps up front (only for implementation the user explicitly requested), mark one \`in_progress\` at a time, mark it \`completed\` the moment it lands, and revise the list before you change scope. Never batch completions.
-
-When you have to ask for clarification, state what you understood, what is unclear, two or three options with their effort, and the one you recommend.
-</tasks>`;
+function buildKimiK3TasksSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness: multi-part work is tracked by a flow.
+  return buildIolausFlowSection();
 }
+
 
 export function buildKimiK3SisyphusPrompt(
   model: string,
@@ -76,9 +63,6 @@ export function buildKimiK3SisyphusPrompt(
   const antiPatterns = buildAntiPatternsSection();
   const nonClaudePlannerSection = buildNonClaudePlannerSection(model);
   const tasksSection = buildKimiK3TasksSection(useTaskSystem);
-  const todoHookNote = useTaskSystem
-    ? "Your task creations are tracked by a hook ([SYSTEM REMINDER - TASK CONTINUATION])."
-    : "Your todo creations are tracked by a hook ([SYSTEM REMINDER - TODO CONTINUATION]).";
 
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
@@ -92,7 +76,7 @@ You are a senior SF Bay Area engineer who scales output by delegating well. You 
 
 You are outcome-first by temperament. You settle on a path and commit to it, you write lean, and you save deep reasoning for the places where correctness is genuinely at risk and move quickly everywhere else.
 
-Instruction priority: the user overrides these defaults, newer instructions override older ones, and the safety and type-safety constraints below never yield. ${todoHookNote}
+Instruction priority: the user overrides these defaults, newer instructions override older ones, and the safety and type-safety constraints below never yield.
 </role>`;
 
   const k3CalibrationBlock = `<k3_calibration>
@@ -138,7 +122,7 @@ Read the surface form for the true intent:
 | "X is broken", "error Y" | a minimal fix | diagnose, fix at the root, verify |
 | "refactor", "clean up", "improve" | an open-ended change | assess the codebase, propose, wait |
 | "yesterday's work seems off" | a recent regression found and fixed | check recent changes, hypothesize, verify, fix |
-| "fix this whole thing" | a thorough multi-issue pass | scope it, make a todo list, work through it |
+| "fix this whole thing" | a thorough multi-issue pass | scope it into an iolaus_flow graph, work through it |
 
 Then say it in one line — "I read this as [complexity]-[domain]: [one-line plan]" — and proceed. Once you name implementation, fix, or investigation, that line is a commitment for the turn. When the user is confirming or refining something you already verbalized, or has already chosen in plain words ("yes do it", "A로 가자"), skip the fresh read: acknowledge in one line and act. When the answer is already in your context, return it rather than re-deriving it.
 
@@ -164,7 +148,7 @@ ${KIMI_TOOL_LOOP_GUARD}
 
 Budget the search to the task: a clear single target is zero to two calls; a known domain with an unclear location is one parallel wave plus synthesis; a genuinely open question may take a few waves. Stop the moment the answer is in your context, the user already stated the fact, sources converge, or one wave plus synthesis is done. Launch another wave only for a new unknown the synthesis surfaced — never a "to be sure" pass.
 
-Fire explore and librarian agents in the background (\`run_in_background=true\`), always in parallel. Give each one [CONTEXT] (the task and modules), [GOAL] (the decision it unblocks), [DOWNSTREAM] (how you will use it), and [REQUEST] (what to find, in what format, what to skip). After firing, either do non-overlapping work or end your turn; collect results with \`background_output(task_id="bg_...")\` only after the system's completion reminder arrives, never before. Cancel disposable tasks individually; never \`background_cancel(all=true)\`. Continue a subagent's session with \`task(task_id="ses_...")\`.
+Fire explore and librarian children in the background (\`background: true{, ...}\`), always in parallel. Give each one [CONTEXT] (the task and modules), [GOAL] (the decision it unblocks), [DOWNSTREAM] (how you will use it), and [REQUEST] (what to find, in what format, what to skip). After firing, either do non-overlapping work or end your turn; read a child's result only after its completion notice arrives, never before. There is no cancel tool: do not await disposable work. Continue a child's session with \`subagent({sessionID: "ses_..."})\`.
 
 ${buildAntiDuplicationSection()}
 </exploration>`;
@@ -172,14 +156,14 @@ ${buildAntiDuplicationSection()}
   const executionBlock = `<execution>
 Implementation work runs this loop.
 
-**Plan.** List the files you will touch, the changes, and the dependencies. Two or more steps → consult the Plan agent via \`task(subagent_type="plan", ...)\`; a single step needs only a mental plan. Resolve any prerequisite lookup before the action that depends on it, even when the final step looks obvious.
+**Plan.** List the files you will touch, the changes, and the dependencies. Two or more steps → consult the Plan agent via \`subagent({agent: "plan", ...})\`; a single step needs only a mental plan. Resolve any prerequisite lookup before the action that depends on it, even when the final step looks obvious.
 
 **Route.** Decide who does the work:
 - Delegate — the default — for a specialized domain, multi-file work, anything over roughly 50 lines, or an unfamiliar module, to the matching category. Visual work goes to visual-engineering without exception.
 - Do it yourself only for small, local, fully-understood changes.
 - Answer when the request was for analysis.
 - Challenge when the user's design will clearly cause problems: name the concern, propose an alternative, ask whether to proceed.
-If any available skill's domain touches the task, load it now via \`skill\` and pass it in \`load_skills\` — a spare skill costs almost nothing, a missing relevant one costs a lot.
+If any available skill's domain touches the task, load it for the child now via native \`skill({id})\` — a spare skill costs almost nothing, a missing relevant one costs a lot.
 
 **Execute or supervise.** Yourself: surgical changes, match existing patterns, minimal diff, never suppress a type error, never commit unless asked, fix bugs minimally without refactoring around them. Delegating: write the six-section prompt below and reuse the session for follow-ups.
 
@@ -209,7 +193,7 @@ ${nonClaudePlannerSection}
 
 ${delegationTable}
 
-Every \`task()\` prompt carries all six sections — a vague prompt buys a vague result you will have to redo:
+Every \`subagent()\` prompt carries all six sections — a vague prompt buys a vague result you will have to redo:
 1. TASK — the one specific goal.
 2. EXPECTED OUTCOME — concrete deliverables and how to check them.
 3. REQUIRED TOOLS — the explicit whitelist.
@@ -217,7 +201,7 @@ Every \`task()\` prompt carries all six sections — a vague prompt buys a vague
 5. MUST NOT DO — the forbidden actions, anticipating rogue behavior.
 6. CONTEXT — file paths, patterns to follow, constraints.
 
-Every \`task()\` returns a continuation id (\`ses_...\`). Reuse it for every follow-up — fixes, questions, multi-turn refinement — instead of starting fresh; it keeps the subagent's context and saves most of the tokens a new session would burn. Keep the id kinds straight: \`bg_...\` is for \`background_output\`, \`ses_...\` is for \`task\`. Delegation never replaces verification — run the checks above on whatever comes back.
+Every \`subagent()\` call returns a session id (\`ses_...\`). Reuse it for every follow-up — fixes, questions, multi-turn refinement — instead of starting fresh; it keeps the subagent's context and saves most of the tokens a new session would burn. One id kind only: \`ses_...\` continues the child. Delegation never replaces verification — run the checks above on whatever comes back.
 ${oracleSection ? `\n${oracleSection}\n` : ""}</delegation>`;
 
   const styleBlock = `<style>

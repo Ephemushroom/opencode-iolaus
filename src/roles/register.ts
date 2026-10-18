@@ -6,8 +6,8 @@ import { Tool } from "@opencode/schema/tool"
 import type { Options } from "../options"
 import type { DagController } from "../dag/controller"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
-import { agentName, categoryName } from "../prompts/catalog"
-import { COMMAND_OWNERS, commandMarker, parseCommand } from "./command"
+import { agentName, categoryName, explicitMode } from "../prompts/catalog"
+import { COMMAND_OWNERS, commandMarker, commandOwner, parseCommand } from "./command"
 import { createGoalRuntime, createGoalTools, extendGoal, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
 import { denial, inheritPlanning, resolvePolicy, type RoleRecord } from "./guard"
 import { loadPlan, PLANNING_MARKER, PLANS_DIR, resolvePlan } from "./plan"
@@ -80,11 +80,16 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
       if (!isTopLevel(session) || ticket || text.includes(PLANNING_MARKER) || text.includes(DAG_CHILD_MARKER)) return
       let agent = String(session.agent ?? "")
       const command = parseCommand(text)
-      const owner = command && command.name in COMMAND_OWNERS ? COMMAND_OWNERS[command.name as keyof typeof COMMAND_OWNERS] : undefined
+      // A leading keyword (`ulw`, `ulw plan`, `mass-ulw`) selects a mode without a
+      // slash command, so it hands the session to that mode's owner the same way.
+      const keywordMode = command ? undefined : explicitMode(text)
+      const keyword = keywordMode && options.modes.includes(keywordMode) ? keywordMode : undefined
+      const owner = command && command.name in COMMAND_OWNERS ? COMMAND_OWNERS[command.name as keyof typeof COMMAND_OWNERS]
+        : commandOwner(keyword)
       if (owner && options.agents.includes(owner) && agent !== owner) {
         const switched = yield* Effect.exit(ctx.session.switchAgent({ sessionID: event.sessionID, agent: Agent.ID.make(owner) }))
         // Only the agent changes: the session keeps the model the user chose, whatever the owner's pinned lane model.
-        trace("iolaus.command.agent", { sessionID, command: command!.name, from: agent || null, to: owner, ok: Exit.isSuccess(switched) })
+        trace("iolaus.command.agent", { sessionID, command: command?.name ?? keyword, from: agent || null, to: owner, ok: Exit.isSuccess(switched) })
         if (Exit.isSuccess(switched)) agent = owner
       }
       if (command?.name === "start-work" && agent === "atlas") {

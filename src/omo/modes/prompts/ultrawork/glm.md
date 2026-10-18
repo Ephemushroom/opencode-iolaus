@@ -163,9 +163,6 @@ ALWAYS add a cleanup todo AT CREATION for each worktree, cache directory (includ
 - **EVIDENCE PER TARGET**: Evidence stays valid per target until an input changes. After each increment rerun what moved — the tests of every touched file and of the files that import it, the scenarios that exercise them — and cite the earlier capture for the rest. The full set runs once more right before the final message.
 - **BLOCKED CHECKPOINT**: After the same failure twice in a row, or a third failed attempt at one step, stop retrying it: mark it blocked with the gap it leaves, record it for the final message, and move on to work that does not depend on it. A broken test harness gets one repair attempt.
 
-## TODO DISCIPLINE
-
-Track every multi-step task in a live todo list: one atomic item per action with its verification, exactly one item in progress, status updated the instant it changes, newly discovered work added immediately. Never batch completions.
 
 ## SCENARIO CONTRACT
 
