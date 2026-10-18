@@ -130,7 +130,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus-junior/prompt-router.ts",
       "path": "src/omo/agents/sisyphus-junior/prompt-router.ts",
       "sourceSha256": "22c644f2e2a05d38d18cea4ff6eb5cc77e7e83054af3e8520537332ae9fa132e",
-      "activeSha256": "c1873f55907f84aa675e9d8ba2db82fa307d812f94455c7278328c2d32694b57"
+      "activeSha256": "d824536f9287c0a73998bc3f4df46cb18ca2dbc9092aab531452f943c66ff78a"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus-junior/kimi-k2-7.ts",
@@ -196,7 +196,7 @@
       "source": "reference/omo/packages/agents-core/src/hephaestus/prompt-router.ts",
       "path": "src/omo/agents/hephaestus/prompt-router.ts",
       "sourceSha256": "254b65abd8a6a3429fbf805b4639a80b2620a03af69e29c17ca198481dc3e314",
-      "activeSha256": "9556182fe9ae461e7627afa016a89d3d16fa8ee2b77f1c8869f0c3c6911e8c14"
+      "activeSha256": "2a3dfb6407fb41dc2ab9c542922a1021644473942f4cf0efce16265f5bc4abcd"
     },
     {
       "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-5.ts",
@@ -268,7 +268,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/claude-opus-5.ts",
       "path": "src/omo/agents/sisyphus/claude-opus-5.ts",
       "sourceSha256": "46f976cc3fd2f8aa205937e91dba494756086d05fabb5c5be90f4f76769e51e4",
-      "activeSha256": "f6ccea37e038f56cb277d4fa17e73d46622e2547fc067eefcbef4289f7239cf2"
+      "activeSha256": "be5868bfb06b138b27000e9a2fab58a086b9bc27076b3dfb118d63e00222787f"
     },
     {
       "source": "reference/omo/packages/agents-core/src/sisyphus/kimi-k2-6.ts",
@@ -340,7 +340,7 @@
       "source": "reference/omo/packages/agents-core/src/sisyphus/gpt-5-4.ts",
       "path": "src/omo/agents/sisyphus/gpt-5-4.ts",
       "sourceSha256": "9fbd81076730faff9d13b8815f5b8b119ed7e5d36a64bfc0cbb76587e17c558e",
-      "activeSha256": "9e87f35c30ccfedd267e041442fbda986d3fe28bf1c18c382bb9752702298e5b"
+      "activeSha256": "d75e271451ea65490827e6293a178f26d27f234cab8a8d5f2bec28a8a3fe410d"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/mode/team.md",
@@ -358,13 +358,13 @@
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/default.md",
       "path": "src/omo/modes/prompts/ultrawork/default.md",
       "sourceSha256": "7a0f5fe01cfb99652c23c318040d9a05f8caf109750a2434b02ebda3f93afdc6",
-      "activeSha256": "aec293f2e60307219e23680e82fd12e28659037040dd4520c32c817fd6c6d04d"
+      "activeSha256": "ec476029b9538a9ef02b49fd41da03b7e96e47a315c8ffde7e6fed8ab3d3cd25"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gpt.md",
       "path": "src/omo/modes/prompts/ultrawork/gpt.md",
       "sourceSha256": "4fb81febc9e6c9e8235228af2fd5d1e9dd0fb63b3b7367a79cf3b63f19b304e7",
-      "activeSha256": "3e32803b96f243031ff1fdf6c0b99a736aeecb2b25b94befc80b9852b5cdbe93"
+      "activeSha256": "d46a2d2dd9526b50b195408c9e502b08824ada3642c99a55b6969d5266338e7f"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/codex.md",
@@ -388,7 +388,7 @@
       "source": "reference/omo/packages/prompts-core/prompts/ultrawork/gemini.md",
       "path": "src/omo/modes/prompts/ultrawork/gemini.md",
       "sourceSha256": "10e5a87a0df9898dab424e0f58bfafe8f9425b37ff079d4a10235a62dbb42b44",
-      "activeSha256": "b9d6fd5b4f0dd0cf003ece207fcf2efd9d5b1153f9f689528ed5d12fc02319af"
+      "activeSha256": "1d42121204f87ad5c42f1028395f8bc34e63c2ac4a5252ced35ca977be2427ea"
     },
     {
       "source": "reference/omo/packages/prompts-core/prompts/prometheus/default.md",
@@ -478,7 +478,7 @@
       "source": "reference/omo/packages/prompts-core/src/atlas-prompts.ts",
       "path": "src/omo/modes/src/atlas-prompts.ts",
       "sourceSha256": "e764da28662f3d859b88f9e3cedb8eabefefae45bf4e2d3b9b29c31573febdf7",
-      "activeSha256": "e764da28662f3d859b88f9e3cedb8eabefefae45bf4e2d3b9b29c31573febdf7"
+      "activeSha256": "b37850e344460e25660ec2f54c22408ed8cefcb85137d4c22c69581e73a39e35"
     },
     {
       "source": "reference/omo/packages/prompts-core/src/index.ts",
@@ -508,7 +508,7 @@
       "source": "reference/omo/packages/omo-opencode2/src/agents/sisyphus-prompt.ts",
       "path": "src/prompts/sisyphus-route.ts",
       "sourceSha256": "bff4ee97a4ecd5a6353c41a85283cae53fdfb7513de924a53e7e430a68431c94",
-      "activeSha256": "cabbcf4cf7ed388afdf3b9d4c0ab5d7ee4880d103417b33e648b84fd78d41af8"
+      "activeSha256": "412553f9e82ef5e26884134a6cc67cf65f5a392920069873809539a1a4f0e23b"
     },
     {
       "source": "oh-my-openagent@ed0fb0601:packages/ast-grep-mcp/src/sg-runner.ts",

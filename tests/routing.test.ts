@@ -3,8 +3,8 @@ import { parseOptions } from "../src/options"
 import { resolveVariant } from "../src/prompts"
 import { getHephaestusPromptSource } from "../src/omo/agents/hephaestus/prompt-router"
 import { buildSisyphusPromptForModel } from "../src/prompts/sisyphus-route"
-import { buildGpt55SisyphusPrompt, buildClaudeOpus48SisyphusPrompt, buildClaudeOpus5SisyphusPrompt, buildClaudeOpus55SisyphusPrompt, buildGpt6AstraSisyphusPrompt, buildKimiK3SisyphusPrompt } from "../src/omo/agents"
-import { identifyModel, resolvePromptLane } from "../src/prompts/prompt-lanes"
+import { buildGpt55SisyphusPrompt, buildClaudeOpus48SisyphusPrompt, buildClaudeOpus5SisyphusPrompt, buildClaudeOpus55SisyphusPrompt, buildGpt6AstraSisyphusPrompt } from "../src/omo/agents"
+import { identifyModel, resolvePromptIdiom, resolvePromptLane } from "../src/prompts/prompt-lanes"
 
 test("variant precedence honors planner and specific family before fallback", () => {
   const variants = Object.fromEntries(["planner", "kimi-k3", "kimi", "gpt", "default"].map((name) => [name, { kind: "bundled" as const, content: name, filePath: name }]))
@@ -24,7 +24,11 @@ test("Sisyphus selects retained family builders without asserting prose", () => 
     ["anthropic/claude-opus-4-8", buildClaudeOpus48SisyphusPrompt],
     ["anthropic/claude-opus-5", buildClaudeOpus5SisyphusPrompt],
     ["anthropic/claude-opus-5-5", buildClaudeOpus55SisyphusPrompt],
-    ["moonshot/kimi-k3", buildKimiK3SisyphusPrompt],
+    // Kimi, GLM and DeepSeek borrow the Anthropic idiom: they get the Claude body,
+    // which names the model actually running, not the retained Kimi/GLM variants.
+    ["moonshot/kimi-k3", buildClaudeOpus5SisyphusPrompt],
+    ["zai/glm-5.2", buildClaudeOpus5SisyphusPrompt],
+    ["custom/deepseek-v4", buildClaudeOpus5SisyphusPrompt],
   ] as const) {
     expect(buildSisyphusPromptForModel(model, [], [], [], [], false)).toBe(builder(model, [], [], [], [], false))
   }
@@ -36,7 +40,10 @@ test("prompt lanes resolve by vendor, class and nearest version inside the class
   expect(lane("proxy-cc/claude-opus-5-5")).toBe("claude-opus-5-5")
   expect(lane("anthropic/claude-opus-5")).toBe("claude-opus-5")
   expect(lane("anthropic/claude-opus-4-7")).toBe("claude-opus-4-7")
+  // Fable 5.1 has its own row pointing at the Fable 5 body: the version resolves
+  // through the table instead of falling back to the nearest lower entry.
   expect(lane("anthropic/claude-fable-5-1")).toBe("claude-fable-5")
+  expect(lane("anthropic/claude-fable-5")).toBe("claude-fable-5")
   // A class with no entry never borrows another class's prompt.
   expect(lane("anthropic/claude-sonnet-5-5")).toBeUndefined()
   expect(lane("anthropic/claude-haiku-4-5")).toBeUndefined()
@@ -52,6 +59,17 @@ test("prompt lanes resolve by vendor, class and nearest version inside the class
   // Non-OpenAI vendors are not table-routed.
   expect(identifyModel("bryan/gemini-4-argon").vendor).toBe("google")
   expect(lane("bryan/gemini-4-argon")).toBeUndefined()
+})
+
+test("prompt idiom: GLM, Kimi and DeepSeek borrow Anthropic; Gemini, Grok and unknown keep their own", () => {
+  const idiom = (model: string) => resolvePromptIdiom(model)
+  for (const model of ["anthropic/claude-opus-5-5", "anthropic/claude-fable-5-1", "zai/glm-5.3", "moonshot/kimi-k3", "moonshot/kimi-k2.8", "deepseek/deepseek-v4", "ds-bryan/anthropic-v4-flash"]) {
+    expect({ model, idiom: idiom(model) }).toEqual({ model, idiom: "anthropic" })
+  }
+  expect(idiom("openai/gpt-6-astra")).toBe("openai")
+  expect(idiom("bryan/gemini-4-argon")).toBe("google")
+  expect(idiom("xai/grok-4-6")).toBe("xai")
+  expect(idiom("custom/unknown-model")).toBe("other")
 })
 
 test("options reject stale OMO settings and unknown names", () => {

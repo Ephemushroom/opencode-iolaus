@@ -240,7 +240,9 @@ test("Hephaestus routes by model class: Claude body for Opus/Fable, GPT variants
   expect(opus).toContain("Claude Opus 5.5")
   expect(fable).toContain("Claude Fable")
   expect(opus).not.toBe(gpt)
-  // A small, non-Anthropic, non-OpenAI model keeps its existing generic behavior.
-  expect(renderAgent("hephaestus", { model: "zai/glm-5.2" })).toBe(renderAgent("hephaestus", { model: "moonshot/kimi-k3" }))
+  // A model that is neither Anthropic nor OpenAI borrows the Anthropic idiom: the
+  // GLM and Kimi carriers read the Claude body, labeled with their own name.
+  expect(renderAgent("hephaestus", { model: "zai/glm-5.2" })).toContain("on glm-5-2")
+  expect(renderAgent("hephaestus", { model: "moonshot/kimi-k3" })).toContain("on kimi-k3")
   expect(renderAgent("hephaestus", { model: "anthropic/claude-opus-5-5" })).not.toBe(renderAgent("sisyphus-junior", { model: "anthropic/claude-opus-5-5" }))
 })

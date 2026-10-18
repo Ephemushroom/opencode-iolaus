@@ -12,6 +12,7 @@
  */
 
 import { isGlmModel, isGpt5_5Model, isGpt5_6Model, isGpt6Model, isGptModel, isGeminiModel, isKimiK2CodeModel, isKimiK2Model, isKimiK3Model } from "../types"
+import { resolvePromptIdiom } from "../../../prompts/prompt-lanes"
 
 import { buildDefaultSisyphusJuniorPrompt } from "./default"
 import { buildKimiK26SisyphusJuniorPrompt } from "./kimi-k2-6"
@@ -40,6 +41,10 @@ export type SisyphusJuniorPromptSource =
   | "glm-5-2"
 
 export function getSisyphusJuniorPromptSource(model?: string): SisyphusJuniorPromptSource {
+  // GLM, Kimi and DeepSeek borrow the Anthropic idiom: their retained bodies
+  // were tuned for a harness this one replaced, so they read the Claude-idiom
+  // default body. GPT and Gemini keep their own variants.
+  if (model && resolvePromptIdiom(model) === "anthropic") return "default"
   if (model && isKimiK3Model(model)) return "kimi-k3"
   if (model && isKimiK2CodeModel(model)) return "kimi-k2-7"
   if (model && isKimiK2Model(model)) return "kimi-k2"

@@ -19,7 +19,16 @@
  * prompt, which is safer than handing `haiku` a prompt tuned for `opus`.
  */
 
-export type PromptVendor = "anthropic" | "openai" | "google" | "moonshot" | "xai" | "zhipu" | "other";
+export type PromptVendor = "anthropic" | "openai" | "google" | "moonshot" | "xai" | "zhipu" | "deepseek" | "other";
+
+/**
+ * The prompt idiom a model is addressed in. Vendors without their own tuned
+ * body borrow one: GLM, Kimi and DeepSeek currently borrow Anthropic's, so they
+ * receive the same Claude-shaped prompt as an Opus or Fable model instead of
+ * the generic fallback. Gemini, Grok and unknown carriers keep their retained
+ * OMO variants.
+ */
+export type PromptIdiom = "anthropic" | "openai" | "google" | "xai" | "other";
 
 export type AnthropicClass = "opus" | "sonnet" | "haiku" | "fable";
 export type OpenAiClass = "astra" | "sol" | "luna" | "terra";
@@ -49,6 +58,10 @@ const LANES: readonly PromptLane[] = [
   { vendor: "anthropic", className: "opus", version: [5, 0], lane: "claude-opus-5" },
   { vendor: "anthropic", className: "opus", version: [5, 5], lane: "claude-opus-5-5" },
   { vendor: "anthropic", className: "fable", version: [5, 0], lane: "claude-fable-5" },
+  // Fable 5.1 shares the Fable 5 body for now: its documented deltas are still
+  // per-run behaviors to measure, not a separate prompt. The row exists so the
+  // version is resolved by the table instead of falling back to the nearest row.
+  { vendor: "anthropic", className: "fable", version: [5, 1], lane: "claude-fable-5" },
   { vendor: "openai", className: "astra", version: [6, 0], lane: "gpt-6-astra" },
   { vendor: "openai", className: "sol", version: [5, 4], lane: "gpt-5-4" },
   { vendor: "openai", className: "sol", version: [5, 5], lane: "gpt-5-5" },
@@ -106,10 +119,14 @@ export function identifyModel(model: string): ModelIdentity {
   const vendor: PromptVendor =
     anthropic ? "anthropic"
     : openai ? "openai"
+    // A gateway id such as `ds-bryan/anthropic-v4-flash` carries the vendor in the
+    // name without a `claude-*` model id; the name still decides the vendor.
+    : name.includes("anthropic") ? "anthropic"
     : name.includes("gemini") ? "google"
     : name.includes("kimi") || name.includes("moonshot") ? "moonshot"
     : name.includes("grok") ? "xai"
     : name.includes("glm") ? "zhipu"
+    : name.includes("deepseek") ? "deepseek"
     : ANTHROPIC_PROVIDERS.includes(provider) ? "anthropic"
     : OPENAI_PROVIDERS.includes(provider) ? "openai"
     : "other"
@@ -119,6 +136,31 @@ export function identifyModel(model: string): ModelIdentity {
     className: matched?.className,
     version: matched?.version ?? [],
     descriptor: matched?.descriptor ?? name,
+  }
+}
+
+/**
+ * The idiom a model's prompt should be written in.
+ *
+ * Only Anthropic and OpenAI have a table of tuned bodies. GLM, Kimi and
+ * DeepSeek borrow the Anthropic idiom deliberately: their own OMO bodies were
+ * tuned for an older harness and diverged from the behavior we want, so until
+ * there is a measured reason to split them they receive the Claude-shaped
+ * prompt. That is a routing decision, not a claim that a Kimi model is Claude:
+ * the body still names the model that is actually running.
+ */
+export function resolvePromptIdiom(model: string): PromptIdiom {
+  const { vendor } = identifyModel(model)
+  switch (vendor) {
+    case "anthropic": return "anthropic"
+    case "openai": return "openai"
+    case "google": return "google"
+    case "xai": return "xai"
+    case "moonshot":
+    case "zhipu":
+    case "deepseek":
+      return "anthropic"
+    default: return "other"
   }
 }
 

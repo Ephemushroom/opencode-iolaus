@@ -5,23 +5,16 @@ import {
   buildClaudeOpus5SisyphusPrompt,
   buildClaudeOpus55SisyphusPrompt,
   buildFallbackSisyphusPrompt,
-  buildGlm52SisyphusPrompt,
   buildGpt54SisyphusPrompt,
   buildGpt55SisyphusPrompt,
   buildGpt6AstraSisyphusPrompt,
   buildGrok4SisyphusPrompt,
-  buildKimiK26SisyphusPrompt,
-  buildKimiK27SisyphusPrompt,
-  buildKimiK3SisyphusPrompt,
   isGptNativeSisyphusModel,
   isGrok45Model,
   isGrok46Model,
-  isKimiK2CodeModel,
-  isKimiK2Model,
-  isKimiK3Model,
 } from "../omo/agents"
 import type { AvailableAgent, AvailableCategory, AvailableSkill, AvailableTool } from "../omo/agents"
-import { resolvePromptLane } from "./prompt-lanes"
+import { identifyModel, resolvePromptIdiom, resolvePromptLane } from "./prompt-lanes"
 
 type Builder = (
   model: string,
@@ -52,9 +45,11 @@ const LANE_BUILDERS: Readonly<Record<string, Builder>> = {
 /**
  * Builds the Sisyphus system prompt for a resolved model.
  *
- * Order: the table first (Anthropic and OpenAI classes), then the families the
- * table does not model — Kimi, GLM, Grok, GPT-5.3/5.4 — and finally the
- * generic body for anything unrecognised.
+ * Order: the table first (Anthropic and OpenAI classes). A model the table does
+ * not name is addressed in its idiom: GLM, Kimi and DeepSeek currently borrow the
+ * Anthropic body, so they get the same Claude-shaped prompt as an Opus model
+ * instead of their own retained variant. Grok and native GPT models keep their
+ * own bodies; anything unrecognised gets the generic one.
  */
 export function buildSisyphusPromptForModel(
   model: string,
@@ -67,11 +62,12 @@ export function buildSisyphusPromptForModel(
   const build = (builder: Builder) => builder(model, availableAgents, availableTools, availableSkills, availableCategories, useTaskSystem)
   const lane = resolvePromptLane(model)
   if (lane) return build(LANE_BUILDERS[lane.lane] ?? buildGpt55SisyphusPrompt)
-  if (isKimiK3Model(model)) return build(buildKimiK3SisyphusPrompt)
-  if (isKimiK2CodeModel(model)) return build(buildKimiK27SisyphusPrompt)
-  if (isKimiK2Model(model)) return build(buildKimiK26SisyphusPrompt)
-  if (isGptNativeSisyphusModel(model)) return build(buildGpt54SisyphusPrompt)
+  const idiom = resolvePromptIdiom(model)
+  // Borrowing is only for non-Anthropic vendors. An Anthropic model the table
+  // does not name (Sonnet, Haiku) keeps the generic body: the Opus 5 body carries
+  // Opus-specific tuning and a self-knowledge block that would name the wrong model.
+  if (idiom === "anthropic" && identifyModel(model).vendor !== "anthropic") return build(buildClaudeOpus5SisyphusPrompt)
   if (isGrok45Model(model) || isGrok46Model(model)) return build(buildGrok4SisyphusPrompt)
-  if (model.toLowerCase().includes("glm")) return build(buildGlm52SisyphusPrompt)
+  if (isGptNativeSisyphusModel(model)) return build(buildGpt54SisyphusPrompt)
   return build(buildFallbackSisyphusPrompt)
 }

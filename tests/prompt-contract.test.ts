@@ -3,7 +3,7 @@ import { buildIolausFlowSection } from "../src/omo/agents/iolaus-flow-section"
 import { buildSisyphusPromptForModel } from "../src/prompts/sisyphus-route"
 import { buildDynamicHephaestusPrompt } from "../src/omo/agents/hephaestus/prompt-router"
 import { buildSisyphusJuniorPrompt } from "../src/omo/agents"
-import { renderMode } from "../src/prompts/render"
+import { renderAgent, renderMode } from "../src/prompts/render"
 
 /**
  * The failure this guards against: a prompt told the model to call `todowrite`
@@ -19,6 +19,9 @@ const ABSENT = [
   /team_(?:create|task|send|shutdown|delete|approve|list)/, /update_plan/, /oh-my-opencode/,
   // The retained planning skill is not shipped; the planner doctrine is the prompt.
   /`ulw-plan`|skill\(name="ulw-plan"\)/,
+  // There is no `plan` agent in the catalog, and goal tools are Hephaestus-only.
+  // Commit discipline belongs to the user's authorization, not to a mode prompt.
+  /agent:\s*"plan"/, /\bplan agent\b/i, /\bcreate_goal\b/, /\bCommit frequently\b/,
 ]
 
 function expectNoAbsentTools(text: string, where: string) {
@@ -76,4 +79,22 @@ test("mode prompts delegate with the native subagent contract", () => {
   }
   // atlas is an agent, not a mode; it is rendered through the same markdown set.
   expect(renderMode("ultrawork", "openai/gpt-6-astra", "sisyphus")).toContain("subagent(")
+})
+
+test("the Anthropic-idiom carriers read the Anthropic bodies, and no reachable body names a dead tool", () => {
+  // GLM, Kimi and DeepSeek borrow the Anthropic idiom; they must reach the same
+  // Claude-shaped bodies as an Opus model and must not be told they are Claude.
+  for (const model of ["zhipu/glm-5.2", "moonshot/kimi-k3", "custom/deepseek-v4"]) {
+    const atlas = renderAgent("atlas", { model })
+    expect({ model, ticket: atlas.includes("<ticket_work>") }).toEqual({ model, ticket: true })
+    expect({ model, legacyWave: atlas.includes("Final Verification Wave") }).toEqual({ model, legacyWave: false })
+    expectNoAbsentTools(atlas, `atlas ${model}`)
+    expectNoAbsentTools(renderMode("ultrawork", model, "sisyphus"), `ultrawork ${model}`)
+    expectNoAbsentTools(renderAgent("sisyphus", { model }), `sisyphus ${model}`)
+    expectNoAbsentTools(renderAgent("hephaestus", { model }), `hephaestus ${model}`)
+    expectNoAbsentTools(renderAgent("sisyphus-junior", { model }), `junior ${model}`)
+  }
+  // OpenAI and Gemini keep their own mode bodies.
+  expect(renderMode("ultrawork", "openai/gpt-6-astra", "sisyphus")).toContain("<output_verbosity_spec>")
+  expect(renderMode("ultrawork", "google/gemini-4", "sisyphus")).toContain("<GEMINI_INTENT_GATE>")
 })

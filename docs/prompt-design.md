@@ -9,6 +9,8 @@ Prompts are selected in `src/prompts/prompt-lanes.ts` from one ordered table, no
 - **Vendor** comes from the model name first, the provider prefix second. A reseller or gateway serves `claude-opus-4-8` under `openai/…`; the name decides the vendor, because that is what the model actually is.
 - **Class** is the family: Anthropic `opus`, `sonnet`, `haiku`, `fable` (which covers `mythos`); OpenAI `astra`, `sol`, `luna`, `terra`, with a bare `gpt-<version>` resolving to `sol`, the flagship class.
 - **Version** picks the highest table entry at or below the requested version **inside the same class**. A class with no entry returns `undefined` and the caller uses its generic body. A model never inherits another class's prompt: handing `haiku` a prompt tuned for `opus` is the overconstraint problem, not a fallback.
+- **Idiom** (`resolvePromptIdiom`) decides the *shape* of a prompt when the table has no tuned body for the vendor. Anthropic models and the carriers that borrow Anthropic's idiom — GLM, Kimi and DeepSeek — read the Claude body; OpenAI reads its own; Gemini and Grok keep their retained variants. Borrowing is explicit and reversible: it is a routing decision, not a claim about the model, so a borrowed body still names the model actually running. Sonnet and Haiku are intentionally **not** in the table: the Opus 5 body carries Opus-specific tuning, so those classes fall through to the generic body instead of inheriting it.
+- **Fable 5.1** has its own row pointing at the Fable 5 body. The row exists so the version resolves through the table; the documented 5.1 deltas (effort levels, progress updates, thinking-block passthrough, tool-call batching) are per-run behaviors to measure before they justify a separate prompt.
 
 Adding a model is one row. Changing a class's prompt is one row. Nothing else in the code has to know.
 
@@ -36,7 +38,9 @@ The two vendors do not respond best to the same shape, and pretending otherwise 
 - Do not pile on verification instructions. Current models run tests and check their own work; repeated "verify again" guidance produces unnecessary work.
 - Fewer itineraries. Guidance written for smaller models overconstrains the strong one. State outcomes and decision rules, not a step list.
 
-**Other carriers (Kimi, GLM, Grok, Gemini, older GPT).** Their retained variants stay as they are. The three primary workflows do not target them, so they are not where prompt effort goes; the category lanes still use them, and their prompts are unchanged.
+**Other carriers (Kimi, GLM, DeepSeek).** They currently borrow the Anthropic idiom: their retained OMO bodies were tuned for a harness this one replaced and diverge from the behavior we want, so Sisyphus, Hephaestus, Sisyphus-Junior, Atlas and the mode prompts all address them in the Anthropic shape. The borrowed body names the model actually running (`on glm-5-2`, `kimi-k3`) and never claims to be a Claude model. The retained variants stay on disk, unreachable through routing, so a measured reason to split a carrier off is a one-line routing change, not a rewrite.
+
+**Gemini, Grok, older GPT.** Their retained variants stay as they are. The three primary workflows do not target them, so they are not where prompt effort goes; the category lanes still use them, and their prompts are unchanged.
 
 ## 3. The flow is a capability, not a ledger
 

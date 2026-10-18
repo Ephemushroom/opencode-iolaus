@@ -29,9 +29,16 @@ import {
 } from "../dynamic-agent-prompt-builder";
 import { buildAgentIdentitySection } from "../dynamic-agent-prompt-builder";
 import { buildIolausFlowSection } from "../iolaus-flow-section";
+import { identifyModel } from "../../../prompts/prompt-lanes";
 
 function modelLabel(model: string): string {
+  const identity = identifyModel(model)
   const name = model.toLowerCase()
+  if (identity.vendor !== "anthropic") {
+    // GLM, Kimi and DeepSeek borrow this body; the label must name the model that
+    // is actually running rather than a Claude model it is not.
+    return identity.descriptor
+  }
   if (name.includes("fable") || name.includes("mythos")) return "Claude Fable"
   if (/opus-5[-.]5/.test(name)) return "Claude Opus 5.5"
   if (/opus-5(?![-.]\d)/.test(name)) return "Claude Opus 5"

@@ -6,8 +6,9 @@ import {
 } from "../omo/agents"
 import {
   atlasPromptVariants, prometheusPromptVariants, ultraworkPromptVariants,
-  HYPERPLAN_MODE_PROMPT, loadPromptSync, resolveVariant,
+  HYPERPLAN_MODE_PROMPT, loadPromptSync,
 } from "../omo/modes/src"
+import { resolvePromptIdiom, resolvePromptLane } from "./prompt-lanes"
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
 import { NATIVE_BINDINGS } from "./native-bindings"
@@ -40,7 +41,15 @@ export function renderAgent(name: AgentName, context: PromptContext): string {
     case "oracle": return getOraclePromptSelection(model).prompt
     case "prometheus": return loadPromptSync({ source: prometheusPromptVariants.default, name, variant: "default" }).body
     case "atlas": {
-      const variant = resolveVariant({ modelID: model, agentName: name, variants: atlasPromptVariants }) as keyof typeof atlasPromptVariants
+      // Lane first (Opus 4.7 keeps its retained tuning), then idiom: Anthropic
+      // models read the Anthropic body, and the GLM/Kimi/DeepSeek carriers that
+      // borrow that idiom read it too. OpenAI and Gemini keep their own bodies.
+      const lane = resolvePromptLane(model)?.lane
+      const variant = lane === "claude-opus-4-7" ? "opus-4-7"
+        : resolvePromptIdiom(model) === "anthropic" ? "anthropic"
+        : resolvePromptIdiom(model) === "openai" ? "gpt"
+        : resolvePromptIdiom(model) === "google" ? "gemini"
+        : "default"
       return loadPromptSync({ source: atlasPromptVariants[variant], name, variant }).body
     }
   }
@@ -63,7 +72,11 @@ export function renderMode(mode: ModeName, model: string, agent?: AgentName): st
   // mass-ulw is the same mode body as ultrawork plus an instruction to author the
   // graph itself, which modeDagInstruction appends.
   if (mode === "mass-ulw") return MASS_ULW_MODE_PROMPT
-  const variant = resolveVariant({ modelID: model, agentName: agent, variants: ultraworkPromptVariants }) as keyof typeof ultraworkPromptVariants
+  // Same identity policy as the agents: Anthropic models and the carriers that
+  // borrow the Anthropic idiom read the default body, OpenAI reads `gpt`, Gemini
+  // reads `gemini`. The retained GLM/Kimi/planner variants are no longer reached.
+  const idiom = resolvePromptIdiom(model)
+  const variant = idiom === "openai" ? "gpt" : idiom === "google" ? "gemini" : "default"
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }
 

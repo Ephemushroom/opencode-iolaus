@@ -7,7 +7,7 @@
  */
 
 import { isGpt5_5Model, isGpt5_6Model, isGpt6Model } from "../types";
-import { identifyModel } from "../../../prompts/prompt-lanes";
+import { identifyModel, resolvePromptIdiom } from "../../../prompts/prompt-lanes";
 import type {
   AvailableAgent,
   AvailableTool,
@@ -51,8 +51,11 @@ function extractModelName(model: string): string {
 
 /** Claude's large models are valid Hephaestus carriers; they get the Claude body. */
 function isClaudeHephaestusModel(model: string): boolean {
-  const identity = identifyModel(model);
-  return identity.vendor === "anthropic" && (identity.className === "opus" || identity.className === "fable");
+  const identity = identifyModel(model)
+  if (identity.vendor === "anthropic") return identity.className === "opus" || identity.className === "fable"
+  // GLM, Kimi and DeepSeek borrow the Anthropic idiom: their retained bodies were
+  // tuned for a harness this one replaced, so they run the Claude body instead.
+  return resolvePromptIdiom(model) === "anthropic"
 }
 
 export function isHephaestusSupportedModel(model: string | undefined): boolean {

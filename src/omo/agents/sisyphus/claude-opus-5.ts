@@ -51,6 +51,7 @@ import {
   categorizeTools,
   buildIolausFlowSection,
 } from "../dynamic-agent-prompt-builder";
+import { identifyModel } from "../../../prompts/prompt-lanes";
 
 export function buildClaudeOpus5SisyphusPrompt(
   model: string,
@@ -88,12 +89,16 @@ export function buildClaudeOpus5SisyphusPrompt(
     "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
   );
 
-  // Claude Opus 5.5 routes to this same variant (the Opus 5 guide's patterns carry over), so the
-  // self-knowledge block has to name the model actually running, not the family's first release.
-  const isOpus55 = /opus-5[-.]5/i.test(model);
-  const modelDisplayName = isOpus55 ? "Claude Opus 5.5" : "Claude Opus 5";
-  const modelIdentifier = isOpus55 ? "claude-opus-5-5" : "claude-opus-5";
-  const modelFamilyLabel = isOpus55 ? "Opus 5.5" : "Opus 5";
+  // Opus 5.5 routes to this same variant (the Opus 5 guide's patterns carry over),
+  // so the self-knowledge block has to name the model actually running. A model
+  // that merely borrows this idiom (GLM, Kimi, DeepSeek) must not be told it is a
+  // Claude model: the body names it by its own descriptor instead.
+  const identity = identifyModel(model)
+  const isClaude = identity.vendor === "anthropic"
+  const isOpus55 = isClaude && /opus-5[-.]5/i.test(model);
+  const modelDisplayName = isClaude ? (isOpus55 ? "Claude Opus 5.5" : "Claude Opus 5") : identity.descriptor;
+  const modelIdentifier = isClaude ? (isOpus55 ? "claude-opus-5-5" : "claude-opus-5") : model;
+  const modelFamilyLabel = isClaude ? (isOpus55 ? "Opus 5.5" : "Opus 5") : "agentic";
 
   return `${agentIdentity}
 <Role>

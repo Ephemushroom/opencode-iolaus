@@ -257,7 +257,7 @@ Every implementation task follows this cycle. No exceptions.
    Follow \`<explore>\` protocol for tool usage and agent prompts.
 
 2. PLAN - List files to modify, specific changes, dependencies, complexity estimate.
-   Multi-step (2+) → consult Plan Agent via \`subagent({agent: "plan", ...})\`.
+   Multi-step (2+) → encode the order in the work itself: a dependency that consumes another's output becomes an \`iolaus_flow\` edge (\`dependsOn\` + \`inputs\`), and independent parts run in parallel. This harness has no planning agent to consult.
    Single-step → mental plan is sufficient.
 
    <dependency_checks>
