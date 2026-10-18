@@ -37,8 +37,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Runtime
 
-- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.0.27
-  (`@opencode/plugin: 2.0.27`, `@opencode/schema: 2.0.27`). The entry is
+- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.0.32
+  (`@opencode/plugin: 2.0.32`, `@opencode/schema: 2.0.32`). The entry is
   `Plugin.define({ id, effect })`; every registration (`agent.transform`,
   `command.transform`, `mcp.transform`, `tool.transform`, `session.hook`,
   `tool.hook`, `rpc.register`) is an Effect in the plugin's `Scope`, and the
@@ -51,7 +51,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
   the Effect editor. `effect@4.0.1` is an exact peer and dependency pinned to the
   host's version and client peer contract (Effect 4.0.3 deferred), with
-  `@opentui/core` and `@opentui/solid` `>=0.5.17`. Bundled builds externalize
+  `@opentui/core` and `@opentui/solid` `>=0.6.6` (`0.6.6` in dev). Bundled builds externalize
   `effect`, `effect/*`, `@opencode/plugin`, and `@opentui/core` so runtime execution
   consumes the host's singleton instances and avoids symbol/type mismatches across packages.
 
@@ -215,11 +215,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   and librarian deny `edit`, `subagent` and `iolaus_flow`; metis and momus deny
   only `edit`; multimodal-looker allows only `read`. Shell stays allowed, so
   read-only is the prompt's contract, as in OMO. Host names: `edit` covers
-  edit/write/patch, `subagent` is OMO's `task`. OpenCode 2.0.27 dropped global
-  `external_directory` prompts from default rules; librarian explicitly adds
-  `external_directory: *` with `ask` to prompt for arbitrary external directories,
-  then grants `allow` for its temporary clone root (`$TMPDIR/iolaus-gh-*`),
-  preserving its clone-only boundary.
+  edit/write/patch, `subagent` is OMO's `task`. The host default is not a
+  meaningful boundary on its own (2.0.32 seeds a catch-all `*` allow), so
+  librarian states its boundary explicitly: `external_directory: *` with
+  `ask`, then `allow` for its temporary clone root (`$TMPDIR/iolaus-gh-*`).
+  Plugin tools cannot raise a prompt, so only an explicit `allow` passes.
 - `src/gh/` registers a read-only `gh` Code Mode namespace when a `gh` binary
   answers `--version` and `gh auth status` shows a login (`IOLAUS_GH_BIN`, then
   PATH, then common prefixes; `gh: false` disables). Twelve tools: searchCode,
