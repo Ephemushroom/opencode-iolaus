@@ -23,7 +23,7 @@ For the live Flow sidebar, add the TUI entry alongside the main plugin:
 }
 ```
 
-Iolaus targets OpenCode 2.0.27 (`@opencode/plugin: 2.0.27`, `@opencode/schema: 2.0.27`). It requires `effect: 4.0.1` as a peer dependency pinned to the host's version, and `@opentui/core` / `@opentui/solid` `>=0.5.17`. Bundled builds externalize `effect`, `@opencode/plugin`, and `@opentui/core` so the plugin shares the host's runtime instance rather than loading duplicate copies.
+Iolaus targets OpenCode 2.0.32 (`@opencode/plugin: 2.0.32`, `@opencode/schema: 2.0.32`). It requires `effect: 4.0.1` as a peer dependency pinned to the host's version, and `@opentui/core` / `@opentui/solid` `>=0.6.6`. Bundled builds externalize `effect`, `@opencode/plugin`, and `@opentui/core` so the plugin shares the host's runtime instance rather than loading duplicate copies.
 
 Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in `IOLAUS_HOME/iolaus.json` to disable it globally.
 

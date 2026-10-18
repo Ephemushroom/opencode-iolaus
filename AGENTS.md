@@ -252,9 +252,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `atlas`, the specialists, or a category lane named after the category
   (`quick`, `deep-low`, `deep-high`, `ultrabrain`, `visual-engineering`,
   `artistry`, `writing`, `unspecified-low`, `unspecified-high`), subject to the
-  tier rule below. OpenCode 2.0.18 ignores `parentID` on session creation;
-  the runner stores the child execution ref before prompting it and records
-  metadata `iolaus_dag_node`, `iolaus_dag_attempt`, `iolaus_dag_run`.
+  tier rule below. Child sessions do not rely on the host honouring `parentID`
+  on creation: the runner stores the child execution ref before prompting it
+  and records metadata `iolaus_dag_node`, `iolaus_dag_attempt`,
+  `iolaus_dag_run`, so recovery and tier checks work on any host that keeps
+  session creation usable.
 - Agent tiers (`src/roles/tier.ts`). Three top-level workflows, four primaries
   (`PRIMARY_AGENTS`): Sisyphus, Hephaestus, Prometheus → Atlas. Every other
   Iolaus agent and category lane is a shared lower worker. Rule: a primary may
