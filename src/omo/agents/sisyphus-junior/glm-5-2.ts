@@ -1,37 +1,25 @@
 import { resolvePromptAppend } from "../builtin-agents/resolve-file-uri"
+import { buildIolausFlowSection } from "../iolaus-flow-section"
 import { buildAntiDuplicationSection } from "../dynamic-agent-prompt-builder"
 
-function buildGlm52TrackingSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `<task_tracking>
-Use task tracking for any non-trivial work.
-- 2+ steps: call \`task_create\` before editing.
-- Start one item at a time with \`task_update(status="in_progress")\`.
-- Complete it immediately with \`task_update(status="completed")\`.
-- Never batch completions or leave stale task state.
-</task_tracking>`
-  }
-
-  return `<todo_tracking>
-Use todo tracking for any non-trivial work.
-- 2+ steps: call \`todowrite\` before editing.
-- Keep one item \`in_progress\` at a time.
-- Mark each item \`completed\` immediately after it lands.
-- Never batch completions or leave stale todo state.
-</todo_tracking>`
+function buildGlm52TrackingSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness; a category lane is a worker, so it gets
+  // the completion contract rather than an orchestration section.
+  return buildIolausFlowSection({ worker: true })
 }
+
 
 export function buildGlm52SisyphusJuniorPrompt(
   useTaskSystem: boolean,
   promptAppend?: string
 ): string {
   const trackingSection = buildGlm52TrackingSection(useTaskSystem)
-  const trackingTool = useTaskSystem ? "task_update" : "todowrite"
+  const trackingTool = "iolaus_flow"
 
   const prompt = `<identity>
 You are Sisyphus-Junior, the focused task executor from OhMyOpenCode, running on GLM 5.2.
 
-You receive one delegated category task from Atlas or Sisyphus and complete it directly. You do not orchestrate, do not delegate implementation, and do not expand the scope. You may use explore or librarian through \`call_omo_agent\` for research only; the implementation, verification, and final handoff are yours.
+You receive one delegated category task from Atlas or Sisyphus and complete it directly. You do not orchestrate, do not delegate implementation, and do not expand the scope. You may use explore or librarian through \`subagent\` for research only; the implementation, verification, and final handoff are yours.
 </identity>
 
 <glm_5_2_calibration>

@@ -135,6 +135,13 @@ test("mode requires explicit marker and resets with the next user request", asyn
   expect(explicitMode("/team inspect this")).toBe("team")
   expect(explicitMode("/iolaus-team inspect this")).toBeUndefined()
   expect(explicitMode("/teamwork now")).toBeUndefined()
+  // OMO-style keywords at the start of a prompt select the matching mode.
+  expect(explicitMode("ulw fix the build")).toBe("ultrawork")
+  expect(explicitMode("ultrawork fix the build")).toBe("ultrawork")
+  expect(explicitMode("ulw plan the migration")).toBe("hyperplan")
+  expect(explicitMode("ulw-plan the migration")).toBe("hyperplan")
+  expect(explicitMode("mass-ulw migrate every service")).toBe("mass-ulw")
+  expect(explicitMode("ulwish it worked")).toBeUndefined()
   const event = context("build")
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
   await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
@@ -217,11 +224,17 @@ test("mode commands register under their short names", async () => {
     command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { names.push(definition.name) } }); return { dispose: Effect.void } }) },
     session: { prompt: () => Effect.succeed(undefined) } as never,
   }, parseOptions({}))))
-  expect(names).toEqual(["ultrawork", "hyperplan", "team", "goal", "start-work"])
+  // Mode commands, their OMO-style aliases, then the role commands. `mass-ulw`
+  // and the aliases are registered from the same table the parser reads.
+  expect(names).toEqual([
+    "ultrawork", "hyperplan", "team", "mass-ulw",
+    "ulw", "ultra", "ulw-plan", "ulw-execute",
+    "goal", "start-work",
+  ])
   const only: string[] = []
   await Effect.runPromise(Effect.scoped(registerModes({
     command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { only.push(definition.name) } }); return { dispose: Effect.void } }) },
     session: { prompt: () => Effect.succeed(undefined) } as never,
   }, parseOptions({ agents: ["sisyphus"], modes: ["ultrawork"] }))))
-  expect(only).toEqual(["ultrawork"])
+  expect(only).toEqual(["ultrawork", "ulw", "ultra"])
 })

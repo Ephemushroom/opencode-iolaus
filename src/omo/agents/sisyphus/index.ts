@@ -20,6 +20,7 @@ export { buildDefaultSisyphusPrompt, buildTaskManagementSection } from "./defaul
 export { buildClaudeOpus47SisyphusPrompt } from "./claude-opus-4-7";
 export { buildClaudeOpus48SisyphusPrompt } from "./claude-opus-4-8";
 export { buildClaudeOpus5SisyphusPrompt } from "./claude-opus-5";
+export { buildClaudeOpus55SisyphusPrompt } from "./claude-opus-5-5";
 export { buildClaudeFable5SisyphusPrompt } from "./claude-fable-5";
 export {
   buildGeminiToolMandate,
@@ -31,6 +32,7 @@ export {
 } from "./gemini";
 export { buildGpt54SisyphusPrompt } from "./gpt-5-4";
 export { buildGpt55SisyphusPrompt } from "./gpt-5-5";
+export { buildGpt6AstraSisyphusPrompt } from "./gpt-6-astra";
 export { buildGrok4SisyphusPrompt } from "./grok-4";
 export { buildGlm52SisyphusPrompt } from "./glm-5-2";
 export { buildKimiK26SisyphusPrompt } from "./kimi-k2-6";

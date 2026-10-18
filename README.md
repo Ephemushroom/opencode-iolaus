@@ -40,6 +40,10 @@ A lane may also name an ordered chain, for example `"quick": ["openai/gpt-6-luna
 
 Plugin options and legacy `models.json` files are ignored. Iolaus is config-first and ships no default model chain: a lane you do not configure is not registered, and a DAG node targeting it is rejected with `model_unavailable`. Use top-level `agents` / `categories` in the global file to select which lanes register.
 
+## Prompt design
+
+How the prompts are structured, which rules come from Anthropic's and OpenAI's current guidance, why `iolaus_flow` is described as a capability rather than a todo replacement, and what to check before changing a prompt: [`docs/prompt-design.md`](docs/prompt-design.md). Read it before editing a primary agent's prompt or adding a model lane.
+
 ## Three workflows
 
 Iolaus has three top-level workflows run by four primary agents. You pick the workflow with a command; no primary hands work to another primary.
@@ -49,6 +53,17 @@ Iolaus has three top-level workflows run by four primary agents. You pick the wo
 | Do anything | Sisyphus | `/ultrawork <task>` |
 | Goal loop | Hephaestus | `/goal <task>` |
 | Plan, then implement | Prometheus → Atlas | `/hyperplan <request>`, then `/start-work <plan>` |
+
+The slash commands have OMO-style keyword aliases. A leading keyword selects the same mode and hands the session to its owning agent, exactly as the command does:
+
+| You type | Same as | What happens |
+| --- | --- | --- |
+| `ulw <task>` or `ultrawork <task>` | `/ultrawork <task>` | Sisyphus enters ultrawork; its first tool call is `iolaus_flow` with the `ultrawork` template, then it waits |
+| `ulw plan <request>`, `ulw-plan <request>` | `/hyperplan <request>` | Prometheus plans; the reviewed plan waits for your `/start-work <plan>` |
+| `ulw-execute <plan>` | `/start-work <plan>` | Atlas runs the plan, one fresh session per ticket |
+| `/mass-ulw <task>` or `mass-ulw <task>` | mode `mass-ulw` | Sisyphus writes the dependency graph itself and drives it through `iolaus_flow`, one run per phase, binding each phase's results into the next |
+
+`mass-ulw` is a mode, not a template: no built-in graph exists because the task decides the phases. The mandate is in the mode prompt: the first run must exist before implementation starts, and each later phase is a new run fed by `inputs` from the previous one.
 
 Prometheus → Atlas is one workflow with a hand-off only you make: Prometheus writes the plan and stops, and Atlas starts when you run `/start-work <plan>` and the plan validates.
 

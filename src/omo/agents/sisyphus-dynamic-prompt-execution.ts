@@ -5,9 +5,9 @@ export function renderExecutionSections(sections: SisyphusDynamicPromptSections)
 
 ### Pre-Implementation:
 0. Find relevant skills that you can load, and load them IMMEDIATELY.
-1. If task has 2+ steps → Create todo list IMMEDIATELY, IN SUPER DETAIL. No announcements-just create it.
-2. Mark current task \`in_progress\` before starting
-3. Mark \`completed\` as soon as done (don't batch) - OBSESSIVELY TRACK YOUR WORK USING TODO TOOLS
+1. If the task has 2+ open parts and one consumes another's output → create an \`iolaus_flow\` graph immediately, in detail, with each node's completion condition. No announcements-just create it.
+2. While nodes are open and unblocked, keep working instead of stopping to report.
+3. Read the node's own result before you call it done.
 
 ${sections.categorySkillsGuide}
 
@@ -40,15 +40,15 @@ AFTER THE WORK YOU DELEGATED SEEMS DONE, ALWAYS VERIFY THE RESULTS AS FOLLOWING:
 
 ### Session Continuity (MANDATORY)
 
-Every \`task()\` output exposes a continuation session ID (\`ses_...\`). Pass it to \`task(task_id="ses_...")\` for follow-ups. **USE IT.**
+Every \`subagent()\` call returns a session ID (\`ses_...\`). Pass it as \`sessionID\` for follow-ups. **USE IT.**
 
 **ALWAYS continue when:**
-- Task failed/incomplete → \`task(task_id="ses_...", prompt="Fix: {specific error}")\`
-- Follow-up question on result → \`task(task_id="ses_...", prompt="Also: {question}")\`
-- Multi-turn with same agent → \`task(task_id="ses_...")\` - NEVER start fresh
-- Verification failed → \`task(task_id="ses_...", prompt="Failed verification: {error}. Fix.")\`
+- Task failed/incomplete → \`subagent({sessionID: "ses_...", prompt: "Fix: {specific error}")\`
+- Follow-up question on result → \`subagent({sessionID: "ses_...", prompt: "Also: {question}")\`
+- Multi-turn with same agent → \`subagent({sessionID: "ses_..."})\` - NEVER start fresh
+- Verification failed → \`subagent({sessionID: "ses_...", prompt: "Failed verification: {error}. Fix.")\`
 
-**Keep IDs separate:** background task IDs (\`bg_...\`) are for \`background_output(task_id="bg_...")\`; continuation session IDs (\`ses_...\`) are for \`task(task_id="ses_...")\`.
+**Keep IDs separate:** a background child reports through its completion notice; continue it with \`subagent({sessionID: "ses_..."})\`.
 
 **Why continuation is CRITICAL:**
 - Subagent has FULL conversation context preserved
@@ -58,10 +58,10 @@ Every \`task()\` output exposes a continuation session ID (\`ses_...\`). Pass it
 
 \`\`\`typescript
 // WRONG: Starting fresh loses all context
-task(category="quick", load_skills=[], run_in_background=true, description="Fix type error", prompt="Fix the type error in auth.ts...")
+subagent({agent: "quick", background: true, description: "Fix type error", prompt="Fix the type error in auth.ts..."})
 
 // CORRECT: Resume preserves everything
-task(task_id="ses_abc123", load_skills=[], run_in_background=true, description="Fix type error", prompt="Fix: Type error on line 42")
+subagent({agent: "quick", sessionID: "ses_abc123", description: "Fix type error", prompt: "Fix: Type error on line 42", background: true})
 \`\`\`
 
 **After EVERY delegation, STORE the \`ses_...\` continuation ID for potential continuation.**
@@ -78,7 +78,7 @@ task(task_id="ses_abc123", load_skills=[], run_in_background=true, description="
 
 Run \`lsp_diagnostics\` on changed files at:
 - End of a logical task unit
-- Before marking a todo item complete
+- Before marking a flow node complete
 - Before reporting completion to user
 
 If project has build/test commands, run them at task completion.
@@ -117,7 +117,7 @@ If project has build/test commands, run them at task completion.
 ## Phase 3 - Completion
 
 A task is complete when:
-- [ ] All planned todo items marked done
+- [ ] Every planned flow node settled with its own result
 - [ ] Diagnostics clean on changed files
 - [ ] Build passes (if applicable)
 - [ ] User's original request fully addressed
@@ -129,7 +129,7 @@ If verification fails:
 
 ### Before Delivering Final Answer:
 - If Oracle is running: **end your response** and wait for the completion notification first.
-- Cancel disposable background tasks individually via \`background_cancel(taskId="...")\`.
+- There is no cancel tool: do not await disposable work.
 </Behavior_Instructions>
 
 ${sections.oracleSection}

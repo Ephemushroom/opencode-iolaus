@@ -7,6 +7,7 @@
  */
 
 import { isGpt5_5Model, isGpt5_6Model, isGpt6Model } from "../types";
+import { identifyModel } from "../../../prompts/prompt-lanes";
 import type {
   AvailableAgent,
   AvailableTool,
@@ -19,6 +20,8 @@ import { buildHephaestusPrompt as buildGptPrompt } from "./gpt";
 import { buildHephaestusPrompt as buildGpt54Prompt } from "./gpt-5-4";
 import { buildGpt55HephaestusPrompt as buildGpt55Prompt } from "./gpt-5-5";
 import { buildGpt56HephaestusPrompt as buildGpt56Prompt } from "./gpt-5-6";
+import { buildGpt6AstraHephaestusPrompt as buildGpt6AstraPrompt } from "./gpt-6-astra";
+import { buildClaudeHephaestusPrompt as buildClaudePrompt } from "./claude";
 
 const GPT_5_3_CODEX_RE = /^gpt-5[.-]3-codex(?:$|[.-])/i;
 const GPT_5_4_RE = /^gpt-5[.-]4(?:$|[.-])/i;
@@ -27,14 +30,14 @@ const GPT_5_6_RE = /^gpt-5[.-]6(?:$|[.-])/i;
 const GPT_6_RE = /^gpt-6(?:$|[.-])/i;
 const HOSTED_VENDOR_PREFIX_RE = /^(?:[^./]+\.)+(gpt-5[.-].*)$/i;
 
-export type HephaestusPromptSource = "gpt-5-6" | "gpt-5-5" | "gpt-5-4" | "gpt";
+export type HephaestusPromptSource = "claude" | "gpt-6-astra" | "gpt-5-6" | "gpt-5-5" | "gpt-5-4" | "gpt";
 
 export class UnsupportedHephaestusModelError extends Error {
   readonly model: string | undefined;
 
   constructor(model: string | undefined) {
     super(
-      `Hephaestus only supports GPT-5.3 Codex, GPT-5.4, GPT-5.5, and GPT-5.6 models; received ${model ?? "no model"}.`,
+      `Hephaestus runs on Claude Opus/Fable or a GPT model in the Iolaus prompt table; received ${model ?? "no model"}.`,
     );
     this.name = "UnsupportedHephaestusModelError";
     this.model = model;
@@ -46,8 +49,15 @@ function extractModelName(model: string): string {
   return HOSTED_VENDOR_PREFIX_RE.exec(afterProvider)?.[1] ?? afterProvider;
 }
 
+/** Claude's large models are valid Hephaestus carriers; they get the Claude body. */
+function isClaudeHephaestusModel(model: string): boolean {
+  const identity = identifyModel(model);
+  return identity.vendor === "anthropic" && (identity.className === "opus" || identity.className === "fable");
+}
+
 export function isHephaestusSupportedModel(model: string | undefined): boolean {
   if (!model) return false;
+  if (isClaudeHephaestusModel(model)) return true;
   const modelName = extractModelName(model);
   return (
     GPT_5_3_CODEX_RE.test(modelName) ||
@@ -68,6 +78,16 @@ export function getHephaestusPromptSource(
   model?: string,
 ): HephaestusPromptSource {
   assertHephaestusSupportedModel(model);
+  // Opus and Fable get a Claude-native body: the GPT one carries apply_patch and
+  // preamble rules Anthropic's guidance says to drop.
+  if (model && isClaudeHephaestusModel(model)) {
+    return "claude";
+  }
+  // Astra keeps its own prompt: its documented behavior differs from 5.6 in the
+  // places this body depends on (when it stops, and how it reads boundaries).
+  if (model && identifyModel(model).className === "astra") {
+    return "gpt-6-astra";
+  }
   if (model && (isGpt5_6Model(model) || isGpt6Model(model))) {
     return "gpt-5-6";
   }
@@ -108,6 +128,12 @@ export function buildDynamicHephaestusPrompt(ctx?: HephaestusContext): string {
 
   let basePrompt: string;
   switch (source) {
+    case "claude":
+      basePrompt = buildClaudePrompt(model ?? "", agents, tools, skills, categories, useTaskSystem);
+      break;
+    case "gpt-6-astra":
+      basePrompt = buildGpt6AstraPrompt(agents, tools, skills, categories, useTaskSystem);
+      break;
     case "gpt-5-6":
       basePrompt = buildGpt56Prompt(
         agents,

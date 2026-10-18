@@ -11,7 +11,7 @@ import {
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
 import { NATIVE_BINDINGS } from "./native-bindings"
-import { TEAM_DAG_MODE_PROMPT } from "./mode-dag"
+import { MASS_ULW_MODE_PROMPT, TEAM_DAG_MODE_PROMPT } from "./mode-dag"
 import { buildHephaestusPrompt } from "../omo/agents/hephaestus/gpt"
 
 export interface PromptContext {
@@ -60,6 +60,9 @@ export function renderCategory(name: CategoryName, model: string): string {
 export function renderMode(mode: ModeName, model: string, agent?: AgentName): string {
   if (mode === "hyperplan") return HYPERPLAN_MODE_PROMPT
   if (mode === "team") return TEAM_DAG_MODE_PROMPT
+  // mass-ulw is the same mode body as ultrawork plus an instruction to author the
+  // graph itself, which modeDagInstruction appends.
+  if (mode === "mass-ulw") return MASS_ULW_MODE_PROMPT
   const variant = resolveVariant({ modelID: model, agentName: agent, variants: ultraworkPromptVariants }) as keyof typeof ultraworkPromptVariants
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }

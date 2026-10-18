@@ -9,6 +9,7 @@
  */
 
 import { resolvePromptAppend } from "../builtin-agents/resolve-file-uri"
+import { buildIolausFlowSection } from "../iolaus-flow-section"
 import { buildAntiDuplicationSection } from "../dynamic-agent-prompt-builder"
 
 export function buildGeminiSisyphusJuniorPrompt(
@@ -59,7 +60,7 @@ Before responding, ask yourself: What tools do I need to call? What am I assumin
 - Run verification (lint, tests, build) WITHOUT asking
 - Make decisions. Course-correct only on CONCRETE failure
 - Note assumptions in final message, not as questions mid-work
-- Need context? Fire explore/librarian via call_omo_agent IMMEDIATELY - continue only with non-overlapping work while they search
+- Need context? Fire explore/librarian with subagent({..., background: true}) IMMEDIATELY - continue only with non-overlapping work while they search
 
 ## Scope Discipline
 
@@ -78,7 +79,7 @@ Before responding, ask yourself: What tools do I need to call? What am I assumin
 
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
-- Explore/Librarian via call_omo_agent = background research. Fire them and continue only with non-overlapping work
+- Explore/librarian as background children = research. Fire them and continue only with non-overlapping work
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 - ALWAYS use tools over internal knowledge for file contents, project state, and verification
@@ -128,7 +129,7 @@ Between implementation and completion, there is VERIFICATION. Every. Single. Tim
 
 - **Diagnostics**: Use lsp_diagnostics - ZERO errors on changed files
 - **Build**: Use Bash - Exit code 0 (if applicable)
-- **Tracking**: Use ${useTaskSystem ? "task_update" : "todowrite"} - ${verificationText}
+- **Tracking**: the flow you started is the record; settle each node with its own result
 
 **No evidence = not complete. "I think it works" is NOT evidence. Tool output IS evidence.**
 
@@ -167,28 +168,8 @@ If ANY answer is no → GO BACK AND DO IT. Do not claim completion.
   return prompt + "\n\n" + resolvePromptAppend(promptAppend)
 }
 
-function buildGeminiTaskDisciplineSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `## Task Discipline (NON-NEGOTIABLE)
-
-**You WILL forget to track tasks if not forced. This section forces you.**
-
-- **2+ steps** - task_create FIRST, atomic breakdown. DO THIS BEFORE ANY IMPLEMENTATION.
-- **Starting step** - task_update(status="in_progress") - ONE at a time
-- **Completing step** - task_update(status="completed") IMMEDIATELY after verification passes
-- **Batching** - NEVER batch completions. Mark EACH task individually.
-
-No tasks on multi-step work = INCOMPLETE WORK. The user tracks your progress through tasks.`
-  }
-
-  return `## Todo Discipline (NON-NEGOTIABLE)
-
-**You WILL forget to track todos if not forced. This section forces you.**
-
-- **2+ steps** - todowrite FIRST, atomic breakdown. DO THIS BEFORE ANY IMPLEMENTATION.
-- **Starting step** - Mark in_progress - ONE at a time
-- **Completing step** - Mark completed IMMEDIATELY after verification passes
-- **Batching** - NEVER batch completions. Mark EACH todo individually.
-
-No todos on multi-step work = INCOMPLETE WORK. The user tracks your progress through todos.`
+function buildGeminiTaskDisciplineSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness; a category lane is a worker, so it gets
+  // the completion contract rather than an orchestration section.
+  return buildIolausFlowSection({ worker: true })
 }

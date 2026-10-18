@@ -86,7 +86,7 @@ ${skillsSection}${customPriorityNote}`
 
   return `### Category + Skills Delegation System
 
-**task() combines categories and skills for optimal task execution.**
+**subagent() dispatches to a category lane or a specialist, and the skills you load first shape what it does.**
 
 #### Available Categories (Domain-Optimized Models)
 
@@ -109,7 +109,7 @@ ${skillsSection}
 Check the \`skill\` tool for available skills and their descriptions. For EVERY skill, ask:
 > "Does this skill's expertise domain overlap with my task?"
 
-- If YES → INCLUDE in \`load_skills=[...]\`
+- If YES → load it for the child with the native \`skill({id})\` tool before you delegate
 - If NO → OMIT (no justification needed)${customPriorityNote}
 
 ---
@@ -117,17 +117,13 @@ Check the \`skill\` tool for available skills and their descriptions. For EVERY 
 ### Delegation Pattern
 
 \`\`\`typescript
-task(
-  category="[selected-category]",
-  load_skills=["skill-1", "skill-2"],  // Include ALL relevant skills - ESPECIALLY user-installed ones
-  run_in_background=true,
-  prompt="..."
-)
+subagent({agent: "[selected-category]", // Include ALL relevant skills - ESPECIALLY user-installed ones
+  background: true, prompt: "..."})
 \`\`\`
 
 **ANTI-PATTERN (will produce poor results):**
 \`\`\`typescript
-task(category="...", load_skills=[], run_in_background=true, prompt="...")  // Empty load_skills without justification
+subagent({agent: "...", prompt: "..."})  // no skill loaded, and no reason why
 \`\`\`
 
 ---
@@ -142,10 +138,10 @@ Any task with even a minor visual-design relationship - including UI, UX, CSS, s
 
 \`\`\`typescript
 // CORRECT: Visual work → visual-engineering category
-task(category="visual-engineering", load_skills=["frontend"], run_in_background=true, prompt="Redesign the sidebar layout with new spacing...")
+subagent({agent: "visual-engineering", background: true, prompt: "Redesign the sidebar layout with new spacing..."})
 
 // WRONG: Visual work in wrong category - WILL PRODUCE INFERIOR RESULTS
-task(category="quick", load_skills=[], run_in_background=true, prompt="Redesign the sidebar layout with new spacing...")
+subagent({agent: "quick", background: true, prompt: "Redesign the sidebar layout with new spacing..."})
 \`\`\`
 
 | Task Domain | MUST Use Category |

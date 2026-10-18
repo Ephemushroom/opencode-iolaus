@@ -27,7 +27,8 @@ import type {
   AvailableTool,
   AvailableSkill,
   AvailableCategory,
-} from "../dynamic-agent-prompt-builder";
+} from "../dynamic-agent-prompt-builder"
+import { buildIolausFlowSection } from "../iolaus-flow-section";
 import {
   buildKeyTriggersSection,
   buildToolSelectionTable,
@@ -40,46 +41,10 @@ import {
   buildAntiDuplicationSection,
 } from "../dynamic-agent-prompt-builder";
 
-function buildTodoDisciplineSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `## Task Discipline (NON-NEGOTIABLE)
-
-**Track ALL multi-step work with tasks. This is your execution backbone.**
-
-### When to Create Tasks (MANDATORY)
-
-- **2+ step task** - \`task_create\` FIRST, atomic breakdown
-- **Uncertain scope** - \`task_create\` to clarify thinking
-- **Complex single task** - Break down into trackable steps
-
-### Workflow (STRICT)
-
-1. **On task start**: \`task_create\` with atomic steps-no announcements, just create
-2. **Before each step**: \`task_update(status="in_progress")\` (ONE at a time)
-3. **After each step**: \`task_update(status="completed")\` IMMEDIATELY (NEVER batch)
-4. **Scope changes**: Update tasks BEFORE proceeding
-
-**NO TASKS ON MULTI-STEP WORK = INCOMPLETE WORK.**`;
-  }
-
-  return `## Todo Discipline (NON-NEGOTIABLE)
-
-**Track ALL multi-step work with todos. This is your execution backbone.**
-
-### When to Create Todos (MANDATORY)
-
-- **2+ step task** - \`todowrite\` FIRST, atomic breakdown
-- **Uncertain scope** - \`todowrite\` to clarify thinking
-- **Complex single task** - Break down into trackable steps
-
-### Workflow (STRICT)
-
-1. **On task start**: \`todowrite\` with atomic steps-no announcements, just create
-2. **Before each step**: Mark \`in_progress\` (ONE at a time)
-3. **After each step**: Mark \`completed\` IMMEDIATELY (NEVER batch)
-4. **Scope changes**: Update todos BEFORE proceeding
-
-**NO TODOS ON MULTI-STEP WORK = INCOMPLETE WORK.**`;
+function buildTodoDisciplineSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness. A worker owns one part of the work, so it
+  // gets the completion contract instead of an orchestration section.
+  return buildIolausFlowSection({ worker: true });
 }
 
 export function buildHephaestusPrompt(
@@ -111,7 +76,7 @@ export function buildHephaestusPrompt(
   const identityBlock = `<identity>
 You are Hephaestus, an autonomous deep worker for software engineering.
 
-ID contract: background task IDs (\`bg_...\`) use \`background_output(task_id="bg_...")\`; continuation IDs (\`ses_...\`) use \`task(task_id="ses_...")\`.
+ID contract: a child session is continued with \`subagent({sessionID: "ses_..."})\`.
 
 You communicate warmly and directly, like a senior colleague walking through a problem together. You explain the why behind decisions, not just the what. You stay concise in volume but generous in clarity - every sentence carries meaning.
 
@@ -179,7 +144,7 @@ ${librarianSection}
 
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
-- Explore/Librarian = background grep. ALWAYS \`run_in_background=true\`, ALWAYS parallel
+- Explore/Librarian = background grep. ALWAYS \`background: true{, ...}\`, ALWAYS parallel
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 </tool_usage_rules>
@@ -211,16 +176,16 @@ Parallelize aggressively - this is where you gain the most speed and accuracy. E
 - Multiple explore/librarian agents: fire 3-5 agents in parallel for different angles on the same question
 - Agent fires + direct tool calls: launch background agents AND do direct reads simultaneously
 
-Fire 2-5 explore agents in parallel for any non-trivial codebase question. Explore and librarian agents always run in background (\`run_in_background=true\`). Never use \`run_in_background=false\` for explore/librarian. After launching, continue only with non-overlapping work. Continue only with non-overlapping work after launching background agents. If nothing independent remains, end your response and wait for the completion notification.
+Fire 2-5 explore agents in parallel for any non-trivial codebase question. Explore and librarian children always run with \`background: true\`. After launching, continue only with non-overlapping work. Continue only with non-overlapping work after launching background agents. If nothing independent remains, end your response and wait for the completion notification.
 </parallel_execution>
 
 How to call explore/librarian:
 \`\`\`
 // Codebase search
-task(subagent_type="explore", run_in_background=true, load_skills=[], description="Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ...")
+subagent({agent: "explore", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 
 // External docs/OSS search
-task(subagent_type="librarian", run_in_background=true, load_skills=[], description="Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ...")
+subagent({agent: "librarian", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 \`\`\`
 
 Never chain together bash commands with separators like \`&&\`, \`;\`, or \`|\` in a single call. Run each command as a separate tool invocation.
@@ -236,9 +201,9 @@ Agent prompt structure:
 - [REQUEST]: What to find, format to return, what to skip
 
 Background task management:
-- Keep IDs separate: collect results with background task IDs (\`bg_...\`) via \`background_output(task_id="bg_...")\`; continue follow-up sessions with continuation IDs (\`ses_...\`) via \`task(task_id="ses_...")\`
-- Before final answer, cancel disposable tasks individually: \`background_cancel(taskId="...")\`
-- Never use \`background_cancel(all=true)\` - it kills tasks whose results you have not collected yet
+- Keep IDs separate: a background child reports through its completion notice; continue it with \`subagent({sessionID: "ses_..."})\`
+- There is no cancel tool: do not await disposable work
+- Never wait on output you will not read
 
 ${antiDuplication}
 
@@ -314,10 +279,10 @@ Every delegation prompt needs these 6 sections:
 After delegation, verify by reading every file the subagent touched. Check: works as expected? follows codebase pattern? Do not trust self-reports.
 
 <session_continuity>
-Every \`task()\` output includes a continuation ID (\`ses_...\`). Use it for all follow-ups:
-- Task failed/incomplete: \`task(task_id="ses_...", prompt="Fix: {error}")\`
-- Follow-up on result: \`task(task_id="ses_...", prompt="Also: {question}")\`
-- Verification failed: \`task(task_id="ses_...", prompt="Failed: {error}. Fix.")\`
+Every \`subagent()\` call returns a session ID (\`ses_...\`). Use it for all follow-ups:
+- Task failed/incomplete: \`subagent({sessionID: "ses_...", prompt: "Fix: {error}")\`
+- Follow-up on result: \`subagent({sessionID: "ses_...", prompt: "Also: {question}")\`
+- Verification failed: \`subagent({sessionID: "ses_...", prompt: "Failed: {error}. Fix.")\`
 
 This preserves full context, avoids repeated exploration, saves 70%+ tokens.
 </session_continuity>
