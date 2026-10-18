@@ -1,25 +1,15 @@
 <hyperplan-mode>
-**MANDATORY**: Say "HYPERPLAN MODE ENABLED!" as your first response, exactly once.
+Hyperplan mode: the plan is produced by several perspectives that attack each other before anything is written, then handed to Prometheus, reviewed by Momus, and paused for your approval.
 
-The user invoked **hyperplan mode** — adversarial multi-agent planning via team-mode.
+The mechanics are the Iolaus `hyperplan` template. The appended mode instruction tells you to create it; this block is the doctrine behind it.
 
-LOAD THE HYPERPLAN SKILL IMMEDIATELY:
+- **Members analyse independently first.** Each member reads the same request and reports findings without seeing the others, so disagreements are real instead of an echo.
+- **Then they attack each other.** A finding survives because it withstood the attack, not because it was stated confidently.
+- **Then they defend, refine, or concede.** A member that cannot defend a point drops it.
+- **Metis distils** what survived into one bundle. The lead does not write the plan.
+- **Prometheus writes it**, under the planner contract: `.iolaus/plans/<plan>/spec.md` plus `tickets/NN-<name>.md`, each ticket with acceptance checkboxes, the paths it touches, and a `Blocked by:` line.
+- **Momus reviews it** on the Standards and Spec axes and ends with `VERDICT: PASS` or `VERDICT: FAIL`.
+- **The run pauses at a gate.** The plan is the user's to accept. Do not implement anything in this mode; execution starts when the user runs `/start-work <plan>` or `/ulw-execute <plan>`.
 
-```
-skill(name="hyperplan")
-```
-
-After loading, follow the skill's full workflow EXACTLY:
-1. Acknowledge and capture the planning request
-2. Spawn the adversarial team via `team_create` with category members `unspecified-low`, `unspecified-high`, `ultrabrain`, and `artistry`; include `deep` only if the category is enabled
-3. Round 1 — Independent analysis (each member produces findings)
-4. Round 2 — Cross-attack (each member ruthlessly attacks the other 4's findings)
-5. Round 3 — Defend, refine, or concede
-6. Distill defensible insights into a structured bundle (Lead does NOT write the plan)
-7. MANDATORY: hand the bundle to the `plan` agent via `task(subagent_type="plan", ...)` — the plan agent owns sequencing, parallelization, and verification gates
-8. Present the plan agent's output verbatim with provenance line, then clean up the team
-
-Do NOT improvise. Do NOT skip rounds. Do NOT write the plan yourself in step 6 — the handoff to the plan agent in step 7 is non-negotiable. Be the lead orchestrator and let the adversarial members do the cross-critique.
-
-If team-mode is unavailable (`team_*` tools missing), instruct the user to set `team_mode.enabled: true` in `~/.config/opencode/oh-my-opencode.jsonc` and restart opencode.
+Members are category lanes from the advertised ids, not invented names. If a lane the task needs is not enabled, say which one and continue with the rest rather than stalling.
 </hyperplan-mode>

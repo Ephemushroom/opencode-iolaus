@@ -1,0 +1,23 @@
+{
+  "evidence": "/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/config-first-dynamic-review/.iolaus/evidence/config-first-dynamic-review/qa-dag-recover",
+  "verdict": "PASS",
+  "checks": [
+    {
+      "name": "plugin reloaded mid-run",
+      "verdict": "PASS",
+      "loads": 2
+    },
+    {
+      "name": "running node reattached and run completed",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel keybind declines and confirms",
+      "verdict": "PASS"
+    },
+    {
+      "name": "observed subagent node reattached after reload",
+      "verdict": "PASS"
+    }
+  ]
+}

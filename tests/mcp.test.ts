@@ -7,6 +7,7 @@ import { registerAgents } from "../src/registration"
 import { evaluate, type PermissionRule } from "../src/ast-grep/permissions"
 import { Agent } from "@opencode/plugin"
 import type { AgentEditor } from "@opencode/plugin/effect/agent"
+import { ALL_LANES } from "./lanes"
 
 type Config = Parameters<MCPEditor["set"]>[1]
 
@@ -55,7 +56,7 @@ test("read-only specialists may call context7 and grep_app tools", async () => {
     list: () => [...agents.values()], get: (id) => agents.get(id), default: () => {}, remove: (id) => { agents.delete(id) },
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
-  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents({ agent: { transform: (run) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }, parseOptions({}), ALL_LANES)))
   const rules = agents.get("librarian")!.permissions as readonly PermissionRule[]
   expect(evaluate("context7_resolve-library-id", "*", rules)).toBe("allow")
   expect(evaluate("context7_query-docs", "*", rules)).toBe("allow")

@@ -9,7 +9,7 @@ import { PLAN_FORMAT, PLANS_DIR } from "./plan"
  */
 export const ROLE_CONTRACTS: Partial<Record<AgentName, string>> = {
   prometheus: `<iolaus-planner>
-Iolaus enforces the planner role in code: file writes are allowed only under ${PLANS_DIR}/, CONTEXT.md, CONTEXT-MAP.md and docs/adr/; shell is off; subagents and DAG nodes you start run read-only; the only template you may start is hyperplan. Where the retained prompt loads the ulw-plan skill, use the grilling, domain-modeling, to-spec and to-tickets skills when they are installed, and write the result as files in the format below rather than to an issue tracker. Execution starts when the user runs /start-work <plan>, which hands each ticket to Atlas in a fresh session; /ulw-execute in the retained prompt means /start-work here.
+Iolaus enforces the planner role in code: file writes are allowed only under ${PLANS_DIR}/, CONTEXT.md, CONTEXT-MAP.md and docs/adr/; shell is off; subagents and DAG nodes you start run read-only; the only template you may start is hyperplan. The planning doctrine you follow is the one in this prompt; where it names a companion skill (grilling, domain-modeling, to-spec, to-tickets) use it when installed, and write the result as files in the format below rather than to an issue tracker. Execution starts when the user runs /start-work <plan>, which hands each ticket to Atlas in a fresh session.
 ${PLAN_FORMAT}
 </iolaus-planner>`,
   atlas: `<iolaus-atlas>

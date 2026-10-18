@@ -20,7 +20,7 @@ export interface DagTemplateInput {
   readonly gate?: boolean
   /** Review attempts before the run fails (planner and reviewer each get this many). Default 2. */
   readonly maxAttempts?: number
-  /** ultrawork: work/review rounds before the loop gives up. Default 3. */
+  /** ultrawork, plan-review, goal-review: work/review rounds, the first included, before the loop gives up. Default 3. */
   readonly iterations?: number
   /** hyperplan: adversarial member lanes. Default unspecified-low, unspecified-high, ultrabrain, artistry. team: worker lanes, repeats allowed. Default two deep-low. */
   readonly members?: readonly string[]
@@ -33,44 +33,58 @@ export const REVIEW_VERDICT_FAIL = "VERDICT: FAIL"
 
 const REVIEW_INSTRUCTIONS = `You are the reviewer node of an Iolaus DAG. The upstream result is in <iolaus-dag-inputs>. Judge it against the task below. Be concrete: name each defect with where it is and what would fix it. End your reply with exactly one line, either "${REVIEW_VERDICT_PASS}" or "${REVIEW_VERDICT_FAIL}", followed by nothing else.`
 
-function planReview(input: DagTemplateInput): DagNodeDefinition[] {
+/**
+ * plan-review and goal-review start with one review. When the newest review settles
+ * FAIL with rounds left, the scheduler appends a fix and a fresh review (`loop`) and
+ * rewires the tail (gate, executor) to it, so a passing first review costs nothing extra.
+ */
+function planReview(input: DagTemplateInput): { readonly nodes: DagNodeDefinition[]; readonly loop: DagLoop } {
   const attempts = input.maxAttempts ?? 2
   const reviewer = input.reviewer ?? "momus"
   const executor = input.executor ?? "sisyphus"
   const gate = input.gate !== false
-  return [
+  const standard = `A plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.`
+  const passed = { node: "review", field: "text", includes: REVIEW_VERDICT_PASS }
+  const nodes: DagNodeDefinition[] = [
     { id: "plan", title: "Write the plan", agent: "prometheus", prompt: `Write the work plan for this task into .iolaus/plans/ and return the plan text in full.\n${PLAN_FORMAT}\n\nTASK:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
-    { id: "review", title: "Review the plan", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nA plan passes only if every step is verifiable, no step depends on unstated assumptions, and the plan covers the whole task.\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
-    { id: "revise", title: "Revise the plan", agent: "prometheus", prompt: `The reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "plan" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
-    { id: "rereview", title: "Re-review the revised plan", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the revised plan after your earlier review. Apply the same standard.\n\nTASK:\n${input.task}`, dependsOn: ["revise"], inputs: [{ node: "revise" }], when: { node: "revise", exists: true }, maxAttempts: attempts },
-    ...(gate ? [{ id: "approve", title: "Approve the plan", kind: "gate" as const, prompt: `Plan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to start execution or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
-    { id: "execute", title: "Execute the approved plan", agent: executor, prompt: `Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>; prefer the revised plan when present. Report what was done and how it was verified.\n\nTASK:\n${input.task}`, dependsOn: gate ? ["approve"] : ["review", "rereview"], inputs: [{ node: "plan" }, { node: "revise" }], ...(gate ? {} : { when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }) },
+    { id: "review", title: "Review the plan", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\n${standard}\n\nTASK:\n${input.task}`, dependsOn: ["plan"], inputs: [{ node: "plan" }], maxAttempts: attempts },
+    ...(gate ? [{ id: "approve", title: "Approve the plan", kind: "gate" as const, prompt: `Plan for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to start execution or reject to stop.`, dependsOn: ["review"], when: passed }] : []),
+    // Gated: runs only once the gate was approved (a skipped gate means the last review failed).
+    { id: "execute", title: "Execute the approved plan", agent: executor, prompt: `Execute the approved plan exactly. The plan is in <iolaus-dag-inputs>. Report what was done and how it was verified.\n\nTASK:\n${input.task}`, dependsOn: gate ? ["approve"] : ["review"], inputs: [{ node: "plan" }], when: gate ? { node: "approve", exists: true } : passed },
   ]
+  const loop: DagLoop = {
+    review: "review", fix: "plan",
+    executorPrompt: `Round {round}: the reviewer rejected the plan. Address every defect named in the review, rewrite the plan in .iolaus/plans/, and return the revised plan in full.\n\nTASK:\n${input.task}`,
+    reviewerPrompt: `${REVIEW_INSTRUCTIONS}\n\nRound {round}: this is the revised plan, and the previous review is in the inputs. Review it fresh against the same standard; check each blocker the previous review cited.\n${standard}\n\nTASK:\n${input.task}`,
+    failIncludes: REVIEW_VERDICT_FAIL, passIncludes: REVIEW_VERDICT_PASS,
+    maxRounds: input.iterations ?? 3,
+    tail: gate ? ["approve", "execute"] : ["execute"],
+  }
+  return { nodes, loop }
 }
 
-function goalReview(input: DagTemplateInput): DagNodeDefinition[] {
+function goalReview(input: DagTemplateInput): { readonly nodes: DagNodeDefinition[]; readonly loop: DagLoop } {
   const attempts = input.maxAttempts ?? 2
   const reviewer = input.reviewer ?? "momus"
   const executor = input.executor ?? "hephaestus"
   const gate = input.gate !== false
-  return [
+  const standard = `The work passes only if the goal is met, the reported verification is real (commands and outputs, not claims), and nothing out of scope was changed.`
+  const nodes: DagNodeDefinition[] = [
     { id: "work", title: "Do the work", agent: executor, prompt: `Achieve this goal end to end and report what changed and how you verified it.\n\nGOAL:\n${input.task}`, dependsOn: [], maxAttempts: attempts },
-    { id: "review", title: "Review the work", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThe work passes only if the goal is met, the reported verification is real (commands and outputs, not claims), and nothing out of scope was changed.\n\nGOAL:\n${input.task}`, dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
-    { id: "fix", title: "Fix the review findings", agent: executor, prompt: `The reviewer rejected the work. Fix every defect named in the review and report the verification again.\n\nGOAL:\n${input.task}`, dependsOn: ["review"], inputs: [{ node: "work" }, { node: "review" }], when: { node: "review", field: "text", includes: REVIEW_VERDICT_FAIL }, maxAttempts: attempts },
-    { id: "rereview", title: "Re-review the fix", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\nThis is the fixed work after your earlier review. Apply the same standard.\n\nGOAL:\n${input.task}`, dependsOn: ["fix"], inputs: [{ node: "fix" }], when: { node: "fix", exists: true }, maxAttempts: attempts },
-    ...(gate ? [{ id: "accept", title: "Accept the work", kind: "gate" as const, prompt: `Work for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review", "rereview"], when: { any: [{ node: "review", field: "text", includes: REVIEW_VERDICT_PASS }, { node: "rereview", field: "text", includes: REVIEW_VERDICT_PASS }] } }] : []),
+    { id: "review", title: "Review the work", kind: "judge", agent: reviewer, prompt: `${REVIEW_INSTRUCTIONS}\n\n${standard}\n\nGOAL:\n${input.task}`, dependsOn: ["work"], inputs: [{ node: "work" }], maxAttempts: attempts },
+    ...(gate ? [{ id: "accept", title: "Accept the work", kind: "gate" as const, prompt: `Work for "${input.name ?? input.task.slice(0, 60)}" passed review. Approve to accept or reject to stop.`, dependsOn: ["review"], when: { node: "review", field: "text", includes: REVIEW_VERDICT_PASS } }] : []),
   ]
+  const loop: DagLoop = {
+    review: "review", fix: "work",
+    executorPrompt: `Round {round}: the reviewer rejected the work. Fix every defect named in the review that lies inside this change's blast radius, re-run what the fix affected, and report the verification again.\n\nGOAL:\n${input.task}`,
+    reviewerPrompt: `${REVIEW_INSTRUCTIONS}\n\nRound {round}: this is the fixed work, and the previous review is in the inputs. Review it fresh against the same standard; check each blocker the previous review cited.\n${standard}\n\nGOAL:\n${input.task}`,
+    failIncludes: REVIEW_VERDICT_FAIL, passIncludes: REVIEW_VERDICT_PASS,
+    maxRounds: input.iterations ?? 3,
+    ...(gate ? { tail: ["accept"] } : {}),
+  }
+  return { nodes, loop }
 }
 
-const PASS_ANY = (reviews: readonly string[]) => ({ any: reviews.map((node) => ({ node, field: "text", includes: REVIEW_VERDICT_PASS })) })
-
-/**
- * The ultrawork loop, unrolled: each round is fix → review guarded by the previous
- * verdict, so the graph stays static, durable and fingerprintable while behaving
- * as "keep going until the reviewer passes, at most `iterations` rounds". Worker
- * prompts start with the ultrawork mode marker so the child session gets the
- * full ultrawork prompt.
- */
 /**
  * The ultrawork loop, dynamic: one work/review pair plus a `loop` spec. When the
  * newest review settles FAIL the scheduler appends `fix<n>` / `review<n>` (up to
@@ -94,8 +108,8 @@ function ultrawork(input: DagTemplateInput): { readonly nodes: DagNodeDefinition
   ]
   const loop: DagLoop = {
     review: "review", fix: "work",
-    executorPrompt: `${marker}\nRound {round}: the reviewer rejected the work. Fix every defect named in the review, re-run the verification, and report the evidence again.\n\nGOAL:\n${input.task}`,
-    reviewerPrompt: reviewerPrompt("Round {round}: this is the fixed work after your earlier review. Apply the same standard.\n\n"),
+    executorPrompt: `${marker}\nRound {round}: the reviewer rejected the work. Fix every defect named in the review that lies inside this change's blast radius, re-run what the fix affected, and report the evidence again.\n\nGOAL:\n${input.task}`,
+    reviewerPrompt: reviewerPrompt("Round {round}: this is the fixed work, and the previous review is in the inputs. Review it fresh against the same standard; check each blocker the previous review cited.\n\n"),
     failIncludes: REVIEW_VERDICT_FAIL, passIncludes: REVIEW_VERDICT_PASS,
     maxRounds: rounds,
     ...(gate ? { tail: ["accept"] } : {}),
@@ -200,7 +214,7 @@ export function expandTemplate(raw: unknown): DagDefinition {
   // Team members may repeat a lane (two deep-low workers); hyperplan members must differ, or the debate has one voice.
   if (input.members !== undefined && (!Array.isArray(input.members) || input.members.length < 2 || input.members.length > 8 || input.members.some((m) => typeof m !== "string" || !m.trim()) || (input.template !== "team" && new Set(input.members).size !== input.members.length))) throw new DagValidationError(input.template === "team" ? "template members must be two to eight lane names" : "template members must be at least two distinct lane names")
   const typed = input as unknown as DagTemplateInput
-  const built = typed.template === "plan-review" ? { nodes: planReview(typed) } : typed.template === "goal-review" ? { nodes: goalReview(typed) } : typed.template === "ultrawork" ? ultrawork(typed) : typed.template === "team" ? { nodes: team(typed) } : { nodes: hyperplan(typed) }
+  const built = typed.template === "plan-review" ? planReview(typed) : typed.template === "goal-review" ? goalReview(typed) : typed.template === "ultrawork" ? ultrawork(typed) : typed.template === "team" ? { nodes: team(typed) } : { nodes: hyperplan(typed) }
   const maxParallel = typed.template === "hyperplan" ? (typed.members ?? HYPERPLAN_MEMBERS).length : typed.template === "team" ? (typed.members ?? TEAM_MEMBERS).length : 1
   return { schemaVersion: 1, name: typed.name ?? `${typed.template}: ${typed.task.slice(0, 60)}`, maxParallel, nodes: built.nodes, ...("loop" in built ? { loop: built.loop } : {}) }
 }

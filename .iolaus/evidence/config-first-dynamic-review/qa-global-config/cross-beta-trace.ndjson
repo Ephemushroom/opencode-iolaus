@@ -1,0 +1,39 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.0.30"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/shared-iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/cross-beta/project/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"none"}
+{"event":"iolaus.roles.registered","goal":false,"startWork":false}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":true,"configured":true}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"quick","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.dag.run.started","runID":"199f2baa-333c-441d-a986-4f9115abcc43","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.waiting","runID":"199f2baa-333c-441d-a986-4f9115abcc43","generation":1,"nodeID":"approve","sequence":2}
+{"event":"iolaus.dag.run.paused","runID":"199f2baa-333c-441d-a986-4f9115abcc43","generation":1,"sequence":3}
+{"event":"iolaus.loaded","enabled":true,"host":"2.0.30"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/shared-iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-global-config-gUg750/cross-beta/project/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"none"}
+{"event":"iolaus.roles.registered","goal":false,"startWork":false}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":true,"configured":true}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"quick","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}

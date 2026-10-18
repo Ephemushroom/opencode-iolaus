@@ -1,3 +1,4 @@
+import { buildIolausFlowSection } from "../iolaus-flow-section"
 /**
  * GPT-5.4 Optimized Sisyphus-Junior System Prompt
  *
@@ -6,7 +7,7 @@
  * - Deterministic tool usage (always/never, not try/maybe)
  * - Prose-first output style
  * - Nuanced autonomy (focus unless directly conflicting)
- * - CAN spawn explore/librarian via call_omo_agent for research
+ * - CAN spawn explore/librarian with subagent({agent: "explore" | "librarian", ...}) for research
  */
 
 import { resolvePromptAppend } from "../builtin-agents/resolve-file-uri";
@@ -45,7 +46,7 @@ When blocked: try a different approach → decompose the problem → challenge a
 - Run verification (lint, tests, build) WITHOUT asking
 - Make decisions. Course-correct only on CONCRETE failure
 - Note assumptions in final message, not as questions mid-work
-- Need context? Fire explore/librarian via call_omo_agent IMMEDIATELY - continue only with non-overlapping work while they search
+- Need context? Fire explore/librarian with subagent({..., background: true}) IMMEDIATELY - continue only with non-overlapping work while they search
 
 ## Scope Discipline
 
@@ -64,7 +65,7 @@ When blocked: try a different approach → decompose the problem → challenge a
 
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
-- Explore/Librarian via call_omo_agent = background research. Fire them and continue only with non-overlapping work
+- Explore/librarian as background children = research. Fire them and continue only with non-overlapping work
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 - ALWAYS use tools over internal knowledge for file contents, project state, and verification
@@ -110,7 +111,7 @@ Style:
 
 - **Diagnostics**: Use lsp_diagnostics - ZERO errors on changed files
 - **Build**: Use Bash - Exit code 0 (if applicable)
-- **Tracking**: Use ${useTaskSystem ? "task_update" : "todowrite"} - ${verificationText}
+- **Tracking**: the flow you started is the record; settle each node with its own result
 
 **No evidence = not complete.**
 
@@ -138,24 +139,9 @@ Style:
   return prompt + "\n\n" + resolvePromptAppend(promptAppend);
 }
 
-function buildGpt54TaskDisciplineSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `## Task Discipline (NON-NEGOTIABLE)
-
-- **2+ steps** - task_create FIRST, atomic breakdown
-- **Starting step** - task_update(status="in_progress") - ONE at a time
-- **Completing step** - task_update(status="completed") IMMEDIATELY
-- **Batching** - NEVER batch completions
-
-No tasks on multi-step work = INCOMPLETE WORK.`;
-  }
-
-  return `## Todo Discipline (NON-NEGOTIABLE)
-
-- **2+ steps** - todowrite FIRST, atomic breakdown
-- **Starting step** - Mark in_progress - ONE at a time
-- **Completing step** - Mark completed IMMEDIATELY
-- **Batching** - NEVER batch completions
-
-No todos on multi-step work = INCOMPLETE WORK.`;
+function buildGpt54TaskDisciplineSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness; a category lane is a worker, so it gets
+  // the completion contract rather than an orchestration section.
+  return buildIolausFlowSection({ worker: true })
 }
+

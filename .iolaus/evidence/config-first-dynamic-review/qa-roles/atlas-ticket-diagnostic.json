@@ -1,0 +1,41 @@
+{
+  "runID": "0de50393-ed73-4f76-a0c8-ce7b2d2204cd",
+  "tickets": [
+    {
+      "number": "01",
+      "id": "ses_ebc20e5b4ffeQ3t73UGUIWYkV8",
+      "agent": "atlas",
+      "metadata": {
+        "iolaus_dag_node": "t01",
+        "iolaus_dag_attempt": 1,
+        "iolaus_dag_run": "0de50393-ed73-4f76-a0c8-ce7b2d2204cd"
+      },
+      "toolOutput": "Success. Updated the following files:\nM src/a.ts"
+    },
+    {
+      "number": "02",
+      "id": "ses_ebc20e56dffen32NZZD3AN6kZ1",
+      "agent": "atlas",
+      "metadata": {
+        "iolaus_dag_node": "t02",
+        "iolaus_dag_attempt": 1,
+        "iolaus_dag_run": "0de50393-ed73-4f76-a0c8-ce7b2d2204cd"
+      },
+      "toolOutput": "Success. Updated the following files:\nA src/b.ts"
+    }
+  ],
+  "roleRecorded": [
+    {
+      "event": "iolaus.role.recorded",
+      "sessionID": "ses_ebc20e5b4ffeQ3t73UGUIWYkV8",
+      "role": "ticket",
+      "plan": "cache"
+    },
+    {
+      "event": "iolaus.role.recorded",
+      "sessionID": "ses_ebc20e56dffen32NZZD3AN6kZ1",
+      "role": "ticket",
+      "plan": "cache"
+    }
+  ]
+}

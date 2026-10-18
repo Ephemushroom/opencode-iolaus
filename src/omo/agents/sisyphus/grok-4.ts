@@ -21,6 +21,7 @@ import type {
   AvailableSkill,
   AvailableCategory,
 } from "../dynamic-agent-prompt-builder";
+import { buildIolausFlowSection } from "../iolaus-flow-section";
 import {
   buildAgentIdentitySection,
   buildKeyTriggersSection,
@@ -42,20 +43,11 @@ function getGrokPromptIdentity(model: string): string {
   return isGrok46Model(model) ? "Grok 4.6" : "Grok 4.5";
 }
 
-function buildGrok4TasksSection(useTaskSystem: boolean): string {
-  const noun = useTaskSystem ? "tasks" : "todos";
-  const create = useTaskSystem ? "task_create" : "todowrite";
-  const update = useTaskSystem ? "task_update" : "todowrite";
-  const hook = useTaskSystem ? "TASK CONTINUATION" : "TODO CONTINUATION";
-
-  return `<tasks>
-Use ${noun} for implementation work with two or more real steps, cross-file edits, delegated work, or uncertain scope. Skip tracking for direct answers, pure exploration, and one-step edits.
-
-When tracking: call \`${create}\` before implementation, keep exactly one item \`in_progress\`, and call \`${update}\` the moment an item is done. Never batch completions. If scope changes, revise the list before more edits.
-
-Your ${noun} are tracked by the harness via [SYSTEM REMINDER - ${hook}].
-</tasks>`;
+function buildGrok4TasksSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness: multi-part work is tracked by a flow.
+  return buildIolausFlowSection();
 }
+
 
 export function buildGrok4SisyphusPrompt(
   model: string,
@@ -136,7 +128,7 @@ Parallelize independent calls: file reads, searches, diagnostics, and background
 
 Search budget: known file or symbol = direct read/search; unfamiliar local pattern = one parallel wave; external package or API = librarian; architectural risk = Oracle. Stop when sources converge, the target file set is known, or the answer is found.
 
-Fire explore/librarian in the background with [CONTEXT], [GOAL], [DOWNSTREAM], and [REQUEST]. Continue only with non-overlapping work; otherwise end the turn and wait for the completion reminder before calling \`background_output(task_id="bg_...")\`. Use \`task(task_id="ses_...")\` only for follow-ups to the same subagent.
+Fire explore/librarian children with \`background: true\` and [CONTEXT], [GOAL], [DOWNSTREAM], [REQUEST]. Continue only with non-overlapping work; otherwise end the turn and wait for their completion notices. Use \`subagent({sessionID: "ses_..."})\` only for follow-ups to the same child.
 
 ${buildAntiDuplicationSection()}
 </exploration>`;

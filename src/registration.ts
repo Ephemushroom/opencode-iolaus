@@ -4,13 +4,13 @@ import { Agent, Model } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { Options } from "./options"
 import {
-  AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, PRIMARY_AGENTS, agentID, categoryID, displayName, modeMarker,
+  AGENT_DESCRIPTIONS, CATEGORY_DESCRIPTIONS, MODE_NAMES, PRIMARY_AGENTS, agentID, categoryID, displayName, modeMarker,
   type AgentName, type CategoryName, type ModeName,
 } from "./prompts/catalog"
 import { modelString, resolveLane, type LaneAssignment, type ModelsConfig } from "./models"
 import { FLOW_TOOL_NAME } from "./dag/tool"
 import { DAG_MODE_TEMPLATES } from "./prompts/mode-dag"
-import { commandMarker } from "./roles/command"
+import { COMMAND_ALIASES, COMMAND_OWNERS, commandMarker } from "./roles/command"
 import { GOAL_TOOL_NAMES } from "./roles/goal"
 import { trace } from "./trace"
 
@@ -164,6 +164,26 @@ export function registerModes(ctx: {
           text: modeDispatchText(mode, prompt.text ?? ""),
           delivery,
         }).pipe(Effect.tap(() => Effect.sync(() => trace("iolaus.mode.dispatched", { mode, sessionID, dag: DAG_MODE_TEMPLATES[mode] ?? null })))),
+      })
+    }
+    // OMO-style aliases: `/ulw`, `/ulw-plan` and `/ulw-execute` dispatch the
+    // canonical mode or role, so a user who types the short form gets the same
+    // path as the long one.
+    for (const [alias, canonical] of Object.entries(COMMAND_ALIASES)) {
+      const isMode = (MODE_NAMES as readonly string[]).includes(canonical)
+      if (isMode && !options.modes.includes(canonical as ModeName)) continue
+      if (!isMode && !options.agents.includes(COMMAND_OWNERS[canonical as keyof typeof COMMAND_OWNERS])) continue
+      editor.add({
+        name: alias,
+        description: isMode
+          ? `Alias for /${canonical}: ${DAG_MODE_TEMPLATES[canonical as ModeName] ? "run the task as its DAG template" : "apply its mode prompt"}.`
+          : `Alias for /${canonical}.`,
+        execute: ({ sessionID, prompt, delivery }) => ctx.session.prompt({
+          ...prompt,
+          sessionID,
+          text: isMode ? modeDispatchText(canonical as ModeName, prompt.text ?? "") : `${commandMarker(canonical as "goal" | "start-work")}\n${prompt.text ?? ""}`,
+          delivery,
+        }).pipe(Effect.asVoid),
       })
     }
     // Role commands: the prompt hook switches the session to the owner and acts on the marker.

@@ -1,6 +1,6 @@
 import { usePlugin } from "@opencode/plugin/tui"
 import type { Context } from "@opencode/plugin/tui/context"
-import { SyntaxStyle, type BoxRenderable, type ColorInput, type ScrollBoxRenderable, type ThemeTokenStyle } from "@opentui/core"
+import { SyntaxStyle, type BoxRenderable, type ColorInput, type NativeResourceOwner, type ScrollBoxRenderable, type ThemeTokenStyle } from "@opentui/core"
 import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMount } from "solid-js"
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
@@ -24,8 +24,12 @@ export function Progress(props: { readonly run: DagViewRun; readonly context: Co
   </box>
 }
 
-/** The Markdown scopes of the host's own chat, and the syntax scopes of fenced code, taken from the active theme. */
-function markdownStyle(theme: Context["theme"]): SyntaxStyle {
+/**
+ * The Markdown scopes of the host's own chat, and the syntax scopes of fenced code,
+ * taken from the active theme. `fromTheme` now takes the native owner that the
+ * style's handle belongs to; the renderer's scene is that owner.
+ */
+function markdownStyle(theme: Context["theme"], owner: NativeResourceOwner): SyntaxStyle {
   const scope = (names: string[], foreground: ColorInput, extra: Omit<ThemeTokenStyle["style"], "foreground"> = {}): ThemeTokenStyle => ({ scope: names, style: { foreground, ...extra } })
   const { markdown, syntax } = theme
   return SyntaxStyle.fromTheme([
@@ -50,7 +54,7 @@ function markdownStyle(theme: Context["theme"]): SyntaxStyle {
     scope(["type", "module", "class"], syntax.type),
     scope(["operator", "punctuation.special"], syntax.operator),
     scope(["punctuation", "punctuation.bracket", "punctuation.delimiter"], syntax.punctuation),
-  ])
+  ], owner)
 }
 
 function DagDialog(props: { readonly sessionID: string; readonly runID: string; readonly nodeID?: string }) {
@@ -88,7 +92,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   let style: SyntaxStyle | undefined
   const markdown = createMemo(() => {
     if (style) retire(style)
-    return (style = markdownStyle(context.theme))
+    return (style = markdownStyle(context.theme, context.renderer.nativeScene.resourceContext))
   })
   onCleanup(() => { if (style) retire(style) })
   /** Centre column of each card in a row of `count`, or undefined when the row wraps. */
@@ -132,7 +136,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   }
   function onFrame() {
     try {
-      if (reveal() || context.renderer.root.getLayoutNode().isDirty()) return
+      if (reveal() || context.renderer.root.isDirty) return
     } catch (error) {
       trace("iolaus.tui.dialog.reveal.failed", { error: String(error) })
     }

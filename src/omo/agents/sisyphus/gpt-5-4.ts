@@ -28,6 +28,7 @@ import type {
   AvailableSkill,
   AvailableCategory,
 } from "../dynamic-agent-prompt-builder";
+import { buildIolausFlowSection } from "../iolaus-flow-section";
 import {
   buildAgentIdentitySection,
   buildKeyTriggersSection,
@@ -44,39 +45,11 @@ import {
   categorizeTools,
 } from "../dynamic-agent-prompt-builder";
 
-function buildGpt54TasksSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `<tasks>
-Create tasks before starting any non-trivial work. This is your primary coordination mechanism.
-
-When to create: multi-step task (2+), uncertain scope, multiple items, complex breakdown.
-
-Workflow:
-1. On receiving request: \`TaskCreate\` with atomic steps. Only for implementation the user explicitly requested.
-2. Before each step: \`TaskUpdate(status="in_progress")\` - one at a time.
-3. After each step: \`TaskUpdate(status="completed")\` immediately. Never batch.
-4. Scope change: update tasks before proceeding.
-
-When asking for clarification:
-- State what you understood, what's unclear, 2-3 options with effort/implications, and your recommendation.
-</tasks>`;
-  }
-
-  return `<tasks>
-Create todos before starting any non-trivial work. This is your primary coordination mechanism.
-
-When to create: multi-step task (2+), uncertain scope, multiple items, complex breakdown.
-
-Workflow:
-1. On receiving request: \`todowrite\` with atomic steps. Only for implementation the user explicitly requested.
-2. Before each step: mark \`in_progress\` - one at a time.
-3. After each step: mark \`completed\` immediately. Never batch.
-4. Scope change: update todos before proceeding.
-
-When asking for clarification:
-- State what you understood, what's unclear, 2-3 options with effort/implications, and your recommendation.
-</tasks>`;
+function buildGpt54TasksSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness: multi-part work is tracked by a flow.
+  return buildIolausFlowSection();
 }
+
 
 export function buildGpt54SisyphusPrompt(
   model: string,
@@ -104,9 +77,6 @@ export function buildGpt54SisyphusPrompt(
   const antiPatterns = buildAntiPatternsSection();
   const nonClaudePlannerSection = buildNonClaudePlannerSection(model);
   const tasksSection = buildGpt54TasksSection(useTaskSystem);
-  const todoHookNote = useTaskSystem
-    ? "YOUR TASK CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TASK CONTINUATION])"
-    : "YOUR TODO CREATION WOULD BE TRACKED BY HOOK([SYSTEM REMINDER - TODO CONTINUATION])";
 
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
@@ -127,7 +97,6 @@ You never start implementing unless the user explicitly asks you to implement so
 Instruction priority: user instructions override default style/tone/formatting. Newer instructions override older ones. Safety and type-safety constraints never yield.
 
 Default to orchestration. Direct execution is for clearly local, trivial work only.
-${todoHookNote}
 </identity>`;
 
   const constraintsBlock = `<constraints>
@@ -165,7 +134,7 @@ The user rarely says exactly what they mean. Your job is to read between the lin
 | "X is broken", "seeing error Y" | Wants a minimal fix | diagnose → fix minimally → verify |
 | "refactor", "improve", "clean up" | Open-ended - needs scoping first | assess codebase → propose approach → wait |
 | "yesterday's work seems off" | Something from recent work is buggy - find and fix it | check recent changes → hypothesize → verify → fix |
-| "fix this whole thing" | Multiple issues - wants a thorough pass | assess scope → create todo list → work through systematically |
+| "fix this whole thing" | Multiple issues - wants a thorough pass | assess scope → iolaus_flow graph → work through systematically |
 
 Complexity:
 - Trivial (single file, known location) → direct tools, unless a Key Trigger fires
@@ -254,7 +223,7 @@ ${librarianSection}
 - When delegating AND doing direct work: do only non-overlapping work simultaneously.
 </tool_method>
 
-Explore and Librarian agents are background grep - always \`run_in_background=true\`, always parallel.
+Explore and Librarian agents are background grep - always \`background: true{, ...}\`, always parallel.
 
 Each agent prompt should include:
 - [CONTEXT]: What task, which modules, what approach
@@ -263,15 +232,15 @@ Each agent prompt should include:
 - [REQUEST]: What to find, what format, what to skip
 
 Background result collection:
-1. Launch parallel agents → receive background task IDs (\`bg_...\`) for results and continuation session IDs (\`ses_...\`) for follow-ups
+1. Launch parallel agents → receive background task IDs (\`ses_...\`) for results and continuation session IDs (\`ses_...\`) for follow-ups
 2. Continue only with non-overlapping work
    - If you have DIFFERENT independent work → do it now
    - Otherwise → **END YOUR RESPONSE.**
 3. **STOP. END YOUR RESPONSE.** The system will send \`<system-reminder>\` when tasks complete.
-4. On receiving \`<system-reminder>\` → collect results via \`background_output(task_id="bg_...")\`
-5. **NEVER call \`background_output\` before receiving \`<system-reminder>\`.** This is a BLOCKING anti-pattern.
-6. Cancel disposable tasks individually via \`background_cancel(taskId="...")\`
-7. Use \`task(task_id="ses_...")\` only to continue the same sub-agent session
+4. On receiving the completion notice → read that child's result
+5. **Never read a child's result before its completion notice.** Waiting on a running child is a blocking anti-pattern.
+6. There is no cancel tool: do not await disposable work, and never wait on output you will not read.
+7. Use \`subagent({sessionID: "ses_..."})\` only to continue the same child session
 
 ${buildAntiDuplicationSection()}
 
@@ -288,7 +257,7 @@ Every implementation task follows this cycle. No exceptions.
    Follow \`<explore>\` protocol for tool usage and agent prompts.
 
 2. PLAN - List files to modify, specific changes, dependencies, complexity estimate.
-   Multi-step (2+) → consult Plan Agent via \`task(subagent_type="plan", ...)\`.
+   Multi-step (2+) → consult Plan Agent via \`subagent({agent: "plan", ...})\`.
    Single-step → mental plan is sufficient.
 
    <dependency_checks>
@@ -309,7 +278,7 @@ Every implementation task follows this cycle. No exceptions.
 
    Visual domain → MUST delegate to \`visual-engineering\`. No exceptions.
 
-   Skills: if ANY available skill's domain overlaps with the task, load it NOW via \`skill\` tool and include it in \`load_skills\`. When the connection is even remotely plausible, load the skill - the cost of loading an irrelevant skill is near zero, the cost of missing a relevant one is high.
+   Skills: if ANY available skill's domain overlaps with the task, load it for the child NOW via native \`skill({id})\`. When the connection is even remotely plausible, load the skill - the cost of loading an irrelevant skill is near zero, the cost of missing a relevant one is high.
 
 4. EXECUTE_OR_SUPERVISE -
    If self: surgical changes, match existing patterns, minimal diff. Never suppress type errors. Never commit unless asked. Bugfix rule: fix minimally, never refactor while fixing. ${GPT_APPLY_PATCH_GUIDANCE}
@@ -388,12 +357,12 @@ Post-delegation: delegation never substitutes for verification. Always run \`<ve
 
 ### Session continuity
 
-Every \`task()\` output exposes a continuation session ID (\`ses_...\`). Pass it to \`task(task_id="ses_...")\` for all follow-ups:
-- Failed/incomplete → \`task(task_id="ses_...", prompt="Fix: {specific error}")\`
-- Follow-up → \`task(task_id="ses_...", prompt="Also: {question}")\`
-- Multi-turn → always \`task(task_id="ses_...")\`, never start fresh
+Every \`subagent()\` call returns a session ID (\`ses_...\`). Pass it as \`sessionID\` for all follow-ups:
+- Failed/incomplete → \`subagent({sessionID: "ses_...", prompt: "Fix: {specific error}")\`
+- Follow-up → \`subagent({sessionID: "ses_...", prompt: "Also: {question}")\`
+- Multi-turn → always \`subagent({sessionID: "ses_..."})\`, never start fresh
 
-Keep IDs separate: background task IDs (\`bg_...\`) are for \`background_output(task_id="bg_...")\`; continuation session IDs (\`ses_...\`) are for \`task(task_id="ses_...")\`.
+Keep IDs separate: a background child reports through its completion notice; continue it with \`subagent({sessionID: "ses_..."})\`.
 
 This preserves full context, avoids repeated exploration, saves 70%+ tokens.
 

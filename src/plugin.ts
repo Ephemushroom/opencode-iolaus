@@ -57,7 +57,7 @@ export default Plugin.define({
     const provisioned = provisionHome(home)
     trace("iolaus.home.ready", { user: home.user, project: home.project, created: provisioned.created })
     const models = parseModelsConfig(global.models ?? {})
-    trace("iolaus.models.loaded", { source: global.models === undefined ? "requirements" : "iolaus.json" })
+    trace("iolaus.models.loaded", { source: global.models === undefined ? "none" : "iolaus.json" })
     yield* registerAgents(ctx, options, models)
     yield* registerModes(ctx, options)
     yield* registerMcps(ctx, options.mcps)
