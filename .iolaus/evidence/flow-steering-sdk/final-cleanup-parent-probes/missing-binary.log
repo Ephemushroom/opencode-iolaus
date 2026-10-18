@@ -1,0 +1,10 @@
+{
+  "verdict": "FAIL",
+  "failure": "Error: spawnSync /var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/missing ENOENT\n    at Object.spawnSync (node:internal/child_process:1160:20)\n    at spawnSync (node:child_process:928:24)\n    at execFileSync (node:child_process:971:15)\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:104:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "checks": 0,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  }
+}

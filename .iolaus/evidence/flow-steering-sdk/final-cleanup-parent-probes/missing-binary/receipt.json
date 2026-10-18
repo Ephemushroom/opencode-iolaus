@@ -1,0 +1,46 @@
+{
+  "verdict": "FAIL",
+  "failure": "Error: spawnSync /var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-cleanup-probes-cZzAmP/missing ENOENT\n    at Object.spawnSync (node:internal/child_process:1160:20)\n    at spawnSync (node:child_process:928:24)\n    at execFileSync (node:child_process:971:15)\n    at file:///Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/script/qa-flow-steering.mjs:104:13\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)",
+  "cleanupErrors": [],
+  "command": "node script/qa-flow-steering.mjs /Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/.iolaus/evidence/flow-steering-sdk/final-cleanup-parent-probes/missing-binary",
+  "checks": [],
+  "errors": [],
+  "isolation": {
+    "env": {
+      "PATH": "/opt/zerobrew/bin:/Users/Bryan/.sdkman/candidates/maven/current/bin:/Users/Bryan/.sdkman/candidates/java/current/bin:/Users/Bryan/.sdkman/candidates/gradle/current/bin:/Users/Bryan/.local/state/fnm_multishells/2522_1791800200005/bin:/Users/Bryan/Library/pnpm/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/Bryan/.local/bin:/Users/Bryan/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/zerobrew/bin:/opt/zerobrew/prefix/bin:/Users/Bryan/.cargo/bin:/Users/Bryan/Library/Application Support/JetBrains/Toolbox/scripts:/Applications/Obsidian.app/Contents/MacOS:/Users/Bryan/.orbstack/bin",
+      "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/home",
+      "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/home",
+      "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif",
+      "IOLAUS_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/home/.iolaus",
+      "IOLAUS_TRACE": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-steering-sdk/.iolaus/evidence/flow-steering-sdk/final-cleanup-parent-probes/missing-binary/trace.ndjson",
+      "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/config",
+      "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/data",
+      "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/cache",
+      "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/state",
+      "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-steering-qa-45Asif/home",
+      "OPENCODE_DISABLE_AUTOUPDATE": "1",
+      "OPENCODE_DISABLE_MODELS_FETCH": "1"
+    },
+    "databasePaths": [],
+    "before": {
+      "/Users/Bryan/.iolaus/iolaus.json": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac",
+      "/Users/Bryan/.config/opencode/opencode.json": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent"
+    },
+    "after": {
+      "/Users/Bryan/.iolaus/iolaus.json": "581a7bf7d87b4b24eedc3e751073fc78fa4790f89d71a83bae3ad9416d1876ac",
+      "/Users/Bryan/.config/opencode/opencode.json": "d17958b179e3780a45c46fdaf420af588ab091727ceedd67a4e1f50cee79ea5e",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent"
+    }
+  },
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  },
+  "limitations": [
+    "No screenshot/direct-child TUI typing reproduced; API sessions only.",
+    "Initial admission, late creation, idle capture, and owner interruption races use deterministic pauses in the isolated plugin copy; other scenarios run the unmodified build.",
+    "Lost-ack simulation resets only isolated Flow receipts after actual host admission; it is not a network-loss experiment."
+  ]
+}

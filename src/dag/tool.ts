@@ -15,6 +15,8 @@ type DagInput = {
   readonly run_id?: unknown
   readonly node_id?: unknown
   readonly note?: unknown
+  readonly text?: unknown
+  readonly request_id?: unknown
   readonly definition?: unknown
   readonly template?: unknown
 }
@@ -22,10 +24,12 @@ type DagInput = {
 const inputSchema = {
   type: "object",
   properties: {
-    action: { type: "string", enum: ["create", "template", "snapshot", "node", "wait", "cancel", "retry", "resume", "approve", "reject", "amend"] },
+    action: { type: "string", enum: ["create", "template", "snapshot", "node", "wait", "cancel", "retry", "resume", "approve", "reject", "amend", "steer"] },
     run_id: { type: "string" },
     node_id: { type: "string" },
     note: { type: "string" },
+    text: { type: "string", minLength: 1, description: "Supplemental task information for an active scheduled child; never changes its agent or model." },
+    request_id: { type: "string", minLength: 1, description: "Required for steer. A stable unique request id; reuse only for the same node and text to inspect its durable delivery state without resending." },
     definition: { type: "object" },
     template: {
       type: "object",
@@ -75,7 +79,7 @@ export function createDagTool(controller: DagController): Tool.Info {
     // Model-facing text only. Runtime refusals (observed runs, steered nodes,
     // authorization, delivery state) come back as the JSON error envelope below,
     // where the model can read them in context instead of reading them here.
-    description: "Create and operate a durable multi-agent flow: each node runs in a fresh child session on the agent lane you name and returns only its result, so the orchestrator holds conclusions instead of transcripts. Give every node a short title (one line, in the user's language); add dependsOn for ordering, inputs: [{node: \"*\"}] to fan upstream results in with provenance, when: {node, field, equals|includes|matches|exists} to skip a node conditionally, and kind: \"gate\" (prompt = the approver's question, no agent/model) to pause for a human decision. Create with a definition, or with a template: plan-review (Prometheus plans, Momus reviews, gate, executor), goal-review (executor works, Momus reviews, gate), ultrawork (ultrawork executor, review, gate), hyperplan (members analyse, cross-attack, defend, Metis distils, Prometheus plans, Momus reviews, gate), team (lead splits, members work in worktrees, lead integrates, Momus reviews, gate). Read snapshot or wait before you claim a node finished; retry and resume re-run a step without restating the task.",
+    description: "Create and operate a durable multi-agent flow: each node runs in a fresh child session on the agent lane you name and returns only its result, so the orchestrator holds conclusions instead of transcripts. Give every node a short title (one line, in the user's language); add dependsOn for ordering, inputs: [{node: \"*\"}] to fan upstream results in with provenance, when: {node, field, equals|includes|matches|exists} to skip a node conditionally, and kind: \"gate\" (prompt = the approver's question, no agent/model) to pause for a human decision. Create with a definition, or with a template: plan-review (Prometheus plans, Momus reviews, gate, executor), goal-review (executor works, Momus reviews, gate), ultrawork (ultrawork executor, review, gate), hyperplan (members analyse, cross-attack, defend, Metis distils, Prometheus plans, Momus reviews, gate), team (lead splits, members work in worktrees, lead integrates, Momus reviews, gate). Read snapshot or wait before you claim a node finished; retry and resume re-run a step without restating the task. Action steer takes run_id, node_id, text and a durable request_id: supplement an active scheduled child without changing its agent or model, and reuse request_id only with identical node and text to inspect delivery without resending. Steered executions are never retried or escalated automatically; start a new flow with the complete task instead. Identity drift and unresolved delivery are reported, never silently repaired or replayed.",
     input: inputSchema,
     options: { codemode: false },
     execute: (raw: unknown, context: Tool.Context) => {
@@ -98,6 +102,7 @@ export function createDagTool(controller: DagController): Tool.Info {
           case "approve": return controller.approve(runID(), sessionID, nodeID(), note)
           case "reject": return controller.reject(runID(), sessionID, nodeID(), note)
           case "amend": return controller.amend(runID(), sessionID, definition(input.definition))
+          case "steer": return controller.steer(runID(), sessionID, nodeID(), requiredString(input.text, "text"), requiredString(input.request_id, "request_id"))
           default: return Effect.fail(new Error(`Unknown DAG action: ${action}`))
         }
       })
