@@ -10,6 +10,7 @@ import { FLOW_TOOL_NAME } from "../src/dag/tool"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
 import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
+import { ALL_LANES } from "./lanes"
 import { bindNative, renderAgent, renderMode } from "../src/prompts/render"
 import {
   EXPLORE_PROMPT_METADATA, LIBRARIAN_PROMPT_METADATA, MULTIMODAL_LOOKER_PROMPT_METADATA, ORACLE_PROMPT_METADATA,
@@ -38,7 +39,7 @@ test("registrations keep native agents and user definitions, and take over only 
   const fixture = registry()
   fixture.editor.update("oracle", (agent) => { agent.system = "user-owned" })
   const before = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   for (const value of before.filter((agent) => agent.id !== "explore")) expect(fixture.agents.get(String(value.id))).toEqual(value)
   const explore = fixture.agents.get("explore")!
   expect(explore.system).toBe(agentMarker("explore"))
@@ -48,13 +49,13 @@ test("registrations keep native agents and user definitions, and take over only 
   for (const name of AGENT_NAMES) expect(fixture.agents.has(agentID(name))).toBe(true)
   expect(fixture.agents.get("sisyphus")?.model).toEqual(Model.Ref.parse("anthropic/claude-opus-5-5#max"))
   const once = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   expect([...fixture.agents.values()]).toEqual(once)
 })
 
 test("specialists follow OMO's per-agent deny lists", async () => {
   const fixture = registry()
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   const permission = (name: string, action: string) => evaluate(action, "*", fixture.agents.get(name)!.permissions)
   for (const name of ["oracle", "explore", "librarian", "metis", "momus"]) {
     expect(permission(name, "edit")).toBe("deny")
@@ -134,6 +135,13 @@ test("mode requires explicit marker and resets with the next user request", asyn
   expect(explicitMode("/team inspect this")).toBe("team")
   expect(explicitMode("/iolaus-team inspect this")).toBeUndefined()
   expect(explicitMode("/teamwork now")).toBeUndefined()
+  // OMO-style keywords at the start of a prompt select the matching mode.
+  expect(explicitMode("ulw fix the build")).toBe("ultrawork")
+  expect(explicitMode("ultrawork fix the build")).toBe("ultrawork")
+  expect(explicitMode("ulw plan the migration")).toBe("hyperplan")
+  expect(explicitMode("ulw-plan the migration")).toBe("hyperplan")
+  expect(explicitMode("mass-ulw migrate every service")).toBe("mass-ulw")
+  expect(explicitMode("ulwish it worked")).toBeUndefined()
   const event = context("build")
   event.messages = [{ role: "user", content: [{ type: "text", text: `${modeMarker("ultrawork")}\nDo the work` }] }]
   await Effect.runPromise(composeContext(event, catalogs, parseOptions({})))
@@ -190,7 +198,7 @@ test("ultrawork, hyperplan and team render a DAG instruction for the commanding 
 
 test("ids and display names are the bare lane names; explore replaces the host agent with its own rules", async () => {
   const fixture = registry()
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   const name = (id: string) => String(fixture.agents.get(id)?.name)
   expect(name("sisyphus")).toBe("Sisyphus")
   expect(name("sisyphus-junior")).toBe("Sisyphus Junior")
@@ -199,15 +207,17 @@ test("ids and display names are the bare lane names; explore replaces the host a
   expect(name("quick")).toBe("Quick")
   expect(name("explore")).toBe("Explore")
   expect([...fixture.agents.keys()].some((id) => id.startsWith("iolaus-"))).toBe(false)
-  // The host's explore rules are dropped: ours start from the host default and add the explore deny list.
+  // The host's explore rules are dropped: ours start from the host default and append the
+  // explore deny list. The host default's length is version-dependent (2.0.32 seeds a
+  // catch-all allow), so the assertion keys off it rather than a literal slice.
   const rules = fixture.agents.get("explore")!.permissions
-  const defaults = Agent.Info.default(Agent.ID.make("explore")).permissions
-  expect(rules.slice(0, defaults.length)).toEqual(defaults)
+  const hostDefaults = Agent.Info.default(Agent.ID.make("explore")).permissions
+  expect(rules.slice(0, hostDefaults.length)).toEqual(hostDefaults)
   expect(evaluate("shell", "*", rules)).toBe("allow")
   expect(evaluate("edit", "*", rules)).toBe("deny")
   // A second registration pass is a no-op.
   const once = structuredClone([...fixture.agents.values()])
-  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(fixture.ctx, parseOptions({}), ALL_LANES)))
   expect([...fixture.agents.values()]).toEqual(once)
 })
 
@@ -217,11 +227,17 @@ test("mode commands register under their short names", async () => {
     command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { names.push(definition.name) } }); return { dispose: Effect.void } }) },
     session: { prompt: () => Effect.succeed(undefined) } as never,
   }, parseOptions({}))))
-  expect(names).toEqual(["ultrawork", "hyperplan", "team", "goal", "start-work"])
+  // Mode commands, their OMO-style aliases, then the role commands. `mass-ulw`
+  // and the aliases are registered from the same table the parser reads.
+  expect(names).toEqual([
+    "ultrawork", "hyperplan", "team", "mass-ulw",
+    "ulw", "ultra", "ulw-plan", "ulw-execute",
+    "goal", "start-work",
+  ])
   const only: string[] = []
   await Effect.runPromise(Effect.scoped(registerModes({
     command: { transform: (run) => Effect.sync(() => { run({ add: (definition) => { only.push(definition.name) } }); return { dispose: Effect.void } }) },
     session: { prompt: () => Effect.succeed(undefined) } as never,
   }, parseOptions({ agents: ["sisyphus"], modes: ["ultrawork"] }))))
-  expect(only).toEqual(["ultrawork"])
+  expect(only).toEqual(["ultrawork", "ulw", "ultra"])
 })

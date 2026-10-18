@@ -6,7 +6,8 @@ import type {
   AvailableTool,
   AvailableSkill,
   AvailableCategory,
-} from "../dynamic-agent-prompt-builder";
+} from "../dynamic-agent-prompt-builder"
+import { buildIolausFlowSection } from "../iolaus-flow-section";
 import {
   buildKeyTriggersSection,
   buildToolSelectionTable,
@@ -20,46 +21,10 @@ import {
   buildAntiDuplicationSection,
 } from "../dynamic-agent-prompt-builder";
 
-function buildTodoDisciplineSection(useTaskSystem: boolean): string {
-  if (useTaskSystem) {
-    return `## Task Discipline (NON-NEGOTIABLE)
-
-**Track ALL multi-step work with tasks. This is your execution backbone.**
-
-### When to Create Tasks (MANDATORY)
-
-- **2+ step task** - \`task_create\` FIRST, atomic breakdown
-- **Uncertain scope** - \`task_create\` to clarify thinking
-- **Complex single task** - Break down into trackable steps
-
-### Workflow (STRICT)
-
-1. **On task start**: \`task_create\` with atomic steps-no announcements, just create
-2. **Before each step**: \`task_update(status="in_progress")\` (ONE at a time)
-3. **After each step**: \`task_update(status="completed")\` IMMEDIATELY (NEVER batch)
-4. **Scope changes**: Update tasks BEFORE proceeding
-
-**NO TASKS ON MULTI-STEP WORK = INCOMPLETE WORK.**`;
-  }
-
-  return `## Todo Discipline (NON-NEGOTIABLE)
-
-**Track ALL multi-step work with todos. This is your execution backbone.**
-
-### When to Create Todos (MANDATORY)
-
-- **2+ step task** - \`todowrite\` FIRST, atomic breakdown
-- **Uncertain scope** - \`todowrite\` to clarify thinking
-- **Complex single task** - Break down into trackable steps
-
-### Workflow (STRICT)
-
-1. **On task start**: \`todowrite\` with atomic steps-no announcements, just create
-2. **Before each step**: Mark \`in_progress\` (ONE at a time)
-3. **After each step**: Mark \`completed\` IMMEDIATELY (NEVER batch)
-4. **Scope changes**: Update todos BEFORE proceeding
-
-**NO TODOS ON MULTI-STEP WORK = INCOMPLETE WORK.**`;
+function buildTodoDisciplineSection(_useTaskSystem: boolean): string {
+  // No todo tool exists in this harness. A worker owns one part of the work, so it
+  // gets the completion contract instead of an orchestration section.
+  return buildIolausFlowSection({ worker: true });
 }
 
 export function buildHephaestusPrompt(
@@ -160,7 +125,7 @@ If you notice a potential issue - fix it or note it in final message. Don't ask 
 **Delegation Check (MANDATORY):**
 0. Find relevant skills to load - load them IMMEDIATELY.
 1. Is there a specialized agent that perfectly matches this request?
-2. If not, what \`task\` category + skills to equip? → \`task(load_skills=[{skill1}, ...])\`
+2. If not, which category lane fits, and which skills should it load first? → \`subagent({agent: "<lane>", ...})\` after \`skill({id})\`
 3. Can I do it myself for the best result, FOR SURE?
 
 **Default Bias: DELEGATE for complex tasks. Work yourself ONLY when trivial.**
@@ -181,29 +146,29 @@ ${librarianSection}
 
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
-- Explore/Librarian = background grep. ALWAYS \`run_in_background=true\`, ALWAYS parallel
+- Explore/Librarian = background grep. ALWAYS \`background: true{, ...}\`, ALWAYS parallel
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 </tool_usage_rules>
 
 **How to call explore/librarian:**
 \`\`\`
-// Codebase search - use subagent_type="explore"
-task(subagent_type="explore", run_in_background=true, load_skills=[], description="Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ...")
+// Codebase search - use subagent({agent: "explore", ...})
+subagent({agent: "explore", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 
-// External docs/OSS search - use subagent_type="librarian"
-task(subagent_type="librarian", run_in_background=true, load_skills=[], description="Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ...")
+// External docs/OSS search - use subagent({agent: "librarian", ...})
+subagent({agent: "librarian", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 
 \`\`\`
 
 **Rules:**
 - Fire 2-5 explore agents in parallel for any non-trivial codebase question
 - Parallelize independent file reads - don't read files one at a time
-- NEVER use \`run_in_background=false\` for explore/librarian
+- Explore and librarian children always run with \`background: true\`
 - Continue only with non-overlapping work after launching background agents
-- Keep IDs separate: collect results with background task IDs (\`bg_...\`) via \`background_output(task_id="bg_...")\`; continue follow-up sessions with continuation IDs (\`ses_...\`) via \`task(task_id="ses_...")\`
+- Keep IDs separate: a background child reports through its completion notice; continue it with \`subagent({sessionID: "ses_..."})\`
 - BEFORE final answer, cancel DISPOSABLE tasks individually
-- **NEVER use \`background_cancel(all=true)\`**
+- There is no cancel tool: never wait on output you will not read.
 
 ${buildAntiDuplicationSection()}
 
@@ -277,11 +242,11 @@ After delegation, ALWAYS verify: works as expected? follows codebase pattern? MU
 
 ### Session Continuity
 
-Every \`task()\` output includes a continuation ID (\`ses_...\`). **USE IT for follow-ups.**
+Every \`subagent()\` call returns a session ID (\`ses_...\`). **USE IT for follow-ups.**
 
-- **Task failed/incomplete** - \`task(task_id="ses_...", prompt="Fix: {error}")\`
-- **Follow-up on result** - \`task(task_id="ses_...", prompt="Also: {question}")\`
-- **Verification failed** - \`task(task_id="ses_...", prompt="Failed: {error}. Fix.")\`
+- **Task failed/incomplete** - \`subagent({sessionID: "ses_...", prompt: "Fix: {error}")\`
+- **Follow-up on result** - \`subagent({sessionID: "ses_...", prompt: "Also: {question}")\`
+- **Verification failed** - \`subagent({sessionID: "ses_...", prompt: "Failed: {error}. Fix.")\`
 
 ${
   oracleSection

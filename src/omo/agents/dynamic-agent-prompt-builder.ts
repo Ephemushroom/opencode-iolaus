@@ -22,6 +22,9 @@ export {
 
 export { buildCategorySkillsDelegationGuide } from "./dynamic-agent-category-skills-guide"
 
+export { buildIolausFlowSection } from "./iolaus-flow-section"
+export type { IolausFlowSectionOptions } from "./iolaus-flow-section"
+
 export {
   buildHardBlocksSection,
   buildAntiPatternsSection,

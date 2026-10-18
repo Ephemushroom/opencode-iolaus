@@ -38,9 +38,13 @@ Model routing follows configuration only. Write `~/.iolaus/iolaus.json` (or `IOL
 }
 ```
 
-A lane may also name an ordered chain, for example `"quick": ["openai/gpt-6-luna-fast#low", "deepseek/deepseek-flash"]`: the first model is the lane's model, and the rest are runtime fallbacks for DAG nodes. When a node's model fails (a provider error that fails the child session or judge call, or an empty reply) the node moves to the next model of the chain and runs again; a node that pins `model` itself does not fall back. Only configured chains fall back, since OMO's requirement chains name providers you may not have.
+A lane may also name an ordered chain, for example `"quick": ["openai/gpt-6-luna-fast#low", "deepseek/deepseek-flash"]`: the first model is the lane's model, and the rest are runtime fallbacks for DAG nodes. When a node's model fails (a provider error that fails the child session or judge call, or an empty reply) the node moves to the next model of the chain and runs again; a node that pins `model` itself does not fall back.
 
-Plugin options and legacy `models.json` files are ignored. Lanes you do not configure use the first entry of OMO's requirement chain; a lane with no model at all is not registered. Use top-level `agents` / `categories` in the global file to select which lanes register.
+Plugin options and legacy `models.json` files are ignored. Iolaus is config-first and ships no default model chain: a lane you do not configure is not registered, and a DAG node targeting it is rejected with `model_unavailable`. Use top-level `agents` / `categories` in the global file to select which lanes register.
+
+## Prompt design
+
+How the prompts are structured, which rules come from Anthropic's and OpenAI's current guidance, why `iolaus_flow` is described as a capability rather than a todo replacement, and what to check before changing a prompt: [`docs/prompt-design.md`](docs/prompt-design.md). Read it before editing a primary agent's prompt or adding a model lane.
 
 ## Three workflows
 
@@ -51,6 +55,17 @@ Iolaus has three top-level workflows run by four primary agents. You pick the wo
 | Do anything | Sisyphus | `/ultrawork <task>` |
 | Goal loop | Hephaestus | `/goal <task>` |
 | Plan, then implement | Prometheus → Atlas | `/hyperplan <request>`, then `/start-work <plan>` |
+
+The slash commands have OMO-style keyword aliases. A leading keyword selects the same mode and hands the session to its owning agent, exactly as the command does:
+
+| You type | Same as | What happens |
+| --- | --- | --- |
+| `ulw <task>` or `ultrawork <task>` | `/ultrawork <task>` | Sisyphus enters ultrawork; its first tool call is `iolaus_flow` with the `ultrawork` template, then it waits |
+| `ulw plan <request>`, `ulw-plan <request>` | `/hyperplan <request>` | Prometheus plans; the reviewed plan waits for your `/start-work <plan>` |
+| `ulw-execute <plan>` | `/start-work <plan>` | Atlas runs the plan, one fresh session per ticket |
+| `/mass-ulw <task>` or `mass-ulw <task>` | mode `mass-ulw` | Sisyphus writes the dependency graph itself and drives it through `iolaus_flow`, one run per phase, binding each phase's results into the next |
+
+`mass-ulw` is a mode, not a template: no built-in graph exists because the task decides the phases. The mandate is in the mode prompt: the first run must exist before implementation starts, and each later phase is a new run fed by `inputs` from the previous one.
 
 Prometheus → Atlas is one workflow with a hand-off only you make: Prometheus writes the plan and stops, and Atlas starts when you run `/start-work <plan>` and the plan validates.
 
@@ -89,8 +104,8 @@ completed state, and generation/provenance-aware result envelopes. DAG nodes use
 the namespaced Iolaus Agents and native OpenCode sessions. The first DAG sidebar
 is available through the `opencode-iolaus/tui` entry. Every Iolaus Agent and
 category lane (`quick`, `deep-low`, `deep-high`, ...) runs on a
-pinned model taken from `IOLAUS_HOME/iolaus.json` or, unconfigured, from OMO's
-requirement chain; a DAG node may omit `model` to inherit the lane's model. Fan-in binds every
+pinned model taken from `IOLAUS_HOME/iolaus.json`; an unconfigured lane is not
+registered. A DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
 pause the run for a human approve/reject.
@@ -134,7 +149,7 @@ Native `subagent` calls stay native: follow-ups by `sessionID`, background runs 
 
 A run is called a **flow**, in the TUI as in the `iolaus_flow` tool. The sidebar is a read-only overview: each active flow is a frame titled with its state and clock, followed by a progress bar and one line per node (status glyph, title, `⚖` for a judge, `◇` for a gate). Click a flow or node to open its details dialog, or use `<leader>d` (normally `Ctrl+X`, then `D`) or **Iolaus Flow: show details** in the command palette. The dialog draws the nodes as cards in dependency order, each with its status in the border; fork and join lines connect each row of cards to the next, and the selected card marks what it depends on (`↑`) and what depends on it (`↓`). The details pane shows the agent, model, dependencies, attempts, approval request and errors, and renders agent replies as Markdown; narrow terminals stack the two panes. Only inside the dialog do `j`/`k` or arrow keys select nodes, `Enter`/`o` open an agent session, and `a`/`r` approve or reject the selected waiting gate. `c` cancels the run after a confirmation prompt. `PageUp`/`PageDown` scroll details; retry is a clickable action. `Esc` closes the dialog and restores the input draft and cursor. Updates never open it automatically. The footer keeps a one-line summary and a waiting gate raises a desktop notification.
 
-Two templates come built in. `{ "action": "create", "template": { "template": "plan-review", "task": "..." } }` has Prometheus write the plan, Momus review it (the reply ends `VERDICT: PASS` or `VERDICT: FAIL`), Prometheus revise on failure, Momus re-review, then pauses at a gate before the executor runs; `goal-review` does the same around Hephaestus doing the work. Use action `template` to see the expanded definition and edit it before creating. Creation is fail-closed: a node whose lane has no configured model is rejected with `model_unavailable` instead of starting a run that would fail later.
+Two templates come built in. `{ "action": "create", "template": { "template": "plan-review", "task": "..." } }` has Prometheus write the plan and Momus review it once (the reply ends `VERDICT: PASS` or `VERDICT: FAIL`), then pauses at a gate before the executor runs; `goal-review` does the same around Hephaestus doing the work. Neither template carries a revise/re-review pair up front: only when the newest review fails does the run append a fix node and a fresh review to its end and move the gate behind it, up to `iterations` rounds (default 3), as `ultrawork` does. Use action `template` to see the expanded definition and edit it before creating. Creation is fail-closed: a node whose lane has no configured model is rejected with `model_unavailable` instead of starting a run that would fail later.
 
 Templates get no exemption from the delegation rule: the expanded definition, with its `executor`, `reviewer` and `members` overrides applied, is checked like any other. So `ultrawork` runs from Sisyphus, `goal-review` from Hephaestus and `hyperplan` from Prometheus, each with its own primary plus lower workers. `plan-review` puts Prometheus and Sisyphus in one graph, so every Iolaus primary is refused it; the Iolaus path from plan to implementation is `/hyperplan` followed by your `/start-work`.
 

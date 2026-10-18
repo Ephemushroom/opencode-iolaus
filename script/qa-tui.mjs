@@ -92,9 +92,9 @@ const mock = http.createServer(async (req, res) => {
   if (messageText.includes("You are the reviewer node")) {
     // Slow the judge a little so the sidebar has time to show the running node; then FAIL once, PASS on the revised plan.
     await new Promise((done) => setTimeout(done, 1500))
-    text = messageText.includes("This is the revised plan") ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
+    text = /this is the revised plan/i.test(messageText) ? "Looks right.\nVERDICT: PASS" : "Step 2 has no verification.\nVERDICT: FAIL"
   } else if (messageText.includes("Write the work plan")) { await new Promise((done) => setTimeout(done, 2500)); text = "IOLAUS_TUI_PLAN_V1" }
-  else if (messageText.includes("The reviewer rejected the plan")) { await new Promise((done) => setTimeout(done, 2500)); text = "IOLAUS_TUI_PLAN_V2" }
+  else if (/the reviewer rejected the plan/i.test(messageText)) { await new Promise((done) => setTimeout(done, 2500)); text = "IOLAUS_TUI_PLAN_V2" }
   else if (messageText.includes("Execute the approved plan")) text = "IOLAUS_TUI_EXECUTED"
   else if (tools.includes("iolaus_flow")) {
     const prior = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
@@ -109,7 +109,7 @@ const mock = http.createServer(async (req, res) => {
 mock.listen(0, "127.0.0.1"); await once(mock, "listening")
 const mockURL = `http://127.0.0.1:${mock.address().port}/v1`
 mkdirSync(join(home, ".iolaus"), { recursive: true })
-writeFileSync(join(home, ".iolaus", "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5" } } }))
+writeFileSync(join(home, ".iolaus", "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], gh: false, verify: false, models: { agents: { prometheus: "openai/gpt-5.5", momus: "openai/gpt-5.5", sisyphus: "openai/gpt-5.5", atlas: "openai/gpt-5.5" } } }))
 
 writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
   plugins: [{ package: join(packageRoot, "dist") }],
@@ -402,11 +402,12 @@ assert.match(strip(screens.running), /╭╌ [⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏] ru
 assert.doesNotMatch(strip(screens.running), COMPOSER_STATUS, "redundant composer status must not be rendered")
 assert.doesNotMatch(strip(screens.gate), COMPOSER_STATUS, "waiting gates must not restore the redundant composer status")
 assert.match(strip(screens.running), /Write the plan/, "node summary line missing")
-assert.match(strip(screens.running), /━+ \d+\/6/, "progress bar missing")
+// While the plan runs the graph has its initial four nodes; the FAIL grows it to six before the gate.
+assert.match(strip(screens.running), /━+ \d+\/4/, "progress bar missing")
 assert.match(strip(screens.gate), /⏸ Approve the plan +◇/, "waiting gate not rendered with its title and gate mark")
 assert.match(strip(screens.gate), /✓ Review the plan +⚖/, "judge node not rendered with its title and judge mark")
 assert.match(strip(screens.dialog).replace(/\s+/g, " "), /Plan for "IOLAUS_TUI_TASK" passed review/, "full gate prompt not rendered in the popup")
-assert.match(strip(screens.gate), /[↷✓] (Revise the plan|Re-review the revised plan)/, "review branch state not rendered")
+assert.match(strip(screens.gate), /✓ (Fix round 1|Review round 1)/, "grown review round not rendered")
 assert.match(strip(screens.gate), /╭╌ ⏸ waiting approval · \d+(?:s|m(?: \d+s)?) ╌*╮/, "sidebar frame title must report the waiting gate with its clock")
 assert.doesNotMatch(strip(screens.gate), /\d+ awaiting approval/, "the sidebar must not repeat the waiting gate on a line of its own")
 assert.doesNotMatch(strip(screens.gate), /gen 1\b/, "the first generation must not be shown")
@@ -418,11 +419,12 @@ assert.match(strip(screens.dialog).replace(/\s+/g, " "), /Esc close/, "dialog mu
 assert.match(strip(screens.dialog), /esc close/, "the dialog header must carry the native esc close hint")
 assert.match(strip(screens.dialog), /╭─ ✓ Done ─+╮/, "dialog cards must carry their status in the border title")
 assert.match(strip(screens.dialog), /┏━ ⏸ Waiting approval ━+┓/, "the selected card must use the heavy border with its status title")
-assert.match(strip(screens.dialog), /│ ↑ rereview\b/, "the selected gate must mark the card it depends on")
-assert.match(strip(screens.previousNode), /┃ › rereview\b/, "j/k must move the selection to the previous card")
-assert.match(strip(screens.previousNode), /│ ↑ revise\b/, "the selection must mark its upstream card")
+assert.match(strip(screens.dialog), /│ ↑ review1\b/, "the selected gate must mark the card it depends on")
+assert.match(strip(screens.previousNode), /┃ › review1\b/, "j/k must move the selection to the previous card")
+assert.match(strip(screens.previousNode), /│ ↑ plan1\b/, "the selection must mark its upstream card")
 assert.match(strip(screens.previousNode), /│ ↓ approve\b/, "the selection must mark its downstream card")
-assert.doesNotMatch(strip(screens.dialog), /gen \d/, "the dialog must not show the first generation")
+// The failed first review grew the graph once, so the dialog names generation 2.
+assert.match(strip(screens.dialog), /gen 2\b/, "the dialog must show the grown generation")
 assert.match(strip(screens.dialog), /▼/, "dialog must draw arrows between dependency waves")
 assert.match(strip(screens.dialog), /Waiting approval/, "cards must carry a readable status label")
 assert.match(strip(screens.dialog), /Unblocks: execute/, "node details must name the nodes the selection unblocks")
@@ -467,8 +469,8 @@ for (const [file, label, expectedMode] of [["02-running.ansi", "Iolaus", mode], 
   colors.push({ label, mode: expectedMode, rgb: color, luminance })
 }
 assert.notDeepEqual(colors[1].rgb, colors[2].rgb, "live theme switch must update the mounted sidebar")
-nodeOrder = [...trace.matchAll(/iolaus\.dag\.node\.(?:completed|approved)[^\n]*"nodeID":"([a-z]+)"/g)].map((m) => m[1])
-assert.deepEqual(nodeOrder, ["plan", "review", "revise", "rereview", "approve", "execute"], `unexpected node order ${nodeOrder}`)
+nodeOrder = [...trace.matchAll(/iolaus\.dag\.node\.(?:completed|approved)[^\n]*"nodeID":"([a-z0-9]+)"/g)].map((m) => m[1])
+assert.deepEqual(nodeOrder, ["plan", "review", "plan1", "review1", "approve", "execute"], `unexpected node order ${nodeOrder}`)
 assert.ok(!/iolaus\.agent\.rendered[^\n]*"agent":"momus"/.test(trace), "judge review opened a momus child session")
 assert.equal([...trace.matchAll(/"event":"iolaus\.dag\.run\.started"/g)].length, 1, "popup Enter must not submit the background draft")
 } catch (error) {

@@ -22,6 +22,7 @@ import { renderAgent } from "../src/prompts/render"
 import { buildDynamicHephaestusPrompt } from "../src/omo/agents"
 import { SessionStateStore } from "../src/database"
 import { readRole, saveRole } from "../src/roles/register"
+import { ALL_LANES } from "./lanes"
 
 let directory: string | undefined
 afterEach(() => { if (directory) rmSync(directory, { recursive: true, force: true }); directory = undefined })
@@ -129,7 +130,12 @@ test("commands parse from markers and slash text, and each role command has an o
   expect(parseCommand("/goals now")).toBeUndefined()
   expect(parseCommand("please /goal x")).toBeUndefined()
   expect(parseCommand("<iolaus-command:nope>\nx")).toBeUndefined()
-  expect(COMMAND_OWNERS).toEqual({ ultrawork: "sisyphus", hyperplan: "prometheus", goal: "hephaestus", "start-work": "atlas" })
+  // OMO-style aliases resolve to the canonical names, so one dispatch path serves both spellings.
+  expect(parseCommand("/ulw fix the build")).toEqual({ name: "ultrawork", args: "fix the build" })
+  expect(parseCommand("/ulw-plan design the migration")).toEqual({ name: "hyperplan", args: "design the migration" })
+  expect(parseCommand("/ulw-execute cache")).toEqual({ name: "start-work", args: "cache" })
+  expect(parseCommand("/ulwish")).toBeUndefined()
+  expect(COMMAND_OWNERS).toEqual({ ultrawork: "sisyphus", "mass-ulw": "sisyphus", hyperplan: "prometheus", goal: "hephaestus", "start-work": "atlas" })
 })
 
 test("goal loop continues an idle active goal, stops on completion, stagnation and the continuation cap", async () => {
@@ -211,7 +217,7 @@ test("goal tools are hidden from every Iolaus lane but Hephaestus; Prometheus ma
     update: (id, update) => { const value = agents.get(id) ?? Agent.Info.default(Agent.ID.make(id)); update(value); agents.set(id, value) },
   }
   const ctx = { agent: { transform: (run: (editor: AgentEditor) => void) => Effect.sync(() => { run(editor); return { dispose: Effect.void } }) } }
-  await Effect.runPromise(Effect.scoped(registerAgents(ctx, parseOptions({}))))
+  await Effect.runPromise(Effect.scoped(registerAgents(ctx, parseOptions({}), ALL_LANES)))
   const allow = (id: string, action: string, resource = "*") => evaluate(action, resource, agents.get(id)!.permissions)
   for (const tool of GOAL_TOOL_NAMES) {
     expect(allow("hephaestus", tool)).toBe("allow")
@@ -222,9 +228,19 @@ test("goal tools are hidden from every Iolaus lane but Hephaestus; Prometheus ma
   expect(allow("prometheus", "edit", "src/a.ts")).toBe("deny")
 })
 
-test("Hephaestus renders on any model: GPT variants for GPT, the generic GPT body otherwise", () => {
+test("Hephaestus routes by model class: Claude body for Opus/Fable, GPT variants for GPT", () => {
   expect(renderAgent("hephaestus", { model: "openai/gpt-5.5" })).toBe(buildDynamicHephaestusPrompt({ model: "openai/gpt-5.5", availableAgents: [], availableSkills: [], availableTools: [], availableCategories: [] }))
-  const claude = renderAgent("hephaestus", { model: "anthropic/claude-opus-5-5" })
-  expect(claude).toBe(renderAgent("hephaestus", { model: "zai/glm-5.2" }))
-  expect(claude).not.toBe(renderAgent("sisyphus-junior", { model: "anthropic/claude-opus-5-5" }))
+  // Claude's large models are long-worker carriers: they must not receive the
+  // generic GPT body, which carries apply_patch and preamble rules Anthropic's
+  // guidance says to drop.
+  const opus = renderAgent("hephaestus", { model: "anthropic/claude-opus-5-5" })
+  const fable = renderAgent("hephaestus", { model: "anthropic/claude-fable-5" })
+  const gpt = renderAgent("hephaestus", { model: "openai/gpt-6-astra" })
+  expect(opus).not.toBe(renderAgent("hephaestus", { model: "zai/glm-5.2" }))
+  expect(opus).toContain("Claude Opus 5.5")
+  expect(fable).toContain("Claude Fable")
+  expect(opus).not.toBe(gpt)
+  // A small, non-Anthropic, non-OpenAI model keeps its existing generic behavior.
+  expect(renderAgent("hephaestus", { model: "zai/glm-5.2" })).toBe(renderAgent("hephaestus", { model: "moonshot/kimi-k3" }))
+  expect(renderAgent("hephaestus", { model: "anthropic/claude-opus-5-5" })).not.toBe(renderAgent("sisyphus-junior", { model: "anthropic/claude-opus-5-5" }))
 })

@@ -33,7 +33,6 @@ export interface SisyphusDynamicPromptSections {
   readonly oracleSection: string;
   readonly parallelDelegationSection: string;
   readonly taskManagementSection: string;
-  readonly todoHookNote: string;
   readonly toolSelection: string;
 }
 
@@ -64,11 +63,7 @@ export function buildSisyphusDynamicPromptSections(
     oracleSection: buildOracleSection(availableAgents),
     parallelDelegationSection: buildParallelDelegationSection(model, availableCategories),
     taskManagementSection: buildTaskManagementSection(useTaskSystem),
-    todoHookNote: buildTodoHookNote(useTaskSystem),
     toolSelection: buildToolSelectionTable(availableAgents, availableTools, availableSkills),
   };
 }
 
-function buildTodoHookNote(useTaskSystem: boolean): string {
-  return "YOUR MULTI-STEP WORK IS TRACKED BY THE DURABLE IOLAUS_FLOW GRAPH";
-}

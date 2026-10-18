@@ -4,7 +4,7 @@ export const AGENT_NAMES = [
 ] as const
 export type AgentName = typeof AGENT_NAMES[number]
 
-export const MODE_NAMES = ["ultrawork", "hyperplan", "team"] as const
+export const MODE_NAMES = ["ultrawork", "hyperplan", "team", "mass-ulw"] as const
 export type ModeName = typeof MODE_NAMES[number]
 
 export const CATEGORY_NAMES = [
@@ -68,9 +68,34 @@ export function modeMarker(mode: ModeName): string {
   return `<iolaus-mode:${mode}>`
 }
 
+/**
+ * Keyword aliases at the start of a prompt, taken from OMO's habits:
+ * - `ulw` / `ultrawork <task>`: Sisyphus enters ultrawork and the run is a flow.
+ * - `ulw plan <request>` / `ulw-plan`: Prometheus writes a reviewed plan first.
+ * - `ulw-execute <plan>`: Atlas runs that plan (the same thing as `/start-work`).
+ * - `mass-ulw <task>`: the main agent writes the dependency graph itself and
+ *   drives it through iolaus_flow, one run per phase.
+ * Order matters: the longer forms are tested before the bare `ulw`.
+ */
+const MODE_ALIASES: ReadonlyArray<readonly [RegExp, ModeName]> = [
+  [/^(?:mass[-\s]?ulw)(?=\s|$)/i, "mass-ulw"],
+  [/^(?:ulw[-\s]?plan)(?=\s|$)/i, "hyperplan"],
+  [/^(?:ultrawork|ulw)(?=\s|$)/i, "ultrawork"],
+]
+
+/** The mode a prompt's leading keyword selects, without the marker or command form. */
+export function modeKeyword(text: string): ModeName | undefined {
+  const head = text.trimStart().replace(/^"/, "").replace(/^\//, "")
+  for (const [pattern, mode] of MODE_ALIASES) {
+    if (pattern.test(head)) return mode
+  }
+  return undefined
+}
+
 export function explicitMode(text: string): ModeName | undefined {
   const marker = MODE_NAMES.find((mode) => text.startsWith(`${modeMarker(mode)}\n`))
   if (marker) return marker
-  const command = text.match(/^"?\/(ultrawork|hyperplan|team)(?:\s|"|$)/)
-  return command?.[1] as ModeName | undefined
+  const command = text.match(/^"?\/(ultrawork|hyperplan|team|mass-ulw)(?:\s|"|$)/)
+  if (command) return command[1] as ModeName
+  return modeKeyword(text)
 }

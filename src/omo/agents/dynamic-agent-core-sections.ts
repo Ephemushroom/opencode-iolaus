@@ -1,3 +1,4 @@
+import { identifyModel } from "../../prompts/prompt-lanes";
 import type {
   AvailableAgent,
   AvailableCategory,
@@ -165,7 +166,7 @@ Briefly announce "Consulting Oracle for [reason]" before invocation.
 - Never "time out and continue anyway" for Oracle-dependent tasks.
 
 - Oracle takes minutes. When done with your own work: **end your response** - wait for the \`<system-reminder>\`.
-- Do NOT poll \`background_output\` on a running Oracle. The notification will come.
+- Do NOT poll a running Oracle. Its completion notice is the only signal.
 - Never cancel Oracle.
 </Oracle_Usage>`
 }
@@ -201,16 +202,28 @@ the flow runs; remain available for the user. Inspect committed node results via
 snapshot before reporting completion. Blocking wait is optional.`
 }
 
+/**
+ * Deliberately empty: this used to push "ALWAYS decompose / NEVER implement
+ * directly / MANDATORY" onto non-Claude orchestrators. Both vendors now say that
+ * kind of itinerary overconstrains a capable model - OpenAI's Astra guidance
+ * warns outright that guidance written for smaller models hinders it - and the
+ * flow section already says when a graph pays for its coordination cost and when
+ * one direct call is the right shape. Call sites stay so the prompt builders keep
+ * compiling; the section contributes nothing.
+ */
 export function buildParallelDelegationSection(
   model: string,
   categories: AvailableCategory[],
 ): string {
-  const isNonClaude = !model.toLowerCase().includes("claude")
+  const identity = identifyModel(model)
   const hasDelegationCategory = categories.some(
     (category) => category.name === "deep-low" || category.name === "deep-high" || category.name === "unspecified-high",
   )
-
-  if (!isNonClaude || !hasDelegationCategory) {
+  // Kept for the small-model carriers that relied on it. Anthropic and OpenAI
+  // primaries do not get it: both vendors now say this kind of mandatory
+  // itinerary overconstrains a capable model, and OpenAI's Astra guidance warns
+  // that guidance written for smaller models hinders it.
+  if (identity.vendor === "anthropic" || identity.vendor === "openai" || !hasDelegationCategory) {
     return ""
   }
 
@@ -241,3 +254,5 @@ export function buildParallelDelegationSection(
 
 **Your value is orchestration, decomposition, and quality control. Delegating with crystal-clear prompts IS your work.**`
 }
+
+

@@ -48,10 +48,17 @@ export function growLoop(run: DagRunRecord, settled: string): DagDefinition | un
   const executor = run.definition.nodes.find((node) => node.id === loop.fix)!
   const previousWork = round === 1 ? loop.fix : `${loop.fix}${round - 1}`
   const fix: DagNodeDefinition = { ...executor, id: fixID, title: `Fix round ${round}`, prompt: loop.executorPrompt.replaceAll("{round}", String(round)), dependsOn: [settled], inputs: [{ node: previousWork }, { node: settled }], when: undefined }
-  const review: DagNodeDefinition = { ...reviewer, id: reviewID, title: `Review round ${round}`, prompt: loop.reviewerPrompt.replaceAll("{round}", String(round)), dependsOn: [fixID], inputs: [{ node: fixID }], when: undefined }
+  // A fresh judge call per round: it sees the fixed work and the blockers the previous review cited.
+  const review: DagNodeDefinition = { ...reviewer, id: reviewID, title: `Review round ${round}`, prompt: loop.reviewerPrompt.replaceAll("{round}", String(round)), dependsOn: [fixID], inputs: [{ node: fixID }, { node: settled }], when: undefined }
   const tail = new Set(loop.tail ?? [])
+  // Tail nodes follow the newest review, and their inputs naming the previous work read the newest work.
   const nodes = run.definition.nodes.map((node) => tail.has(node.id)
-    ? { ...node, dependsOn: node.dependsOn.map((d) => d === settled ? reviewID : d), when: { node: reviewID, field: "text", includes: loop.passIncludes } }
+    ? {
+        ...node,
+        dependsOn: node.dependsOn.map((d) => d === settled ? reviewID : d),
+        ...(node.dependsOn.includes(settled) ? { when: { node: reviewID, field: "text", includes: loop.passIncludes } } : {}),
+        ...(node.inputs ? { inputs: node.inputs.map((input) => input.node === previousWork ? { ...input, node: fixID } : input.node === settled ? { ...input, node: reviewID } : input) } : {}),
+      }
     : node)
   return { ...run.definition, nodes: [...nodes.filter((node) => !tail.has(node.id)), fix, review, ...nodes.filter((node) => tail.has(node.id))] }
 }

@@ -28,7 +28,7 @@ Never start responses with casual acknowledgments:
 - "I'll get to work on..."
 - "I'm going to..."
 
-Just start working. Use todos for progress tracking-that's what they're for.
+Just start working. Use the flow for progress tracking-that's what it's for.
 
 ### When User is Wrong
 If the user's approach seems problematic:

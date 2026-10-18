@@ -81,9 +81,9 @@ Confirm:
 \`\`\`
 // Launch these explore agents FIRST
 // Prompt structure: CONTEXT + GOAL + QUESTION + REQUEST
-call_omo_agent(subagent_type="explore", prompt="I'm analyzing a new feature request and need to understand existing patterns before asking clarifying questions. Find similar implementations in this codebase - their structure and conventions.")
-call_omo_agent(subagent_type="explore", prompt="I'm planning to build [feature type] and want to ensure consistency with the project. Find how similar features are organized - file structure, naming patterns, and architectural approach.")
-call_omo_agent(subagent_type="librarian", prompt="I'm implementing [technology] and need to understand best practices before making recommendations. Find official documentation, common patterns, and known pitfalls to avoid.")
+subagent({agent: "explore", prompt:"I'm analyzing a new feature request and need to understand existing patterns before asking clarifying questions. Find similar implementations in this codebase - their structure and conventions.")
+subagent({agent: "explore", prompt:"I'm planning to build [feature type] and want to ensure consistency with the project. Find how similar features are organized - file structure, naming patterns, and architectural approach.")
+subagent({agent: "librarian", prompt:"I'm implementing [technology] and need to understand best practices before making recommendations. Find official documentation, common patterns, and known pitfalls to avoid.")
 \`\`\`
 
 **Questions to Ask** (AFTER exploration):
@@ -150,14 +150,15 @@ call_omo_agent(subagent_type="librarian", prompt="I'm implementing [technology] 
 
 **Oracle Consultation** (RECOMMEND to Prometheus):
 \`\`\`
-Task(
-  subagent_type="oracle",
-  prompt="Architecture consultation:
+subagent({
+  agent: "oracle",
+  description: "Architecture consultation",
+  prompt: "Architecture consultation:
   Request: [user's request]
   Current state: [gathered context]
-  
+
   Analyze: options, trade-offs, long-term implications, risks"
-)
+})
 \`\`\`
 
 **Questions to Ask**:
@@ -192,9 +193,9 @@ Task(
 **Investigation Structure**:
 \`\`\`
 // Parallel probes - Prompt structure: CONTEXT + GOAL + QUESTION + REQUEST
-call_omo_agent(subagent_type="explore", prompt="I'm researching how to implement [feature] and need to understand the current approach. Find how X is currently handled - implementation details, edge cases, and any known issues.")
-call_omo_agent(subagent_type="librarian", prompt="I'm implementing Y and need authoritative guidance. Find official documentation - API reference, configuration options, and recommended patterns.")
-call_omo_agent(subagent_type="librarian", prompt="I'm looking for proven implementations of Z. Find open source projects that solve this - focus on production-quality code and lessons learned.")
+subagent({agent: "explore", prompt:"I'm researching how to implement [feature] and need to understand the current approach. Find how X is currently handled - implementation details, edge cases, and any known issues.")
+subagent({agent: "librarian", prompt:"I'm implementing Y and need authoritative guidance. Find official documentation - API reference, configuration options, and recommended patterns.")
+subagent({agent: "librarian", prompt:"I'm looking for proven implementations of Z. Find open source projects that solve this - focus on production-quality code and lessons learned.")
 \`\`\`
 
 **Directives for Prometheus**:
