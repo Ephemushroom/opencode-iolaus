@@ -1,0 +1,30 @@
+{
+  "scope": "sandbox plugin copy only, after all unmodified-plugin scenarios",
+  "effectName": "Effect12",
+  "injections": [
+    [
+      "    pendingPrompts.delete(ref.sessionID);",
+      "    if (ref.nodeID === 'initial-pause') yield* Effect12.promise(() => __qaPause('initial', ref.sessionID));\n    pendingPrompts.delete(ref.sessionID);"
+    ],
+    [
+      "    const text = assistantText(messages.slice(after + 1));",
+      "    if (ref.nodeID === 'final-pause' && !requests.length) yield* Effect12.promise(() => __qaPause('final', ref.sessionID));\n    const text = assistantText(messages.slice(after + 1));"
+    ],
+    [
+      "      pendingPrompts.set(String(session.id), prompt);",
+      "      if (input.node.id === 'starting-pause' && input.attempt === 1) yield* Effect12.promise(() => __qaPause('starting', String(session.id)));\n      pendingPrompts.set(String(session.id), prompt);"
+    ],
+    [
+      "      const receipt = yield* ctx.session.synthetic({",
+      "      if (ref.nodeID === 'cancel-pause') yield* Effect12.promise(() => __qaPause('cancel', ref.sessionID));\n      const receipt = yield* ctx.session.synthetic({"
+    ],
+    [
+      "      const receipt = yield* ctx.session.synthetic({",
+      "      if (ref.nodeID === 'owner-before') yield* Effect12.promise(() => __qaPause('owner-before', ref.sessionID));\n      const receipt = yield* ctx.session.synthetic({"
+    ],
+    [
+      "      return { messageID: String(receipt.id) };",
+      "      if (ref.nodeID === 'owner-after') yield* Effect12.promise(() => __qaPause('owner-after', ref.sessionID));\n      return { messageID: String(receipt.id) };"
+    ]
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "compatibility": "PASS",
+  "failure": null,
+  "exitCode": 0,
+  "durationSeconds": 8.056,
+  "hostVersion": "opencode v2.0.28",
+  "binarySha256": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341",
+  "buildSha256": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010",
+  "evidence": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/publication-compat/run-20261014T164740",
+  "protectedStateUnchanged": true,
+  "outerSandboxRemoved": true,
+  "cleanupErrors": []
+}

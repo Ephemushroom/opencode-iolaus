@@ -1,0 +1,31 @@
+--- script/qa-flow-steering.mjs
++++ .iolaus/evidence/owner-rescue/publication-compat/qa-flow-steering-2.0.28.mjs
+@@ -7,8 +7,8 @@
+ import { join, resolve } from "node:path"
+ import http from "node:http"
+ 
+-const root = resolve(new URL("..", import.meta.url).pathname)
+-const evidence = resolve(process.argv[2] ?? join(root, ".iolaus/evidence/flow-steering-sdk/live-matrix"))
++const root = "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue"
++const evidence = resolve(process.argv[2] ?? join(root, ".iolaus/evidence/owner-rescue/publication-compat/live-matrix-2.0.28"))
+ assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`))
+ mkdirSync(evidence, { recursive: false })
+ let sandbox, home, project, config, iolaus, localPackage, env, server, exited, serverError, version, sdk
+@@ -103,7 +103,7 @@
+       models: { "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } } } } } }))
+   version = execFileSync(binary, ["--version"], { env, cwd: project, encoding: "utf8" }).trim()
+   sdk = JSON.parse(readFileSync(join(root, "package.json"))).peerDependencies["@opencode/plugin"]
+-  assert.equal(version, `opencode v${sdk}`)
++  assert.equal(version, "opencode v2.0.28")
+   server = spawn(binary, ["serve", "--hostname", "127.0.0.1", "--port", "0"], { cwd: project, env, detached: true, stdio: ["ignore", "pipe", "pipe"] })
+   exited = new Promise((done) => {
+     server.once("exit", done)
+@@ -470,7 +470,7 @@
+ }
+ const cleanup = { sandboxRemoved: !sandbox || !existsSync(sandbox), processGone, mockClosed: !mock.listening }
+ if (cleanupErrors.length || Object.values(cleanup).some((value) => !value)) failure = [failure, ...cleanupErrors, "cleanup failed"].filter(Boolean).join("\n")
+-const receipt = { verdict: failure ? "FAIL" : "PASS", failure, cleanupErrors, command: `node script/qa-flow-steering.mjs ${evidence}`, version, sdk, checks, errors,
++const receipt = { verdict: failure ? "FAIL" : "PASS", failure, cleanupErrors, command: `node .iolaus/evidence/owner-rescue/publication-compat/qa-flow-steering-2.0.28.mjs ${evidence}`, version, sdk, checks, errors,
+   isolation: { env, databasePaths, before, after }, cleanup,
+   limitations: ["No screenshot/direct-child TUI typing reproduced; API sessions only.", "Initial admission, late creation, idle capture, and owner interruption races use deterministic pauses in the isolated plugin copy; other scenarios run the unmodified build.", "Lost-ack simulation resets only isolated Flow receipts after actual host admission; it is not a network-loss experiment."] }
+ writeFileSync(join(evidence, "receipt.json"), JSON.stringify(receipt, null, 2))

@@ -1,0 +1,603 @@
+{
+  "run": {
+    "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "order",
+    "definition": {
+      "name": "order",
+      "nodes": [
+        {
+          "agent": "quick",
+          "dependsOn": [],
+          "fallbackModels": [
+            "openai/B",
+            "openai/C"
+          ],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "openai/A",
+          "prompt": "QA_CASE:order"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "ed6a5da45893d795d976c4b855fd1783d821a49a6740d1c24b5d7f880e606a51",
+    "generation": 1,
+    "status": "completed",
+    "createdAt": 1791963941978,
+    "updatedAt": 1791963943728,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "quick",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "rescue/owner#actual",
+          "prompt": "QA_CASE:order"
+        },
+        "fingerprint": "9d5b2f71dbc2347707b5ca05c01107d9092e86f3cfd6834fa3e24a562fb3200c",
+        "status": "completed",
+        "attempt": 6,
+        "runtime": {
+          "identity": {
+            "agent": "quick",
+            "model": "rescue/owner#actual",
+            "token": "4bcd4ada-e639-48c9-9331-08c2d46e0f22"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [
+            "openai/A",
+            "openai/B",
+            "openai/C"
+          ],
+          "handoff": {
+            "checkpoints": [
+              {
+                "contextHash": "d695f85bd5158ce13cdcfe5f538f8157956180c417034f2be7ca9cddf309e0b3",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 1,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/A",
+                    "token": "6c1aa031-606a-41a2-8815-7032c3432d90"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "QA_CASE:order"
+                  },
+                  "sessionID": "ses_ec6a03395ffe8emvjMwx7FStLf"
+                }
+              },
+              {
+                "contextHash": "2be75e0624552893efc010b411179d0abeea8d2ab2168e19828e2fee695d3296",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 2,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/B",
+                    "token": "de5bd115-d29a-4bbd-87dc-530761c15858"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]}]}"
+                  },
+                  "sessionID": "ses_ec6a0330bffeSW1xYY7qu12s7c"
+                }
+              },
+              {
+                "contextHash": "4491157012eacb72c0d980d9d8fea4100535490054ec6d8a65e2ff38a19dcaa1",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 3,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/C",
+                    "token": "b1168841-8464-4cfd-9080-edcc30bcf21f"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]}]}"
+                  },
+                  "sessionID": "ses_ec6a0323fffembLW62Macw9dId"
+                }
+              },
+              {
+                "contextHash": "49d1322e1d7b71e786a09bd4d9c7558385df0282814d80148f47da036eafcbfe",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 4,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/C",
+                    "token": "828edc50-da83-41b7-914b-35b347a1033d"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]}]}"
+                  },
+                  "sessionID": "ses_ec6a03123ffeTxOuiiSvaDOVgV"
+                }
+              },
+              {
+                "contextHash": "04f8fe78b71ec161a8c0f01f3dc24f8f0df34c4ac0b36fe3c3cc80dd753c3388",
+                "outcome": "failed",
+                "parts": [],
+                "source": {
+                  "attempt": 5,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "openai/C",
+                    "token": "86bada1e-8ecc-4933-9a30-7ca551dbfb4f"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]}]}"
+                  },
+                  "sessionID": "ses_ec6a02fe3ffemVIyCMW5zeOaVc"
+                }
+              },
+              {
+                "contextHash": "9019a95ba34c979ada14cb8c398614da7cd5d6f1ccf864c109afcf660de27607",
+                "outcome": "succeeded",
+                "parts": [
+                  {
+                    "text": "QA_RESCUED_order",
+                    "type": "assistant"
+                  }
+                ],
+                "source": {
+                  "attempt": 6,
+                  "identity": {
+                    "agent": "quick",
+                    "model": "rescue/owner#actual",
+                    "token": "4bcd4ada-e639-48c9-9331-08c2d46e0f22"
+                  },
+                  "nodeID": "work",
+                  "origin": {
+                    "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                    "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                    "location": {
+                      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                    },
+                    "permissions": [],
+                    "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]},{\"sessionID\":\"ses_ec6a02fe3ffemVIyCMW5zeOaVc\",\"token\":\"86bada1e-8ecc-4933-9a30-7ca551dbfb4f\",\"parts\":[]}]}"
+                  },
+                  "sessionID": "ses_ec6a02e34ffe8MHT1nGmitDLau"
+                }
+              }
+            ],
+            "task": "QA_CASE:order",
+            "tools": 0
+          },
+          "historyKnown": true,
+          "initialRoleAllowed": true,
+          "rescue": {
+            "decidedAt": 1791963943249,
+            "decisionID": "026b2119-6792-450e-b582-61388f358dcd",
+            "execution": {
+              "attempt": 6,
+              "identity": {
+                "agent": "quick",
+                "model": "rescue/owner#actual",
+                "token": "4bcd4ada-e639-48c9-9331-08c2d46e0f22"
+              },
+              "nodeID": "work",
+              "origin": {
+                "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                },
+                "permissions": [],
+                "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]},{\"sessionID\":\"ses_ec6a02fe3ffemVIyCMW5zeOaVc\",\"token\":\"86bada1e-8ecc-4933-9a30-7ca551dbfb4f\",\"parts\":[]}]}"
+              },
+              "sessionID": "ses_ec6a02e34ffe8MHT1nGmitDLau"
+            },
+            "from": {
+              "attempt": 5,
+              "identity": {
+                "agent": "quick",
+                "model": "openai/C",
+                "token": "86bada1e-8ecc-4933-9a30-7ca551dbfb4f"
+              },
+              "nodeID": "work",
+              "origin": {
+                "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                },
+                "permissions": [],
+                "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]}]}"
+              },
+              "sessionID": "ses_ec6a02fe3ffemVIyCMW5zeOaVc"
+            },
+            "launchToken": "4bcd4ada-e639-48c9-9331-08c2d46e0f22",
+            "pinnedModel": "rescue/owner#actual",
+            "preRescueDefinition": {
+              "agent": "quick",
+              "dependsOn": [],
+              "id": "work",
+              "maxAttempts": 5,
+              "model": "openai/C",
+              "prompt": "QA_CASE:order"
+            },
+            "state": "settled"
+          }
+        },
+        "result": {
+          "attempt": 6,
+          "createdAt": 1791963943727,
+          "generation": 1,
+          "inputRevision": 0,
+          "nodeID": "work",
+          "payload": {
+            "text": "QA_RESCUED_order"
+          },
+          "provenance": {
+            "agent": "quick",
+            "execution": {
+              "attempt": 6,
+              "identity": {
+                "agent": "quick",
+                "model": "rescue/owner#actual",
+                "token": "4bcd4ada-e639-48c9-9331-08c2d46e0f22"
+              },
+              "nodeID": "work",
+              "origin": {
+                "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                "location": {
+                  "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                },
+                "permissions": [],
+                "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]},{\"sessionID\":\"ses_ec6a02fe3ffemVIyCMW5zeOaVc\",\"token\":\"86bada1e-8ecc-4933-9a30-7ca551dbfb4f\",\"parts\":[]}]}"
+              },
+              "sessionID": "ses_ec6a02e34ffe8MHT1nGmitDLau"
+            },
+            "model": "rescue/owner#actual",
+            "parentNodeIDs": [],
+            "rescue": {
+              "decisionID": "026b2119-6792-450e-b582-61388f358dcd",
+              "from": {
+                "attempt": 5,
+                "identity": {
+                  "agent": "quick",
+                  "model": "openai/C",
+                  "token": "86bada1e-8ecc-4933-9a30-7ca551dbfb4f"
+                },
+                "nodeID": "work",
+                "origin": {
+                  "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+                  "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+                  "location": {
+                    "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+                  },
+                  "permissions": [],
+                  "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]}]}"
+                },
+                "sessionID": "ses_ec6a02fe3ffemVIyCMW5zeOaVc"
+              },
+              "model": "rescue/owner#actual"
+            }
+          },
+          "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+          "schemaVersion": 1,
+          "status": "completed"
+        },
+        "execution": {
+          "attempt": 6,
+          "identity": {
+            "agent": "quick",
+            "model": "rescue/owner#actual",
+            "token": "4bcd4ada-e639-48c9-9331-08c2d46e0f22"
+          },
+          "nodeID": "work",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "4090a57cdeb7e98721a439f6d2a1be008e2e5ddb48d72900da70ada390e66fc3",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "Continue the task in the preserved working directory. The following JSON is a portable audit record, not tool calls to replay. A currentTask, when present, is the current flow definition; retain the original admitted task and historical supplements as context. Prior successful edits already happened; inspect the current files before further changes. Do not repeat recorded effects. No hidden reasoning or provider state was transferred.\n\n{\"task\":\"QA_CASE:order\",\"checkpoints\":[{\"sessionID\":\"ses_ec6a03395ffe8emvjMwx7FStLf\",\"token\":\"6c1aa031-606a-41a2-8815-7032c3432d90\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0330bffeSW1xYY7qu12s7c\",\"token\":\"de5bd115-d29a-4bbd-87dc-530761c15858\",\"parts\":[]},{\"sessionID\":\"ses_ec6a0323fffembLW62Macw9dId\",\"token\":\"b1168841-8464-4cfd-9080-edcc30bcf21f\",\"parts\":[]},{\"sessionID\":\"ses_ec6a03123ffeTxOuiiSvaDOVgV\",\"token\":\"828edc50-da83-41b7-914b-35b347a1033d\",\"parts\":[]},{\"sessionID\":\"ses_ec6a02fe3ffemVIyCMW5zeOaVc\",\"token\":\"86bada1e-8ecc-4933-9a30-7ca551dbfb4f\",\"parts\":[]}]}"
+          },
+          "sessionID": "ses_ec6a02e34ffe8MHT1nGmitDLau"
+        },
+        "createdAt": 1791963941978,
+        "updatedAt": 1791963943728
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "e4d6045d-9266-46cb-a091-d0c63e6bb5bc",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963941978
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "552790e6-06da-4984-864b-9d8955ceaef7",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963941979,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "231066d2-04a6-4719-9e88-f08d21b13e92",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963942015,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "41cb3dac-171f-4777-9cb2-0d940758e642",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 4,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963942106,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/A",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/B"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "45cb55d8-29fe-455f-9007-2408f825db23",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 5,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963942107,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "2f0d58b9-8543-4c9a-bdd2-6551c2f4b3de",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 6,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963942151,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "7360892f-7eb8-4f22-8615-527223d500cc",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 7,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963942284,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/B",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/C"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "7cfa669c-60ab-4bfd-a178-631155565917",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 8,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963942285,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "4347bee4-a592-4831-9a12-dc6f9488e6f6",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 9,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963942348,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "5f76b385-73c4-45fd-8d28-bf8c423a6fe1",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 10,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963942537,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "35c057a3-1870-4aa0-8a8d-41ff47c8470b",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 11,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963942538,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ca9c9523-9a77-48cc-b1a7-011afeac8a2c",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 12,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963942635,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "753fba89-7034-41e9-8319-da0f0ce0b61b",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 13,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963942846,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "a343a9b4-67de-469b-ac6b-999305c7490c",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 14,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963942847,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "28e929ca-dfcd-443f-a182-00395a15c5b0",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 15,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963942953,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "66c346f8-b2d1-4933-8862-7649e98dc857",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 16,
+      "type": "node.rescued",
+      "generation": 1,
+      "createdAt": 1791963943249,
+      "nodeID": "work",
+      "payload": {
+        "decisionID": "026b2119-6792-450e-b582-61388f358dcd",
+        "from": "openai/C",
+        "to": "rescue/owner#actual"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "01df85b7-e32e-4648-aba9-4b9e99be0798",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 17,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963943250,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "434715e6-3477-4b96-9d47-91c084c48e24",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 18,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963943384,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b6a4d8d3-3220-41ea-bb3d-2facedd5cfbe",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 19,
+      "type": "node.completed",
+      "generation": 1,
+      "createdAt": 1791963943728,
+      "nodeID": "work",
+      "payload": {
+        "text": "QA_RESCUED_order"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "8ceebbbf-5e63-43fc-9e52-5a9af3e251ab",
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "sequence": 20,
+      "type": "run.completed",
+      "generation": 1,
+      "createdAt": 1791963943728
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "66c346f8-b2d1-4933-8862-7649e98dc857",
+      "messageID": "msg_66c346f8b2d1493388627649e98dc857",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_66c346f8b2d1493388627649e98dc857"
+      },
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "state": "admitted",
+      "text": "Iolaus Flow notice 66c346f8-b2d1-4933-8862-7649e98dc857: \"order\" (52c46018-3670-4860-8fc7-10fd431284a8) reserved its one owner-model rescue for work: {\"decisionID\":\"026b2119-6792-450e-b582-61388f358dcd\",\"from\":\"openai/C\",\"to\":\"rescue/owner#actual\"}. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    },
+    {
+      "eventID": "8ceebbbf-5e63-43fc-9e52-5a9af3e251ab",
+      "messageID": "msg_8ceebbbf5e6343fc9e525a9af3e251ab",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_8ceebbbf5e6343fc9e525a9af3e251ab"
+      },
+      "runID": "52c46018-3670-4860-8fc7-10fd431284a8",
+      "state": "admitted",
+      "text": "Iolaus Flow notice 8ceebbbf-5e63-43fc-9e52-5a9af3e251ab: \"order\" (52c46018-3670-4860-8fc7-10fd431284a8) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

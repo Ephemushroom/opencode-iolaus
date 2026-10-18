@@ -1,0 +1,315 @@
+{
+  "verdict": "PASS",
+  "mode": "patched",
+  "checks": [
+    {
+      "name": "patched default flow baseline",
+      "verdict": "PASS"
+    },
+    {
+      "name": "actual plugin session.inbox.list exists; no external HTTP bridge",
+      "verdict": "PASS"
+    },
+    {
+      "name": "sessionless judge completes, amends and retries without blocked recovery or owner rescue",
+      "verdict": "PASS"
+    },
+    {
+      "name": "A B C C C then exactly one actual owner variant across two providers, not lane default",
+      "verdict": "PASS"
+    },
+    {
+      "name": "retry after settled rescue restores the planned A B C chain without another owner extra",
+      "verdict": "PASS"
+    },
+    {
+      "name": "amend then retry preserves the amended task and B C chain with spent rescue budget",
+      "verdict": "PASS"
+    },
+    {
+      "name": "rescue and terminal notices queue without auto-waking owner",
+      "verdict": "PASS"
+    },
+    {
+      "name": "one real native edit and two confirmed steers survive fresh-model handoff without raw tools or foreign reasoning",
+      "verdict": "PASS"
+    },
+    {
+      "name": "failed rescue never recurses; retry reload amend removal and re-add preserve spent budget",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hidden-failure refuses rescue preserving queued requirement",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hidden-reload refuses rescue preserving queued requirement",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hidden-fallback refuses rescue preserving queued requirement",
+      "verdict": "PASS"
+    },
+    {
+      "name": "persisted unsafe history remains non-replayable after disabling rescue and reloading",
+      "verdict": "PASS"
+    },
+    {
+      "name": "hidden-attempt refuses rescue preserving queued requirement",
+      "verdict": "PASS"
+    },
+    {
+      "name": "unknown history/error refused",
+      "verdict": "PASS"
+    },
+    {
+      "name": "opaque history/error refused",
+      "verdict": "PASS"
+    },
+    {
+      "name": "opaque-fallback history/error refused",
+      "verdict": "PASS"
+    },
+    {
+      "name": "opaque-attempt history/error refused",
+      "verdict": "PASS"
+    },
+    {
+      "name": "actual denied native edit proves inherited restrictions on rescue child",
+      "verdict": "PASS"
+    },
+    {
+      "name": "canonical failed owner deduplication (omitted variant)",
+      "verdict": "PASS"
+    },
+    {
+      "name": "canonical failed owner deduplication (default variant)",
+      "verdict": "PASS"
+    },
+    {
+      "name": "auth-flow rechecked at recovery",
+      "verdict": "PASS"
+    },
+    {
+      "name": "auth-delegate rechecked at recovery",
+      "verdict": "PASS"
+    },
+    {
+      "name": "planning owner refused at recovery",
+      "verdict": "PASS"
+    },
+    {
+      "name": "atlas execution excluded",
+      "verdict": "PASS"
+    },
+    {
+      "name": "atlas excluded failure keeps explicit retry and planned chain",
+      "verdict": "PASS"
+    },
+    {
+      "name": "prometheus execution excluded",
+      "verdict": "PASS"
+    },
+    {
+      "name": "prometheus excluded failure keeps explicit retry and planned chain",
+      "verdict": "PASS"
+    },
+    {
+      "name": "judge execution excluded",
+      "verdict": "PASS"
+    },
+    {
+      "name": "judge excluded failure keeps explicit retry and planned chain",
+      "verdict": "PASS"
+    },
+    {
+      "name": "atlas initial exclusion preserves successful fallback, retry and amend without handoff",
+      "verdict": "PASS"
+    },
+    {
+      "name": "prometheus initial exclusion preserves successful fallback, retry and amend without handoff",
+      "verdict": "PASS"
+    },
+    {
+      "name": "quick initial exclusion preserves successful fallback, retry and amend without handoff",
+      "verdict": "PASS"
+    },
+    {
+      "name": "initial planning authority keeps ordinary failure budget, unlike later role drift",
+      "verdict": "PASS"
+    },
+    {
+      "name": "authorized Atlas plan failure never launches owner rescue",
+      "verdict": "PASS"
+    },
+    {
+      "name": "authorized success keeps Atlas and session-backed ordinary reviewers on their configured chains",
+      "verdict": "PASS"
+    },
+    {
+      "name": "authorized failure keeps Atlas and session-backed ordinary reviewers on their configured chains",
+      "verdict": "PASS"
+    },
+    {
+      "name": "native observed failure never launches owner rescue",
+      "verdict": "PASS"
+    },
+    {
+      "name": "actual pending native edit is interrupted without rescue or effect",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel spends rescue and fences late provider response",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel-fallback cancellation preserves B work and queued input, blocks stale A replay across reload and rescue disable with zero extra child requests",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel-attempt cancellation preserves B work and queued input, blocks stale A replay across reload and rescue disable with zero extra child requests",
+      "verdict": "PASS"
+    },
+    {
+      "name": "initial planning exclusion still cancels, retries and amends normally without unsafe-history poisoning",
+      "verdict": "PASS"
+    },
+    {
+      "name": "reload reattaches admitted rescue without prompt replay",
+      "verdict": "PASS"
+    },
+    {
+      "name": "capture hidden queue refuses continuation/publication without consumption",
+      "verdict": "PASS"
+    },
+    {
+      "name": "admission-source hidden queue refuses continuation/publication without consumption",
+      "verdict": "PASS"
+    },
+    {
+      "name": "admission-child hidden queue refuses continuation/publication without consumption",
+      "verdict": "PASS"
+    },
+    {
+      "name": "refinalization hidden queue refuses continuation/publication without consumption",
+      "verdict": "PASS"
+    },
+    {
+      "name": "pinned keeps pinned model after owner selection changes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "reserved-reload keeps pinned model after owner selection changes",
+      "verdict": "PASS"
+    },
+    {
+      "name": "cancel fences late-created rescue reference before prompt admission",
+      "verdict": "PASS"
+    },
+    {
+      "name": "private host opened only sandbox databases",
+      "verdict": "PASS",
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "errors": [],
+  "cleanupErrors": [],
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true,
+    "sockets": 0
+  },
+  "isolation": {
+    "env": {
+      "PATH": "/opt/zerobrew/bin:/Users/Bryan/.sdkman/candidates/maven/current/bin:/Users/Bryan/.sdkman/candidates/java/current/bin:/Users/Bryan/.sdkman/candidates/gradle/current/bin:/Users/Bryan/.local/state/fnm_multishells/1311_1791892259534/bin:/Users/Bryan/Library/pnpm/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/Bryan/.local/bin:/Users/Bryan/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/zerobrew/bin:/opt/zerobrew/prefix/bin:/Users/Bryan/.cargo/bin:/Users/Bryan/Library/Application Support/JetBrains/Toolbox/scripts:/Applications/Obsidian.app/Contents/MacOS:/Users/Bryan/.orbstack/bin",
+      "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home",
+      "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home",
+      "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv",
+      "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/config",
+      "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data",
+      "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/cache",
+      "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/state",
+      "IOLAUS_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus",
+      "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home",
+      "QA_SANDBOX": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv",
+      "QA_OPENCODE_SOURCE": "/Users/Bryan/.local/share/opencode/qa-sources/owner-rescue-opencode-2.0.27",
+      "OPENCODE_DISABLE_AUTOUPDATE": "1",
+      "OPENCODE_DISABLE_MODELS_FETCH": "1",
+      "IOLAUS_TRACE": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/cancel-acceptance/feature/trace.ndjson"
+    },
+    "before": {
+      "/Users/Bryan/.iolaus/iolaus.json": "7ef3a683d3514e283b137781aa4a23dc2fff077ba43b0f30559f6c4dc2a3a783",
+      "/Users/Bryan/.config/opencode/opencode.json": "3a5379e6197705e00a82fe7aa86de2075f12a4a31ae122de72aa9d1fd111f2ee",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381",
+      "/opt/homebrew/bin/opencode": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341",
+      "/Users/Bryan/.iolaus/dist/index.js": "absent"
+    },
+    "after": {
+      "/Users/Bryan/.iolaus/iolaus.json": "7ef3a683d3514e283b137781aa4a23dc2fff077ba43b0f30559f6c4dc2a3a783",
+      "/Users/Bryan/.config/opencode/opencode.json": "3a5379e6197705e00a82fe7aa86de2075f12a4a31ae122de72aa9d1fd111f2ee",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent",
+      "/Users/Bryan/.config/opencode/cli.json": "954505da846b92136c5be43d7b8f1d58c5431fcfb1b33e8fd524a104550da381",
+      "/opt/homebrew/bin/opencode": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341",
+      "/Users/Bryan/.iolaus/dist/index.js": "absent"
+    },
+    "databasePaths": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/data/opencode/opencode-local.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/home/.iolaus/iolaus.db-wal"
+    ]
+  },
+  "instrumentation": [
+    {
+      "label": "capture",
+      "match": "      const handoff = yield* Effect12.try({ try: () => checkpoint(input, messages)",
+      "replacement": "      if (input.ref.nodeID === 'capture') yield* Effect12.promise(() => __rescuePause(\"capture\", input.ref.sessionID));\n      const handoff = yield* Effect12.try({ try: () => checkpoint(input, messages)"
+    },
+    {
+      "label": "admission",
+      "match": "    const handoff = pendingHandoffs.get(ref.sessionID);",
+      "replacement": "    const handoff = pendingHandoffs.get(ref.sessionID);\n    if (handoff && ['admission-source', 'admission-child'].includes(ref.nodeID)) yield* Effect12.promise(() => __rescuePause(ref.nodeID, ref.sessionID));"
+    },
+    {
+      "label": "refinalization",
+      "match": "      const final = yield* Effect8.exit",
+      "replacement": "      if (nodeID === 'refinalization') yield* Effect8.promise(() => __rescuePause(\"refinalization\", live.execution.sessionID));\n      const final = yield* Effect8.exit"
+    },
+    {
+      "label": "reservation",
+      "match": "        event(updated, \"node.rescued\", nodeID, { decisionID: rescue.decisionID, from: live.definition.model, to: rescue.pinnedModel }, confirmed);",
+      "replacement": "        event(updated, \"node.rescued\", nodeID, { decisionID: rescue.decisionID, from: live.definition.model, to: rescue.pinnedModel }, confirmed);\n        if (['pinned', 'reserved-reload'].includes(nodeID)) yield* Effect8.promise(() => __rescuePause(nodeID, live.execution.sessionID));"
+    },
+    {
+      "label": "oldref",
+      "match": "      pendingPrompts.set(String(session.id), prompt);",
+      "replacement": "      if (input.handoff && input.node.id === 'oldref') yield* Effect12.promise(() => __rescuePause(\"oldref\", String(session.id)));\n      pendingPrompts.set(String(session.id), prompt);"
+    }
+  ],
+  "limits": [
+    "API-driven native sessions, not a TUI cursor/draft interaction test.",
+    "Mock providers prove protocol and scheduling behavior, not remote-provider availability.",
+    "Unknown-error case injects a child-only native context-hook defect; exact provider.unknown is separately unit-tested. No provider retry policy is suppressed.",
+    "Pending native tool is interrupted at a real permission wait; failed-terminal incomplete tool history is separately unit-tested.",
+    "Stock opt-in UNSUPPORTED is not a feature pass. Inbox reads are point-in-time, not atomic transfer or exactly-once execution."
+  ]
+}

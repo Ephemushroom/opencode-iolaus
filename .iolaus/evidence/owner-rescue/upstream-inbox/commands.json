@@ -1,0 +1,91 @@
+[
+  {
+    "name": "red-baseline",
+    "argv": [
+      "bun",
+      "test",
+      "test/plugin/session-inbox.test.ts"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core",
+    "exitCode": 1
+  },
+  {
+    "name": "core-focused",
+    "argv": [
+      "bun",
+      "test",
+      "test/plugin/session-inbox.test.ts",
+      "test/plugin/session-remove.test.ts",
+      "test/plugin/session-compact.test.ts"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+    "exitCode": 0
+  },
+  {
+    "name": "core-plugin-tests",
+    "argv": [
+      "bun",
+      "test",
+      "test/plugin"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+    "exitCode": 0
+  },
+  {
+    "name": "plugin-tests",
+    "argv": [
+      "bun",
+      "test"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+    "exitCode": 0
+  },
+  {
+    "name": "plugin-typecheck",
+    "argv": [
+      "bun",
+      "typecheck"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+    "exitCode": 0
+  },
+  {
+    "name": "core-typecheck",
+    "argv": [
+      "bun",
+      "typecheck"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+    "exitCode": 0
+  },
+  {
+    "name": "plugin-build",
+    "argv": [
+      "bun",
+      "run",
+      "build"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+    "exitCode": 0
+  },
+  {
+    "name": "core-build",
+    "argv": [
+      "bun",
+      "run",
+      "build"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+    "exitCode": 0
+  },
+  {
+    "name": "root-check",
+    "argv": [
+      "bun",
+      "run",
+      "check"
+    ],
+    "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+    "exitCode": 0
+  }
+]

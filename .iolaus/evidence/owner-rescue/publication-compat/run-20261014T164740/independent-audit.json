@@ -1,0 +1,48 @@
+{
+  "verdict": "PASS",
+  "protectedHashEntries": 14,
+  "sourceAndBuildHashEntries": 213,
+  "protectedStateAndSourceUnchanged": true,
+  "version": "opencode v2.0.28",
+  "sdk": "2.0.27",
+  "checks": 35,
+  "requests": 180,
+  "providerModelCounts": {
+    "gpt-6-luna": 4,
+    "gpt-5.5": 176
+  },
+  "titleGenerationSequences": [
+    0,
+    30,
+    82,
+    91
+  ],
+  "allTaskRequestsUseConfiguredModel": true,
+  "binarySha256": "7d9e936ab23af4928e0dfbf94c9fe313aac0728eef34a06709e1d86ca8987341",
+  "buildSha256": "effd43ee75d4702ed93ede83b1c0ddcd184b6098c1452a641ef8416fba0c1010",
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  },
+  "outerSandboxRemoved": true,
+  "processLeftovers": [],
+  "secretPatternHits": [],
+  "auditNote": "Extra audit assumptions about every request or command marker using the task model were incorrect: four native title-generation requests contain copies of QA user commands and use gpt-6-luna. All are served by the local mock. All 176 non-title requests use gpt-5.5. The unchanged 35-check matrix already passed; no driver assertion was changed.",
+  "sizes": {
+    "before.json": 24206,
+    "summary.json": 546,
+    "stderr.log": 0,
+    "after.json": 24206,
+    "stdout.log": 136,
+    "invocation.json": 2281,
+    "matrix/fault-injection.json": 1643,
+    "matrix/requests.ndjson": 13742704,
+    "matrix/direct-child-api.json": 4059,
+    "matrix/identity-ordering.json": 5980,
+    "matrix/trace.ndjson": 61303,
+    "matrix/server.log": 70,
+    "matrix/assertions.json": 12222,
+    "matrix/receipt.json": 18775
+  }
+}

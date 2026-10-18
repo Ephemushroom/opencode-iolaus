@@ -1,0 +1,170 @@
+{
+  "laneBefore": {
+    "location": {
+      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+    },
+    "data": {
+      "id": "quick",
+      "name": "Quick",
+      "model": {
+        "id": "A",
+        "providerID": "openai"
+      },
+      "request": {
+        "settings": {},
+        "headers": {},
+        "body": {}
+      },
+      "system": "<iolaus-category:quick>",
+      "description": "Trivial tasks: single file changes, typo fixes, simple modifications.",
+      "mode": "subagent",
+      "hidden": false,
+      "permissions": [
+        {
+          "action": "*",
+          "resource": "*",
+          "effect": "allow"
+        },
+        {
+          "action": "read",
+          "resource": "*.env",
+          "effect": "ask"
+        },
+        {
+          "action": "read",
+          "resource": "*.env.*",
+          "effect": "ask"
+        },
+        {
+          "action": "read",
+          "resource": "*.env.example",
+          "effect": "allow"
+        },
+        {
+          "action": "subagent",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "get_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "create_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "update_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "*",
+          "resource": "*",
+          "effect": "allow"
+        },
+        {
+          "action": "edit",
+          "resource": "*blocked.txt",
+          "effect": "deny"
+        },
+        {
+          "action": "edit",
+          "resource": "*pending.txt",
+          "effect": "ask"
+        },
+        {
+          "action": "browser",
+          "resource": "*",
+          "effect": "deny"
+        }
+      ]
+    }
+  },
+  "laneAfter": {
+    "location": {
+      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+    },
+    "data": {
+      "id": "quick",
+      "name": "Quick",
+      "model": {
+        "id": "A",
+        "providerID": "openai"
+      },
+      "request": {
+        "settings": {},
+        "headers": {},
+        "body": {}
+      },
+      "system": "<iolaus-category:quick>",
+      "description": "Trivial tasks: single file changes, typo fixes, simple modifications.",
+      "mode": "subagent",
+      "hidden": false,
+      "permissions": [
+        {
+          "action": "*",
+          "resource": "*",
+          "effect": "allow"
+        },
+        {
+          "action": "read",
+          "resource": "*.env",
+          "effect": "ask"
+        },
+        {
+          "action": "read",
+          "resource": "*.env.*",
+          "effect": "ask"
+        },
+        {
+          "action": "read",
+          "resource": "*.env.example",
+          "effect": "allow"
+        },
+        {
+          "action": "subagent",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "get_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "create_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "update_goal",
+          "resource": "*",
+          "effect": "deny"
+        },
+        {
+          "action": "*",
+          "resource": "*",
+          "effect": "allow"
+        },
+        {
+          "action": "edit",
+          "resource": "*blocked.txt",
+          "effect": "deny"
+        },
+        {
+          "action": "edit",
+          "resource": "*pending.txt",
+          "effect": "ask"
+        },
+        {
+          "action": "browser",
+          "resource": "*",
+          "effect": "deny"
+        }
+      ]
+    }
+  }
+}

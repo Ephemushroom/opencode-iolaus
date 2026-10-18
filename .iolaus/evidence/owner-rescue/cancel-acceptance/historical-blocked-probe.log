@@ -1,0 +1,9 @@
+{
+  "verdict": "BLOCKED",
+  "checks": 5,
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  }
+}

@@ -1,0 +1,403 @@
+{
+  "verdict": "PASS",
+  "cleanupErrors": [],
+  "command": "node .iolaus/evidence/owner-rescue/publication-compat/qa-flow-steering-2.0.28.mjs /Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/publication-compat/run-20261014T164740/matrix",
+  "version": "opencode v2.0.28",
+  "sdk": "2.0.27",
+  "checks": [
+    {
+      "name": "owner turn ends, new turn is interactive, interruption leaves child running",
+      "verdict": "PASS"
+    },
+    {
+      "name": "request id cannot change text",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "request_id already identifies a different steering request"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "same agent/model, one supplement, stale idle/result fenced from downstream",
+      "verdict": "PASS"
+    },
+    {
+      "name": "terminal notice present in inbox without an owner provider turn",
+      "verdict": "PASS"
+    },
+    {
+      "name": "settled target",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering requires an active flow; this flow is completed"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "gate/terminal notices queue without owner wake, reload dedupes, gate stays human-controlled",
+      "verdict": "PASS",
+      "noticeIDs": [
+        "msg_72dad0cbb781475c9ff9559d27d20e93"
+      ]
+    },
+    {
+      "name": "gate target",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering requires a session-backed agent node, not a gate or judge"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "pending initial target",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering requires an active running node; pending is pending"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "foreign owner",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Iolaus DAG run belongs to another session"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "sibling child cannot steer foreign flow",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Iolaus DAG run belongs to another session"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "planning owner",
+      "verdict": "PASS",
+      "receipt": {
+        "error": {
+          "type": "unknown",
+          "message": "[iolaus planner] Planning sessions cannot steer live executions; steering is delegation, not a read-only operation."
+        },
+        "content": []
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "inherited planning role survives switch to worker",
+      "verdict": "PASS",
+      "receipt": {
+        "error": {
+          "type": "unknown",
+          "message": "[iolaus planning] Planning sessions cannot steer live executions; steering is delegation, not a read-only operation."
+        },
+        "content": []
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "observed native target",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering observed native subagent runs is not supported"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "judge target",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering requires a session-backed agent node, not a gate or judge"
+      },
+      "supplementalHostMessages": 1
+    },
+    {
+      "name": "authorization refusals precede supplemental host/provider admission",
+      "verdict": "PASS"
+    },
+    {
+      "name": "lost Flow acknowledgement reconciles real host id after reload without replay",
+      "verdict": "PASS",
+      "faultInjection": "sandbox-only steering receipt reset to reserved",
+      "messageID": "msg_813e128f9a2a4316bc0ab1b6b87a42ca"
+    },
+    {
+      "name": "steered execution cannot retry",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Cannot retry a steered execution: reconcile its delivery or create a new flow with the complete task"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "steered execution cannot resume",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Cannot retry a steered execution: reconcile its delivery or create a new flow with the complete task"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "cancel/admission race and reload cannot publish late result or retry supplement",
+      "verdict": "PASS"
+    },
+    {
+      "name": "Atlas-containing flow",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering Atlas or authorized-plan flows is not supported"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "authorized-plan owner",
+      "verdict": "PASS",
+      "receipt": {
+        "error": {
+          "type": "unknown",
+          "message": "[iolaus atlas-orchestrator] This Atlas session orchestrates a /start-work run: each ticket is implemented in its own fresh Atlas session. Operate the background run with iolaus_flow (snapshot, node, retry; optional blocking wait; approve or reject only on the user's word) instead of changing files or steering tickets here."
+        },
+        "content": []
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "authorized plan survives owner agent switch",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering Atlas or authorized-plan flows is not supported"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "unsteered retry allocates a fresh child and execution token",
+      "verdict": "PASS",
+      "before": {
+        "attempt": 1,
+        "identity": {
+          "agent": "visual-engineering",
+          "model": "openai/gpt-5.5",
+          "token": "b91aa6f3-8d61-4b78-a270-574c0a788884"
+        },
+        "nodeID": "implement",
+        "sessionID": "ses_ec667622cfferfvO1lLss092UA"
+      },
+      "after": {
+        "attempt": 2,
+        "identity": {
+          "agent": "visual-engineering",
+          "model": "openai/gpt-5.5",
+          "token": "dab55e58-5bdc-4677-8295-071202985518"
+        },
+        "nodeID": "implement",
+        "sessionID": "ses_ec667618dffeTgB7N4d5ekMg13"
+      }
+    },
+    {
+      "name": "lost notification acknowledgement reconciles stable host id and never approves gate",
+      "verdict": "PASS",
+      "messageID": "msg_bb4001c8d2754ff18362e9d053e76edc",
+      "faultInjection": "sandbox-only notice state reset to reserved"
+    },
+    {
+      "name": "direct-child API typing does not change identity; screenshot trigger not reproduced",
+      "verdict": "PASS"
+    },
+    {
+      "name": "explicit child agent drift fails closed before supplemental admission and is not silently repaired",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Execution identity drift for implement; expected visual-engineering on openai/gpt-5.5, got sisyphus on {\"id\":\"gpt-5.5\",\"providerID\":\"openai\",\"variant\":\"default\"} (execution token matches). The session was not changed."
+      }
+    },
+    {
+      "name": "running child before initial host admission",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering is unavailable before initial prompt admission or for legacy unpinned executions"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "pre-initial refusal does not enter host context",
+      "verdict": "PASS",
+      "sessionID": "ses_ec6675e78ffe02e2aJUg6No1dB",
+      "faultInjection": "pause before initial prompt on sandbox plugin copy"
+    },
+    {
+      "name": "starting execution",
+      "verdict": "PASS",
+      "receipt": {
+        "error": "Steering requires an active running node; starting-pause is starting"
+      },
+      "supplementalHostMessages": 3
+    },
+    {
+      "name": "cancel/retry fences late-created attempt before prompting",
+      "verdict": "PASS",
+      "lateID": "ses_ec6675d8affepLJHTHAMG5P7Mo",
+      "faultInjection": "pause after native child creation but before runner ref publication"
+    },
+    {
+      "name": "accepted supplement while old result captured at idle fences downstream",
+      "verdict": "PASS",
+      "faultInjection": "pause after real host context capture before returning old result"
+    },
+    {
+      "name": "concurrent RPC cancellation serializes behind owner-mediated host admission",
+      "verdict": "PASS",
+      "receipt": {
+        "runID": "0b1fdf26-0b06-4d77-a03e-d12450506a68",
+        "nodeID": "cancel-pause",
+        "requestID": "concurrent-request",
+        "text": "QA_SUPPLEMENT Fontsource",
+        "execution": {
+          "attempt": 1,
+          "identity": {
+            "agent": "visual-engineering",
+            "model": "openai/gpt-5.5",
+            "token": "a756aa7b-b9e2-4bdb-9971-af9968c91cfa"
+          },
+          "nodeID": "cancel-pause",
+          "sessionID": "ses_ec6675a97ffdKgyy118NA6saDP"
+        },
+        "generation": 1,
+        "revision": 1,
+        "messageID": "msg_8650c470272c41eba04a2aaf8905e198",
+        "state": "admitted",
+        "createdAt": 1791967667617,
+        "receipt": {
+          "messageID": "msg_8650c470272c41eba04a2aaf8905e198"
+        }
+      },
+      "faultInjection": "pause immediately before native synthetic admission on sandbox plugin copy"
+    },
+    {
+      "name": "owner-before: owner tool interruption preserves admission and result tracking in the same controller",
+      "verdict": "PASS",
+      "runID": "db3eed12-e38c-447e-bca3-948d7f5cab6d",
+      "request": {
+        "createdAt": 1791967667971,
+        "execution": {
+          "attempt": 1,
+          "identity": {
+            "agent": "visual-engineering",
+            "model": "openai/gpt-5.5",
+            "token": "cc7bc430-4509-49b8-8ffe-29814dac708a"
+          },
+          "nodeID": "owner-before",
+          "sessionID": "ses_ec667594bffeR3fG6Ye0d9IKnb"
+        },
+        "generation": 1,
+        "messageID": "msg_eb12869879d347e69edef3d1d1be7103",
+        "nodeID": "owner-before",
+        "receipt": {
+          "messageID": "msg_eb12869879d347e69edef3d1d1be7103"
+        },
+        "requestID": "owner-before",
+        "revision": 1,
+        "runID": "db3eed12-e38c-447e-bca3-948d7f5cab6d",
+        "state": "delivered",
+        "text": "QA_SUPPLEMENT Fontsource"
+      },
+      "faultInjection": "pause before native synthetic admission"
+    },
+    {
+      "name": "owner-after: owner tool interruption preserves admission and result tracking in the same controller",
+      "verdict": "PASS",
+      "runID": "6fe1c7cb-35f5-44a0-969e-bcbd0736bd5f",
+      "request": {
+        "createdAt": 1791967668332,
+        "execution": {
+          "attempt": 1,
+          "identity": {
+            "agent": "visual-engineering",
+            "model": "openai/gpt-5.5",
+            "token": "5c96cd81-4e33-450c-bf08-91503c4e5e3b"
+          },
+          "nodeID": "owner-after",
+          "sessionID": "ses_ec66757cdffe3TYX5liU8TY3ON"
+        },
+        "generation": 1,
+        "messageID": "msg_502f73e2250a4c9288028538adb3265b",
+        "nodeID": "owner-after",
+        "receipt": {
+          "messageID": "msg_502f73e2250a4c9288028538adb3265b"
+        },
+        "requestID": "owner-after",
+        "revision": 1,
+        "runID": "6fe1c7cb-35f5-44a0-969e-bcbd0736bd5f",
+        "state": "delivered",
+        "text": "QA_SUPPLEMENT Fontsource"
+      },
+      "faultInjection": "pause after native synthetic admission before returning receipt"
+    },
+    {
+      "name": "isolated live host only opened sandbox databases",
+      "verdict": "PASS",
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "errors": [],
+  "isolation": {
+    "env": {
+      "PATH": "/opt/zerobrew/bin:/Users/Bryan/.sdkman/candidates/maven/current/bin:/Users/Bryan/.sdkman/candidates/java/current/bin:/Users/Bryan/.sdkman/candidates/gradle/current/bin:/Users/Bryan/.local/state/fnm_multishells/1311_1791892259534/bin:/Users/Bryan/Library/pnpm/bin:/opt/homebrew/share/google-cloud-sdk/bin:/Users/Bryan/.local/bin:/Users/Bryan/.bun/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin:/pkg/env/global/bin:/Library/Apple/usr/bin:/usr/local/share/dotnet:~/.dotnet/tools:/opt/homebrew/bin:/opt/zerobrew/bin:/opt/zerobrew/prefix/bin:/Users/Bryan/.cargo/bin:/Users/Bryan/Library/Application Support/JetBrains/Toolbox/scripts:/Applications/Obsidian.app/Contents/MacOS:/Users/Bryan/.orbstack/bin",
+      "HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home",
+      "USERPROFILE": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home",
+      "TMPDIR": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7",
+      "IOLAUS_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus",
+      "IOLAUS_TRACE": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/publication-compat/run-20261014T164740/matrix/trace.ndjson",
+      "XDG_CONFIG_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/config",
+      "XDG_DATA_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data",
+      "XDG_CACHE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/cache",
+      "XDG_STATE_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/state",
+      "OPENCODE_TEST_HOME": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home",
+      "OPENCODE_DISABLE_AUTOUPDATE": "1",
+      "OPENCODE_DISABLE_MODELS_FETCH": "1"
+    },
+    "databasePaths": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-publication-compat-qh0a56i3/iolaus-steering-qa-WTycx7/home/.iolaus/iolaus.db-wal"
+    ],
+    "before": {
+      "/Users/Bryan/.iolaus/iolaus.json": "7ef3a683d3514e283b137781aa4a23dc2fff077ba43b0f30559f6c4dc2a3a783",
+      "/Users/Bryan/.config/opencode/opencode.json": "3a5379e6197705e00a82fe7aa86de2075f12a4a31ae122de72aa9d1fd111f2ee",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent"
+    },
+    "after": {
+      "/Users/Bryan/.iolaus/iolaus.json": "7ef3a683d3514e283b137781aa4a23dc2fff077ba43b0f30559f6c4dc2a3a783",
+      "/Users/Bryan/.config/opencode/opencode.json": "3a5379e6197705e00a82fe7aa86de2075f12a4a31ae122de72aa9d1fd111f2ee",
+      "/Users/Bryan/.config/opencode/opencode.jsonc": "absent"
+    }
+  },
+  "cleanup": {
+    "sandboxRemoved": true,
+    "processGone": true,
+    "mockClosed": true
+  },
+  "limitations": [
+    "No screenshot/direct-child TUI typing reproduced; API sessions only.",
+    "Initial admission, late creation, idle capture, and owner interruption races use deterministic pauses in the isolated plugin copy; other scenarios run the unmodified build.",
+    "Lost-ack simulation resets only isolated Flow receipts after actual host admission; it is not a network-loss experiment."
+  ]
+}

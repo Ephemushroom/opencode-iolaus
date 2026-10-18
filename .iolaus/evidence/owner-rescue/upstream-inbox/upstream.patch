@@ -1,0 +1,129 @@
+diff --git a/packages/core/src/plugin/host.ts b/packages/core/src/plugin/host.ts
+index d6d2781..72ed84b 100644
+--- a/packages/core/src/plugin/host.ts
++++ b/packages/core/src/plugin/host.ts
+@@ -573,6 +573,9 @@ export const make = Effect.fn("PluginHost.make")(function* (
+           .pipe(Effect.map((interrupted) => ({ interrupted }))),
+       wait: (input) => sessions.wait(input.sessionID),
+       context: (input) => sessions.context(input.sessionID),
++      inbox: {
++        list: (input) => sessions.inbox(input.sessionID),
++      },
+     },
+   }
+   return context
+diff --git a/packages/core/test/plugin/host.ts b/packages/core/test/plugin/host.ts
+index 108846d..471c418 100644
+--- a/packages/core/test/plugin/host.ts
++++ b/packages/core/test/plugin/host.ts
+@@ -180,6 +180,9 @@ export function host(overrides: Overrides = {}): Plugin.Context {
+       interrupt: overrides.session?.interrupt ?? (() => Effect.die("unused session.interrupt")),
+       wait: overrides.session?.wait ?? (() => Effect.die("unused session.wait")),
+       context: overrides.session?.context ?? (() => Effect.die("unused session.context")),
++      inbox: overrides.session?.inbox ?? {
++        list: () => Effect.die("unused session.inbox.list"),
++      },
+     },
+   }
+ }
+diff --git a/packages/plugin/src/effect/session.ts b/packages/plugin/src/effect/session.ts
+index b9f19a6..3a88d36 100644
+--- a/packages/plugin/src/effect/session.ts
++++ b/packages/plugin/src/effect/session.ts
+@@ -168,5 +168,6 @@ export type SessionDomain = Pick<
+   | "wait"
+   | "context"
+ > & {
++  readonly inbox: Pick<SessionApi<unknown>["inbox"], "list">
+   readonly hook: ModelHooks<SessionHooks>
+ }
+diff --git a/packages/plugin/src/promise/adapter.ts b/packages/plugin/src/promise/adapter.ts
+index ff5efd1..0997e4c 100644
+--- a/packages/plugin/src/promise/adapter.ts
++++ b/packages/plugin/src/promise/adapter.ts
+@@ -600,6 +600,9 @@ export function fromPromise(plugin: Plugin) {
+             move: adaptApiMethod(SessionEndpoints["session.move"], host.session.move),
+             wait: adaptApiMethod(SessionEndpoints["session.wait"], host.session.wait),
+             context: adaptApiMethod(SessionEndpoints["session.context"], host.session.context),
++            inbox: {
++              list: adaptApiMethod(SessionEndpoints["session.inbox.list"], host.session.inbox.list),
++            },
+           },
+           shell: {
+             hook: (name, callback) =>
+diff --git a/packages/plugin/src/promise/session.ts b/packages/plugin/src/promise/session.ts
+index 9794147..0681fc6 100644
+--- a/packages/plugin/src/promise/session.ts
++++ b/packages/plugin/src/promise/session.ts
+@@ -168,5 +168,6 @@ export type SessionDomain = Pick<
+   | "wait"
+   | "context"
+ > & {
++  readonly inbox: Pick<SessionApi["inbox"], "list">
+   readonly hook: ModelHooks<SessionHooks>
+ }
+diff --git a/packages/core/test/plugin/session-inbox.test.ts b/packages/core/test/plugin/session-inbox.test.ts
+new file mode 100644
+index 0000000..859b2e6
+--- /dev/null
++++ b/packages/core/test/plugin/session-inbox.test.ts
+@@ -0,0 +1,59 @@
++import { expect, expectTypeOf } from "bun:test"
++import { Plugin } from "@opencode/core/plugin"
++import { PluginHost } from "@opencode/core/plugin/host"
++import { PluginPromise } from "@opencode/core/plugin/promise"
++import { Session } from "@opencode/core/session"
++import { Effect } from "effect"
++import { testEffect } from "../lib/effect"
++import { PluginTestLayer } from "./fixture"
++
++const it = testEffect(PluginTestLayer)
++
++it.live("Effect plugins can read pending inbox requirements without consuming them", () =>
++  Effect.gen(function* () {
++    const plugins = yield* Plugin.Service
++    const context = yield* PluginHost.make(plugins)
++    expectTypeOf<keyof typeof context.session.inbox>().toEqualTypeOf<"list">()
++    const created = yield* context.session.create({ title: "Pending requirements" })
++    expect(yield* context.session.inbox.list({ sessionID: created.id })).toEqual([])
++    const admitted = yield* context.session.synthetic({
++      sessionID: created.id,
++      text: "Keep this requirement",
++      delivery: "queue",
++      resume: false,
++    })
++    expect(yield* context.session.context({ sessionID: created.id })).toEqual([])
++    expect(yield* context.session.inbox.list({ sessionID: created.id })).toEqual([admitted])
++    expect(yield* context.session.inbox.list({ sessionID: created.id })).toEqual([admitted])
++    expect(Object.keys(context.session.inbox)).toEqual(["list"])
++    expect(yield* context.session.inbox.list({ sessionID: Session.ID.create() }).pipe(Effect.flip)).toMatchObject({
++      _tag: "Session.NotFoundError",
++    })
++  }),
++)
++
++it.live("Promise plugins can read pending inbox requirements without consuming them", () =>
++  Effect.gen(function* () {
++    const plugins = yield* Plugin.Service
++    const context = yield* PluginHost.make(plugins)
++    const created = yield* context.session.create({ title: "Promise pending requirements" })
++    yield* PluginPromise.fromPromise({
++      id: "test.session-inbox",
++      async setup(ctx) {
++        expectTypeOf<keyof typeof ctx.session.inbox>().toEqualTypeOf<"list">()
++        expect(await ctx.session.inbox.list({ sessionID: created.id })).toEqual([])
++        const admitted = await ctx.session.synthetic({
++          sessionID: created.id,
++          text: "Keep this requirement",
++          delivery: "queue",
++          resume: false,
++        })
++        expect(await ctx.session.context({ sessionID: created.id })).toEqual([])
++        expect(await ctx.session.inbox.list({ sessionID: created.id })).toEqual([admitted])
++        expect(await ctx.session.inbox.list({ sessionID: created.id })).toEqual([admitted])
++        expect(Object.keys(ctx.session.inbox)).toEqual(["list"])
++        await expect(ctx.session.inbox.list({ sessionID: Session.ID.create() })).rejects.toThrow()
++      },
++    }).effect(context)
++  }),
++)

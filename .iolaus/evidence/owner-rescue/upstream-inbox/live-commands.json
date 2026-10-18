@@ -1,0 +1,65 @@
+[
+  {
+    "argv": [
+      "node",
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+    ],
+    "env": {
+      "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/live"
+    },
+    "exitCode": 0,
+    "expected": true
+  },
+  {
+    "argv": [
+      "node",
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+    ],
+    "env": {
+      "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/failure-spawn",
+      "QA_PROBE_FAULT": "spawn"
+    },
+    "exitCode": 1,
+    "expected": true
+  },
+  {
+    "argv": [
+      "node",
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+    ],
+    "env": {
+      "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/failure-partial-setup",
+      "QA_PROBE_FAULT": "partial-setup"
+    },
+    "exitCode": 1,
+    "expected": true
+  },
+  {
+    "name": "refused-command",
+    "argv": [
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+      "service",
+      "restart"
+    ],
+    "exitCode": 2,
+    "expected": true
+  },
+  {
+    "name": "refused-state-path",
+    "argv": [
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+      "--version"
+    ],
+    "exitCode": 2,
+    "expected": true
+  },
+  {
+    "name": "refused-unmarked-home",
+    "argv": [
+      "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+      "--version"
+    ],
+    "exitCode": 1,
+    "expected": true
+  }
+]

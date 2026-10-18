@@ -65,6 +65,8 @@ export class DagStore {
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
     const runtimeRows = this.db.query("SELECT node_id, value_json FROM dag_node_runtime WHERE run_id = ?").all(runID) as Array<{ node_id: string; value_json: string }>
     const runtime = new Map(runtimeRows.map((row) => [row.node_id, parse<NonNullable<DagNodeRecord["runtime"]>>(row.value_json)]))
+    const recoveryRows = this.db.query("SELECT node_id, value_json FROM dag_node_recovery WHERE run_id = ?").all(runID) as Array<{ node_id: string; value_json: string }>
+    const recovery = new Map(recoveryRows.map((row) => [row.node_id, parse<NonNullable<DagNodeRecord["recovery"]>>(row.value_json)]))
     const authorization = this.db.query("SELECT plan, atlas_nodes_json FROM dag_authorizations WHERE run_id = ?").get(runID) as { plan: string; atlas_nodes_json: string } | null
     return {
       runID: row.run_id, ownerSessionID: row.owner_session_id, name: row.name,
@@ -75,6 +77,7 @@ export class DagStore {
         definition: parse<DagNodeRecord["definition"]>(node.node_json), fingerprint: node.fingerprint,
         status: node.status, attempt: node.attempt,
         ...(runtime.has(node.node_id) ? { runtime: runtime.get(node.node_id)! } : {}),
+        ...(recovery.has(node.node_id) ? { recovery: recovery.get(node.node_id)! } : {}),
         ...(node.result_json ? { result: parse<NonNullable<DagNodeRecord["result"]>>(node.result_json) } : {}),
         ...(node.error ? { error: node.error } : {}),
         ...(node.execution_json ? { execution: parse<NonNullable<DagNodeRecord["execution"]>>(node.execution_json) } : {}),
@@ -88,6 +91,12 @@ export class DagStore {
       ? this.db.query("SELECT run_id FROM dag_runs WHERE project = ? ORDER BY updated_at DESC").all(this.project) as Array<{ run_id: string }>
       : this.db.query("SELECT run_id FROM dag_runs WHERE project = ? AND owner_session_id = ? ORDER BY updated_at DESC").all(this.project, ownerSessionID) as Array<{ run_id: string }>
     return rows.map((row) => this.getRun(row.run_id)).filter((run): run is DagRunRecord => run !== undefined)
+  }
+
+  recovery(runID: string, nodeID: string): DagNodeRecord["recovery"] {
+    if (!this.owns(runID)) return undefined
+    const row = this.db.query("SELECT value_json FROM dag_node_recovery WHERE run_id = ? AND node_id = ?").get(runID, nodeID) as { value_json: string } | null
+    return row ? parse<NonNullable<DagNodeRecord["recovery"]>>(row.value_json) : undefined
   }
 
   steering(runID: string): readonly DagSteerRequest[] {
@@ -147,6 +156,7 @@ export class DagStore {
   }
 
   private writeNode(runID: string, node: DagNodeRecord): void {
+    if (node.recovery) this.db.run("INSERT INTO dag_node_recovery VALUES (?, ?, ?) ON CONFLICT(run_id, node_id) DO UPDATE SET value_json = excluded.value_json", [runID, node.definition.id, canonicalJson(node.recovery)])
     if (node.runtime) this.db.run("INSERT INTO dag_node_runtime VALUES (?, ?, ?)", [runID, node.definition.id, canonicalJson(node.runtime)])
     this.db.run("INSERT INTO dag_nodes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)", [runID, node.definition.id, canonicalJson(node.definition), node.fingerprint, node.status, node.attempt, node.result ? canonicalJson(node.result) : null, node.error ?? null, node.execution ? canonicalJson(node.execution) : null, node.createdAt ?? Date.now(), node.updatedAt ?? Date.now()])
   }

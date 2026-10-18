@@ -1,0 +1,286 @@
+{
+  "run": {
+    "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+    "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+    "name": "prometheus",
+    "definition": {
+      "name": "prometheus",
+      "nodes": [
+        {
+          "agent": "prometheus",
+          "dependsOn": [],
+          "fallbackModels": [
+            "openai/B",
+            "openai/C"
+          ],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "openai/A",
+          "prompt": "QA_CASE:prometheus"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "043a0645e7ca95cc78456e2593d5cdcb83b3ecab5693cbb4c0f7bef0ab1f3551",
+    "generation": 1,
+    "status": "failed",
+    "createdAt": 1791963956095,
+    "updatedAt": 1791963956460,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "prometheus",
+          "dependsOn": [],
+          "id": "work",
+          "maxAttempts": 5,
+          "model": "openai/C",
+          "prompt": "QA_CASE:prometheus"
+        },
+        "fingerprint": "1c0ef4c15de7b9803ed6926e0bb92481f0429ab9a2e67021f6c3a5ef36c2cf93",
+        "status": "failed",
+        "attempt": 5,
+        "runtime": {
+          "identity": {
+            "agent": "prometheus",
+            "model": "openai/C",
+            "token": "0a702190-b28a-4e38-a001-f27cd1342154"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [],
+          "historyKnown": true
+        },
+        "error": "Iolaus DAG child session failed",
+        "execution": {
+          "attempt": 5,
+          "identity": {
+            "agent": "prometheus",
+            "model": "openai/C",
+            "token": "0a702190-b28a-4e38-a001-f27cd1342154"
+          },
+          "nodeID": "work",
+          "origin": {
+            "directoryIdentity": "[\"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project\",16777229,222868214,null]",
+            "laneHash": "680417d19a2ae428a880a3ae795a496143b7b2246e1d4334c4905875f32e9bb0",
+            "location": {
+              "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/iolaus-rescue-feature-Xohzvv/project"
+            },
+            "permissions": [],
+            "prompt": "QA_CASE:prometheus"
+          },
+          "sessionID": "ses_ec69ffb54ffe5UJbrjpA9rczue"
+        },
+        "createdAt": 1791963956095,
+        "updatedAt": 1791963956460
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "0b080e79-ed2a-481a-bff4-d379d7c1fb1a",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1791963956095
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ec9f676f-71fd-45b1-9fe3-98133941082b",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956095,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "9411f9d7-42fd-43a4-974d-aaf3b3098dea",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963956118,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "340faa26-828b-49c1-a6d5-5161310cde34",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 4,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963956182,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/A",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/B"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "350adfba-5293-4a61-9bd8-7c35392851a6",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 5,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956183,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "1e7a6bc3-c7e9-483c-a5ad-282b01d3e02c",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 6,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963956197,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "0ee1367c-c525-4cbb-a047-87bee9d859b2",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 7,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1791963956262,
+      "nodeID": "work",
+      "payload": {
+        "from": "openai/B",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/C"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "5f60da0b-e4a1-47e0-a044-97670bb599b7",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 8,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956262,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "64f2a443-2926-49fc-aec4-74231a149f71",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 9,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963956275,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "7219c334-0ebb-4380-b853-d65b832a9a43",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 10,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956330,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "e901b909-7c41-4a85-8b64-d913783c211d",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 11,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956331,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "58d6d5a7-95ba-4e88-8bd1-57b3dedbd73c",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 12,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963956343,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "b0263fd3-406f-4895-8b32-fe7976ea026d",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 13,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956394,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "needs_retry"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "8d71f0d7-9116-4838-8892-c634301df803",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 14,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1791963956394,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "281b972b-0cd6-48d4-bc00-49dfe8fac1da",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 15,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1791963956406,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "61bd1519-e6d2-4816-9fc6-7deb03d2507b",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 16,
+      "type": "node.failed",
+      "generation": 1,
+      "createdAt": 1791963956460,
+      "nodeID": "work",
+      "payload": {
+        "message": "Iolaus DAG child session failed",
+        "status": "failed"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "e3f29502-6e56-4ade-9558-d80e7e20b6b5",
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "sequence": 17,
+      "type": "run.failed",
+      "generation": 1,
+      "createdAt": 1791963956460
+    }
+  ],
+  "steering": [],
+  "notices": [
+    {
+      "eventID": "e3f29502-6e56-4ade-9558-d80e7e20b6b5",
+      "messageID": "msg_e3f295026e564ade9558d80e7e20b6b5",
+      "ownerSessionID": "ses_ec6a0365effeYlBkYSsl5kMgYk",
+      "receipt": {
+        "messageID": "msg_e3f295026e564ade9558d80e7e20b6b5"
+      },
+      "runID": "640b3ec0-7abd-4054-b24b-0f9b4b2bcd86",
+      "state": "admitted",
+      "text": "Iolaus Flow notice e3f29502-6e56-4ade-9558-d80e7e20b6b5: \"prometheus\" (640b3ec0-7abd-4054-b24b-0f9b4b2bcd86) failed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

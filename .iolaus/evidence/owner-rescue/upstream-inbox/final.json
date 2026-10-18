@@ -1,0 +1,183 @@
+{
+  "verdict": "HOST_CONTRACT: PASS",
+  "source": {
+    "source": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+    "tag": "v2.0.27",
+    "sha": "1f4d07a4a519185955ae8ab2ea3607805509e386",
+    "branch": "plugin-inbox-read",
+    "patchSha256": "23d1153ad3e025058362d7af9ca0d5ef8af6182f219daba877b62caf224911d0",
+    "lockSha256": "97b04a1407c4cf48ad4e3fc7c0c85932188e4d0e97ca8005309420062887f60f",
+    "bun": "1.4.3",
+    "node": "v24.20.0",
+    "dependenciesReused": true
+  },
+  "sessionID": "ses_ecb7d486fffeW0XwSKJD1irwoW",
+  "stoppedServerPID": 4464,
+  "providerRequestsBeforeReads": 3,
+  "providerRequestsAfterReads": 3,
+  "effectAndPromiseBeforeAndAfterReload": true,
+  "failureCleanupVerified": true,
+  "realConfigAndInstallHashesUnchanged": true,
+  "scripts": {
+    "checks.py": "67816181b9d7c7b3a4026d23c88d35419af5d978ae8124328c01dfad839cbbe2",
+    "lifecycle.py": "4f0fd7d711f78db7838f1567852d80a214c7c5c0c6c4c78838bb5e5d3480bd40",
+    "probe.mjs": "1d55bed5d760c33caf505b275b898a58cbaffccf5a8cc05a8cf85c1e4cdb0114",
+    "patched-opencode.sh": "a713826aedc3e7c114c32d3ac5085f9d2fd9fb42b898d6b2e4402968151fbf8b"
+  },
+  "staticAndUnitCommands": [
+    {
+      "name": "red-baseline",
+      "argv": [
+        "bun",
+        "test",
+        "test/plugin/session-inbox.test.ts"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/inbox-checks-aez8wabb/baseline/packages/core",
+      "exitCode": 1
+    },
+    {
+      "name": "core-focused",
+      "argv": [
+        "bun",
+        "test",
+        "test/plugin/session-inbox.test.ts",
+        "test/plugin/session-remove.test.ts",
+        "test/plugin/session-compact.test.ts"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+      "exitCode": 0
+    },
+    {
+      "name": "core-plugin-tests",
+      "argv": [
+        "bun",
+        "test",
+        "test/plugin"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+      "exitCode": 0
+    },
+    {
+      "name": "plugin-tests",
+      "argv": [
+        "bun",
+        "test"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+      "exitCode": 0
+    },
+    {
+      "name": "plugin-typecheck",
+      "argv": [
+        "bun",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+      "exitCode": 0
+    },
+    {
+      "name": "core-typecheck",
+      "argv": [
+        "bun",
+        "typecheck"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+      "exitCode": 0
+    },
+    {
+      "name": "plugin-build",
+      "argv": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/plugin",
+      "exitCode": 0
+    },
+    {
+      "name": "core-build",
+      "argv": [
+        "bun",
+        "run",
+        "build"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27/packages/core",
+      "exitCode": 0
+    },
+    {
+      "name": "root-check",
+      "argv": [
+        "bun",
+        "run",
+        "check"
+      ],
+      "cwd": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/owner-rescue-opencode-2.0.27",
+      "exitCode": 0
+    }
+  ],
+  "liveCommands": [
+    {
+      "argv": [
+        "node",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+      ],
+      "env": {
+        "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/live"
+      },
+      "exitCode": 0,
+      "expected": true
+    },
+    {
+      "argv": [
+        "node",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+      ],
+      "env": {
+        "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/failure-spawn",
+        "QA_PROBE_FAULT": "spawn"
+      },
+      "exitCode": 1,
+      "expected": true
+    },
+    {
+      "argv": [
+        "node",
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/probe.mjs"
+      ],
+      "env": {
+        "QA_EVIDENCE_DIR": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/failure-partial-setup",
+        "QA_PROBE_FAULT": "partial-setup"
+      },
+      "exitCode": 1,
+      "expected": true
+    },
+    {
+      "name": "refused-command",
+      "argv": [
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+        "service",
+        "restart"
+      ],
+      "exitCode": 2,
+      "expected": true
+    },
+    {
+      "name": "refused-state-path",
+      "argv": [
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+        "--version"
+      ],
+      "exitCode": 2,
+      "expected": true
+    },
+    {
+      "name": "refused-unmarked-home",
+      "argv": [
+        "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/upstream-inbox/patched-opencode.sh",
+        "--version"
+      ],
+      "exitCode": 1,
+      "expected": true
+    }
+  ]
+}

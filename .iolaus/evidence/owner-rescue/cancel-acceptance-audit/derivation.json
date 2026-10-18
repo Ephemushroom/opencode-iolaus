@@ -1,0 +1,13 @@
+{
+  "methodSource": "/Users/Bryan/.local/share/opencode/worktree/c1d0b7/flow-owner-rescue/.iolaus/evidence/owner-rescue/final-acceptance-audit/run.py",
+  "changes": [
+    "fresh evidence directory names",
+    "fail on pre-existing QA activity",
+    "remove external QA binary/mode overrides",
+    "record current git SHA",
+    "also compare build fingerprints",
+    "assert all 19 expected command exits",
+    "bind feature source and unmodified sandbox build to audited current artifact"
+  ],
+  "applicationOrDriverChanges": false
+}
