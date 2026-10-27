@@ -60,10 +60,15 @@ Iolaus is an orchestration harness — its prompt is structured like other harne
 
 | Path | What it is |
 | --- | --- |
-| `Anthropic/claude-code/` | Claude Code (CLI/agent harness) system prompts, per model |
-| `Anthropic/claude-opus-5.5.md`, `claude-opus-5.md` | claude.ai app system prompts — **not** harness prompts |
-| `Anthropic/official/` | Prompts Anthropic publishes themselves (release-notes versions) |
-| `OpenAI/Codex/` | Codex / GPT-6-Astra harness prompts |
+| `Anthropic/claude-code/claude-code-opus-5.5.md` | **Primary reference** — Claude Code harness prompt for Opus 5.5 |
+| `Anthropic/claude-code/claude-code-fable-5.1.md` | Claude Code harness prompt for Fable 5.1 |
+| `Anthropic/claude-code/claude-code-opus-5.md` | Claude Code harness prompt for Opus 5.0 |
+| `Anthropic/claude-code/agents/` | Claude Code subagent prompts: `Plan.md`, `Explore.md`, `claude.md` (background job), `general-purpose.md` |
+| `Anthropic/claude-code/prompts/` | `plan-mode.md` (multi-phase planning loop), `advisor-tool.md` (reviewer pattern) |
+| `Anthropic/claude-opus-5.5.md`, `claude-opus-5.md` | claude.ai **app** system prompts — not harness prompts |
+| `Anthropic/official/` | Prompts Anthropic publishes themselves (release-notes versions, shorter than served) |
+| `OpenAI/Codex/gpt-6-astra.md` | **Primary reference** — GPT-6 Astra Codex harness prompt |
+| `OpenAI/Codex/gpt-6.1-sol.md` | GPT-6.1-Sol Codex harness prompt |
 | `Cursor/cursor.md` | Cursor agent system prompt |
 | `Misc/amp-code.md`, `Misc/devin-cli.md`, `Misc/warp-2.0-agent.md`, `Misc/zed.md` | Other coding harness prompts |
 
