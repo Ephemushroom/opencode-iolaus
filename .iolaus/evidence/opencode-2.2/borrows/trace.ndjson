@@ -1,0 +1,242 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project/.iolaus","created":["/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus/README.md"]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/claude-opus-5-5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecee8ffe2bcGEBHlLeaA9o"}
+{"event":"iolaus.dag.run.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":2}
+{"event":"iolaus.dag.node.ready","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"pinned","sequence":3}
+{"event":"iolaus.dag.node.ready","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":4}
+{"event":"iolaus.dag.node.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"pinned","sequence":6}
+{"event":"iolaus.dag.node.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":7}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ecd1effelAaEbnegaL5L0B"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ecd1dffezRAslenL6lHQzM"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ecd1dffd5HRTSkAKa453to"}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecee8ffe2bcGEBHlLeaA9o"}
+{"event":"iolaus.dag.node.fallback","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":8}
+{"event":"iolaus.dag.node.ready","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":9}
+{"event":"iolaus.dag.node.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":10}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/claude-opus-5-5","sessionID":"ses_e831ecd1effelAaEbnegaL5L0B"}
+{"event":"iolaus.dag.node.failed","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"pinned","sequence":11}
+{"event":"iolaus.dag.node.fallback","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":12}
+{"event":"iolaus.dag.node.ready","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":13}
+{"event":"iolaus.dag.node.started","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":14}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/claude-opus-5-5","sessionID":"ses_e831ecd1dffd5HRTSkAKa453to"}
+{"event":"iolaus.dag.node.completed","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"empty","sequence":15}
+{"event":"iolaus.dag.node.completed","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"nodeID":"provider","sequence":16}
+{"event":"iolaus.dag.run.failed","runID":"f52e21ac-5719-4ce6-8ee2-e8b4a76f5fd8","generation":1,"sequence":17}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecc17ffeNVe4lwE0XPOjWa"}
+{"event":"iolaus.dag.run.started","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"deep-low","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ecbfeffeLvEyCYlrwDUacb"}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecc17ffeNVe4lwE0XPOjWa"}
+{"event":"iolaus.dag.node.escalated","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"deep-high","kind":"category","model":"openai/claude-opus-5-5","sessionID":"ses_e831ecbd7ffeMU7rOuyq2po4mb"}
+{"event":"iolaus.dag.node.completed","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"nodeID":"decide","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"f08f3b5c-f579-4628-b548-0d14086236b7","generation":1,"sequence":8}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecad1ffevbPLMGt4uV3IeP"}
+{"event":"iolaus.dag.run.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"split","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"split","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"unspecified-high","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ecab4ffeN43qpHcgiBStsF"}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ecad1ffevbPLMGt4uV3IeP"}
+{"event":"iolaus.dag.node.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"split","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member1","sequence":5}
+{"event":"iolaus.dag.node.ready","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member2","sequence":6}
+{"event":"iolaus.dag.node.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member1","sequence":7}
+{"event":"iolaus.dag.node.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member2","sequence":8}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project-wt/iolaus-25c9985c-member1/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/claude-opus-5-5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831eca2fffezet9wTrqm5gOXC"}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project-wt/iolaus-25c9985c-member2/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/claude-opus-5-5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831eca07ffesURwAw5pDqNAwg"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831eca2fffezet9wTrqm5gOXC"}
+{"event":"iolaus.dag.node.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member1","sequence":9}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831eca07ffesURwAw5pDqNAwg"}
+{"event":"iolaus.dag.node.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"member2","sequence":10}
+{"event":"iolaus.dag.node.ready","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"integrate","sequence":11}
+{"event":"iolaus.dag.node.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"integrate","sequence":12}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project-wt/iolaus-25c9985c-integrate/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/claude-opus-5-5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.agent.rendered","agent":"unspecified-high","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ec830ffe7K6f7A4RYCCkXk"}
+{"event":"iolaus.agent.rendered","agent":"unspecified-high","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e831ec830ffe7K6f7A4RYCCkXk"}
+{"event":"iolaus.dag.node.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"integrate","sequence":13}
+{"event":"iolaus.dag.node.ready","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"review","sequence":14}
+{"event":"iolaus.dag.node.started","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"review","sequence":15}
+{"event":"iolaus.dag.node.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"review","sequence":16}
+{"event":"iolaus.dag.node.waiting","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"accept","sequence":17}
+{"event":"iolaus.dag.run.paused","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"sequence":18}
+{"event":"iolaus.dag.node.approved","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"nodeID":"accept","sequence":19}
+{"event":"iolaus.dag.run.completed","runID":"25c9985c-998f-4cdf-8f6a-162b21fb26d6","generation":1,"sequence":20}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ec5ccffeeXCVOmWihNmbtq"}
+{"event":"iolaus.agent.rendered","agent":"sisyphus","model":"openai/gpt-5.5","sessionID":"ses_e831ec5ccffeeXCVOmWihNmbtq"}
+{"event":"iolaus.command.agent","sessionID":"ses_e831ec486ffeh08Wrc6DHdtVa6","command":"start-work","from":"build","to":"atlas","ok":true}
+{"event":"iolaus.startwork.rejected","sessionID":"ses_e831ec486ffeh08Wrc6DHdtVa6","errors":["unknown /start-work option --bogus; expected --worktree [path], --make-pr or --ship"]}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec486ffeh08Wrc6DHdtVa6"}
+{"event":"iolaus.command.agent","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt","command":"start-work","from":"build","to":"atlas","ok":true}
+{"event":"iolaus.startwork.worktree","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt","path":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project-wt/cache","branch":"iolaus/cache","pr":true,"ship":false}
+{"event":"iolaus.dag.run.started","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"t01","sequence":2}
+{"event":"iolaus.startwork.started","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt","plan":"cache","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","tickets":["01"]}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt"}
+{"event":"iolaus.dag.node.started","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"t01","sequence":3}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-borrows-qa-6lQp4G/project-wt/cache/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.registered","enabled":true,"binary":"/opt/homebrew/bin/ast-grep"}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.model","agent":"sisyphus","name":"Sisyphus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"atlas","name":"Atlas","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"deep-low","name":"Deep Low","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.model","agent":"deep-high","name":"Deep High","model":"openai/claude-opus-5-5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"unspecified-high","name":"Unspecified High","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.role.recorded","sessionID":"ses_e831ec423ffen4q90nCJwrpe0h","role":"ticket","plan":"cache"}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec423ffen4q90nCJwrpe0h"}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec423ffen4q90nCJwrpe0h"}
+{"event":"iolaus.dag.node.completed","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"t01","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-spec","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-spec","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"momus","model":"openai/gpt-5.5","sessionID":"ses_e831ec333ffdnDxW6ZYdkVnRyn"}
+{"event":"iolaus.dag.node.completed","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-spec","sequence":7}
+{"event":"iolaus.dag.node.ready","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-standards","sequence":8}
+{"event":"iolaus.dag.node.started","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-standards","sequence":9}
+{"event":"iolaus.agent.rendered","agent":"momus","model":"openai/gpt-5.5","sessionID":"ses_e831ec30dffelat22G5nEKwnJy"}
+{"event":"iolaus.dag.node.completed","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"review-standards","sequence":10}
+{"event":"iolaus.dag.node.skipped","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"fix","sequence":11}
+{"event":"iolaus.dag.node.waiting","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"accept","sequence":12}
+{"event":"iolaus.dag.run.paused","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"sequence":13}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt"}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec478ffeSo8LAgwMJhLWHt"}
+{"event":"iolaus.dag.node.approved","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"accept","sequence":14}
+{"event":"iolaus.dag.node.ready","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"pr","sequence":15}
+{"event":"iolaus.dag.node.started","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"pr","sequence":16}
+{"event":"iolaus.role.recorded","sessionID":"ses_e831ec07effeCtpQUkX92DSAxN","role":"ticket","plan":"cache"}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec07effeCtpQUkX92DSAxN"}
+{"event":"iolaus.agent.rendered","agent":"atlas","model":"openai/gpt-5.5","sessionID":"ses_e831ec07effeCtpQUkX92DSAxN"}
+{"event":"iolaus.dag.node.completed","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"nodeID":"pr","sequence":17}
+{"event":"iolaus.dag.run.completed","runID":"15801ac7-5757-48e3-b76b-d8e9ef31f93a","generation":1,"sequence":18}

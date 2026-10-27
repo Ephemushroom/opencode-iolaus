@@ -160,7 +160,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       } else yield* controller.observed(child.runID, child.nodeID, type === "session.execution.interrupted" ? { status: "interrupted", error: "The subagent session was interrupted" } : { status: "failed", error: failure ?? "The subagent session failed" })
     })
 
-    yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe(), (event) => {
+    yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: ["session.created", "session.execution.succeeded", "session.execution.failed", "session.execution.interrupted"] }), (event) => {
       const data = record((event as { data?: unknown }).data)
       const sessionID = typeof data.sessionID === "string" ? data.sessionID : undefined
       if (!sessionID) return Effect.void

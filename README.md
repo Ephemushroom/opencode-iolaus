@@ -23,7 +23,7 @@ For the live Flow sidebar, add the TUI entry alongside the main plugin:
 }
 ```
 
-Iolaus targets OpenCode 2.1.4 (`@opencode/plugin: 2.1.4`, `@opencode/schema: 2.1.4`). It requires `effect: 4.0.1` as a peer dependency pinned to the host's version, and `@opentui/core` / `@opentui/solid` `>=0.6.8`. Bundled builds externalize `effect`, `@opencode/plugin`, and `@opentui/core` so the plugin shares the host's runtime instance rather than loading duplicate copies.
+Iolaus targets OpenCode 2.2.0 (`@opencode/plugin: 2.2.0`, `@opencode/schema: 2.2.0`). It requires `effect: 4.0.1` as a peer dependency pinned to the host's version, and `@opentui/core` / `@opentui/solid` `0.7.0`. Bundled builds externalize `effect`, `@opencode/plugin`, and `@opentui/core` so the plugin shares the host's runtime instance rather than loading duplicate copies.
 
 Iolaus registers agents under their plain names (`sisyphus`, `oracle`, `quick`) and commands `/ultrawork`, `/hyperplan`, `/team`, `/goal`, `/start-work`. The host's own `explore` agent is replaced by Iolaus's. It does not replace `build`, `plan`, the default model, or OpenCode's native tools. Configure `{ "enabled": false }` in `IOLAUS_HOME/iolaus.json` to disable it globally.
 
@@ -161,7 +161,7 @@ Any agent node can ask for its own worktree with `worktree: true`, and a run-lev
 
 A `deep-low` node that cannot settle its central decision from evidence ends its reply with the line `ESCALATE: deep-high`. Iolaus then reruns the node on `deep-high` with the findings so far appended to its prompt; the deep-low lane prompt states this contract.
 
-When OpenCode compacts a session, Iolaus adds that session's live state to the compaction request so the summary keeps it: an active or paused goal, the session's role, and every unfinished DAG run it owns with its open nodes and waiting gates.
+Iolaus keeps each session's live state as a session context entry (`iolaus.state`): an active or paused goal, the session's role, and every unfinished DAG run it owns with its open nodes and waiting gates. The entry updates as that state changes; the model sees the change at its next step without an extra turn or a system-prompt change, and OpenCode keeps it across compaction and revert.
 
 When the `ast-grep` CLI is installed, Iolaus adds an `ast_grep` namespace to OpenCode's Code Mode: `search` (structural search with metavariable captures), `rewrite` (codemods, dry-run unless `apply: true`) and `scan` (YAML rules). Results are structured JSON with match limits and truncation reported, so an agent can filter them inside one `execute` call. Writes follow the calling agent's `edit` permission file by file; read-only specialists see only `search` and `scan`. Set `IOLAUS_AST_GREP_BIN` to pick a binary, or set `{ "astGrep": false }` in the global `iolaus.json` to turn the tools off.
 

@@ -1,0 +1,240 @@
+{
+  "run": {
+    "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+    "ownerSessionID": "ses_e831e6777ffePocoTlp6p2Y7Hz",
+    "name": "steer",
+    "definition": {
+      "name": "steer",
+      "nodes": [
+        {
+          "agent": "deep-low",
+          "dependsOn": [],
+          "fallbackModels": [
+            "openai/gpt-b"
+          ],
+          "id": "work",
+          "model": "openai/gpt-a",
+          "prompt": "QA_CHILD:steer finish the task",
+          "title": "steer"
+        }
+      ],
+      "schemaVersion": 1
+    },
+    "fingerprint": "f5e9f080b1a5f97862a7d062f862dc874b47bdb5048bd4f40254d55623b40ab0",
+    "generation": 1,
+    "status": "completed",
+    "createdAt": 1793096522558,
+    "updatedAt": 1793096522897,
+    "nodes": [
+      {
+        "definition": {
+          "agent": "deep-low",
+          "dependsOn": [],
+          "id": "work",
+          "model": "openai/gpt-b",
+          "prompt": "QA_CHILD:steer finish the task",
+          "title": "steer"
+        },
+        "fingerprint": "48e4d089b660ec5f2ed232314020e683d9f6c9691b0edf8afa0b641515e67e64",
+        "status": "completed",
+        "attempt": 2,
+        "runtime": {
+          "identity": {
+            "agent": "deep-low",
+            "model": "openai/gpt-b",
+            "token": "b1ca2b04-171b-44cb-a8ac-566e321da13f"
+          },
+          "initial": "admitted",
+          "inputRevision": 0
+        },
+        "recovery": {
+          "failedModels": [
+            "openai/gpt-a"
+          ]
+        },
+        "result": {
+          "attempt": 2,
+          "createdAt": 1793096522897,
+          "generation": 1,
+          "inputRevision": 0,
+          "nodeID": "work",
+          "payload": {
+            "text": "STEER_DONE supplement=true"
+          },
+          "provenance": {
+            "agent": "deep-low",
+            "execution": {
+              "attempt": 2,
+              "identity": {
+                "agent": "deep-low",
+                "model": "openai/gpt-b",
+                "token": "b1ca2b04-171b-44cb-a8ac-566e321da13f"
+              },
+              "nodeID": "work",
+              "sessionID": "ses_e831e64b7ffeDgs5pY8k4g5vY6"
+            },
+            "model": "openai/gpt-b",
+            "parentNodeIDs": []
+          },
+          "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+          "schemaVersion": 1,
+          "status": "completed"
+        },
+        "execution": {
+          "attempt": 2,
+          "identity": {
+            "agent": "deep-low",
+            "model": "openai/gpt-b",
+            "token": "b1ca2b04-171b-44cb-a8ac-566e321da13f"
+          },
+          "nodeID": "work",
+          "sessionID": "ses_e831e64b7ffeDgs5pY8k4g5vY6"
+        },
+        "createdAt": 1793096522558,
+        "updatedAt": 1793096522897
+      }
+    ]
+  },
+  "events": [
+    {
+      "schemaVersion": 1,
+      "eventID": "9c1e7abf-6b81-41f6-b2d6-a75365cf6a80",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 1,
+      "type": "run.started",
+      "generation": 1,
+      "createdAt": 1793096522558
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "0560d992-411c-42b8-acdd-80fb76a10084",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 2,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1793096522559,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "d62d4a44-f666-463a-8614-cad8261b85d3",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 3,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1793096522574,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "6e71ef9e-726a-46dd-8509-c38604e02684",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 4,
+      "type": "node.steering",
+      "generation": 1,
+      "createdAt": 1793096522849,
+      "nodeID": "work",
+      "payload": {
+        "requestID": "qa-supplement",
+        "state": "admitted"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "1a95df86-4707-4f26-80c1-8bd3784157ec",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 5,
+      "type": "node.fallback",
+      "generation": 1,
+      "createdAt": 1793096522874,
+      "nodeID": "work",
+      "payload": {
+        "continued": true,
+        "from": "openai/gpt-a",
+        "message": "Iolaus DAG child session failed",
+        "to": "openai/gpt-b"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "483b3983-3d46-4715-903f-d2927f47fb96",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 6,
+      "type": "node.ready",
+      "generation": 1,
+      "createdAt": 1793096522876,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "57242065-b072-4675-86e6-026dd4dfbbd7",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 7,
+      "type": "node.started",
+      "generation": 1,
+      "createdAt": 1793096522880,
+      "nodeID": "work"
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "3d2ba761-e5d7-44ed-b626-edfa91c1c00c",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 8,
+      "type": "node.completed",
+      "generation": 1,
+      "createdAt": 1793096522897,
+      "nodeID": "work",
+      "payload": {
+        "text": "STEER_DONE supplement=true"
+      }
+    },
+    {
+      "schemaVersion": 1,
+      "eventID": "ee331337-5687-4ee0-8883-c2ac01714979",
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "sequence": 9,
+      "type": "run.completed",
+      "generation": 1,
+      "createdAt": 1793096522897
+    }
+  ],
+  "steering": [
+    {
+      "createdAt": 1793096522845,
+      "execution": {
+        "attempt": 1,
+        "identity": {
+          "agent": "deep-low",
+          "model": "openai/gpt-a",
+          "token": "247f30b8-6b6b-41c3-bf46-a4c2e559d8d3"
+        },
+        "nodeID": "work",
+        "sessionID": "ses_e831e64b7ffeDgs5pY8k4g5vY6"
+      },
+      "generation": 1,
+      "messageID": "msg_996a205bdfeb404bb36052a71db2cba4",
+      "nodeID": "work",
+      "receipt": {
+        "messageID": "msg_996a205bdfeb404bb36052a71db2cba4"
+      },
+      "requestID": "qa-supplement",
+      "revision": 1,
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "state": "delivered",
+      "text": "QA_SUPPLEMENT also mention fontsource"
+    }
+  ],
+  "notices": [
+    {
+      "eventID": "ee331337-5687-4ee0-8883-c2ac01714979",
+      "messageID": "msg_ee33133756874ee08883c2ac01714979",
+      "ownerSessionID": "ses_e831e6777ffePocoTlp6p2Y7Hz",
+      "receipt": {
+        "messageID": "msg_ee33133756874ee08883c2ac01714979"
+      },
+      "runID": "e1a8481c-355e-4088-82f8-316bb1ea70e0",
+      "state": "admitted",
+      "text": "Iolaus Flow notice ee331337-5687-4ee0-8883-c2ac01714979: \"steer\" (e1a8481c-355e-4088-82f8-316bb1ea70e0) completed. Inspect snapshot or node for committed results. This notice is informational, not an instruction to resume work or approve a gate."
+    }
+  ]
+}

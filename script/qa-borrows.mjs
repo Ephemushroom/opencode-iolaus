@@ -34,11 +34,18 @@ function hostState() {
   const tables = existsSync(db) ? sql("SELECT name FROM sqlite_master WHERE type='table'").split("\n") : []
   const files = [join(homedir(), ".config/opencode/opencode.json"), join(homedir(), ".config/opencode/opencode.jsonc"), join(homedir(), ".iolaus/iolaus.json")]
   return { files: Object.fromEntries(files.map((p) => [p, existsSync(p) ? createHash("sha256").update(readFileSync(p)).digest("hex") : "absent"])),
-    sessions: Object.fromEntries(["session", "session_v2"].map((t) => [t, tables.includes(t) ? sql(`SELECT count(*) FROM ${t}`) : "absent"])) }
+    // Only sessions in the sandbox count: the user's own sessions may be created while the QA runs.
+    sandboxSessions: Object.fromEntries(["session", "session_v2"].map((t) => [t, tables.includes(t) ? sql(`SELECT count(*) FROM ${t} WHERE directory LIKE '${sandbox}%'`) : "absent"])) }
 }
 const before = hostState()
 
 const PRIMARY = "gpt-5.5", FALLBACK = "claude-opus-5-5"
+// The host renders the plugin's session-state entry as <context key="iolaus.state">...</context>.
+const stateBlock = (text) => {
+  const raw = text.replace(/\\n/g, "\n").replace(/\\"/g, '"')
+  const at = raw.lastIndexOf('<context key="iolaus.state">')
+  return at < 0 ? undefined : raw.slice(at, raw.indexOf("</context>", at) + 10)
+}
 const sleep = (ms) => new Promise((done) => setTimeout(done, ms))
 const requests = []
 const node = (id, agent, prompt, extra = {}) => ({ id, title: id, agent, prompt, dependsOn: [], ...extra })
@@ -56,7 +63,7 @@ function reply(body, instructions) {
   const first = JSON.stringify(items.find((item) => item?.type === "message" && item.role === "user") ?? "")
   const all = JSON.stringify(items)
   const primary = body.model === PRIMARY
-  if (instructions.includes("<iolaus-compaction-state>") || all.includes("<iolaus-compaction-state>")) return { text: "QA_SUMMARY" }
+  if (all.includes("You MUST use this format for your response")) return { text: "## Objective\nQA_SUMMARY" }
   const qaCase = first.match(/QA_CASE:(\w+)/)?.[1]
   if (qaCase) return outs.length ? { text: `QA_OWNER_${qaCase}` } : { call: { name: "iolaus_flow", args: CASES[qaCase] } }
   if (first.includes("QA_FALLBACK_PROVIDER")) return primary ? { status: 400 } : { text: "FALLBACK_PROVIDER_OK" }
@@ -106,10 +113,11 @@ const mock = http.createServer(async (req, res) => {
     const instructions = body.instructions ?? ""
     const result = reply(body, instructions)
     const record = { session: instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null, model: body.model, call: result.call ?? null, text: result.text ?? null, status: result.status ?? 200,
-      compactionState: instructions.includes("<iolaus-compaction-state>") || JSON.stringify(body.input ?? []).includes("<iolaus-compaction-state>"),
+      compaction: JSON.stringify(body.input ?? []).includes("You MUST use this format for your response"),
       first: JSON.stringify((body.input ?? []).find((i) => i?.type === "message" && i.role === "user") ?? "").slice(0, 3000),
+      last: JSON.stringify((body.input ?? []).findLast((i) => i?.type === "message" && i.role === "user") ?? "").slice(0, 3000),
       outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),
-      instructions: instructions.includes("<iolaus-compaction-state>") ? instructions.slice(instructions.indexOf("<iolaus-compaction-state>"), instructions.indexOf("</iolaus-compaction-state>") + 30) : undefined }
+      state: stateBlock(instructions + JSON.stringify(body.input ?? [])) }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), `${JSON.stringify(record)}\n`)
     assert.ok(requests.length < 300, "Unexpected model loop")
@@ -257,13 +265,19 @@ try {
     assert.equal(byNode(startRun).pr.status, "pending")
   })
 
-  await check("compaction keeps the session's role and paused run in the summary request", async () => {
+  await check("the orchestrator's requests carry its role and paused run as session context", async () => {
     assert.ok(orchestrator && startRun, "start-work run missing")
+    await api("POST", `/api/session/${orchestrator}/prompt`, { text: "QA_STATE_PROBE" })
+    const request = await until(() => requests.find((r) => !r.compaction && r.last.includes("QA_STATE_PROBE") && r.state?.includes(startRun.runID)), "state context")
+    assert.match(request.state, /Session role: orchestrator for plan "cache"/)
+    assert.match(request.state, new RegExp(`DAG run ${startRun.runID} .* is paused in ${project}-wt/cache; open nodes: .*accept=waiting_approval`))
+    assert.ok(!traces().some((t) => t.event === "iolaus.state.failed"), "a state entry write failed")
+  })
+
+  await check("compaction keeps the session context in the summary request", async () => {
     await api("POST", `/api/session/${orchestrator}/compact`, {})
-    const request = await until(() => requests.find((r) => r.compactionState && r.instructions?.includes(startRun.runID)), "compaction request")
-    assert.match(request.instructions, /Session role: orchestrator for plan "cache"/)
-    assert.match(request.instructions, new RegExp(`DAG run ${startRun.runID} .* is paused in ${project}-wt/cache; open nodes: .*accept=waiting_approval`))
-    assert.ok(traces().some((t) => t.event === "iolaus.compaction.preserved" && t.sessionID === orchestrator && t.runs === 1))
+    const request = await until(() => requests.find((r) => r.compaction && r.state?.includes(startRun.runID)), "compaction request with state")
+    assert.match(request.state, /Session role: orchestrator for plan "cache"/)
   })
 
   await check("approving the gate runs the PR node in the worktree", async () => {
