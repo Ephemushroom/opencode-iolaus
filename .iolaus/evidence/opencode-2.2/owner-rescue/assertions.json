@@ -1,0 +1,90 @@
+[
+  {
+    "name": "host version",
+    "verdict": "PASS",
+    "version": "opencode v2.2.0",
+    "binary": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/opencode/oc22/opencode"
+  },
+  {
+    "name": "fallback and owner rescue continue one child session after a real tool effect",
+    "verdict": "PASS",
+    "sessionID": "ses_e831e659cffeReNuiEL8rO1QVl",
+    "events": [
+      "run.started",
+      "node.ready",
+      "node.started",
+      "node.fallback",
+      "node.ready",
+      "node.started",
+      "node.rescued",
+      "node.ready",
+      "node.started",
+      "node.completed",
+      "run.completed"
+    ],
+    "models": [
+      "gpt-a",
+      "gpt-b",
+      "gpt-owner"
+    ],
+    "sessionModel": {
+      "id": "gpt-owner",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "agent": "deep-low",
+    "progress": "STEP_A (once, not replayed)",
+    "historyInputs": [
+      "user",
+      "model-switched",
+      "user",
+      "model-switched",
+      "user"
+    ],
+    "provenance": {
+      "agent": "deep-low",
+      "execution": {
+        "attempt": 3,
+        "identity": {
+          "agent": "deep-low",
+          "model": "openai/gpt-owner",
+          "token": "a3d2c932-c764-4bfb-a552-78e57d34b769"
+        },
+        "nodeID": "work",
+        "sessionID": "ses_e831e659cffeReNuiEL8rO1QVl"
+      },
+      "model": "openai/gpt-owner",
+      "parentNodeIDs": [],
+      "rescue": {
+        "decisionID": "b8fc0b05-6f39-4164-983d-357f605c684e",
+        "from": "openai/gpt-b",
+        "model": "openai/gpt-owner"
+      }
+    }
+  },
+  {
+    "name": "a steered node falls back in the same session with its supplement delivered once",
+    "verdict": "PASS",
+    "sessionID": "ses_e831e64b7ffeDgs5pY8k4g5vY6",
+    "events": [
+      "run.started",
+      "node.ready",
+      "node.started",
+      "node.steering",
+      "node.fallback",
+      "node.ready",
+      "node.started",
+      "node.completed",
+      "run.completed"
+    ],
+    "historyInputs": [
+      "user",
+      "synthetic",
+      "model-switched",
+      "user"
+    ],
+    "steering": [
+      "delivered"
+    ]
+  }
+]

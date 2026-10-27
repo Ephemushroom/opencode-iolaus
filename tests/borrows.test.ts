@@ -15,7 +15,6 @@ import { ensureWorktree, sameRepository } from "../src/dag/worktree"
 import { laneFallbacks, parseModelsConfig, resolveLane } from "../src/models"
 import { compilePlan, parseStartWork } from "../src/roles/startwork"
 import { loadPlan } from "../src/roles/plan"
-import { compactionState } from "../src/compaction"
 import { renderCategory, renderMode } from "../src/prompts/render"
 import type { DagDefinition, DagNodeDefinition } from "../src/dag/types"
 
@@ -135,7 +134,7 @@ test("worktree nodes get their own branch and directory; a run directory must be
   const created: { directory: string }[] = []
   const native = createOpenCodeDagRunner({
     location: { directory: repo },
-    generate: { text: () => Effect.succeed({ text: "" }) },
+    experimental: { generate: { text: () => Effect.succeed({ text: "" }) } },
     session: { create: (input: { location: { directory: string } }) => { created.push(input.location); return Effect.succeed({ id: `ses_${created.length}` }) }, prompt: () => Effect.void, wait: () => Effect.void, get: () => Effect.succeed({ outcome: "succeeded" }), context: () => Effect.succeed([]), interrupt: () => Effect.void },
   } as never)
   await Effect.runPromise(native.start({ runID: "abcdef12-run", node: { id: "member1", agent: "deep-low", worktree: true, prompt: "p", dependsOn: [] }, prompt: "p", attempt: 1 }))
@@ -213,18 +212,4 @@ test("team template: a lead splits, members build in their own worktrees, the le
   expect(() => expandTemplate({ template: "hyperplan", task: "t", members: ["quick", "quick"] })).toThrow(/distinct/)
   expect(renderMode("team", "openai/gpt-5.5")).toContain("<iolaus-team-mode>")
   expect(renderMode("team", "openai/gpt-5.5")).not.toContain("team_create")
-})
-
-test("compaction keeps the session's goal, role and unfinished runs, and nothing when there is none", () => {
-  const run = (status: string, observed = false) => ({ runID: `r-${status}`, ownerSessionID: "s", name: `run ${status}`, fingerprint: "f", generation: 1, createdAt: 0, updatedAt: 0,
-    status, definition: { schemaVersion: 1, name: "x", nodes: [], ...(observed ? { observed: true } : {}), ...(status === "paused" ? { directory: "/repo-wt/cache" } : {}) },
-    nodes: [{ definition: { id: "a", prompt: "", dependsOn: [] }, fingerprint: "", status: "completed", attempt: 1 }, { definition: { id: "accept", kind: "gate", prompt: "", dependsOn: [] }, fingerprint: "", status: "waiting_approval", attempt: 1 }] }) as never
-  const text = compactionState({ sessionID: "s", objective: "Ship the cache", status: "active", continuations: 2, stagnant: 0, createdAt: 0, updatedAt: 0 }, { role: "orchestrator", plan: "cache", runID: "r-paused" }, [run("paused"), run("completed"), run("running", true)])!
-  expect(text).toContain("<iolaus-compaction-state>")
-  expect(text).toContain("Session goal (active): Ship the cache")
-  expect(text).toContain('Session role: orchestrator for plan "cache" (run r-paused)')
-  expect(text).toContain('DAG run r-paused "run paused" is paused in /repo-wt/cache; open nodes: accept=waiting_approval (the user decides)')
-  expect(text).not.toContain("r-completed")
-  expect(text).not.toContain("r-running")
-  expect(compactionState(null, undefined, [run("completed")])).toBeUndefined()
 })

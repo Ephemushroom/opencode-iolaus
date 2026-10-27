@@ -8,7 +8,7 @@ import type { DagController } from "../dag/controller"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
 import { agentName, categoryName, explicitMode } from "../prompts/catalog"
 import { COMMAND_OWNERS, commandMarker, commandOwner, parseCommand } from "./command"
-import { createGoalRuntime, createGoalTools, extendGoal, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
+import { createGoalRuntime, createGoalTools, extendGoal, GOAL_EVENT_TYPES, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
 import { denial, inheritPlanning, resolvePolicy, type RoleRecord } from "./guard"
 import { loadPlan, PLANNING_MARKER, PLANS_DIR, resolvePlan } from "./plan"
 import { compilePlan, gitHead, parseStartWork, type Delivery } from "./startwork"
@@ -182,7 +182,8 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
     if (options.agents.includes("hephaestus")) {
       const tools = createGoalTools(state, isGoalSession, trace)
       yield* ctx.tool.transform((editor) => { for (const tool of tools) editor.add(tool) })
-      yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe(), (event) =>
+      // Only the edges the goal runtime switches on; the default stream carries every text and reasoning delta.
+      yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: GOAL_EVENT_TYPES }), (event) =>
         Effect.forkScoped(Effect.promise(() => runtime.handle(event))).pipe(Effect.asVoid)).pipe(
         Effect.catchCause((cause) => Effect.sync(() => trace("iolaus.goal.events-stopped", { cause: String(cause) })))))
     }

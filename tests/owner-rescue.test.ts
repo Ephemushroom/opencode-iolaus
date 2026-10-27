@@ -153,7 +153,7 @@ function host(options: { agent?: string; outcome?: string } = {}) {
     context: () => Effect.succeed([{ type: "user", id: "msg_t2" }, { type: "assistant", content: [{ type: "text", text: "continued" }] }]),
     synthetic: () => Effect.die("unused"), interrupt: () => Effect.void,
   }
-  return { calls, runner: createOpenCodeDagRunner({ session, generate: { text: () => Effect.die("unused") }, location: { directory: "/project" } } as never) }
+  return { calls, runner: createOpenCodeDagRunner({ session, experimental: { generate: { text: () => Effect.die("unused") } }, location: { directory: "/project" } } as never) }
 }
 const from: DagExecutionRef = { nodeID: "work", attempt: 1, sessionID: "ses_child", identity: { token: "t1", agent: "deep-low", model: "a/one" } }
 const next = (node = {}): DagRunnerStart => ({ node: { id: "work", agent: "deep-low", model: "b/two#high", prompt: "task", dependsOn: [], ...node }, prompt: "task", attempt: 2, identity: { token: "t2", agent: "deep-low", model: "b/two#high" }, continueFrom: from })
@@ -181,7 +181,7 @@ test("the native runner refuses to continue a session that changed agent, execut
 
 test("a failed turn after a delivered supplement is a model failure that names the delivered requests", async () => {
   const request: DagSteerRequest = { runID: "run", nodeID: "work", requestID: "r1", text: "fontsource", execution: from, generation: 1, revision: 1, messageID: "msg_r1", state: "admitted", receipt: { messageID: "msg_r1" }, createdAt: 1 }
-  const runner = createOpenCodeDagRunner({ location: { directory: "/project" }, generate: { text: () => Effect.die("unused") }, session: {
+  const runner = createOpenCodeDagRunner({ location: { directory: "/project" }, experimental: { generate: { text: () => Effect.die("unused") } }, session: {
     get: () => Effect.succeed({ agent: "deep-low", model: { providerID: "a", id: "one" }, metadata: { iolaus_execution_token: "t1" }, outcome: "failed" }),
     wait: () => Effect.void, context: () => Effect.succeed([{ type: "user", id: "msg_t1" }, { type: "synthetic", id: "msg_r1", text: "fontsource" }]),
   } } as never)

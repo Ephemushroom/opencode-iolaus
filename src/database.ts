@@ -76,6 +76,8 @@ export function openDatabase(path: string): Database {
 
 export class SessionStateStore {
   private readonly db: Database
+  /** Called after every save, so derived session state can follow role and goal changes. */
+  onSave?: (sessionID: string) => void
   constructor(path: string) { this.db = openDatabase(path) }
   read(kind: "role" | "goal", sessionID: string): unknown {
     const row = this.db.query("SELECT value_json FROM session_state WHERE session_id = ? AND kind = ?").get(sessionID, kind) as { value_json: string } | null
@@ -84,6 +86,7 @@ export class SessionStateStore {
   }
   save(kind: "role" | "goal", sessionID: string, value: unknown): void {
     this.db.run("INSERT INTO session_state VALUES (?, ?, ?, ?) ON CONFLICT(session_id, kind) DO UPDATE SET value_json = excluded.value_json, updated_at = excluded.updated_at", [sessionID, kind, JSON.stringify(value), Date.now()])
+    this.onSave?.(sessionID)
   }
   close(): void { this.db.close() }
 }

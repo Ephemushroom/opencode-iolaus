@@ -93,7 +93,7 @@ export function assistantText(messages: readonly unknown[]): string {
 
 /** `switchModel` and `update` enable same-session continuation; without them a retry starts a new session. */
 type SessionApi = Pick<Context["session"], "create" | "prompt" | "synthetic" | "wait" | "get" | "context" | "interrupt"> & Partial<Pick<Context["session"], "switchModel" | "update">>
-type GenerateApi = Pick<Context["generate"], "text">
+type GenerateApi = Pick<Context["experimental"]["generate"], "text">
 
 function runnerError(nodeID: string, model = false) {
   return (cause: unknown) => new DagRunnerError({ message: cause instanceof Error ? cause.message : String(cause), nodeID, cause, ...(model ? { model } : {}) })
@@ -115,7 +115,7 @@ const JUDGE_REF = "judge:"
  * model, and judge nodes as one `generate.text` call. A judge has no session,
  * so its ref encodes the reply and `wait` returns it without a host round trip.
  */
-export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly generate: GenerateApi; readonly location: { readonly directory: string } }): DagRunner {
+export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly experimental: { readonly generate: GenerateApi }; readonly location: { readonly directory: string } }): DagRunner {
   const judgeReplies = new Map<string, string>()
   const pendingPrompts = new Map<string, string>()
   const verify = (ref: DagExecutionRef) => Effect.gen(function* () {
@@ -196,7 +196,7 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
     start: (input) => Effect.gen(function* () {
       if (input.node.kind === "judge") {
         const model = input.node.model === undefined ? undefined : Model.Ref.parse(input.node.model)
-        const reply = yield* ctx.generate.text({ prompt: input.prompt, ...(model ? { model } : {}) }).pipe(Effect.mapError(runnerError(input.node.id, true)))
+        const reply = yield* ctx.experimental.generate.text({ prompt: input.prompt, ...(model ? { model } : {}) }).pipe(Effect.mapError(runnerError(input.node.id, true)))
         const key = `${JUDGE_REF}${input.node.id}:${input.attempt}:${Date.now()}`
         judgeReplies.set(key, reply.text)
         return { nodeID: input.node.id, attempt: input.attempt, sessionID: key, ...(input.identity ? { identity: input.identity } : {}) }

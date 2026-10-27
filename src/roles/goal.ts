@@ -110,6 +110,9 @@ export interface GoalRuntimePorts {
 
 export type GoalRuntime = ReturnType<typeof createGoalRuntime>
 
+/** The host events `handle` switches on; the plugin subscribes to these only. */
+export const GOAL_EVENT_TYPES = ["session.execution.started", "session.execution.succeeded", "session.idle", "session.execution.failed", "session.execution.interrupted", "session.deleted"] as const
+
 function sessionOf(event: unknown): { readonly type: string; readonly sessionID?: string } {
   const record = typeof event === "object" && event !== null ? event as { type?: unknown; data?: { sessionID?: unknown } } : {}
   const sessionID = record.data?.sessionID

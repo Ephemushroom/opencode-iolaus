@@ -227,7 +227,7 @@ test("the native runner reattaches a prompted child without prompting it again",
   }
   const runner = createOpenCodeDagRunner({
     location: { directory: "/p" },
-    generate: { text: () => Effect.succeed({ text: "" }) },
+    experimental: { generate: { text: () => Effect.succeed({ text: "" }) } },
     session: {
       create: () => Effect.succeed({ id: "ses_new" }), prompt: () => { prompted += 1; return Effect.void }, wait: () => Effect.void,
       get: () => Effect.succeed({ outcome: "succeeded" }), context: (input: { sessionID: string }) => Effect.succeed(context[input.sessionID] ?? []), interrupt: () => Effect.void,

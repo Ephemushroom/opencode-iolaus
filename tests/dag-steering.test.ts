@@ -195,7 +195,7 @@ test("native steering keeps the pinned identity and requires a delivered supplem
   let messages: unknown[] = [{ type: "assistant", content: [{ type: "text", text: "old" }] }]
   const runner = createOpenCodeDagRunner({
     location: { directory: "/project" },
-    generate: { text: () => Effect.succeed({ text: "review" }) },
+    experimental: { generate: { text: () => Effect.succeed({ text: "review" }) } },
     session: {
       get: () => Effect.succeed({ agent, model: { providerID: "test", id: "visual", variant: "high" }, metadata: { iolaus_execution_token: identity.token }, outcome: "succeeded" }),
       synthetic: (input: unknown) => { calls.push(input); return Effect.succeed({ id: request.messageID }) },

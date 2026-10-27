@@ -164,7 +164,7 @@ test("the native DAG runner persists the execution before prompting without unsu
   let prompted = false
   const runner = createOpenCodeDagRunner({
     location: { directory: "/project" },
-    generate: { text: () => Effect.succeed({ text: "review" }) },
+    experimental: { generate: { text: () => Effect.succeed({ text: "review" }) } },
     session: {
       create: (input: { parentID?: unknown; metadata?: Record<string, unknown> }) => { created = input; return Effect.succeed({ id: "ses_child" }) },
       prompt: () => { prompted = true; return Effect.void }, wait: () => Effect.void,
