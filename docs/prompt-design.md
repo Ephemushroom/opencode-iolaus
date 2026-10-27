@@ -97,6 +97,8 @@ Prompt changes are verified at two levels:
 
 ## 8. How to change this next time
 
+See `docs/prompt-sources.md` for the full index of vendor prompting guides, harness reference prompts, and which source each Iolaus prompt file traces to. Read there first.
+
 1. Read the vendor's current guidance for the model class before touching its prompt. Do not carry a rule over because it worked on the previous generation.
 2. Decide whether the change adds a **capability** or a **procedure**. Procedures constrain a capable model; add them only where a measured failure requires one.
 3. Never replace one form of bookkeeping with another. If a list-like mechanism is tempting, ask what it buys the model that it could not compute itself.
