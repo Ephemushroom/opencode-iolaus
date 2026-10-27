@@ -175,7 +175,9 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   }
   const waiting = () => !busy() && current()?.status === "waiting_approval"
   const hasSession = () => !!current()?.sessionID && !current()?.sessionID?.startsWith("judge:")
-  const retryable = () => !busy() && ["failed", "needs_retry", "interrupted"].includes(current()?.status ?? "")
+  // An observed run records native subagent calls; the controller refuses to retry, resume or amend it, so the
+  // action is not offered. Re-run the subagent, or build an iolaus_flow definition when the work needs scheduling.
+  const retryable = () => !busy() && !run()?.observed && ["failed", "needs_retry", "interrupted"].includes(current()?.status ?? "")
   const cancellable = () => !busy() && (run()?.status === "running" || run()?.status === "paused")
   const decide = async (action: "approve" | "reject" | "retry" | "cancel") => {
     const node = current(), value = run()

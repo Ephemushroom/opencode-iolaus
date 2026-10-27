@@ -459,6 +459,17 @@ test("an observed child session is found from the store after a reload, and only
   Effect.runSync(second.close)
 })
 
+test("a failed child settles with the provider's own reason, not a generic sentence", async () => {
+  const { subagentFailure } = await import("../src/dag/observe")
+  // The host's session.execution.failed carries {type, message, status, response}; the message is what the user needs.
+  expect(subagentFailure({ sessionID: "ses_1", error: { type: "provider.invalid-request", message: "Provider request failed with HTTP 404: not found", status: 404, response: { body: "not found" } } }))
+    .toBe("Provider request failed with HTTP 404: not found")
+  expect(subagentFailure({ sessionID: "ses_1", error: { type: "unknown-provider" } })).toBe("unknown-provider")
+  expect(subagentFailure({ error: { message: "   " , type: " " } })).toBeUndefined()
+  expect(subagentFailure({ sessionID: "ses_1" })).toBeUndefined()
+  expect(subagentFailure(undefined)).toBeUndefined()
+})
+
 test("subagent results parse from the structured output, the tagged text and the background notice", async () => {
   const { subagentOutcome } = await import("../src/dag/observe")
   expect(subagentOutcome({ output: { sessionID: "ses_1", status: "completed", output: "done" } })).toEqual({ sessionID: "ses_1", status: "completed", text: "done" })

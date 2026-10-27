@@ -11,6 +11,8 @@ const node = z.object({
 export const DagViewSchema = z.object({
   runs: z.array(z.object({
     runID: id, name: z.string(), generation: z.number(), status: z.string(),
+    // An observed run records native subagent calls; it cannot be retried, resumed or amended.
+    observed: z.boolean().optional(),
     createdAt: z.number(), updatedAt: z.number(), nodes: z.array(node),
   })),
 })

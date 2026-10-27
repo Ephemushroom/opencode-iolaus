@@ -36,6 +36,15 @@ export function subagentOutcome(result: unknown): SubagentOutcome {
   return background ? { sessionID: background[1], status: "running" } : {}
 }
 
+/** The reason a child session failed, as its terminal event reports it: `{type, message, status, response}`. */
+export function subagentFailure(data: unknown): string | undefined {
+  const error = record(record(data).error)
+  const message = typeof error.message === "string" ? error.message.trim() : ""
+  if (message) return message
+  const type = typeof error.type === "string" ? error.type.trim() : ""
+  return type || undefined
+}
+
 interface Call {
   readonly runID: string
   readonly nodeID: string
@@ -135,7 +144,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       else if (outcome.status && outcome.status !== "running") yield* controller.observed(call.runID, call.nodeID, { status: outcome.status === "interrupted" ? "interrupted" : "failed", error: outcome.text || `subagent ${outcome.status}` })
     }).pipe(safe("after")))
 
-    const settle = (sessionID: string, type: string) => Effect.gen(function* () {
+    const settle = (sessionID: string, type: string, failure?: string) => Effect.gen(function* () {
       // A call the host refused before running it (unknown tool, depth limit) reaches no execute.after; it ends with its caller's turn.
       for (const [id, call] of calls) {
         if (call.caller !== sessionID || call.sessionID !== undefined) continue
@@ -148,7 +157,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
         const messages = (yield* ctx.session.context({ sessionID: sessionID as never })) as readonly unknown[]
         const model = modelOf(record([...messages].reverse().find((message) => record(message).type === "assistant")).model)
         yield* controller.observed(child.runID, child.nodeID, { status: "completed", text: assistantText(messages), ...(model ? { model } : {}) })
-      } else yield* controller.observed(child.runID, child.nodeID, type === "session.execution.interrupted" ? { status: "interrupted", error: "The subagent session was interrupted" } : { status: "failed", error: "The subagent session failed" })
+      } else yield* controller.observed(child.runID, child.nodeID, type === "session.execution.interrupted" ? { status: "interrupted", error: "The subagent session was interrupted" } : { status: "failed", error: failure ?? "The subagent session failed" })
     })
 
     yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe(), (event) => {
@@ -162,7 +171,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
         return call ? attach(call, sessionID, modelOf(data.model)).pipe(safe("created")) : Effect.void
       }
       if (event.type === "session.execution.succeeded" || event.type === "session.execution.failed" || event.type === "session.execution.interrupted") {
-        return Effect.forkScoped(settle(sessionID, event.type).pipe(safe("settle"))).pipe(Effect.asVoid)
+        return Effect.forkScoped(settle(sessionID, event.type, subagentFailure(data)).pipe(safe("settle"))).pipe(Effect.asVoid)
       }
       return Effect.void
     }).pipe(safe("events")))

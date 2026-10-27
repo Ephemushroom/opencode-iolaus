@@ -38,6 +38,20 @@ test("a finished run never reports nodes as in flight", () => {
   expect(viewNodeStatus("completed", "completed")).toBe("completed")
 })
 
+test("an observed run reaches the view marked, so the dialog knows not to offer a retry", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-view-observed-"))
+  const controller = createDagController({ directory, runner: runnerFromPromise({ async start(input) { return { nodeID: input.node.id, attempt: input.attempt, sessionID: `s-${input.node.id}` } }, async wait() { return { payload: { text: "" } } }, async cancel() {} }) })
+  await Effect.runPromise(controller.observe({ ownerSessionID: "owner", agent: "deep-low", title: "修正计费日志并验证", prompt: "go" }))
+  const observed = await Effect.runPromise(dagView(controller, "owner"))
+  expect(observed.runs[0].observed).toBe(true)
+  // A scheduled run carries no flag: its nodes are retryable.
+  await Effect.runPromise(controller.create({ schemaVersion: 1, name: "t", nodes: [{ id: "work", agent: "sisyphus", model: "p/m", prompt: "go", dependsOn: [] }] }, "owner"))
+  const both = await Effect.runPromise(dagView(controller, "owner"))
+  expect(both.runs.find((run) => run.observed)?.name).toBe("Subagent calls")
+  expect(both.runs.find((run) => !run.observed)?.observed).toBeUndefined()
+  await Effect.runPromise(controller.close)
+})
+
 test("cancel settles running nodes, a late child outcome cannot reopen them, and the view carries titles", async () => {
   directory = mkdtempSync(join(tmpdir(), "iolaus-dag-view-"))
   const release = Promise.withResolvers<void>()
