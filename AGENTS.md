@@ -37,8 +37,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Runtime
 
-- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.0.32
-  (`@opencode/plugin: 2.0.32`, `@opencode/schema: 2.0.32`). The entry is
+- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.1.4
+  (`@opencode/plugin: 2.1.4`, `@opencode/schema: 2.1.4`). The entry is
   `Plugin.define({ id, effect })`; every registration (`agent.transform`,
   `command.transform`, `mcp.transform`, `tool.transform`, `session.hook`,
   `tool.hook`, `rpc.register`) is an Effect in the plugin's `Scope`, and the
@@ -51,7 +51,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
   the Effect editor. `effect@4.0.1` is an exact peer and dependency pinned to the
   host's version and client peer contract (Effect 4.0.3 deferred), with
-  `@opentui/core` and `@opentui/solid` `>=0.6.6` (`0.6.6` in dev). Bundled builds externalize
+  `@opentui/core` and `@opentui/solid` `>=0.6.8` (`0.6.8` in dev). Bundled builds externalize
   `effect`, `effect/*`, `@opencode/plugin`, and `@opentui/core` so runtime execution
   consumes the host's singleton instances and avoids symbol/type mismatches across packages.
 
@@ -216,7 +216,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   only `edit`; multimodal-looker allows only `read`. Shell stays allowed, so
   read-only is the prompt's contract, as in OMO. Host names: `edit` covers
   edit/write/patch, `subagent` is OMO's `task`. The host default is not a
-  meaningful boundary on its own (2.0.32 seeds a catch-all `*` allow), so
+  meaningful boundary on its own (2.1.4 seeds a catch-all `*` allow), so
   librarian states its boundary explicitly: `external_directory: *` with
   `ask`, then `allow` for its temporary clone root (`$TMPDIR/iolaus-gh-*`).
   Plugin tools cannot raise a prompt, so only an explicit `allow` passes.
