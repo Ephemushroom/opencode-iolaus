@@ -5,6 +5,11 @@
  * for 5.5 ("existing Claude Opus 5 prompts should perform well without
  * changes"). The delta below is what the Opus 5.5 prompting page names as
  * different in an agentic harness:
+ * - PARALLEL WORK REPLACES OVER-DELEGATION: the 5.0 body's delegation cap is
+ *   correct for 5.0 (which over-delegates) but overshoots on 5.5, whose doc
+ *   names "parallel subagents with little oversight" as a strength. The
+ *   counter is replaced with positive guidance that routes fan-out work into
+ *   child sessions to keep the orchestrator's context clean.
  * - THINKING IS ALWAYS ON: effort is the control, thinking cannot be disabled.
  *   Instructions that stood in for thinking are removed, and the prompt never
  *   asks for reasoning in the response text (the `reasoning_extraction` refusal
@@ -29,6 +34,17 @@ import type {
   AvailableCategory,
 } from "../dynamic-agent-prompt-builder";
 import { buildClaudeOpus5SisyphusPrompt } from "./claude-opus-5";
+
+/**
+ * Self-knowledge override for item 3 on 5.5: replaces 5.0's delegation cap with
+ * positive parallel-work guidance aligned with 5.5 doc ("parallel subagents with
+ * little oversight" is listed as a 5.5 strength, not a risk to contain).
+ */
+const OPUS_5_5_SELF_KNOWLEDGE_ITEM_3 =
+  "3. **OVER-DELEGATION**: You reach for subagents more readily than the work justifies. Delegate ONLY for a matching specialist domain or a genuinely independent, sizeable track (wide multi-file investigation, parallel research). Work you can finish in a handful of tool calls → do it yourself. NEVER spawn a subagent to verify or double-check your own work. One agent when one suffices; keep spawn counts low.";
+
+const OPUS_5_5_SELF_KNOWLEDGE_ITEM_3_REPLACEMENT =
+  "3. **PARALLEL WORK**: Iolaus is built for traceable parallel and serial execution — each node runs in a fresh session and returns only its result, so the orchestrator keeps clean context for judging outcomes. Route fan-out work into `iolaus_flow` nodes when the task has a natural fan-out shape: explore → implement → verify, several independent modules, or any wide investigation that would otherwise fill your context. This keeps your context for the judgment the orchestrator owes. Do not spawn subagents only to verify your own work, and do not fan out work that is genuinely a handful of tool calls.";
 
 const OPUS_5_5_DELTA = `<opus_5_5>
 ## What is different on Opus 5.5
@@ -61,6 +77,10 @@ On a request that is loosely specified, look through the sources that could be r
 ### Frontend defaults
 
 When asked for frontend work without design direction, do not fall back on a generic look, and do not satisfy the instruction by naming something to avoid in the abstract. Name the specific patterns you are avoiding, for example: cream or off-white page backgrounds, italic accent words in headlines, numbered "01/02/03" section labels, monospace labels, pill-shaped buttons. Then choose a direction and commit to it.
+
+### Time budget for flow leads
+
+When you orchestrate a flow with parallel nodes and have an estimate of how long the full task should take, pass elapsed-time signals back to child nodes as they report in (e.g. \`elapsed 340s / 1200s\`). When no estimate is available, tell child nodes: "Time matters here: do not spend time that can be avoided, and the earlier a correct result is obtained, the better." This paces parallel convergence without lowering effort.
 </opus_5_5>`;
 
 export function buildClaudeOpus55SisyphusPrompt(
@@ -86,5 +106,12 @@ export function buildClaudeOpus55SisyphusPrompt(
     "- **SILENCE BETWEEN TOOL CALLS.** Default to no text between tool calls. Write ONE sentence only when you find something load-bearing, change direction, or hit a blocker. NEVER narrate routine actions (\"Now I'll...\", \"Let me check...\", \"Looking at...\").\n",
     "- **PROGRESS NOTES, NOT NARRATION.** A status note rides in the same message as your next tool call. Write one when it changes what the reader knows - a finding, a decision, a blocker - not to announce a routine read.\n",
   );
-  return `${withoutSilence}\n\n${OPUS_5_5_DELTA}`;
+  // Replace 5.0's OVER-DELEGATION counter with 5.5's positive parallel-work
+  // guidance. The 5.0 body's item 3 is correct for 5.0 (which over-delegates)
+  // but overshoots on 5.5, whose doc names parallel subagents as a strength.
+  const withItem3Replaced = withoutSilence.replace(
+    OPUS_5_5_SELF_KNOWLEDGE_ITEM_3,
+    OPUS_5_5_SELF_KNOWLEDGE_ITEM_3_REPLACEMENT,
+  );
+  return `${withItem3Replaced}\n\n${OPUS_5_5_DELTA}`;
 }
