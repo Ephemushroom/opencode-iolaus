@@ -21,6 +21,68 @@ type DagInput = {
   readonly template?: unknown
 }
 
+/**
+ * JSON Schema for a hand-authored definition. It mirrors `DagNodeDefinition` and
+ * `graph.ts` validation so a malformed node is rejected by the host's schema check
+ * with a readable message, instead of surfacing as a `[iolaus]` runtime failure
+ * after a round trip. `observed` and the template expansion are deliberately absent:
+ * the first is internal, the second goes through `template`.
+ */
+const conditionSchema = {
+  type: "object",
+  description: "Deterministic predicate over a settled upstream result: {node, field?, equals|includes|matches|exists}, or a combinator {all: [...]}, {any: [...]}, {not: {...}}. A false condition skips the node; its dependents still run.",
+  properties: {
+    node: { type: "string" },
+    field: { type: "string", description: "Dotted path into the upstream payload; omit to test the whole payload." },
+    equals: {},
+    includes: { type: "string" },
+    matches: { type: "string" },
+    exists: { type: "boolean" },
+    all: { type: "array", items: { type: "object" }, minItems: 1 },
+    any: { type: "array", items: { type: "object" }, minItems: 1 },
+    not: { type: "object" },
+  },
+  additionalProperties: false,
+} as const
+
+const nodeSchema = {
+  type: "object",
+  properties: {
+    id: { type: "string", minLength: 1, description: "Unique within the flow; `dependsOn` and `inputs` refer to it." },
+    title: { type: "string", description: "One-line label shown in the flow view (one line, in the user's language)." },
+    kind: { type: "string", enum: ["agent", "judge", "gate"], description: "agent (default) runs a child session; judge makes one model call with no session; gate waits for the user and names no agent." },
+    agent: { type: "string", description: "Agent or lane id. Required for agent and judge, forbidden on a gate." },
+    model: { type: "string", description: "\"provider/model[#variant]\". Omit to use the lane's configured model." },
+    prompt: { type: "string", minLength: 1, description: "The node's task. For a gate, the question the approver answers." },
+    dependsOn: { type: "array", items: { type: "string" }, description: "Node ids that must settle first. Omit for a root node." },
+    inputs: {
+      type: "array",
+      items: { type: "object", properties: { node: { type: "string" }, field: { type: "string" } }, required: ["node"], additionalProperties: false },
+      description: "Upstream results bound into this node's prompt inside <iolaus-dag-inputs>. node: \"*\" fans in every dependency.",
+    },
+    when: conditionSchema,
+    maxAttempts: { type: "integer", minimum: 1 },
+    fallbackModels: { type: "array", items: { type: "string" }, description: "Models tried in order when the child fails on its model." },
+    worktree: { type: "boolean", description: "Agent nodes only: run in its own git worktree on a fresh branch." },
+  },
+  required: ["id", "prompt"],
+  additionalProperties: false,
+} as const
+
+const DEFINITION_SCHEMA = {
+  type: "object",
+  properties: {
+    schemaVersion: { type: "integer", enum: [1] },
+    name: { type: "string", minLength: 1 },
+    nodes: { type: "array", items: nodeSchema, minItems: 1 },
+    maxParallel: { type: "integer", minimum: 1 },
+    directory: { type: "string", description: "Absolute path of a worktree of this project's repository; omitted, children work in the project directory." },
+    loop: { type: "object", description: "Auto-grown review loop: {review, fix, executorPrompt, reviewerPrompt, failIncludes, passIncludes, maxRounds (1-10), tail?}. Prefer the ultrawork or goal-review template; hand-author this only when a built-in template does not fit." },
+  },
+  required: ["schemaVersion", "name", "nodes"],
+  additionalProperties: false,
+} as const
+
 const inputSchema = {
   type: "object",
   properties: {
@@ -30,7 +92,7 @@ const inputSchema = {
     note: { type: "string" },
     text: { type: "string", minLength: 1, description: "Supplemental task information for an active scheduled child; never changes its agent or model." },
     request_id: { type: "string", minLength: 1, description: "Required for steer. A stable unique request id; reuse only for the same node and text to inspect its durable delivery state without resending." },
-    definition: { type: "object" },
+    definition: DEFINITION_SCHEMA,
     template: {
       type: "object",
       description: "For action \"template\" (expand only) or \"create\" without definition (expand and run). {template, task, name?, reviewer?, executor?, lead?, gate?, maxAttempts?, iterations?, members?}.",
@@ -58,8 +120,21 @@ function requiredString(value: unknown, name: string): string {
   return value
 }
 
+/**
+ * The schema lets a root node omit `dependsOn` because the example in the flow
+ * prompt does; `graph.ts` iterates it unconditionally, so normalize a missing or
+ * non-array value to an empty list here rather than rejecting a shape the prompt
+ * itself shows.
+ */
 function definition(value: unknown): DagDefinition {
-  return asObject(value) as unknown as DagDefinition
+  const input = asObject(value)
+  if (!Array.isArray(input.nodes)) return input as unknown as DagDefinition
+  const nodes = input.nodes.map((node) => {
+    if (typeof node !== "object" || node === null || Array.isArray(node)) return node
+    const record = node as Record<string, unknown>
+    return Array.isArray(record.dependsOn) ? record : { ...record, dependsOn: [] }
+  })
+  return { ...input, nodes } as unknown as DagDefinition
 }
 
 function content(value: unknown): { content: string } {

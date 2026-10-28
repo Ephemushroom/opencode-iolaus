@@ -5,9 +5,10 @@ export type JsonValue = JsonPrimitive | JsonValue[] | { readonly [key: string]: 
 
 /**
  * `agent` runs a child session; `judge` makes one model call with no session and
- * is the cheap shape for reviews; `gate` waits for a human.
+ * is the cheap shape for reviews; `gate` waits for a human. There is no separate
+ * fan-in kind: a join is an ordinary agent node binding `inputs: [{node: "*"}]`.
  */
-export type DagNodeKind = "agent" | "judge" | "aggregator" | "gate"
+export type DagNodeKind = "agent" | "judge" | "gate"
 export type DagRunStatus = "running" | "paused" | "completed" | "failed" | "cancelled" | "interrupted"
 export type DagNodeStatus =
   | "pending"

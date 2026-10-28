@@ -382,7 +382,9 @@ test("gate pauses the run, approve resumes with a human result, reject fails and
 test("gate validation requires a message and forbids an execution target", () => {
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "  ", dependsOn: [] }]))).toThrow("needs a message")
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", agent: "sisyphus", prompt: "ok?", dependsOn: [] }]))).toThrow("must not name an agent")
-  expect(() => validateDefinition(definition([{ id: "g", kind: "aggregator", agent: "x", model: "p/m", prompt: "ok?", dependsOn: [] }]))).toThrow("Unsupported node kind")
+  // An unknown kind is rejected: the union is closed, and the fan-in a former
+  // `aggregator` name hinted at is an ordinary agent node binding inputs: [{node: "*"}].
+  expect(() => validateDefinition(definition([{ id: "g", kind: "unknown-kind" as never, agent: "x", model: "p/m", prompt: "ok?", dependsOn: [] }]))).toThrow("Unsupported node kind")
   expect(() => validateDefinition(definition([{ id: "g", kind: "gate", prompt: "ok?", dependsOn: [] }]))).not.toThrow()
 })
 

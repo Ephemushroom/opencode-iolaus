@@ -8,11 +8,14 @@
  *
  * Replacing it with an equivalent "the flow is your checklist" rule would be the
  * same mistake under a new name. This section therefore describes what
- * `iolaus_flow` is good at - ordering dependent work, running independent work
- * in parallel, rerunning a failed step, pausing for a decision - and leaves it
- * to the model to decide when that pays for its coordination cost. Each node
- * starts a fresh session and returns only its result, which is the real reason a
- * flow is cheaper than carrying a long transcript in one context.
+ * `iolaus_flow` is good at and, more importantly, what it can do that a plain
+ * `subagent` call cannot. Size alone is not the discriminator: several
+ * independent children that the orchestrator merges itself are cheaper as
+ * subagents, because a flow would only add a join node that does the
+ * orchestrator's own job. The discriminator is shape - work that is ordered by
+ * quality rather than by time: a verdict that sends work back, a step that
+ * consumes another's result as input, a human gate, or a step that may need
+ * re-running on its own.
  */
 
 export interface IolausFlowSectionOptions {
@@ -51,14 +54,43 @@ Work one part of a larger flow. Your prompt carries what done means for that par
 ## What it gives you
 
 - **Fresh context per node.** Each node runs in a new session and returns only its result, so the orchestrator holds conclusions instead of every file it read and every command it ran.
+- **The right lane per node.** Every node names its own \`agent\` lane, and each lane carries its own pinned model, so one run can put reading on \`explore\`, implementation on \`deep-low\`, review on a \`momus\` judge and escalation on \`deep-high\` - without your own session changing model.
 - **Dependency order.** A node can declare \`dependsOn\` and receive an upstream result through \`inputs: [{"node": "<id>"}]\` instead of having it pasted into a prompt.
 - **Parallel work that joins.** Independent nodes run at the same time; a downstream node binds \`inputs: [{"node": "*"}]\` and sees every upstream result with its producer.
 - **Retry without restating.** A failed or interrupted node is rerun on its own.
 - **A decision point.** A \`kind: "gate"\` node pauses the run until the user answers.
 
-## When that is worth its coordination cost
+## Pick the shape, not the size
 
-Use a flow when at least one of those properties is load-bearing: several parts where one consumes another's output, work wide enough that running it in parallel materially shortens it, a step likely to fail and need a rerun, or a decision only the user can make. Otherwise call \`subagent\` directly for one child, or just do the work.
+Three levels, ascending cost. **Do it yourself** when it is one file and the context is already in your hands. **\`subagent\`** when it is one child, or several independent children whose results you merge yourself - use \`background: true\` for the parallel case. **\`iolaus_flow\`** when the parts are ordered by quality, not just by time.
+
+A flow earns its cost when the work has one of these shapes, whatever its size:
+
+- **Work → review → fix.** Something must be judged and a FAIL must send the work back. A \`loop\` grows the next fix/review round by itself when the review settles FAIL; a subagent cannot act on a verdict.
+- **A step consumes another's result as input.** Declare \`dependsOn\` and bind the upstream with \`inputs: [{"node": "<id>"}]\`; the payload arrives with its provenance instead of being pasted into the next prompt by hand.
+- **A human decides mid-way.** A \`kind: "gate"\` node pauses the run in \`waiting_approval\` until the user answers.
+- **A step may need re-running alone.** \`retry\` re-runs one node and keeps every other result. An observed native \`subagent\` run can never be retried, resumed or amended - it is a read-only trace once it settles.
+- **The parts need different lanes.** Reading, implementing, reviewing and escalating are different jobs with different lane contracts and, usually, different models. One flow composes them; a sequence of subagent calls makes you carry each result across by hand.
+
+If none of those hold - the parts are independent and you are the one merging them - \`subagent\` is the right tool. A flow would only add a join node that does your own job.
+
+## Each node runs on the lane you choose
+
+A node's \`agent\` is a lane: a category lane (\`deep-low\`, \`deep-high\`, \`ultrabrain\`, \`quick\`, \`visual-engineering\`, \`writing\`, \`artistry\`, \`unspecified-low\`, \`unspecified-high\`) or a specialist (\`explore\`, \`librarian\`, \`oracle\`, \`metis\`, \`momus\`, \`sisyphus-junior\`, \`multimodal-looker\`). Each lane is pinned to its own model in \`IOLAUS_HOME/iolaus.json\`; omit \`model\` on the node and it runs on that lane's configured model. A lane with no configured model is refused at create time rather than discovered when the child fails to start.
+
+The lane carries the worker's contract, so choose by the work:
+
+- \`explore\`, \`librarian\` and \`oracle\` are read-only; \`metis\` analyses and \`multimodal-looker\` only reads. Use them for gathering, never for editing.
+- \`momus\` is the natural review lane for a \`judge\` node.
+- The category lanes are one-goal workers with no delegation of their own: give each the completion condition of its own step, not the whole plan.
+- \`sisyphus-junior\` implements a scoped change without spawning anything further.
+- A \`deep-low\` node whose central decision cannot be settled from what it can read and run should end its reply with the line \`ESCALATE: deep-high\`; it is then rerun in place on \`deep-high\` with its findings attached. Reserve \`deep-high\` for exactly that case rather than reaching for it up front.
+
+Nodes that write in parallel and might touch the same files set \`worktree: true\`; each gets its own branch cut from the run directory's HEAD, and nothing touches the user's working tree.
+
+## Review is a judge, not a child
+
+\`kind: "judge"\` makes one model call with no session and returns the reply. Use it for review, verification or a second opinion inside a flow: it costs a fraction of a child session and needs no context of its own. Reserve \`agent\` nodes for work that edits files or runs commands.
 
 Give a node the completion condition of the step it owns, so the child can tell when it is done. Reserve \`deep-high\` for a node whose central decision cannot be settled from what it can read and run.
 
