@@ -1,0 +1,50 @@
+ ⠦ SCHEDULER_CHILD_RESULT          Flow · work                   +
+
+  ┃
+  ┃  You are a subagent spawned by another session.
+  ┃  NATIVE_RUNNING_QA_on
+  ┃
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  Subagents  Shell  Terminals                                                                                                                                   esc
+  ┃
+  ┃  Quick: Running QA on                                                                                                                                     Running
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃  interrupt ctrl+d  show inactive ctrl+a  tabs ←/→
+  ┃
+

@@ -1,0 +1,65 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.2.0",
+  "checks": [
+    "Flow continuation refused before any observed node creation",
+    "Native followup succeeded and reopened only its existing observed node; repeated Flow misuse left it untouched",
+    "Failed attempt A ses_e7d525b98ffeScKUeuN47r5TTU refused after explicit retry B ses_e7d525675ffec7N02O8sGO9230, with no observed-state changes and no unverified ownership claim",
+    "on-Native-Enter navigated exact session ses_e7d526c21ffeUoepPI0R0WHfR0",
+    "on-Native-o navigated exact session ses_e7d526c21ffeUoepPI0R0WHfR0",
+    "on-Scheduled-Enter navigated exact session ses_e7d5274a1ffe3B4bn2blt68g7J",
+    "on-Scheduled-o navigated exact session ses_e7d5274a1ffe3B4bn2blt68g7J",
+    "on-Unavailable QA explains unavailable session and stays in details",
+    "on-Judge QA explains unavailable session and stays in details",
+    "on-Future QA explains unavailable session and stays in details",
+    "on-Running-native-Enter navigated exact active child ses_e7d51f146ffeg5S1cZLfICiI3J while its node remained running",
+    "on-Running-native-o navigated exact active child ses_e7d51f146ffeg5S1cZLfICiI3J while its node remained running",
+    "off-Native-Enter navigated exact session ses_e7d526c21ffeUoepPI0R0WHfR0",
+    "off-Native-o navigated exact session ses_e7d526c21ffeUoepPI0R0WHfR0",
+    "off-Scheduled-Enter navigated exact session ses_e7d5274a1ffe3B4bn2blt68g7J",
+    "off-Scheduled-o navigated exact session ses_e7d5274a1ffe3B4bn2blt68g7J",
+    "off-Unavailable QA explains unavailable session and stays in details",
+    "off-Judge QA explains unavailable session and stays in details",
+    "off-Future QA explains unavailable session and stays in details",
+    "off-Running-native-Enter navigated exact active child ses_e7d516f57ffetRTIRhJVOqVDxb while its node remained running",
+    "off-Running-native-o navigated exact active child ses_e7d516f57ffetRTIRhJVOqVDxb while its node remained running"
+  ],
+  "owner": "ses_e7d5274e8ffe3W5LzTmTRW82Y2",
+  "native": "ses_e7d526c21ffeUoepPI0R0WHfR0",
+  "scheduled": "ses_e7d5274a1ffe3B4bn2blt68g7J",
+  "isolation": [
+    {
+      "mode": "on",
+      "pids": [
+        55147,
+        55171
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db-wal"
+      ]
+    },
+    {
+      "mode": "off",
+      "pids": [
+        58646,
+        58670
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "hostConfigUnchanged": true,
+  "remainingSandboxProcesses": "",
+  "sandboxRemoved": true
+}

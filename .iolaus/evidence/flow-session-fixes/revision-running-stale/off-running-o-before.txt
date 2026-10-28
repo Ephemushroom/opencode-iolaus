@@ -1,0 +1,50 @@
+  ┃  UQiOiJzZXNfZTdkNTI1Yjk4ZmZlU2NLVWV1TjQ3cjVUVFUiLCJwcm9tcHQiOiJGb2xsb3cgdXAgb2xkIGZhaWxlZCBhdHRlbXB0In19
+  ┃                                                                                                                               SCHEDULER_CHILD_RESULT
+
+     ↳ Continue subagent — Stale attempt followup                                                                                 Context
+                                                                                                                                  15 tokens
+     NATIVE_CHILD_RESULT                                                                                                          0% used
+                                                                                                                                  $0.01 spent
+     Build · GPT-5.5 · 18ms · 1000.0 tok/s
+                                                                                                                                   Iolaus
+     NATIVE_CHILD_RESULT
+                                                                                                                                   ╭╌ ⠧ running · 1m 9s ╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     Build · GPT-5.5 · 27ms · 1071.4 tok/s                                                                                         ╎ Subagent calls                  ╎
+                                                                                                                                   ╎ ━━━━━━━━━━━━ 2/3                ╎
+  ┃                                                                                                                                ╎ ⠧ Running QA off                ╎
+  ┃  QA_COMMAND:                                                                                                                   ╎ ✓ Native QA                     ╎
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlJ1bm5pbmcgUUEgb24iLCJwcm9tcHQiOiJOQVRJVkVfU     ╎ ✓ Running QA on                 ╎
+  ┃  lVOTklOR19RQV9vbiIsImJhY2tncm91bmQiOnRydWV9fQ==                                                                               ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+  ┃
+                                                                                                                                   ╭╌ ⏸ waiting approval · 1m 12s ╌╌╌╮
+     ✓ Quick Subagent — Running QA on  Background                                                                                  ╎ Session Routing QA              ╎
+                                                                                                                                   ╎ ━━━━━━━━━━━━ 2/4                ╎
+     NATIVE_CHILD_RESULT                                                                                                           ╎ ⏸ Unavailable QA              ◇ ╎
+                                                                                                                                   ╎ ✓ Scheduled QA                  ╎
+     Build · GPT-5.5 · 34ms · 526.3 tok/s                                                                                          ╎ ✓ Judge QA                    ⚖ ╎
+                                                                                                                                   ╎ · Future QA                     ╎
+     ↳ Quick finished · Running QA on                                                                                              ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+     NATIVE_CHILD_RESULT                                                                                                           Recent
+                                                                                                                                   ✓ Stale Attempt QA
+     Build · GPT-5.5 · 8ms · 1250.0 tok/s                                                                                            1/1 · done in 1s
+
+  ┃                                                                                                                                Click for details · ctrl+x d
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlJ1bm5pbmcgUUEgb2ZmIiwicHJvbXB0IjoiTkFUSVZFX
+  ┃  1JVTk5JTkdfUUFfb2ZmIiwiYmFja2dyb3VuZCI6dHJ1ZX19
+  ┃
+                                                                                                                                    ⬖ Getting started                ✕
+     ⠏ Quick Subagent — Running QA off  Background
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 56ms · 384.6 tok/s                                                                                             Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/project   ↓ 1 subagent · 15 (0%) · $0.01  ctrl+p commands    /…/iolaus-session-fixes-klesOm/project
+

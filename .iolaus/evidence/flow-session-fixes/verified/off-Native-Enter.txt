@@ -1,0 +1,50 @@
+
+     Build · GPT-5.5 · 20ms · 1000.0 tok/s                                                                                        SCHEDULER_CHILD_RESULT
+
+     SCHEDULER_CHILD_RESULT                                                                                                       Context
+                                                                                                                                  15 tokens
+     Build · GPT-5.5 · 29ms · 1000.0 tok/s                                                                                        0% used
+                                                                                                                                  $0.00 spent
+  ┃
+  ┃  QA_COMMAND:                                                                                                                   Iolaus
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6Ik5hdGl2ZSBRQSIsInByb21wdCI6Ik5BVElWRV9DSElMR
+  ┃  F9RQSJ9fQ==                                                                                                                   ╭╌ ⏸ waiting approval · 33s ╌╌╌╌╌╌╮
+  ┃                                                                                                                                ╎ Session Routing QA              ╎
+                                                                                                                                   ╎ ━━━━━━━━━━━━ 2/4                ╎
+     ✓ Quick Subagent — Native QA                                                                                                  ╎ ⏸ Unavailable QA              ◇ ╎
+                                                                                                                                               d QA                  ╎
+     NATIVE_CHILD_RESULT                                                                                                                                           ⚖ ╎
+                            Flow · Subagent calls                                                                                    esc close A                     ╎
+     Build · GPT-5.5 · 39ms ✓ done in 1s  ━━━━━━━━━━━━ 1/1                                                                                     ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+  ┃                                                                   ┏━ ✓ Done · attempt 2 ━━━━━━━┓
+  ┃  QA_COMMAND:                                                      ┃ › 1-native-qa              ┃                                           alls
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                           ┃ Native QA                  ┃                                            in 1s
+  ┃  2U2MjVmZmQ1dEhHMFFQd21                                           ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+  ┃                                                                                                                                            tails · ctrl+x d
+                            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+     ↳ Continue subagent —  │ ✓ 1-native-qa · Native QA                                                                                      │
+                            │ Status: Done · agent                                                                                           │
+     NATIVE_CHILD_RESULT    │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 2                                                              │
+                            │ Depends on: none (start node)                                                                                  │
+     Build · GPT-5.5 · 33ms │ Unblocks: none (final node)                                                                                    │
+                            │                                                                                                                │
+  ┃                         │ Result                                                                                                         │
+  ┃  QA_COMMAND:            │ NATIVE_CHILD_RESULT                                                                                            │
+  ┃  eyJuYW1lIjoic3ViYWdlbn ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  2Vzc2lvbklEIjoic2VzX2U
+  ┃                         ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+                                                                                                                                               tarted                ✕
+     ↳ Continue subagent — Wrong Flow continuation again
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 18ms · 1111.1 tok/s                                                                                            Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-HXpTK4/project
+

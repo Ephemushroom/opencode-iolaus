@@ -24,6 +24,7 @@ import { loadGlobalConfig } from "./global-config"
 import { SessionStateStore } from "./database"
 import { registerRoles } from "./roles/register"
 import { registerSubagentObserver } from "./dag/observe"
+import { registerFlowContinuationGuard } from "./dag/continuation"
 import { createStateSync } from "./session-state"
 import { DagValidationError } from "./dag/errors"
 import { admitTier, tierSource, type TierSession } from "./roles/tier"
@@ -105,6 +106,7 @@ export default Plugin.define({
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
     yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), state, trace })
+    yield* registerFlowContinuationGuard(ctx, controller)
     // After the role guard, so a refused subagent call is not recorded.
     yield* registerSubagentObserver(ctx, controller, trace)
 

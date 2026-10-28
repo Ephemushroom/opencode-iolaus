@@ -118,6 +118,8 @@ When a human gate begins waiting (`node.waiting`) or a flow reaches a terminal s
 
 ### Live steering (`action: "steer"`)
 
+Native `subagent({sessionID})` followups require a direct child of the calling session. Iolaus checks actual host parentage before recording any observed call, including old Flow attempts whose authorization lineage is no longer retained. Unverified non-child targets receive a generic refusal; metadata alone never establishes Flow ownership. Verified current Flow targets retain specific guidance: the owner can steer an eligible active task, retry an eligible failed/interrupted task in a fresh session, or start a new Flow/subagent with complete context for additional work after completion.
+
 An owner session can supplement an active child task without switching sessions or opening child dialogs via `action: "steer"`:
 
 ```json
@@ -180,6 +182,8 @@ Iolaus reads only `~/.iolaus/iolaus.json` (or `IOLAUS_HOME/iolaus.json`) for set
 Run `bun test` to execute unit and regression suites (including steering, roles, and tier checks). Run `bun run typecheck` for type checking, `bun run check:package` to verify build outputs and active manifest hashes, and `node script/check-reference.mjs` (or `bun run check:reference`) to verify the 800 offline source snapshot files.
 
 Isolated host verification can be executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Verified evidence lives under `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, non-waking queued terminal notices, host-state isolation, and sandbox process cleanup. Same-session fallback and owner-model rescue run on stock OpenCode 2.0.28 with no host patch: `node script/qa-owner-rescue.mjs <evidence-dir>` (evidence `.iolaus/evidence/owner-rescue/same-session-live`), host contract probe `.iolaus/evidence/owner-rescue/same-session-probe/run3`. The `host-contract/`, `upstream-inbox/` and `implementation-smoke/` directories record the superseded fresh-session handoff design and its `session.inbox.list` patch; they are historical only. Compatibility claims are strictly bounded to verified evidence. Read `reference/README.md` for its scope and provenance.
+
+Flow session routing and continuation preflight are verified on OpenCode 2.2.0 with `node script/qa-flow-session-fixes.mjs <evidence-dir>`. Evidence in `.iolaus/evidence/flow-session-fixes/revision-running-stale/` covers exact selected settled and actively running child navigation with tabs on/off, unavailable session explanations, refused current and stale scheduler continuation without observed-state changes, successful native followup, sandbox-only database access and cleanup. `Enter`/`o` use direct session routing rather than tab focus, which can normalize native children to their root session; navigation errors are shown as toasts.
 
 ## Independence and licensing
 

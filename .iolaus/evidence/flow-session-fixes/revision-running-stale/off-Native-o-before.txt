@@ -1,0 +1,50 @@
+
+     Build · GPT-5.5 · 5ms · 1250.0 tok/s                                                                                         SCHEDULER_CHILD_RESULT
+
+     NATIVE_CHILD_RESULT                                                                                                          Context
+                                                                                                                                  15 tokens
+     Build · GPT-5.5 · 7ms · 1250.0 tok/s                                                                                         0% used
+                                                                                                                                  $0.01 spent
+     ◈ Instructions updated: api/iolaus.state
+                                                                                                                                   Iolaus
+  ┃
+  ┃  QA_COMMAND:                                                                                                                   ╭╌ ⏸ waiting approval · 48s ╌╌╌╌╌╌╮
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlN0YWxlIGF0dGVtcHQgZm9sbG93dXAiLCJzZXNzaW9uS     ╎ Session Routing QA              ╎
+  ┃  UQiOiJzZXNfZTdkNTI1Yjk4ZmZlU2NLVWV1TjQ3cjVUVFUiLCJwcm9tcHQiOiJGb2xsb3cgdXAgb2xkIGZhaWxlZCBhdHRlbXB0In19                       ╎ ━━━━━━━━━━━━ 2/4                ╎
+  ┃                                                                                                                                ╎ ⏸ Unavailable QA              ◇ ╎
+                                                                                                                                   ╎ ✓ Scheduled QA                  ╎
+     ↳ Continue subagent — Stale attempt followup                                                                                  ╎ ✓ Judge QA                    ⚖ ╎
+                                                                                                                                   ╎ · Future QA                     ╎
+     NATIVE_CHILD_RESULT                                                                                                           ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+     Build · GPT-5.5 · 18ms · 1000.0 tok/s                                                                                         Recent
+                                                                                                                                   ✓ Subagent calls
+     NATIVE_CHILD_RESULT                                                                                                             2/2 · done in 37s
+                                                                                                                                   ✓ Stale Attempt QA
+     Build · GPT-5.5 · 27ms · 1071.4 tok/s                                                                                           1/1 · done in 1s
+
+  ┃                                                                                                                                Click for details · ctrl+x d
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlJ1bm5pbmcgUUEgb24iLCJwcm9tcHQiOiJOQVRJVkVfU
+  ┃  lVOTklOR19RQV9vbiIsImJhY2tncm91bmQiOnRydWV9fQ==
+  ┃
+
+     ✓ Quick Subagent — Running QA on  Background
+
+     NATIVE_CHILD_RESULT
+
+     Build · GPT-5.5 · 34ms · 526.3 tok/s
+                                                                                                                                    ⬖ Getting started                ✕
+     ↳ Quick finished · Running QA on
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 8ms · 1250.0 tok/s                                                                                             Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-klesOm/project  15 (0%) · $0.01  ctrl+p commands    /…/iolaus-session-fixes-klesOm/project
+

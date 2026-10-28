@@ -5,6 +5,7 @@ import { For, Show, createEffect, createMemo, createSignal, on, onCleanup, onMou
 import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
 import { paneHeights, revealScroll } from "./layout"
+import { openNodeSession, sessionUnavailable } from "./navigation"
 import { borderTitle, connector, kindMark, liveGlyph, nodeResult, progressBar, resultLabel, rowStart, runHeadline, settledCount, statusColor, statusLabel, topologyNodes, waves, type DagViewNode, type DagViewRun } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
@@ -166,15 +167,12 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     const index = items.findIndex((node) => node.id === selected())
     setSelected(items[Math.min(items.length - 1, Math.max(0, index + delta))]?.id)
   }
-  const open = () => {
+  const open = async () => {
     const node = current()
-    if (!node?.sessionID || node.sessionID.startsWith("judge:")) return
-    trace("iolaus.tui.open", { runID: props.runID, nodeID: node.id, sessionID: node.sessionID })
-    close()
-    if (!context.ui.tabs.enabled() || !context.ui.tabs.focus(node.sessionID)) context.ui.router.navigate({ type: "session", sessionID: node.sessionID })
+    if (await openNodeSession(context.ui, node)) trace("iolaus.tui.open", { runID: props.runID, nodeID: node!.id, sessionID: node!.sessionID })
   }
   const waiting = () => !busy() && current()?.status === "waiting_approval"
-  const hasSession = () => !!current()?.sessionID && !current()?.sessionID?.startsWith("judge:")
+  const hasSession = () => sessionUnavailable(current()) === undefined
   // An observed run records native subagent calls; the controller refuses to retry, resume or amend it, so the
   // action is not offered. Re-run the subagent, or build an iolaus_flow definition when the work needs scheduling.
   const retryable = () => !busy() && !run()?.observed && ["failed", "needs_retry", "interrupted"].includes(current()?.status ?? "")
@@ -209,7 +207,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     commands: [
       { id: "iolaus.dag.down", title: "Iolaus Flow: next node", bind: "j,down", run: () => move(1) },
       { id: "iolaus.dag.up", title: "Iolaus Flow: previous node", bind: "k,up", run: () => move(-1) },
-      { id: "iolaus.dag.open", title: "Iolaus Flow: open agent session", bind: "o,return", enabled: hasSession, run: open },
+      { id: "iolaus.dag.open", title: "Iolaus Flow: open agent session", bind: "o,return", run: open },
       { id: "iolaus.dag.approve", title: "Iolaus Flow: approve gate", bind: "a", enabled: waiting, run: () => void decide("approve") },
       { id: "iolaus.dag.reject", title: "Iolaus Flow: reject gate", bind: "r", enabled: waiting, run: () => void decide("reject") },
       { id: "iolaus.dag.cancel", title: "Iolaus Flow: cancel flow", bind: "c", enabled: cancellable, run: () => void decide("cancel") },
@@ -279,6 +277,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               <text fg={theme().text.base}>Agent: {node().agent || "human"} · Model: {node().model || "none"} · Attempt: {node().attempt}</text>
               <text fg={theme().text.base}>Depends on: {node().dependsOn.join(", ") || "none (start node)"}</text>
               <text fg={theme().text.base}>Unblocks: {downstream(node().id).join(", ") || "none (final node)"}</text>
+              <Show when={sessionUnavailable(node())}>{(reason) => <text fg={theme().text.muted}>{reason()}</text>}</Show>
               <Show when={node().prompt}><text marginTop={1} fg={theme().text.action.primary.base}>Approval request</text><text fg={theme().text.base}>{node().prompt}</text></Show>
               <Show when={node().error}><text marginTop={1} fg={theme().text.feedback.error.base}>Error</text><text fg={theme().text.base}>{node().error}</text></Show>
               <Show when={node().result}>{(result) => {
