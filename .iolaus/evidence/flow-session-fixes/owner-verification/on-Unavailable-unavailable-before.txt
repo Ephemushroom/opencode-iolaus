@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT          Flow · work                   +
+     Build · GPT-5.5 · 21ms · 1111.1 tok/s
+                                                                                                                                  SCHEDULER_CHILD_RESULT
+     SCHEDULER_CHILD_RESULT
+                                                                                                                                  Context
+     Build · GPT-5.5 · 35ms · 833.3 tok/s                                                                                         15 tokens
+                                                                                                                                  0% used
+  ┃                                                                                                                               $0.00 spent
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6Ik5hdGl2ZSBRQSIsInByb21wdCI6Ik5BVElWRV9DSElMR     Iolaus
+  ┃  F9RQSJ9fQ==
+  ┃                                                                                                                                ╭╌ ⏸ waiting approval · 19s ╌╌╌╌╌╌╮
+                                                                                                                                   ╎ Session Routing QA              ╎
+     ✓ Quick Subagent — Native QA                                                                                                  ╎ ━━━━━━━━━━━━ 2/4                ╎
+                                                                                                                                   ╎ ⏸ Unavailable QA              ◇ ╎
+     NATIVE_CHILD_RESULT                                                                                                           ╎ ✓ Scheduled QA                  ╎
+                                                                                                                                   ╎ ✓ Judge QA                    ⚖ ╎
+     Build · GPT-5.5 · 39ms · 1000.0 tok/s                                                                                         ╎ · Future QA                     ╎
+                                                                                                                                   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+  ┃
+  ┃  QA_COMMAND:                                                                                                                   Recent
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6Ik5hdGl2ZSBRQSIsInNlc3Npb25JRCI6InNlc19lN2Q1O     ✓ Subagent calls
+  ┃  GM5NWFmZmVHeTF2TkJvMzNWZjc3USIsInByb21wdCI6Ik5BVElWRV9DSElMRF9RQSBmb2xsb3d1cCJ9fQ==                                             1/1 · done in 1s
+  ┃
+                                                                                                                                   Click for details · ctrl+x d
+     ↳ Continue subagent — Native QA
+
+     NATIVE_CHILD_RESULT
+
+     Build · GPT-5.5 · 34ms · 1000.0 tok/s
+
+  ┃
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6Ildyb25nIEZsb3cgY29udGludWF0aW9uIGFnYWluIiwic
+  ┃  2Vzc2lvbklEIjoic2VzX2U3ZDU4ZDFjMmZmZWhVbTY3WFA5NnZoaTVvIiwicHJvbXB0IjoiQW5vdGhlciBmb2xsb3cgdXAifX0=
+  ┃
+                                                                                                                                    ⬖ Getting started                ✕
+     ↳ Continue subagent — Wrong Flow continuation again
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 18ms · 1428.6 tok/s                                                                                            Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-Go55nk/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-Go55nk/project
+

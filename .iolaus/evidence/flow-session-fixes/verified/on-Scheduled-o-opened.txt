@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT          Flow · work                   +
+
+  ┃                                                                                                                               Flow · work
+  ┃  SCHEDULER_CHILD_QA
+  ┃                                                                                                                               Context
+                                                                                                                                  15 tokens
+     SCHEDULER_CHILD_RESULT                                                                                                       0% used
+                                                                                                                                  $0.00 spent
+     Quick · GPT-5.5 · 11ms · 714.3 tok/s
+                                                                                                                                   Iolaus
+                                                                                                                                   No active flows
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                                                                                                                    ⬖ Getting started                ✕
+
+                                                                                                                                      OpenCode includes free models so
+                                                                                                                                      you can start immediately.
+
+                                                                                                                                      Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-HXpTK4/project
+

@@ -1,0 +1,50 @@
+
+     Build · GPT-5.5 · 20ms · 1000.0 tok/s                                                                                 ┃                                           ┃
+                                                                                                                           ┃  Iolaus Flow                           x  ┃
+     SCHEDULER_CHILD_RESULT                                                                                                ┃                                           ┃
+                                                                                                                           ┃  The agent session is not available yet.  ┃
+     Build · GPT-5.5 · 29ms                                                                                                                                            ┃
+
+  ┃                         Flow · Session Routing QA                                                                                esc close
+  ┃  QA_COMMAND:            ⏸ waiting approval · 52s  ━━━━━━━━━━━━ 2/4
+  ┃  eyJuYW1lIjoic3ViYWdlbn
+  ┃  F9RQSJ9fQ==                                                      ╭─ ✓ Done ───────────────────╮                                            approval · 52s ╌╌╌╌╌╌╮
+  ┃                                                                   │   work                     │                                           uting QA              ╎
+                                                                      │ Scheduled QA               │                                           ━━ 2/4                ╎
+     ✓ Quick Subagent — Nat                                           ╰────────────────────────────╯                                           ble QA              ◇ ╎
+                                                                                    │                                                          d QA                  ╎
+     NATIVE_CHILD_RESULT                                                            ▼                                                                              ⚖ ╎
+                                                                      ╭─ ✓ Done ───────────────────╮                                           A                     ╎
+     Build · GPT-5.5 · 39ms                                           │   judge                  ⚖ │                                           ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                      │ Judge QA                   │
+  ┃                                                                   ╰────────────────────────────╯
+  ┃  QA_COMMAND:                                                                    │                                                          alls
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                                         ▼                                                           in 1s
+  ┃  2U2MjVmZmQ1dEhHMFFQd21                                           ╭─ ⏸ Waiting approval ───────╮
+  ┃                                                                   │ ↑ gate                   ◇ │                                           tails · ctrl+x d
+                                                                      │ Unavailable QA             │
+     ↳ Continue subagent —                                            ╰────────────────────────────╯
+                                                                                    │
+     NATIVE_CHILD_RESULT                                                            ▼
+                                                                      ┏━ · Pending ━━━━━━━━━━━━━━━━┓
+     Build · GPT-5.5 · 33ms                                           ┃ › future                   ┃
+                                                                      ┃ Future QA                  ┃
+  ┃                                                                   ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbn ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃  2Vzc2lvbklEIjoic2VzX2U │ · future · Future QA                                                                                           │
+  ┃                         │ Status: Pending · agent                                                                                        │
+                            │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 0                                                              │ tarted                ✕
+     ↳ Continue subagent —  │ Depends on: gate                                                                                               │
+                            │ Unblocks: none (final node)                                                                                    │ includes free models so
+     NATIVE_CHILD_RESULT    │ The agent session is not available yet.                                                                        │ tart immediately.
+                            │                                                                                                                │
+     Build · GPT-5.5 · 18ms │ No result yet.                                                                                                 │ rom 75+ providers to
+                            ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯  models, including
+  ┃                                                                                                                                            PT, Gemini etc
+  ┃                         ↑/↓ j/k select · c cancel flow · PgUp/PgDn details · Esc close
+  ┃                                                                                                                                            rovider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-HXpTK4/project
+

@@ -1,0 +1,50 @@
+
+     Build · GPT-5.5 · 21ms · 1111.1 tok/s                                                                                        SCHEDULER_CHILD_RESULT
+
+     SCHEDULER_CHILD_RESULT                                                                                                       Context
+
+     Build · GPT-5.5 · 35ms
+                            Flow · Session Routing QA                                                                                esc close
+  ┃                         ⏸ waiting approval · 45s  ━━━━━━━━━━━━ 2/4
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                           ╭─ ✓ Done ───────────────────╮
+  ┃  F9RQSJ9fQ==                                                      │   work                     │                                            approval · 45s ╌╌╌╌╌╌╮
+  ┃                                                                   │ Scheduled QA               │                                           uting QA              ╎
+                                                                      ╰────────────────────────────╯                                           ━━ 2/4                ╎
+     ✓ Quick Subagent — Nat                                                         │                                                          ble QA              ◇ ╎
+                                                                                    ▼                                                          d QA                  ╎
+     NATIVE_CHILD_RESULT                                              ╭─ ✓ Done ───────────────────╮                                                               ⚖ ╎
+                                                                      │ ↑ judge                  ⚖ │                                           A                     ╎
+     Build · GPT-5.5 · 39ms                                           │ Judge QA                   │                                           ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                      ╰────────────────────────────╯
+  ┃                                                                                 │
+  ┃  QA_COMMAND:                                                                    ▼                                                          alls
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                           ┏━ ⏸ Waiting approval ━━━━━━━┓                                            in 1s
+  ┃  GM5NWFmZmVHeTF2TkJvMzN                                           ┃ › gate                   ◇ ┃
+  ┃                                                                   ┃ Unavailable QA             ┃                                           tails · ctrl+x d
+                                                                      ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+     ↳ Continue subagent —                                                          │
+                                                                                    ▼
+     NATIVE_CHILD_RESULT                                              ╭─ · Pending ────────────────╮
+                                                                      │ ↓ future                   │
+     Build · GPT-5.5 · 34ms                                           │ Future QA                  │
+                                                                      ╰────────────────────────────╯
+  ┃
+  ┃  QA_COMMAND:            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+  ┃  eyJuYW1lIjoic3ViYWdlbn │ ⏸ gate · Unavailable QA                                                                                        │
+  ┃  2Vzc2lvbklEIjoic2VzX2U │ Status: Waiting approval · gate                                                                                │
+  ┃                         │ Agent: human · Model: none · Attempt: 1                                                                        │
+                            │ Depends on: judge                                                                                              │ tarted                ✕
+     ↳ Continue subagent —  │ Unblocks: future                                                                                               │
+                            │ Human gates do not have an agent session.                                                                      │ includes free models so
+     NATIVE_CHILD_RESULT    │                                                                                                                │ tart immediately.
+                            │ Approval request                                                                                               │
+     Build · GPT-5.5 · 18ms │ Keep waiting                                                                                                   │ rom 75+ providers to
+                            ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯  models, including
+  ┃                                                                                                                                            PT, Gemini etc
+  ┃                         ↑/↓ j/k select · a approve · r reject · c cancel flow · PgUp/PgDn details · Esc close
+  ┃                                                                                                                                            rovider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-Go55nk/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-Go55nk/project
+

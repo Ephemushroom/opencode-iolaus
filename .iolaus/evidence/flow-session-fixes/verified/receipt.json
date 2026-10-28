@@ -1,0 +1,60 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.2.0",
+  "checks": [
+    "Flow continuation refused before any observed node creation",
+    "Native followup succeeded and reopened only its existing observed node; repeated Flow misuse left it untouched",
+    "on-Native-Enter navigated exact session ses_e7d5ce625ffd5tHG0QPwmnbMeH",
+    "on-Native-o navigated exact session ses_e7d5ce625ffd5tHG0QPwmnbMeH",
+    "on-Scheduled-Enter navigated exact session ses_e7d5cee9dffesYQf5Mi5ssTwP4",
+    "on-Scheduled-o navigated exact session ses_e7d5cee9dffesYQf5Mi5ssTwP4",
+    "on-Unavailable QA explains unavailable session and stays in details",
+    "on-Judge QA explains unavailable session and stays in details",
+    "on-Future QA explains unavailable session and stays in details",
+    "off-Native-Enter navigated exact session ses_e7d5ce625ffd5tHG0QPwmnbMeH",
+    "off-Native-o navigated exact session ses_e7d5ce625ffd5tHG0QPwmnbMeH",
+    "off-Scheduled-Enter navigated exact session ses_e7d5cee9dffesYQf5Mi5ssTwP4",
+    "off-Scheduled-o navigated exact session ses_e7d5cee9dffesYQf5Mi5ssTwP4",
+    "off-Unavailable QA explains unavailable session and stays in details",
+    "off-Judge QA explains unavailable session and stays in details",
+    "off-Future QA explains unavailable session and stays in details"
+  ],
+  "owner": "ses_e7d5ceee5ffeyFx2DD5veCu1wQ",
+  "native": "ses_e7d5ce625ffd5tHG0QPwmnbMeH",
+  "scheduled": "ses_e7d5cee9dffesYQf5Mi5ssTwP4",
+  "isolation": [
+    {
+      "mode": "on",
+      "pids": [
+        42368,
+        42392
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db-wal"
+      ]
+    },
+    {
+      "mode": "off",
+      "pids": [
+        44946,
+        44973
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-HXpTK4/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "hostConfigUnchanged": true,
+  "remainingSandboxProcesses": "",
+  "sandboxRemoved": true
+}

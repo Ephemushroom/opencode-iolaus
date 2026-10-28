@@ -1,0 +1,50 @@
+
+  ┃
+  ┃  You are a subagent spawned by another session.
+  ┃  NATIVE_RUNNING_QA_off
+  ┃
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  Subagents  Shell  Terminals                                                                                                                                   esc
+  ┃
+  ┃  Quick: Running QA off                                                                                                                                    Running
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃  interrupt ctrl+d  show inactive ctrl+a  tabs ←/→
+  ┃
+

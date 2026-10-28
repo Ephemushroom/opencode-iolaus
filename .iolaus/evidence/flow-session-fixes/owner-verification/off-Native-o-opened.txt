@@ -1,0 +1,50 @@
+
+  ┃
+  ┃  You are a subagent spawned by another session.
+  ┃  NATIVE_CHILD_QA
+  ┃
+
+     NATIVE_CHILD_RESULT
+
+     Quick · GPT-5.5 · 8ms · 1000.0 tok/s
+
+  ┃
+  ┃  NATIVE_CHILD_QA followup
+  ┃
+
+     NATIVE_CHILD_RESULT
+
+     Quick · GPT-5.5 · 8ms · 1000.0 tok/s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  Subagents  Shell  Terminals                                                                                                                                   esc
+  ┃
+  ┃  No active subagents
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃  show inactive ctrl+a  tabs ←/→
+  ┃
+

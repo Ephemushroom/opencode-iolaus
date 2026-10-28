@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT        +
+     Build · GPT-5.5 · 21ms · 1111.1 tok/s
+                                                                                                                                  SCHEDULER_CHILD_RESULT
+     SCHEDULER_CHILD_RESULT
+                                                                                                                                  Context
+     Build · GPT-5.5 · 35ms · 833.3 tok/s                                                                                         15 tokens
+                                                                                                                                  0% used
+  ┃                                                                                                                               $0.00 spent
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6Ik5hdGl2ZSBRQSIsInByb21wdCI6Ik5BVElWRV9DSElMR     Iolaus
+  ┃  F9RQSJ9fQ==
+  ┃                                                                                                                                ╭╌ ⏸ waiting approval · 8s ╌╌╌╌╌╌╌╮
+                                                                                                                                   ╎ Session Routing QA              ╎
+     ✓ Quick Subagent — Native QA                                                                                                  ╎ ━━━━━━━━━━━━ 2/4                ╎
+                                                                                                                                               ble QA              ◇ ╎
+     NATIVE_CHILD_RESULT                                                                                                                       d QA                  ╎
+                            Flow · Subagent calls                                                                                    esc close                     ⚖ ╎
+     Build · GPT-5.5 · 39ms ✓ done in 1s  ━━━━━━━━━━━━ 1/1                                                                                     A                     ╎
+                                                                                                                                               ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+  ┃                                                                   ┏━ ✓ Done · attempt 2 ━━━━━━━┓
+  ┃  QA_COMMAND:                                                      ┃ › 1-native-qa              ┃
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                           ┃ Native QA                  ┃                                           alls
+  ┃  GM5NWFmZmVHeTF2TkJvMzN                                           ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                            in 1s
+  ┃
+                            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮ tails · ctrl+x d
+     ↳ Continue subagent —  │ ✓ 1-native-qa · Native QA                                                                                      │
+                            │ Status: Done · agent                                                                                           │
+     NATIVE_CHILD_RESULT    │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 2                                                              │
+                            │ Depends on: none (start node)                                                                                  │
+     Build · GPT-5.5 · 34ms │ Unblocks: none (final node)                                                                                    │
+                            │                                                                                                                │
+  ┃                         │ Result                                                                                                         │
+  ┃  QA_COMMAND:            │ NATIVE_CHILD_RESULT                                                                                            │
+  ┃  eyJuYW1lIjoic3ViYWdlbn ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  2Vzc2lvbklEIjoic2VzX2U
+  ┃                         ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+                                                                                                                                               tarted                ✕
+     ↳ Continue subagent — Wrong Flow continuation again
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 18ms · 1428.6 tok/s                                                                                            Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-Go55nk/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-Go55nk/project
+

@@ -1,0 +1,30 @@
+bun test v1.4.4 (38afee6c8)
+
+tests/flow-session.test.ts:
+ 97 |       const call = (sessionID: string) => Effect.gen(function* () {
+ 98 |         for (const hook of hooks) yield* hook({ id: sessionID, tool: "subagent", sessionID: "owner", input: { sessionID, agent: "quick", prompt: "followup" } })
+ 99 |       })
+100 |       const before = yield* controller.list("owner")
+101 |       const stale = yield* Effect.exit(call("attempt-A"))
+102 |       expect(Exit.isFailure(stale)).toBe(true)
+                                          ^
+error: expect(received).toBe(expected)
+
+Expected: true
+Received: false
+
+      at <anonymous> (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/tests/flow-session.test.ts:102:37)
+      at ~effect/Effect/successCont (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:973:28)
+      at runLoop (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:448:86)
+      at evaluate (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:398:23)
+      at <anonymous> (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2460:9)
+      at <anonymous> (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2512:19)
+      at <anonymous> (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/node_modules/.bun/effect@4.0.1/node_modules/effect/dist/internal/effect.js:2523:31)
+      at <anonymous> (/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-flow-session-fixes/tests/flow-session.test.ts:94:18)
+(fail) failed attempt A stays refused before observation after actual controller retry creates B [35.83ms]
+
+ 0 pass
+ 3 filtered out
+ 1 fail
+ 5 expect() calls
+Ran 1 test across 1 file. [264.00ms]
