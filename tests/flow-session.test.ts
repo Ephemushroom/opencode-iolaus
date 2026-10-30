@@ -21,7 +21,7 @@ test("continuation preflight refuses scheduled sessions before creating or reope
   const run = { runID: "flow", ownerSessionID: "owner", nodes: [node] } as unknown as DagRunRecord
   const ctx = {
     tool: { hook: (name: string, hook: (event: unknown) => Effect.Effect<unknown, unknown>) => Effect.sync(() => { if (name === "execute.before") hooks.push(hook) }) },
-    session: { get: ({ sessionID }: { sessionID: string }) => ["missing", "unreadable"].includes(sessionID) ? Effect.fail(new Error("unavailable")) : Effect.succeed({ parentID: ["native", "forged", "unknown-child"].includes(sessionID) ? "owner" : sessionID === "unrelated" ? "other" : undefined, metadata: sessionID === "native" || sessionID === "unrelated" ? {} : { iolaus_dag_run: sessionID === "unknown-child" ? "unknown" : "flow", iolaus_dag_node: "work" } }) },
+    session: { context: () => Effect.succeed([]), get: ({ sessionID }: { sessionID: string }) => ["missing", "unreadable"].includes(sessionID) ? Effect.fail(new Error("unavailable")) : Effect.succeed({ parentID: ["native", "forged", "unknown-child"].includes(sessionID) ? "owner" : sessionID === "unrelated" ? "other" : undefined, metadata: sessionID === "native" || sessionID === "unrelated" ? {} : { iolaus_dag_run: sessionID === "unknown-child" ? "unknown" : "flow", iolaus_dag_node: "work" } }) },
     event: { subscribe: () => Stream.empty },
   } as unknown as Context
   const controller = {
@@ -88,7 +88,7 @@ test("failed attempt A stays refused before observation after actual controller 
     const hooks: ((event: unknown) => Effect.Effect<unknown, unknown>)[] = []
     const ctx = {
       tool: { hook: (name: string, hook: (event: unknown) => Effect.Effect<unknown, unknown>) => Effect.sync(() => { if (name === "execute.before") hooks.push(hook) }) },
-      session: { get: ({ sessionID }: { sessionID: string }) => Effect.succeed({ parentID: sessionID === "native" ? "owner" : undefined, metadata: sessionID === "owner" ? {} : { iolaus_dag_run: first.runID, iolaus_dag_node: "work" } }) },
+      session: { context: () => Effect.succeed([]), get: ({ sessionID }: { sessionID: string }) => Effect.succeed({ parentID: sessionID === "native" ? "owner" : undefined, metadata: sessionID === "owner" ? {} : { iolaus_dag_run: first.runID, iolaus_dag_node: "work" } }) },
       event: { subscribe: () => Stream.empty },
     } as unknown as Context
     await Effect.runPromise(Effect.scoped(Effect.gen(function* () {

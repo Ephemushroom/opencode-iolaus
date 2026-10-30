@@ -1,0 +1,55 @@
+   QA_DONE                       +
+
+     Build · GPT-5.5 · 104ms · 344.8 tok/s                                                                                             QA_DONE
+
+  ┃                                                                                                                                    Context
+  ┃  QA_PLAN:                                                                                                                          15 tokens
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiV29yayAxIiwicHJvbXB0IjoiQ0hJTERfT0sifX0seyJuYW    0% used
+  ┃  1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgMiIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoi    $0.01 spent
+  ┃  c3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgMyIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYW
+  ┃  dlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgNCIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQi     Iolaus
+  ┃  LCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgNSIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQiLCJhcm
+  ┃  dzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgNiIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7     Recent
+  ┃  ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgNyIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW     ✓ Calls · request KWKIZcw6
+  ┃  50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgOCIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50Ijoi       12/12 · done in 1s
+  ┃  cXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgOSIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2     ✗ Calls · request O0RLqG0C
+  ┃  siLCJkZXNjcmlwdGlvbiI6IldvcmsgMTAiLCJwcm9tcHQiOiJDSElMRF9PSyJ9fV0sW3sibmFtZSI6InN1YmFnZW50IiwiYXJncyI6eyJhZ2VudCI6InF1aWNrIiwi       0/1 · failed in 0s
+  ┃  ZGVzY3JpcHRpb24iOiJXb3JrIDExIiwicHJvbXB0IjoiQ0hJTERfT0sifX1dLFt7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2
+  ┃  NyaXB0aW9uIjoiV29yayAxMiIsInByb21wdCI6IkNISUxEX09LIn19XV0=                                                                         Click for details · ctrl+x d
+  ┃
+
+     ✓ Quick Subagent — Work 1
+
+     ✓ Quick Subagent — Work 2
+
+     ✓ Quick Subagent — Work 3
+
+     ✓ Quick Subagent — Work 4
+
+     ✓ Quick Subagent — Work 5
+
+     ✓ Quick Subagent — Work 6
+
+     ✓ Quick Subagent — Work 7
+
+     ✓ Quick Subagent — Work 8
+
+     ✓ Quick Subagent — Work 9
+
+     ✓ Quick Subagent — Work 10
+
+     ✓ Quick Subagent — Work 11
+                                                                                                                                         ⬖ Getting started                ✕
+     ✓ Quick Subagent — Work 12
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 753ms · 508.5 tok/s                                                                                                 Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-9mVy2w/project
+

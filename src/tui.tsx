@@ -7,7 +7,7 @@ import { dagTarget } from "./tui/data"
 import { Progress, openDagDialog } from "./tui/dialog"
 import { useDagData, useNow } from "./tui/hooks"
 import { createSlotPresence, trackSlotPresence, type SlotPresence } from "./tui/presence"
-import { DASHED_BORDER, borderTitle, isActiveRun, kindMark, labelColor, liveGlyph, orderNodes, partitionRuns, runActivity, runClock, runHeadline, settledCount, statusColor, statusGlyph, type DagViewRun } from "./tui/view"
+import { DASHED_BORDER, borderTitle, isActiveRun, kindMark, labelColor, liveGlyph, orderNodes, partitionRuns, runActivity, runClock, runHeadline, runLabel, settledCount, statusColor, statusGlyph, type DagViewRun } from "./tui/view"
 
 /** One line per node: its status glyph, its title (the id when it has none) and the judge or gate mark. */
 function RunNodes(props: { readonly run: DagViewRun; readonly frame: number; readonly context: Context; readonly open: (runID: string, nodeID?: string) => void }) {
@@ -42,13 +42,13 @@ function DagSidebar(props: { readonly sessionID: string; readonly context: Conte
       <For each={groups().active}>{(run) => <box flexDirection="column" marginTop={1} paddingLeft={1} paddingRight={1}
         border customBorderChars={DASHED_BORDER} borderColor={statusColor(run.status, theme())}
         title={borderTitle(liveGlyph(run.status, frame()), runHeadline(run, now()), inner())} titleColor={statusColor(run.status, theme())}>
-        <text wrapMode="none" truncate fg={theme().text.base} attributes={1} onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>{run.name}</text>
+        <text wrapMode="none" truncate fg={theme().text.base} attributes={1} onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>{runLabel(run)}</text>
         <Progress run={run} context={context} />
         <RunNodes run={run} frame={frame()} context={context} open={open} />
       </box>}</For>
       <Show when={groups().finished.length > 0}><text marginTop={1} fg={theme().text.muted}>Recent</text></Show>
       <For each={groups().finished}>{(run) => <box flexDirection="column" onMouseUp={(event) => { if (event.button === 0) open(run.runID) }}>
-        <text wrapMode="none" truncate fg={statusColor(run.status, theme())}>{statusGlyph(run.status)} {run.name}</text>
+        <text wrapMode="none" truncate fg={statusColor(run.status, theme())}>{statusGlyph(run.status)} {runLabel(run)}</text>
         <text wrapMode="none" truncate fg={theme().text.muted}>{"  "}{settledCount(run)}/{run.nodes.length} · {runClock(run, now())}</text>
       </box>}</For>
       <Show when={groups().hidden > 0}><text fg={theme().text.muted}>+{groups().hidden} older (details: {context.keymap.shortcuts("iolaus.dag.show").join(" / ")})</text></Show>
@@ -69,7 +69,7 @@ function DagComposerStatus(props: { readonly sessionID: string; readonly context
     <box flexDirection="column" paddingLeft={2} paddingRight={2}>
       <For each={active()}>{(run) => <text wrapMode="none" truncate fg={statusColor(run.status, theme())}
         onMouseUp={(event) => { if (event.button === 0) openDagDialog(context, props.sessionID, run.runID) }}>
-        {liveGlyph(run.status, Math.floor(now() / 200))} Flow {run.name} · {settledCount(run)}/{run.nodes.length} · {runActivity(run)} · {runClock(run, now())}
+        {liveGlyph(run.status, Math.floor(now() / 200))} {runLabel(run)} · {settledCount(run)}/{run.nodes.length} · {runActivity(run)} · {runClock(run, now())}
       </text>}</For>
     </box>
   </Show>

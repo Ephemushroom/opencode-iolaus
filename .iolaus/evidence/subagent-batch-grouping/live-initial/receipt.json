@@ -1,0 +1,61 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.2.1",
+  "checks": [
+    "One real user request: 2 parallel + 10 sequential calls share one request batch; next request isolates old failure/count/time; stable 1..12 definition order",
+    "Native nesting inherits exact observed run and local parent edge",
+    "Two scheduled flows keep distinct observed batches, including nested descendants; scheduled definitions unchanged; no cross-group edges",
+    "Host restart/reload: later-request explicit native followup reopens original node, descendant inherits original batch, no new followup batch",
+    "Scheduled continuation guard still refuses before observation",
+    "Seeded isolated legacy unkeyed aggregate retained without reassignment or append",
+    "Real 2.2 tool hooks expose current assistant in delivered context; persisted user IDs used instead of admission or assistant IDs",
+    "Real TUI labels observed details as Calls/request; Enter still opens direct child"
+  ],
+  "isolation": [
+    {
+      "pids": [
+        97672,
+        97702
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-wal"
+      ]
+    },
+    {
+      "pids": [
+        98391,
+        98415
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-wal"
+      ]
+    },
+    {
+      "pids": [
+        98714,
+        98740
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-nnHhqQ/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "hostConfigUnchanged": true,
+  "remainingSandboxProcesses": "",
+  "sandboxRemoved": true
+}

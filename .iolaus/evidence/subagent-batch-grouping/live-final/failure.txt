@@ -1,0 +1,55 @@
+   QA_DONE                       +
+
+  ┃
+  ┃  You are a subagent spawned by another session.
+  ┃  CHILD_OK
+  ┃
+
+     QA_DONE
+
+     Quick · GPT-5.5 · 10ms · 714.3 tok/s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  Subagents  Shell  Terminals                                                                                                                                        esc
+  ┃
+  ┃  No active subagents
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃  show inactive ctrl+a  tabs ←/→
+  ┃
+

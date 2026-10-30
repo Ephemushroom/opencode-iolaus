@@ -127,6 +127,7 @@ export interface DagDefinition {
    * edges, and cannot be retried, resumed or amended.
    */
   readonly observed?: true
+  readonly observedBatch?: { readonly kind: "request" | "flow" | "call"; readonly id: string }
   readonly loop?: DagLoop
   readonly nodes: readonly DagNodeDefinition[]
   readonly maxParallel?: number
@@ -141,6 +142,8 @@ export interface DagDefinition {
 /** A native subagent call as it starts: the child session and where it hangs in its owner's observed run. */
 export interface DagObservedStart {
   readonly ownerSessionID: string
+  readonly batch?: NonNullable<DagDefinition["observedBatch"]>
+  readonly runID?: string
   /** Absent when the call failed before a child session existed. */
   readonly sessionID?: string
   readonly agent: string

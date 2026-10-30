@@ -38,6 +38,7 @@ export function dagView(controller: DagController, sessionID: string): Effect.Ef
     runID: run.runID, name: run.name, generation: run.generation,
     status: run.status, createdAt: run.createdAt, updatedAt: run.updatedAt,
     ...(run.definition.observed ? { observed: true } : {}),
+    ...(run.definition.observedBatch ? { observedBatch: run.definition.observedBatch } : {}),
     // The host validates RPC output as JSON before the zod schema; undefined is not JSON, so optional fields are omitted.
     nodes: run.nodes.map((node) => {
       // A gate's prompt is shown in full as the approval request, so it is not summarised.

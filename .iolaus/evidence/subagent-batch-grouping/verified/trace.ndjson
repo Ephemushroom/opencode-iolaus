@@ -1,0 +1,265 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.1"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/project/.iolaus","created":["/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/home/.iolaus/README.md"]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.unavailable","enabled":false,"binary":null}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.hidden","agent":"sisyphus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"atlas","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"momus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.tui.loaded","host":"2.2.1"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.dag.run.started","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","generation":1,"nodeID":"1-old-failure","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","nodeID":"1-old-failure","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","generation":1,"nodeID":"1-old-failure","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e789270ccffeSQh15UnetnwQRv"}
+{"event":"iolaus.dag.node.failed","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","generation":1,"nodeID":"1-old-failure","sequence":4}
+{"event":"iolaus.dag.run.failed","runID":"99d2596b-ce1b-4bb1-987e-a557499894aa","generation":1,"sequence":5}
+{"event":"iolaus.dag.run.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"1-work-1","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"1-work-1","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"2-work-2","sequence":3}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"2-work-2","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"1-work-1","sequence":4}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925f4fffepZ02GM1x68vArV"}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"2-work-2","sequence":5}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925f4effet2upd1GJdqhs5R"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"1-work-1","sequence":6}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"2-work-2","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":8}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"3-work-3","sequence":9}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"3-work-3","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"3-work-3","sequence":10}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925f0effeiU21A8W97eXY64"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"3-work-3","sequence":11}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":12}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"4-work-4","sequence":13}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"4-work-4","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"4-work-4","sequence":14}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925ee8ffey57JSsIZ60zTf0"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"4-work-4","sequence":15}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":16}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"5-work-5","sequence":17}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"5-work-5","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"5-work-5","sequence":18}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925e8cffeHeG66sdE6NW4uK"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"5-work-5","sequence":19}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":20}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"6-work-6","sequence":21}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"6-work-6","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"6-work-6","sequence":22}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925e4dffePUXhUibpFqJbYt"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"6-work-6","sequence":23}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":24}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"7-work-7","sequence":25}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"7-work-7","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"7-work-7","sequence":26}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925df8ffe0stMu77oGyT20F"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"7-work-7","sequence":27}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":28}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"8-work-8","sequence":29}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"8-work-8","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"8-work-8","sequence":30}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925d88ffeUpifm0ewVdmdsh"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"8-work-8","sequence":31}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":32}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"9-work-9","sequence":33}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"9-work-9","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"9-work-9","sequence":34}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925d54ffeu7KSFnPnuHdM8w"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"9-work-9","sequence":35}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":36}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"10-work-10","sequence":37}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"10-work-10","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"10-work-10","sequence":38}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925d23ffeIOzLbhKqrLZ8P3"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"10-work-10","sequence":39}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":40}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"11-work-11","sequence":41}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"11-work-11","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"11-work-11","sequence":42}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925ccfffeSLJ84w3YJhH1Xs"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"11-work-11","sequence":43}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":44}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"12-work-12","sequence":45}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"12-work-12","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"12-work-12","sequence":46}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925c90ffe0MvTOX3vS8olKt"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"12-work-12","sequence":47}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":48}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e"}
+{"event":"iolaus.dag.run.started","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"1-native-parent","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","nodeID":"1-native-parent","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"1-native-parent","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925072ffe0xHL0IMrSGx7uu"}
+{"event":"iolaus.dag.node.started","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"2-grandchild","sequence":4}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","nodeID":"2-grandchild","agent":"quick","nested":true,"background":false}
+{"event":"iolaus.dag.node.started","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"2-grandchild","sequence":5}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925061ffdnmAKay242Sdahi"}
+{"event":"iolaus.dag.node.completed","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"2-grandchild","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925072ffe0xHL0IMrSGx7uu"}
+{"event":"iolaus.dag.node.completed","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"nodeID":"1-native-parent","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"fb3e1715-8ecb-4d32-bba4-4fb98a61e435","generation":1,"sequence":8}
+{"event":"iolaus.dag.run.started","runID":"8e5e76c6-411a-4383-a802-7be85b190b51","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"8e5e76c6-411a-4383-a802-7be85b190b51","generation":1,"nodeID":"work","sequence":2}
+{"event":"iolaus.dag.run.started","runID":"67399c03-d9ea-4b23-a668-3d26bf6dd220","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"67399c03-d9ea-4b23-a668-3d26bf6dd220","generation":1,"nodeID":"work","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"8e5e76c6-411a-4383-a802-7be85b190b51","generation":1,"nodeID":"work","sequence":3}
+{"event":"iolaus.dag.node.started","runID":"67399c03-d9ea-4b23-a668-3d26bf6dd220","generation":1,"nodeID":"work","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923cceffeLvrdpFUdz7Pgpx"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923ccdffeymmxKRLvuInrEa"}
+{"event":"iolaus.dag.run.started","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"1-work-source-a-child","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"1d519799-e621-4380-a903-97f538ad5404","nodeID":"1-work-source-a-child","agent":"quick","nested":false,"scheduledNode":"work","background":false}
+{"event":"iolaus.dag.run.started","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"1-work-source-b-child","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","nodeID":"1-work-source-b-child","agent":"quick","nested":false,"scheduledNode":"work","background":false}
+{"event":"iolaus.dag.node.started","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"1-work-source-a-child","sequence":3}
+{"event":"iolaus.dag.node.started","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"1-work-source-b-child","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c9effdmGsHQMnJBoPxKu"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c9bffeFAMbqjOAOAGCur"}
+{"event":"iolaus.dag.node.started","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"2-grandchild","sequence":4}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"1d519799-e621-4380-a903-97f538ad5404","nodeID":"2-grandchild","agent":"quick","nested":true,"background":false}
+{"event":"iolaus.dag.node.started","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"2-grandchild","sequence":4}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","nodeID":"2-grandchild","agent":"quick","nested":true,"background":false}
+{"event":"iolaus.dag.node.started","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"2-grandchild","sequence":5}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c7affeumzGgYnC1J1L4n"}
+{"event":"iolaus.dag.node.started","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"2-grandchild","sequence":5}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c6fffem3Ut7Gdzj6FkzX"}
+{"event":"iolaus.dag.node.completed","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"2-grandchild","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c9effdmGsHQMnJBoPxKu"}
+{"event":"iolaus.dag.node.completed","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"nodeID":"1-work-source-a-child","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"1d519799-e621-4380-a903-97f538ad5404","generation":1,"sequence":8}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923cceffeLvrdpFUdz7Pgpx"}
+{"event":"iolaus.dag.node.completed","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"2-grandchild","sequence":6}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923c9bffeFAMbqjOAOAGCur"}
+{"event":"iolaus.dag.node.completed","runID":"8e5e76c6-411a-4383-a802-7be85b190b51","generation":1,"nodeID":"work","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"8e5e76c6-411a-4383-a802-7be85b190b51","generation":1,"sequence":5}
+{"event":"iolaus.dag.node.completed","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"nodeID":"1-work-source-b-child","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"d09b2640-9bff-4026-9955-78f16f4a2def","generation":1,"sequence":8}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78923ccdffeymmxKRLvuInrEa"}
+{"event":"iolaus.dag.node.completed","runID":"67399c03-d9ea-4b23-a668-3d26bf6dd220","generation":1,"nodeID":"work","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"67399c03-d9ea-4b23-a668-3d26bf6dd220","generation":1,"sequence":5}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.tui.closed"}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.1"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/project/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.unavailable","enabled":false,"binary":null}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.hidden","agent":"sisyphus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"atlas","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"momus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.tui.loaded","host":"2.2.1"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"1-work-1","sequence":49}
+{"event":"iolaus.subagent.followed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","nodeID":"1-work-1"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925f4fffepZ02GM1x68vArV"}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"13-after-reload-descendant","sequence":50}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","nodeID":"13-after-reload-descendant","agent":"quick","nested":true,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"13-after-reload-descendant","sequence":51}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78921f4cffe51ojQ6rRg92YS7"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"13-after-reload-descendant","sequence":52}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78925f4fffepZ02GM1x68vArV"}
+{"event":"iolaus.dag.node.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"nodeID":"1-work-1","sequence":53}
+{"event":"iolaus.dag.run.completed","runID":"dfc20302-8086-4184-ac3a-7cc46ad34c7e","generation":1,"sequence":54}
+{"event":"iolaus.dag.run.started","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","generation":1,"nodeID":"1-before-queued-delivery","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","nodeID":"1-before-queued-delivery","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","generation":1,"nodeID":"1-before-queued-delivery","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78920ef7ffeMO1NpqxAxbUg6K"}
+{"event":"iolaus.dag.node.completed","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","generation":1,"nodeID":"1-before-queued-delivery","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"db40d2ee-a543-4e22-9afb-10469a3480b2","generation":1,"sequence":5}
+{"event":"iolaus.dag.run.started","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","generation":1,"nodeID":"1-queued-request-child","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","nodeID":"1-queued-request-child","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","generation":1,"nodeID":"1-queued-request-child","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e78920ebbffeuAkuSDbpfp10df"}
+{"event":"iolaus.dag.node.completed","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","generation":1,"nodeID":"1-queued-request-child","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"dbb4a481-5cde-41ce-b1cd-6acbef04e801","generation":1,"sequence":5}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.tui.closed"}
+{"event":"iolaus.loaded","enabled":true,"host":"2.2.1"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-9mVy2w/project/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.unavailable","enabled":false,"binary":null}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.hidden","agent":"sisyphus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"atlas","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"momus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.tui.loaded","host":"2.2.1"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.dag.run.started","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","generation":1,"nodeID":"1-new-after-legacy","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","nodeID":"1-new-after-legacy","agent":"quick","nested":false,"background":false}
+{"event":"iolaus.dag.node.started","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","generation":1,"nodeID":"1-new-after-legacy","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e7891f49affeUwLGE0AErPpANU"}
+{"event":"iolaus.dag.node.completed","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","generation":1,"nodeID":"1-new-after-legacy","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","generation":1,"sequence":5}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e78927140ffe7na6PZf5RYzkKA","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c"}
+{"event":"iolaus.tui.open","runID":"ee849b70-1f6e-47f7-8ac5-70986bb1e96c","nodeID":"1-new-after-legacy","sessionID":"ses_e7891f49affeUwLGE0AErPpANU"}
+{"event":"iolaus.tui.closed"}
