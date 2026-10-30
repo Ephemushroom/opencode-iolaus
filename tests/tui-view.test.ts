@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test"
 import { RGBA } from "@opentui/core"
-import { activityLine, borderTitle, connector, depths, elapsed, kindMark, labelColor, liveGlyph, nodeResult, orderNodes, partitionRuns, progressBar, resultLabel, rowStart, runActivity, runClock, runHeadline, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
+import { activityLine, borderTitle, connector, depths, dialogLayers, dialogNodes, elapsed, kindMark, labelColor, liveGlyph, nodeResult, orderNodes, partitionRuns, progressBar, resultLabel, rowStart, runActivity, runClock, runHeadline, statusLabel, waves, settledCount, statusColor, statusGlyph, summarize, topologyNodes, type DagViewRun } from "../src/tui/view"
 
 const theme = { text: {
   base: RGBA.fromHex("#202020"), muted: RGBA.fromHex("#666666"),
@@ -44,6 +44,18 @@ test("dialog ordering keeps both fan-in parents before their descendant regardle
   const graph: DagViewRun = { ...run, nodes: [node("join", "running", ["left", "right"]), node("right", "failed", ["root"]), node("root", "completed"), node("left", "completed", ["root"])] }
   expect(topologyNodes(graph).map((node) => node.id)).toEqual(["root", "right", "left", "join"])
   expect(topologyNodes(graph).at(-1)?.dependsOn).toEqual(["left", "right"])
+})
+
+test("observed dialog cards and keyboard traversal retain mixed root/child/root chronology without wave links", () => {
+  const mixed: DagViewRun = { ...run, observed: true, nodes: [node("1-parent", "completed"), node("2-child", "completed", ["1-parent"]), node("3-independent", "completed")] }
+  expect(dialogNodes(mixed).map((node) => node.id)).toEqual(["1-parent", "2-child", "3-independent"])
+  expect(dialogLayers(mixed).map((layer) => layer.map((node) => node.id))).toEqual([["1-parent", "2-child", "3-independent"]])
+  expect(dialogNodes(mixed)[1].dependsOn).toEqual(["1-parent"])
+  expect(dialogNodes(mixed)[2].dependsOn).toEqual([])
+  const scheduled = { ...mixed, observed: false }
+  expect(dialogNodes(scheduled)).toEqual(topologyNodes(scheduled))
+  expect(dialogLayers(scheduled)).toEqual(waves(scheduled))
+  expect(dialogLayers(scheduled).map((layer) => layer.map((node) => node.id))).toEqual([["1-parent", "3-independent"], ["2-child"]])
 })
 
 test("dialog results render a reply's text as Markdown and keep structured or truncated data as JSON", () => {

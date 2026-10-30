@@ -1,0 +1,55 @@
+   QA_DONE                       +
+
+     Build · GPT-5.5 · 60ms · 625.0 tok/s                                                                                              QA_DONE
+
+  ┃                                                                                                                                    Context
+  ┃  QA_PLAN:                                                                                                                          15 tokens
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiV29yayAxIiwicHJvbXB0IjoiQ0hJTERfT0sifX0seyJuYW    0% used
+  ┃  1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IldvcmsgMiIsInByb21wdCI6IkNISUxEX09LIn19XSxbeyJuYW1lIjoi    $0.01 spent
+  ┃  c3ViYWdlbnQiLCJhcmdzIjp7I
+  ┃  dlbnQiLCJhcmdzIjp7ImFnZW5
+  ┃  LCJhcmdzIjp7ImFnZW50Ijoic Calls · request o98IdZAc                                                                                 esc close
+  ┃  dzIjp7ImFnZW50IjoicXVpY2s ✓ done in 0s  ━━━━━━━━━━━━ 12/12
+  ┃  ImFnZW50IjoicXVpY2siLCJkZ                                                                                                                    request o98IdZAc
+  ┃  50IjoicXVpY2siLCJkZXNjcml            ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮            done in 0s
+  ┃  cXVpY2siLCJkZXNjcmlwdGlvb            ┃ › 1-work-1                 ┃ │   2-work-2                 │ │   3-work-3                 │            request vfyDAhh8
+  ┃  siLCJkZXNjcmlwdGlvbiI6Ild            ┃ Work 1                     ┃ │ Work 2                     │ │ Work 3                     │            iled in 0s
+  ┃  ZGVzY3JpcHRpb24iOiJXb3JrI            ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────────╯ ╰────────────────────────────╯
+  ┃  NyaXB0aW9uIjoiV29yayAxMiI                                                                                                                    details · ctrl+x d
+  ┃                                       ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+                                          │   4-work-4                 │ │   5-work-5                 │ │   6-work-6                 │
+     ✓ Quick Subagent — Work 1            │ Work 4                     │ │ Work 5                     │ │ Work 6                     │
+                                          ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+     ✓ Quick Subagent — Work 2
+                                          ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+     ✓ Quick Subagent — Work 3            │   7-work-7                 │ │   8-work-8                 │ │   9-work-9                 │
+                                          │ Work 7                     │ │ Work 8                     │ │ Work 9                     │
+     ✓ Quick Subagent — Work 4            ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+
+     ✓ Quick Subagent — Work 5            ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮
+                                          │   10-work-10               │ │   11-work-11               │ │   12-work-12               │
+     ✓ Quick Subagent — Work 6            │ Work 10                    │ │ Work 11                    │ │ Work 12                    │
+                                          ╰────────────────────────────╯ ╰────────────────────────────╯ ╰────────────────────────────╯
+     ✓ Quick Subagent — Work 7                                                     · 12 calls
+
+     ✓ Quick Subagent — Work 8 ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                               │ ✓ 1-work-1 · Work 1                                                                                            │
+     ✓ Quick Subagent — Work 9 │ Status: Done · agent                                                                                           │
+                               │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 1                                                              │
+     ✓ Quick Subagent — Work 1 │ Parent call: none (root call)                                                                                  │
+                               │ Child calls: none                                                                                              │
+     ✓ Quick Subagent — Work 1 │                                                                                                                │
+                               │ Result                                                                                                         │  started                ✕
+     ✓ Quick Subagent — Work 1 │ QA_DONE                                                                                                        │
+                               ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ e includes free models so
+     QA_DONE                                                                                                                                       start immediately.
+                               ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+     Build · GPT-5.5 · 447ms ·                                                                                                                     from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-2xSW9j/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-2xSW9j/project
+

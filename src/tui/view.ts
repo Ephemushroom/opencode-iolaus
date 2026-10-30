@@ -4,6 +4,13 @@ import type { DagView } from "../dag/rpc"
 export type DagViewRun = DagView["runs"][number]
 export type DagViewNode = DagViewRun["nodes"][number]
 
+export function runLabel(run: DagViewRun): string {
+  if (!run.observed) return `Flow · ${run.name}`
+  const batch = run.observedBatch
+  if (!batch) return "Calls · historical aggregate"
+  return `Calls · ${batch.kind} ${batch.id.slice(-8)}`
+}
+
 /** The semantic tokens consumed from the host's resolved theme. */
 export interface DagTheme {
   readonly text: {
@@ -182,6 +189,7 @@ export function depths(run: DagViewRun): Map<string, number> {
 
 /** Gates first (they need the user), then running, then the rest in graph order. */
 export function orderNodes(run: DagViewRun): DagViewNode[] {
+  if (run.observed) return [...run.nodes]
   const rank = (n: DagViewNode) => n.status === "waiting_approval" ? 0 : n.status === "running" || n.status === "starting" ? 1 : 2
   return topologyNodes(run).sort((a, b) => rank(a) - rank(b))
 }
@@ -210,6 +218,14 @@ export function statusLabel(status: string): string {
 export function topologyNodes(run: DagViewRun): DagViewNode[] {
   const levels = depths(run)
   return [...run.nodes].sort((a, b) => (levels.get(a.id) ?? 0) - (levels.get(b.id) ?? 0))
+}
+
+export function dialogLayers(run: DagViewRun): DagViewNode[][] {
+  return run.observed ? [run.nodes] : waves(run)
+}
+
+export function dialogNodes(run: DagViewRun): DagViewNode[] {
+  return dialogLayers(run).flat()
 }
 
 /** A reopened node (follow-up or retry) keeps its last result until the new attempt settles; say which attempt it came from. */

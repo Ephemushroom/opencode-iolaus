@@ -1,0 +1,55 @@
+   QA_DONE                       +
+  ┃  J9fV1d
+  ┃                                                                                                                                    QA_DONE
+
+     ↳ Continue subagent — Later followup                                                                                              Context
+                                                                                                                                       15 tokens
+     QA_DONE                                                                                                                           0% used
+                                                                                                                                       $0.01 spent
+     Build · GPT-5.5 · 104ms · 526.3 tok/s
+                                                                                                                                        Iolaus
+     QA_DONE
+                                                                                                                                        Recent
+     Build · GPT-5.5 · 116ms · 576.9 tok/s                                                                                              ✓ Calls · request w2YR3trO
+                                                                                                                                          1/1 · done in 0s
+     QA_DONE                                                                                                                            ✓ Calls · request KZE9lrDF
+                                                                                                                                          13/13 · done in 16s
+     Build · GPT-5.5 · 125ms · 666.7 tok/s                                                                                              ✓ Flow · Source B
+                                                                                                                                          1/1 · done in 0s
+  ┃                                                                                                                                     +5 older (details: ctrl+x d)
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiRm9yYmlkZGVuIGZsb3cgZm9sbG93dXAiLCJwcm9tcHQiOi     Click for details · ctrl+x d
+  ┃  JObyIsInNlc3Npb25JRCI6InNlc19lNzg5NGJkZjJmZmVFSk0zeldmazZwVGNuYyJ9fV1d
+  ┃
+
+     ↳ Continue subagent — Forbidden flow followup
+
+     QA_DONE
+
+     Build · GPT-5.5 · 23ms · 1000.0 tok/s
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJxYV9xdWV1ZSIsImFyZ3MiOnsicHJvbXB0IjoiUUFfUExBTjpXMXQ3SW01aGJXVWlPaUp6ZFdKaFoyVnVkQ0lzSW1GeVozTWlPbnNpWVdkbGJuUW
+  ┃  lPaUp4ZFdsamF5SXNJbVJsYzJOeWFYQjBhVzl1SWpvaVVYVmxkV1ZrSUhKbGNYVmxjM1FnWTJocGJHUWlMQ0p3Y205dGNIUWlPaUpEU0VsTVJGOVBTeUo5ZlYxZCJ9
+  ┃  fV0sW3sibmFtZSI6InN1YmFnZW50IiwiYXJncyI6eyJhZ2VudCI6InF1aWNrIiwiZGVzY3JpcHRpb24iOiJCZWZvcmUgcXVldWVkIGRlbGl2ZXJ5IiwicHJvbXB0Ij
+  ┃  oiQ0hJTERfT0sifX1dXQ==
+  ┃
+
+     ✗ qa_queue [prompt=QA_PLAN:
+       W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiUXVldWVkIHJlcXVlc3QgY2hpbGQiLCJwcm9tcHQiOiJD
+       SElMRF9PSyJ9fV1d]
+                                                                                                                                         ⬖ Getting started                ✕
+     ✓ Quick Subagent — Before queued delivery
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 63ms · 1071.4 tok/s                                                                                                 Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-fvTOXV/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-fvTOXV/project
+

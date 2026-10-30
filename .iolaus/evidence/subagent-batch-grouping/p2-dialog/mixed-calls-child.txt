@@ -1,0 +1,55 @@
+   QA_DONE                       +
+  ┃  NyaXB0aW9uIjoiV29yayAxMiIsInByb21wdCI6IkNISUxEX09LIn19XV0=
+  ┃                                                                                                                                    QA_DONE
+
+     ✓ Quick Subagent — Work 1                                                                                                         Context
+                                                                                                                                       15 tokens
+     ✓ Quick Subagent — Work 2                                                                                                         0% used
+                                                                                                                                       $0.01 spent
+     ✓ Quick Subagent — Work 3
+                                                                                                                                        Iolaus
+     ✓ Quick Subagent — Work 4
+                                                                                                                                        Recent
+     ✓ Quick Subagent — Work 5                                                                                                          ✓ Calls · request jQ76FO6Z
+                                                                                                                                          3/3 · done in 0s
+     ✓ Quick Subagent — Work 6                                                                                                          ✓ Calls · request o98IdZAc
+                                                                                                                                          12/12 · done in 0s
+     ✓ Quick Subagent — Work 7                                                                                                                    request vfyDAhh8
+                                                                                                                                                  iled in 0s
+     ✓ Quick Subagent — Work 8 Calls · request jQ76FO6Z                                                                                 esc close
+                               ✓ done in 0s  ━━━━━━━━━━━━ 3/3                                                                                     details · ctrl+x d
+     ✓ Quick Subagent — Work 9
+                                          ╭─ ✓ Done ───────────────────╮ ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓ ╭─ ✓ Done ───────────────────╮
+     ✓ Quick Subagent — Work 1            │ ↑ 1-native-parent          │ ┃ › 2-grandchild             ┃ │   3-independent            │
+                                          │ Native parent              │ ┃ Grandchild                 ┃ │ Independent                │
+     ✓ Quick Subagent — Work 1            ╰────────────────────────────╯ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛ ╰────────────────────────────╯
+
+     ✓ Quick Subagent — Work 1 ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                               │ ✓ 2-grandchild · Grandchild                                                                                    │
+     QA_DONE                   │ Status: Done · agent                                                                                           │
+                               │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 1                                                              │
+     Build · GPT-5.5 · 447ms · │ Parent call: 1-native-parent                                                                                   │
+                               │ Child calls: none                                                                                              │
+  ┃                            │                                                                                                                │
+  ┃  QA_PLAN:                  │ Result                                                                                                         │
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2Vud │ QA_DONE                                                                                                        │
+  ┃  F0N0ltNWhiV1VpT2lKemRXSmh ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  SW5CeWIyMXdkQ0k2SWtOSVNVe
+  ┃  oiSW5kZXBlbmRlbnQiLCJwcm9 ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+  ┃
+
+     ✓ Quick Subagent — Native parent
+                                                                                                                                         ⬖ Getting started                ✕
+     ✓ Quick Subagent — Independent
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 97ms · 1071.4 tok/s                                                                                                 Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-2xSW9j/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-2xSW9j/project
+

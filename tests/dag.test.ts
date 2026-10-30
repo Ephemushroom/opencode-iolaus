@@ -417,7 +417,7 @@ test("observed runs record subagent calls by time and parent, settle once, and r
   const controller = createEffect({ directory, databasePath: join(directory, "iolaus.db"), runner: runnerFromPromise(fakeRunner()) })
   const run = <A, E>(effect: import("effect").Effect.Effect<A, E>) => Effect.runPromise(effect)
   const a = await run(controller.observe({ ownerSessionID: "owner", agent: "explore", title: "Find config", prompt: "look" }))
-  const b = await run(controller.observe({ ownerSessionID: "owner", agent: "oracle", title: "Review", prompt: "judge", parentNodeID: a.nodeID }))
+  const b = await run(controller.observe({ ownerSessionID: "owner", runID: a.runID, agent: "oracle", title: "Review", prompt: "judge", parentNodeID: a.nodeID }))
   expect(b.runID).toBe(a.runID)
   expect([a.nodeID, b.nodeID]).toEqual(["1-find-config", "2-review"])
   await run(controller.observed(a.runID, a.nodeID, { status: "running", sessionID: "ses_a", model: "openai/gpt-5.5" }))

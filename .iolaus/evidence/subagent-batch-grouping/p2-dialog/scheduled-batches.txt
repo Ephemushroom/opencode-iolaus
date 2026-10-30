@@ -1,0 +1,55 @@
+   QA_DONE                       +
+     ✓ Quick Subagent — Work 12
+                                                                                                                                       QA_DONE
+     QA_DONE
+                                                                                                                                       Context
+     Build · GPT-5.5 · 447ms · 833.3 tok/s                                                                                             15 tokens
+                                                                                                                                       0% used
+  ┃                                                                                                                                    $0.01 spent
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiTmF0aXZlIHBhcmVudCIsInByb21wdCI6IlFBX1BMQU46Vz     Iolaus
+  ┃  F0N0ltNWhiV1VpT2lKemRXSmhaMlZ1ZENJc0ltRnlaM01pT25zaVlXZGxiblFpT2lKeGRXbGpheUlzSW1SbGMyTnlhWEIwYVc5dUlqb2lSM0poYm1SamFHbHNaQ0lz
+  ┃  SW5CeWIyMXdkQ0k2SWtOSVNVeEVYMDlMSW4xOVhWMD0ifX1dLFt7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIj     Recent
+  ┃  oiSW5kZXBlbmRlbnQiLCJwcm9tcHQiOiJDSElMRF9PSyJ9fV1d                                                                                 ✓ Flow · Source A
+  ┃                                                                                                                                       1/1 · done in 0s
+                                                                                                                                        ✓ Calls · flow e5de4183
+     ✓ Quick Subagent — Native parent                                                                                                     2/2 · done in 0s
+                                                                                                                                        ✓ Flow · Source B
+     ✓ Quick Subagent — Independent                                                                                                       1/1 · done in 0s
+                                                                                                                                        +4 older (details: ctrl+x d)
+     QA_DONE
+                                                                                                                                        Click for details · ctrl+x d
+     Build · GPT-5.5 · 97ms · 1071.4 tok/s
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJpb2xhdXNfZmxvdyIsImFyZ3MiOnsiYWN0aW9uIjoiY3JlYXRlIiwiZGVmaW5pdGlvbiI6eyJzY2hlbWFWZXJzaW9uIjoxLCJuYW1lIjoiU291cm
+  ┃  NlIEEiLCJub2RlcyI6W3siaWQiOiJ3b3JrIiwiYWdlbnQiOiJxdWljayIsInByb21wdCI6IlFBX1BMQU46VzF0N0ltNWhiV1VpT2lKemRXSmhaMlZ1ZENJc0ltRnla
+  ┃  M01pT25zaVlXZGxiblFpT2lKeGRXbGpheUlzSW1SbGMyTnlhWEIwYVc5dUlqb2lVMjkxY21ObElFRWdZMmhwYkdRaUxDSndjbTl0Y0hRaU9pSlJRVjlRVEVGT09sY3
+  ┃  hkRGRKYlRWb1lsZFZhVTlwU25wa1YwcG9XakpXZFdSRFNYTkpiVVo1V2pOTmFVOXVjMmxaVjJSc1ltNVJhVTlwU25oa1YyeHFZWGxKYzBsdFVteGpNazU1WVZoQ01H
+  ┃  RlhPWFZKYW05cFVqTkthR0p0VW1waFIyeHpXa05KYzBsdVFubGlNakYzWkVOSk5rbHJUa2xUVlhoRldEQTVURWx1TVRsWVZqQTlJbjE5WFYwPSIsImRlcGVuZHNPbi
+  ┃  I6W119XX19fSx7Im5hbWUiOiJpb2xhdXNfZmxvdyIsImFyZ3MiOnsiYWN0aW9uIjoiY3JlYXRlIiwiZGVmaW5pdGlvbiI6eyJzY2hlbWFWZXJzaW9uIjoxLCJuYW1l
+  ┃  IjoiU291cmNlIEIiLCJub2RlcyI6W3siaWQiOiJ3b3JrIiwiYWdlbnQiOiJxdWljayIsInByb21wdCI6IlFBX1BMQU46VzF0N0ltNWhiV1VpT2lKemRXSmhaMlZ1ZE
+  ┃  NJc0ltRnlaM01pT25zaVlXZGxiblFpT2lKeGRXbGpheUlzSW1SbGMyTnlhWEIwYVc5dUlqb2lVMjkxY21ObElFSWdZMmhwYkdRaUxDSndjbTl0Y0hRaU9pSlJRVjlR
+  ┃  VEVGT09sY3hkRGRKYlRWb1lsZFZhVTlwU25wa1YwcG9XakpXZFdSRFNYTkpiVVo1V2pOTmFVOXVjMmxaVjJSc1ltNVJhVTlwU25oa1YyeHFZWGxKYzBsdFVteGpNaz
+  ┃  U1WVZoQ01HRlhPWFZKYW05cFVqTkthR0p0VW1waFIyeHpXa05KYzBsdVFubGlNakYzWkVOSk5rbHJUa2xUVlhoRldEQTVURWx1TVRsWVZqQTlJbjE5WFYwPSIsImRl
+  ┃  cGVuZHNPbiI6W119XX19fV1d
+  ┃
+
+     ✓ iolaus_flow [action=create]
+
+     ✓ iolaus_flow [action=create]
+                                                                                                                                         ⬖ Getting started                ✕
+     ◈ Instructions updated: api/iolaus.state
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 44ms · 370.4 tok/s                                                                                                  Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-2xSW9j/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-2xSW9j/project
+

@@ -1,0 +1,55 @@
+   QA_DONE                       +
+
+     QA_DONE                                                                                                                           QA_DONE
+
+     Build · GPT-5.5 · 20ms · 1250.0 tok/s                                                                                             Context
+                                                                                                                                       15 tokens
+  ┃                                                                                                                                    0% used
+  ┃  QA_PLAN:                                                                                                                          $0.01 spent
+  ┃  W1t7Im5hbWUiOiJxYV9xdWV1ZSIsImFyZ3MiOnsicHJvbXB0IjoiUUFfUExBTjpXMXQ3SW01aGJXVWlPaUp6ZFdKaFoyVnVkQ0lzSW1GeVozTWlPbnNpWVdkbGJuUW
+  ┃  lPaUp4ZFdsamF5SXNJbVJsYzJOeWFYQjBhVzl1SWpvaVVYVmxkV1ZrSUhKbGNYVmxjM1FnWTJocGJHUWlMQ0p3Y205dGNIUWlPaUpEU0VsTVJGOVBTeUo5ZlYxZCJ9     Iolaus
+  ┃  fV0sW3sibmFtZSI6InN1YmFnZW50IiwiYXJncyI6eyJhZ2VudCI6InF1aWNrIiwiZGVzY3JpcHRpb24iOiJCZWZvcmUgcXVldWVkIGRlbGl2ZXJ5IiwicHJvbXB0Ij
+  ┃  oiQ0hJTERfT0sifX1dXQ==                                                                                                             Recent
+  ┃                                                                                                                                     ✓ Calls · request 5r50RxEF
+                                                                                                                                          1/1 · done in 0s
+     ✓ qa_queue [prompt=QA_PLAN:                                                                                                        ✗ Calls · historical aggregate
+       W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiUXVldWVkIHJlcXVlc3QgY2hpbGQiLCJwcm9tcHQiOiJD       0/1 · failed in 31h 0m
+       SElMRF9PSyJ9fV1d]                                                                                                                ✓ Calls · request Qs31EQyv
+                                                                                                                                          1/1 · done in 0s
+     ✓ Quick Subagent — Before queued delivery                                                                                          +8 older (details: ctrl+x d)
+
+     QA_DONE                                                                                                                            Click for details · ctrl+x d
+
+     Build · GPT-5.5 · 56ms · 1071.4 tok/s
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiUXVldWVkIHJlcXVlc3QgY2hpbGQiLCJwcm9tcHQiOiJDSE
+  ┃  lMRF9PSyJ9fV1d
+  ┃
+
+     ✓ Quick Subagent — Queued request child
+
+     QA_DONE
+
+     Build · GPT-5.5 · 101ms · 1041.7 tok/s
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiTmV3IGFmdGVyIGxlZ2FjeSIsInByb21wdCI6IkNISUxEX0
+  ┃  9LIn19XV0=
+  ┃
+                                                                                                                                         ⬖ Getting started                ✕
+     ✓ Quick Subagent — New after legacy
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 70ms · 769.2 tok/s                                                                                                  Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-2xSW9j/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-2xSW9j/project
+

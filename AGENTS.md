@@ -60,7 +60,7 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   cancellation and JSON-safe result envelopes.
 - `src/dag/observe.ts` records native `subagent` calls without changing them. The
   `execute.before` hook (registered after the role guard, so refused calls are not
-  recorded) appends a node to the owner session's observed run
+  recorded) appends a node to an owner-scoped observed batch
   (`definition.observed: true`, name "Subagent calls") via `controller.observe`; the
   child session comes from `session.created` (`parentID`) or the tool result
   (`{output: {sessionID, status, output}}`, the `<subagent …>` text or the background
@@ -72,13 +72,25 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   Correlation is cached in memory and read back from the store
   (`controller.observedChild`) after a reload. A call made inside a scheduled
   `iolaus_flow` node's session (found through its `iolaus_dag_run`/`iolaus_dag_node`
-  metadata and `controller.lineage`) joins the run owner's observed run, titled
+  metadata and `controller.lineage`) joins a batch keyed by that source flow ID, titled
   `<node> › <description>`; the scheduled run's definition is not touched. A
   reopened node keeps its last result, which the view labels with its attempt
   (`resultAttempt`). Observed runs are never scheduled: `retry`, `resume`
   and `amend` reject them. The native binding tells agents to call `subagent`
   directly for simple delegation and to use `iolaus_flow` only for data
   dependencies, retry/resume, gates or conditional branches.
+  `definition.observedBatch` stores `{kind: "request" | "flow" | "call", id}`.
+  Direct roots use the last real user ID preceding the tool hook's assistant
+  `messageID` in delivered `session.context`; prompt admission and synthetic
+  messages do not define batches. Missing context/identity isolates each call.
+  Native descendants pass the exact observed `runID` and local parent; explicit
+  followups keep the original node/batch even in later requests and after reload,
+  so deliberate continuations retain the original clock. New roots never reuse
+  unkeyed legacy aggregates, labeled `Calls · historical aggregate` without migration.
+  Stored nodes follow definition order, not lexicographic IDs. TUI observed labels
+  are `Calls` plus source kind/ID suffix; scheduled labels remain `Flow`.
+  Live QA: `node script/qa-subagent-batches.mjs <evidence-dir>`; evidence under
+  `.iolaus/evidence/subagent-batch-grouping/`.
 - `iolaus_flow` (`FLOW_TOOL_NAME` in `src/dag/tool.ts`; formerly `iolaus_dag`, which
   `check:package` refuses in `dist/`) is the only model-facing orchestration tool in
   the first runtime slice. It is owner-scoped and schema-validated. Action `create`
@@ -366,9 +378,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   the command's `execute` (and `iolaus.mode.dispatched`) is not involved; the
   context hook is what makes the mode a DAG.
 - The DAG TUI (`src/tui.tsx`, dialog in `src/tui/dialog.tsx`, shared hooks in
-  `src/tui/hooks.ts`) calls a run a "flow" in every label (`Flow · <name>`,
-  `Iolaus Flow: show details`, child sessions `Flow · <node>`) as the tool does
-  (`iolaus_flow`); the RPC id, command ids, metadata keys (`iolaus_dag_run/node/attempt`),
+  `src/tui/hooks.ts`) distinguishes scheduled `Flow · <name>` from observed `Calls` batches.
+  The launcher retains `Iolaus Flow: show details`, and scheduled child sessions
+  retain `Flow · <node>`. The tool name (`iolaus_flow`), RPC id, command ids,
+  metadata keys (`iolaus_dag_run/node/attempt`),
   prompt markers (`<iolaus-dag-child>`, `<iolaus-dag-inputs>`), trace events and
   tables keep their `dag` names. Node cards carry
   their status in the border title and are joined row to row by fork/join

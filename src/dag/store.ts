@@ -63,6 +63,9 @@ export class DagStore {
     const row = (anyProject ? this.db.query("SELECT * FROM dag_runs WHERE run_id = ?").get(runID) : this.db.query("SELECT * FROM dag_runs WHERE run_id = ? AND project = ?").get(runID, this.project)) as RunRow | null
     if (!row) return undefined
     const nodeRows = this.db.query("SELECT * FROM dag_nodes WHERE run_id = ? ORDER BY node_id").all(runID) as NodeRow[]
+    const definition = parse<DagDefinition>(row.definition_json)
+    const positions = new Map(definition.nodes.map((node, index) => [node.id, index]))
+    nodeRows.sort((left, right) => (positions.get(left.node_id) ?? Infinity) - (positions.get(right.node_id) ?? Infinity))
     const runtimeRows = this.db.query("SELECT node_id, value_json FROM dag_node_runtime WHERE run_id = ?").all(runID) as Array<{ node_id: string; value_json: string }>
     const runtime = new Map(runtimeRows.map((row) => [row.node_id, parse<NonNullable<DagNodeRecord["runtime"]>>(row.value_json)]))
     const recoveryRows = this.db.query("SELECT node_id, value_json FROM dag_node_recovery WHERE run_id = ?").all(runID) as Array<{ node_id: string; value_json: string }>
@@ -71,7 +74,7 @@ export class DagStore {
     return {
       runID: row.run_id, ownerSessionID: row.owner_session_id, name: row.name,
       ...(authorization ? { authorizedPlan: authorization.plan, authorizedAtlasNodes: parse<Record<string, string>>(authorization.atlas_nodes_json) } : {}),
-      definition: parse<DagDefinition>(row.definition_json), fingerprint: row.fingerprint,
+      definition, fingerprint: row.fingerprint,
       generation: row.generation, status: row.status, createdAt: row.created_at, updatedAt: row.updated_at,
       nodes: nodeRows.map((node) => ({
         definition: parse<DagNodeRecord["definition"]>(node.node_json), fingerprint: node.fingerprint,

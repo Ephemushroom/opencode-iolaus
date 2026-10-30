@@ -1,0 +1,27 @@
+{
+  "verdict": "FAIL",
+  "failure": "Error: timeout: plan finished\n    at until (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-subagent-batch-grouping/script/qa-subagent-batches.mjs:23:9)\n    at async submit (file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-subagent-batch-grouping/script/qa-subagent-batches.mjs:92:18)\n    at async file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-subagent-batch-grouping/script/qa-subagent-batches.mjs:130:3",
+  "version": "opencode v2.2.1",
+  "checks": [
+    "One real user request: 2 parallel + 10 sequential calls share one request batch; next request isolates old failure/count/time; stable 1..12 definition order"
+  ],
+  "isolation": [
+    {
+      "pids": [
+        99906,
+        99931
+      ],
+      "databasePaths": [
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/data/opencode/opencode.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/home/.iolaus/iolaus.db-shm",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/data/opencode/opencode.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/data/opencode/opencode.db-wal",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/home/.iolaus/iolaus.db",
+        "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-l6LBXN/home/.iolaus/iolaus.db-wal"
+      ]
+    }
+  ],
+  "hostConfigUnchanged": true,
+  "remainingSandboxProcesses": "",
+  "sandboxRemoved": true
+}

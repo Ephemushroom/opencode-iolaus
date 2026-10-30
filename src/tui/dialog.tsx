@@ -6,7 +6,7 @@ import { trace } from "../trace"
 import { useDagData, useNow } from "./hooks"
 import { paneHeights, revealScroll } from "./layout"
 import { openNodeSession, sessionUnavailable } from "./navigation"
-import { borderTitle, connector, kindMark, liveGlyph, nodeResult, progressBar, resultLabel, rowStart, runHeadline, settledCount, statusColor, statusLabel, topologyNodes, waves, type DagViewNode, type DagViewRun } from "./view"
+import { borderTitle, connector, dialogLayers, dialogNodes, kindMark, liveGlyph, nodeResult, progressBar, resultLabel, rowStart, runHeadline, runLabel, settledCount, statusColor, statusLabel, type DagViewNode, type DagViewRun } from "./view"
 
 export function openDagDialog(context: Context, sessionID: string, runID: string, nodeID?: string) {
   trace("iolaus.tui.dialog.open", { sessionID, runID, nodeID })
@@ -63,8 +63,8 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   const theme = () => context.theme
   const { rpc, target, state, refresh, runs } = useDagData({ context, sessionID: props.sessionID })
   const run = createMemo(() => runs().find((run) => run.runID === props.runID))
-  const nodes = createMemo(() => { const value = run(); return value ? topologyNodes(value) : [] })
-  const layers = createMemo(() => { const value = run(); return value ? waves(value) : [] })
+  const nodes = createMemo(() => { const value = run(); return value ? dialogNodes(value) : [] })
+  const layers = createMemo(() => { const value = run(); return value ? dialogLayers(value) : [] })
   const downstream = (id: string) => nodes().filter((node) => node.dependsOn.includes(id)).map((node) => node.id)
   const [selected, setSelected] = createSignal(props.nodeID)
   const current = createMemo(() => nodes().find((node) => node.id === selected()))
@@ -223,8 +223,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
       onMouseDown={(event) => { if (event.button === 0) { panel?.focus(); event.preventDefault() } }}>
       <box flexDirection="row" justifyContent="space-between">
         <box flexDirection="row" flexShrink={1}>
-          <text flexShrink={0} fg={theme().text.muted}>{run() ? "Flow · " : "Flow"}</text>
-          <text flexShrink={1} wrapMode="none" truncate fg={theme().text.base} attributes={1}>{run()?.name ?? ""}</text>
+          <text flexShrink={1} wrapMode="none" truncate fg={theme().text.base} attributes={1}>{run() ? runLabel(run()!) : "Flow"}</text>
         </box>
         <box flexDirection="row" flexShrink={0} marginLeft={2} onMouseUp={(event) => { if (event.button === 0) close() }}>
           <text fg={theme().text.base}>esc</text>
@@ -245,7 +244,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
             <For each={layers()}>{(wave, index) => {
               const start = () => rowStart(wave.length, cardWidth(), width())
               return <box id={`dag-dialog-wave-${index()}`} flexDirection="column">
-                <Show when={index() > 0}>
+                <Show when={!value().observed && index() > 0}>
                   <For each={connector(centres(layers()[index() - 1].length), centres(wave.length), middle())}>{(line) => <text wrapMode="none" fg={theme().text.muted}>{line}</text>}</For>
                 </Show>
                 <box width="100%" flexDirection="row" flexWrap={start() === undefined ? "wrap" : "no-wrap"} justifyContent={start() === undefined ? "center" : "flex-start"} paddingLeft={start() ?? 0} gap={1}>
@@ -264,7 +263,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
                     </box>
                   }}</For>
                 </box>
-                <Show when={start() === undefined && wave.length > 1}><text alignSelf="center" fg={theme().text.muted}>· {wave.length} in parallel</text></Show>
+                <Show when={start() === undefined && wave.length > 1}><text alignSelf="center" fg={theme().text.muted}>· {wave.length} {value().observed ? "calls" : "in parallel"}</text></Show>
               </box>
             }}</For>
             </box>
@@ -275,8 +274,8 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
               <text fg={statusColor(node().status, theme())} attributes={1}>{liveGlyph(node().status, frame())} {node().id}{node().title ? ` · ${node().title}` : ""}</text>
               <text fg={statusColor(node().status, theme())}>Status: {statusLabel(node().status)} · {node().kind}</text>
               <text fg={theme().text.base}>Agent: {node().agent || "human"} · Model: {node().model || "none"} · Attempt: {node().attempt}</text>
-              <text fg={theme().text.base}>Depends on: {node().dependsOn.join(", ") || "none (start node)"}</text>
-              <text fg={theme().text.base}>Unblocks: {downstream(node().id).join(", ") || "none (final node)"}</text>
+              <text fg={theme().text.base}>{value().observed ? "Parent call" : "Depends on"}: {node().dependsOn.join(", ") || (value().observed ? "none (root call)" : "none (start node)")}</text>
+              <text fg={theme().text.base}>{value().observed ? "Child calls" : "Unblocks"}: {downstream(node().id).join(", ") || (value().observed ? "none" : "none (final node)")}</text>
               <Show when={sessionUnavailable(node())}>{(reason) => <text fg={theme().text.muted}>{reason()}</text>}</Show>
               <Show when={node().prompt}><text marginTop={1} fg={theme().text.action.primary.base}>Approval request</text><text fg={theme().text.base}>{node().prompt}</text></Show>
               <Show when={node().error}><text marginTop={1} fg={theme().text.feedback.error.base}>Error</text><text fg={theme().text.base}>{node().error}</text></Show>

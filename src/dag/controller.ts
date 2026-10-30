@@ -33,7 +33,7 @@ export interface DagController {
   readonly reject: (runID: string, ownerSessionID: string, nodeID: string, note?: string, expectedGeneration?: number) => Effect.Effect<DagRunRecord, DagValidationError>
   readonly amend: (runID: string, ownerSessionID: string, definition: DagDefinition) => Effect.Effect<DagRunRecord, DagValidationError>
   readonly steer: (runID: string, ownerSessionID: string, nodeID: string, text: string, requestID: string) => Effect.Effect<DagSteerRequest, DagValidationError>
-  /** Appends a native subagent call to its owner's observed run, creating the run on first use. */
+  /** Appends a native subagent call to its exact inherited run or owner-scoped batch. */
   readonly observe: (input: DagObservedStart) => Effect.Effect<{ readonly runID: string; readonly nodeID: string }>
   /** Moves an observed node to running again (a follow-up), or settles it. */
   readonly observed: (runID: string, nodeID: string, update: DagObservedUpdate) => Effect.Effect<void>
@@ -842,12 +842,16 @@ export function createDagController(options: DagControllerOptions): DagControlle
     // Both bodies are synchronous against the store, so they never interleave with other controller state transitions.
     observe: (input) => Effect.sync(() => {
       const at = now()
-      const run = store.listRuns(input.ownerSessionID).find((candidate) => candidate.definition.observed)
+      const batch = input.batch ?? { kind: "call" as const, id: randomUUID() }
+      const run = input.runID ? store.getRun(input.runID) : store.listRuns(input.ownerSessionID).find((candidate) =>
+        candidate.definition.observed && candidate.definition.observedBatch?.kind === batch.kind && candidate.definition.observedBatch.id === batch.id)
+      if (input.runID && (!run?.definition.observed || run.ownerSessionID !== input.ownerSessionID)) throw new Error("Unknown observed batch")
+      if (input.parentNodeID && !run?.nodes.some((node) => node.definition.id === input.parentNodeID)) throw new Error("Parent must belong to the observed batch")
       const nodeID = `${(run?.nodes.length ?? 0) + 1}-${slug(input.title)}`
       const definition: DagNodeDefinition = { id: nodeID, title: input.title, agent: input.agent, ...(input.model ? { model: input.model } : {}), prompt: input.prompt, dependsOn: input.parentNodeID ? [input.parentNodeID] : [] }
       const record: DagNodeRecord = { definition, fingerprint: nodeFingerprint(definition), status: "running", attempt: 1, ...(input.sessionID ? { execution: { nodeID, attempt: 1, sessionID: input.sessionID } } : {}), createdAt: at, updatedAt: at }
       if (!run) {
-        const created: DagDefinition = { schemaVersion: 1, name: "Subagent calls", observed: true, nodes: [definition] }
+        const created: DagDefinition = { schemaVersion: 1, name: "Subagent calls", observed: true, observedBatch: batch, nodes: [definition] }
         const next: DagRunRecord = { runID: randomUUID(), ownerSessionID: input.ownerSessionID, name: created.name, definition: created, fingerprint: graphFingerprint(created), generation: 1, status: "running", nodes: [record], createdAt: at, updatedAt: at }
         store.createRun(next); event(next, "run.started"); event(next, "node.started", nodeID)
         return { runID: next.runID, nodeID }

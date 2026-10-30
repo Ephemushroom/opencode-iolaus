@@ -13,6 +13,7 @@ export const DagViewSchema = z.object({
     runID: id, name: z.string(), generation: z.number(), status: z.string(),
     // An observed run records native subagent calls; it cannot be retried, resumed or amended.
     observed: z.boolean().optional(),
+    observedBatch: z.object({ kind: z.enum(["request", "flow", "call"]), id: z.string() }).optional(),
     createdAt: z.number(), updatedAt: z.number(), nodes: z.array(node),
   })),
 })

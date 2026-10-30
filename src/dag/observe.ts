@@ -66,7 +66,7 @@ interface Child {
  * the DAG view shows it. The call itself is untouched: follow-ups by sessionID,
  * background runs and completion notices stay the host's. A call made inside a
  * child session hangs under that child's node in the same run. Correlation lives
- * in memory, so after a restart a follow-up to an older child starts a new node.
+ * in memory and in the store, so follow-ups retain their original batch after reload.
  */
 export function registerSubagentObserver(ctx: Context, controller: DagController, trace: Trace): Effect.Effect<void, never, Scope.Scope> {
   return Effect.gen(function* () {
@@ -87,7 +87,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       if (stored) children.set(sessionID, stored)
       return stored
     })
-    // A session the DAG scheduler started belongs to its run's owner; its calls join the owner's observed run, labelled with the node.
+    // Verified scheduler lineage selects the source-flow batch, never a parent link across batches.
     const scheduledOf = (sessionID: string) => Effect.gen(function* () {
       const session = yield* ctx.session.get({ sessionID: sessionID as never }).pipe(Effect.catch(() => Effect.succeed(undefined)))
       const metadata = record((session as { metadata?: unknown } | undefined)?.metadata)
@@ -95,7 +95,14 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       const run = yield* controller.lineage(metadata.iolaus_dag_run, metadata.iolaus_dag_node, sessionID)
       if (!run) return undefined
       const parent = yield* childOf(run.ownerSessionID)
-      return { owner: parent?.owner ?? run.ownerSessionID, ...(parent ? { parentNodeID: parent.nodeID } : {}), node: metadata.iolaus_dag_node }
+      return { owner: parent?.owner ?? run.ownerSessionID, runID: run.runID, node: metadata.iolaus_dag_node }
+    })
+    const requestOf = (sessionID: string, messageID: string) => Effect.gen(function* () {
+      const messages = yield* ctx.session.context({ sessionID: sessionID as never }).pipe(Effect.catch(() => Effect.succeed([])))
+      const index = messages.findIndex((message) => message.id === messageID && message.type === "assistant")
+      if (index < 0) return undefined
+      const user = messages.slice(0, index).findLast((message) => message.type === "user")
+      return user?.id
     })
     const attach = (call: Call, sessionID: string, known?: string) => Effect.gen(function* () {
       call.sessionID = sessionID
@@ -120,9 +127,13 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       const observedParent = yield* childOf(caller)
       const scheduled = observedParent ? undefined : yield* scheduledOf(caller)
       const owner = observedParent?.owner ?? scheduled?.owner ?? caller
-      const parentNodeID = observedParent?.nodeID ?? scheduled?.parentNodeID
+      const parentNodeID = observedParent?.nodeID
+      const request = observedParent || scheduled ? undefined : yield* requestOf(caller, String(event.messageID))
+      const batch = scheduled ? { kind: "flow" as const, id: scheduled.runID }
+        : request ? { kind: "request" as const, id: request } : undefined
       const title = scheduled ? `${scheduled.node} › ${described}` : described
       const node = yield* controller.observe({ ownerSessionID: owner, agent, title, prompt: typeof input.prompt === "string" ? input.prompt.slice(0, PROMPT_LIMIT) : "",
+        batch, ...(observedParent ? { runID: observedParent.runID } : {}),
         ...(parentNodeID ? { parentNodeID } : {}), ...(typeof input.sessionID === "string" ? { sessionID: input.sessionID } : {}) })
       const call: Call = { ...node, owner, caller, agent, title }
       calls.set(String(event.id), call)
