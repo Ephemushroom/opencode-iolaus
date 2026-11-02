@@ -150,7 +150,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     }
     context.renderer.requestRender()
   }
-  createEffect(on([selected, width, height, graphContent, detailContent], startReveal))
+  createEffect(on([selected, width, height], startReveal))
   onCleanup(stopReveal)
   createEffect(on(selected, () => detail?.scrollTo(0)))
   onMount(() => {
