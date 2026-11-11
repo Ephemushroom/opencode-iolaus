@@ -121,6 +121,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
   // selected card is in view. The offset is computed here because scrollChildIntoView leaves a card that is exactly
   // as tall as the viewport where it is.
   let revealing = false
+  let deadline = 0
   function reveal() {
     const id = selected(), box = list
     if (!id || !box) return false
@@ -130,28 +131,36 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
     box.scrollTop = revealScroll(before, card.y - box.viewport.y, card.height, box.viewport.height)
     return box.scrollTop !== before
   }
-  function stopReveal() {
+  function stopReveal(reason: "settled" | "scroll" | "timeout" | "closed") {
     if (!revealing) return
     revealing = false
     context.renderer.off("frame", onFrame)
+    trace("iolaus.tui.dialog.reveal.stop", { reason, nodeID: selected() })
   }
   function onFrame() {
+    // A running node's spinner re-renders every tick, so the root is dirty in every frame and the dirty check alone
+    // would keep this loop alive for as long as the flow runs. Then it re-pins the list to the selected card on the
+    // frame after every wheel scroll. The deadline and the scroll handler bound it instead.
+    if (Date.now() > deadline) return stopReveal("timeout")
     try {
       if (reveal() || context.renderer.root.isDirty) return
     } catch (error) {
       trace("iolaus.tui.dialog.reveal.failed", { error: String(error) })
     }
-    stopReveal()
+    stopReveal("settled")
   }
   function startReveal() {
+    deadline = Date.now() + 3000
     if (!revealing) {
       revealing = true
       context.renderer.on("frame", onFrame)
     }
     context.renderer.requestRender()
   }
+  // The user asked for a scroll position, so the reveal stops instead of snapping the list back to the selection.
+  const haltReveal = () => stopReveal("scroll")
   createEffect(on([selected, width, height, graphContent, detailContent], startReveal))
-  onCleanup(stopReveal)
+  onCleanup(() => stopReveal("closed"))
   createEffect(on(selected, () => detail?.scrollTo(0)))
   onMount(() => {
     context.ui.dialog.set({ size: "xlarge", centered: true })
@@ -239,7 +248,7 @@ function DagDialog(props: { readonly sessionID: string; readonly runID: string; 
           <Progress run={value()} context={context} />
         </box>
         <box flexDirection="column" height={panes().graph + panes().detail + 1} flexShrink={0} marginTop={1} gap={1}>
-          <scrollbox ref={(value) => { list = value }} width="100%" height={panes().graph} flexShrink={0} scrollX={false} contentOptions={{ flexDirection: "column" }}>
+          <scrollbox ref={(value) => { list = value }} width="100%" height={panes().graph} flexShrink={0} scrollX={false} contentOptions={{ flexDirection: "column" }} onMouseScroll={haltReveal}>
             <box width="100%" flexDirection="column" flexShrink={0} onSizeChange={function () { setWidth(this.width); setGraphContent(this.height) }}>
             <For each={layers()}>{(wave, index) => {
               const start = () => rowStart(wave.length, cardWidth(), width())

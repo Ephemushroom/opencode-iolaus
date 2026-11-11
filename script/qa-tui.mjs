@@ -165,10 +165,11 @@ const click = (x, y) => {
   keys("-l", `\x1b[<0;${x + 1};${y + 1}m`)
 }
 const SIDEBAR_HEADER = /^\s*Iolaus\s*$/m
-const COMPOSER_STATUS = /Flow plan-review: IOLAUS_TUI_TASK ·/
-const GATE_STATUS = /⏸ Flow plan-review: IOLAUS_TUI_TASK · \d+\/6 · awaiting approval: approve · waiting \d+(?:s|m(?: \d+s)?)/
-// The details dialog is titled with the flow it shows; child session tabs read "Flow · <node>".
-const DIALOG = /Flow · plan-review/
+const COMPOSER_STATUS = /Flow · plan-review: IOLAUS_TUI_TASK ·/
+const GATE_STATUS = /⏸ Flow · plan-review: IOLAUS_TUI_TASK · \d+\/6 · awaiting approval: approve · waiting \d+(?:s|m(?: \d+s)?)/
+// The details dialog is titled with the flow it shows and carries the native "esc close" hint on that row; child
+// session tabs read "Flow · <node>". The composer status line names the same flow but has no close hint.
+const DIALOG = /Flow · plan-review.*esc close/
 const SIDEBAR_MOUNTED = /iolaus\.tui\.sidebar\.mounted/
 const SIDEBAR_UNMOUNTED = /iolaus\.tui\.sidebar\.unmounted/
 const screens = {}
@@ -200,6 +201,26 @@ try {
   await waitFor(/iolaus\.dag\.node\.started.*"nodeID":"plan"/, 30000, "plan node start")
   await sleep(800)
   screens.running = capture("02-running")
+  // A running node's spinner dirties the renderer every tick, so the dialog's reveal loop never settled and re-pinned
+  // the graph to the selected card on the frame after every wheel scroll. Open the dialog while the plan runs, scroll
+  // the graph with the wheel, and the list must keep the position the user asked for.
+  const wheel = (button, x, y) => keys("-l", `\x1b[<${button};${x + 1};${y + 1}M`)
+  keys("C-x"); await sleep(150); keys("d"); await sleep(700)
+  screens.runningDialog = capture("02-dialog-while-running")
+  assert.match(screens.runningDialog, DIALOG, "the dialog must open while a node runs")
+  const cardRow = (screen) => strip(screen).split("\n").findIndex((line) => /[›↑↓] plan\b/.test(line))
+  const beforeWheel = cardRow(screens.runningDialog)
+  assert.ok(beforeWheel >= 0, "the running card must be visible before scrolling")
+  for (let i = 0; i < 3; i++) wheel(65, 40, beforeWheel)
+  await sleep(900)
+  screens.runningDialogScrolled = capture("02-dialog-scrolled")
+  assert.match(readFileSync(tracePath, "utf8"), /iolaus\.tui\.dialog\.reveal\.stop[^\n]*"reason":"scroll"/, "a wheel scroll must end the reveal loop instead of letting it re-pin the graph")
+  await sleep(900)
+  const settled = capture("02-dialog-scrolled-later")
+  assert.equal(cardRow(settled), cardRow(screens.runningDialogScrolled), "the graph must keep the position the wheel asked for")
+  keys("Escape"); await sleep(300)
+  screens.runningAfterScroll = capture("02-after-scroll")
+  assert.doesNotMatch(screens.runningAfterScroll, DIALOG, "Escape must close the dialog after scrolling")
   await waitFor(/iolaus\.dag\.node\.waiting.*"nodeID":"approve"/, 60000, "approve gate")
   await sleep(1200)
   screens.gate = capture("03-gate-waiting")
@@ -434,7 +455,7 @@ assert.match(strip(screens.completed), /✓ execute/, "execute node not shown co
 assert.match(strip(screens.completed), /┃ › execute/, "selecting the next node must scroll its highlighted card into view")
 assert.match(trace, /iolaus\.tui\.open.*"sessionID":"ses_/, "open keybind did not target a child session")
 assert.match(strip(screens.opened), /No active flows/, "child session must not inherit another session's ownership")
-assert.match(strip(screens.returned), /plan-review: IOLAUS_TUI_TASK/, "switching back must reload the owner flow without an event")
+assert.match(strip(screens.returned), /Flow · plan-re.*IOLAUS_TUI_TASK/, "switching back must reload the owner flow without an event")
 const finishedClock = (screen) => strip(screen).match(/done in [0-9hms ]+/)?.[0].trim()
 assert.ok(finishedClock(screens.returned), "completed run must show a fixed duration")
 assert.equal(finishedClock(screens.returnedLater), finishedClock(screens.returned), "completed run clock kept ticking")

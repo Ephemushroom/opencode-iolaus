@@ -1,0 +1,45 @@
+ ⠴ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    Flow · plan-review: IOLAUS_TUI_TASK                                                                      esc close
+                       ⠇ running · 3s  ━━━━━━━━━━━━ 1/4
+     ✓ iolaus_flow [ac
+                                                                 ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓
+     ◈ Instructions up                                           ┃ › plan                     ┃
+                                                                 ┃ Write the plan             ┃
+                                                                 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+                                                                               │                                                           ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+                                                                               ▼                                                          ..OLAUS_TUI_TASK ╎
+                                                                 ╭─ ⠇ Starting ───────────────╮                                           4                ╎
+                                                                 │ ↓ review                 ⚖ │                                           an             ⚖ ╎
+                                                                 │ Review the plan            │                                           n                ╎
+                                                                 ╰────────────────────────────╯                                           lan            ◇ ╎
+                                                                               │                                                          pproved plan     ╎
+                                                                               ▼                                                          ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                 ╭─ · Pending ────────────────╮
+                                                                 │   approve                ◇ │                                            · ctrl+x d
+                                                                 │ Approve the plan           │
+                                                                 ╰────────────────────────────╯
+                                                                               │
+                                                                               ▼
+                                                                 ╭─ · Pending ────────────────╮
+                                                                 │   execute                  │
+                                                                 │ Execute the approved plan  │
+                                                                 ╰────────────────────────────╯
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ✓ plan · Write the plan                                                                                        │
+                       │ Status: Done · agent                                                                                           │
+                       │ Agent: prometheus · Model: openai/gpt-5.5 · Attempt: 1                                                         │
+                       │ Depends on: none (start node)                                                                                  │
+                       │ Unblocks: review                                                                                               │
+                       │                                                                                                                │
+                       │ Result                                                                                                         │
+  ┃                    │ IOLAUS_TUI_PLAN_V1                                                                                             │
+  ┃                    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃
+  ┃  Build · GPT-5.5 O ↑/↓ j/k select · Enter/o open · c cancel flow · PgUp/PgDn details · Esc close
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    /…/qc1…/T/iolaus-tui-qa-mVFruH/project
+

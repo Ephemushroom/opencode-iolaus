@@ -1,0 +1,150 @@
+{
+  "verdict": "PASS",
+  "binary": "/opt/homebrew/bin/opencode",
+  "version": "opencode v2.2.7",
+  "mode": "light",
+  "colors": [
+    {
+      "label": "Iolaus",
+      "mode": "light",
+      "rgb": [
+        26,
+        26,
+        26
+      ],
+      "luminance": 0.010329823029626936
+    },
+    {
+      "label": "No active flows",
+      "mode": "light",
+      "rgb": [
+        138,
+        138,
+        138
+      ],
+      "luminance": 0.25415209433082675
+    },
+    {
+      "label": "No active flows",
+      "mode": "dark",
+      "rgb": [
+        128,
+        128,
+        128
+      ],
+      "luminance": 0.21586050011389923
+    }
+  ],
+  "tracePath": "/Users/Bryan/Programme/Project/AI/opencode-iolaus/.iolaus/evidence/20261111T062230Z-dialog-wheel-scroll/trace.ndjson",
+  "tmuxLog": "/Users/Bryan/Programme/Project/AI/opencode-iolaus/.iolaus/evidence/20261111T062230Z-dialog-wheel-scroll/tmux.log",
+  "nativeTuiLoaded": true,
+  "screens": [
+    "idle",
+    "agents",
+    "running",
+    "runningDialog",
+    "runningDialogScrolled",
+    "runningAfterScroll",
+    "gate",
+    "narrowStatus",
+    "narrowStatusClick",
+    "narrowAfterClick",
+    "wideAgain",
+    "typing",
+    "dialog",
+    "narrowDialog",
+    "escaped",
+    "manualHidden",
+    "manualTyping",
+    "manualShown",
+    "clicked",
+    "previousNode",
+    "reviseNode",
+    "childDuringRun",
+    "ownerDuringRun",
+    "ownerHiddenAfterChild",
+    "ownerShownAfterChild",
+    "reopened",
+    "completed",
+    "opened",
+    "switched",
+    "returned",
+    "returnedLater",
+    "afterClose",
+    "narrowFinished",
+    "hiddenSidebar",
+    "commands",
+    "palette",
+    "afterPalette"
+  ],
+  "nodeOrder": [
+    "plan",
+    "review",
+    "plan1",
+    "review1",
+    "approve",
+    "execute"
+  ],
+  "sidebarPresence": {
+    "owner": {
+      "mounted": 6,
+      "live": 0
+    },
+    "child": {
+      "mounted": 1,
+      "live": 0
+    },
+    "sessions": 2
+  },
+  "requestCount": 19,
+  "realBefore": {
+    "config": "a369f2746813c776fb9c072ecadf36b228c0cb62410be47306ee4ae59f882626",
+    "database": "2c556453aad0c060bae7fb43683a309c928a549f89f5fc7edba5fcb9d351b98a"
+  },
+  "realAfter": {
+    "config": "a369f2746813c776fb9c072ecadf36b228c0cb62410be47306ee4ae59f882626",
+    "database": "2c556453aad0c060bae7fb43683a309c928a549f89f5fc7edba5fcb9d351b98a"
+  },
+  "hostUnchanged": true,
+  "realDatabaseDigestChanged": false,
+  "hostDatabaseUsers": {
+    "before": [
+      2765,
+      15645
+    ],
+    "after": [
+      2765,
+      15645
+    ]
+  },
+  "isolation": {
+    "standalone": true,
+    "home": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home",
+    "config": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/config",
+    "data": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data",
+    "project": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/project",
+    "databasePaths": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db-wal"
+    ],
+    "databasePathsAtEnd": [
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/data/opencode/opencode.db-wal",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db-shm",
+      "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-mVFruH/home/.iolaus/iolaus.db-wal"
+    ]
+  },
+  "cleanup": {
+    "sandboxRemoved": true,
+    "mockClosed": true,
+    "tmuxStopped": true
+  },
+  "sandboxRemoved": true,
+  "omitted": "No provider credentials, auth files, prompts, or inherited secret-bearing environment values were recorded."
+}

@@ -1,0 +1,45 @@
+ ⠙ IOLAUS_TUI_QA_DONE            +
+
+  ┃                                                                                                                     IOLAUS_TUI_QA_DONE
+  ┃  Run a plan-review DAG for IOLAUS_TUI_TASK
+  ┃                                                                                                                     Context
+                                                                                                                        15 tokens
+     ✓ iolaus_flow [action=create]                                                                                      0% used
+                                                                                                                        $0.00 spent
+     ◈ Instructions updated: api/iolaus.state
+                                                                                                                         Iolaus
+     ✓ iolaus_flow [action=snapshot, run_id=a295b8dc-1412-4249-83f7-755d7e8c677a]
+                                                                                                                         ╭╌ ⠼ running · 4s ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+     ◈ Instructions updated: api/iolaus.state                                                                            ╎ Flow · plan-re...OLAUS_TUI_TASK ╎
+                                                                                                                         ╎ ━━━━━━━━━━━━ 1/4                ╎
+                                                                                                                         ╎ ⠼ Review the plan             ⚖ ╎
+                                                                                                                         ╎ ✓ Write the plan                ╎
+                                                                                                                         ╎ · Approve the plan            ◇ ╎
+                                                                                                                         ╎ · Execute the approved plan     ╎
+                                                                                                                         ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+
+                                                                                                                         Click for details · ctrl+x d
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+   ⬝⬝⬝⬝⬝⬝⬝⬝ esc interrupt                                                           15 (0%) · $0.00  ctrl+p commands    /…/qc1…/T/iolaus-tui-qa-mVFruH/project
+
