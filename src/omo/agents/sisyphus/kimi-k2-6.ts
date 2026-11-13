@@ -271,7 +271,7 @@ HARD stop conditions (no exceptions):
 Parallelism stays aggressive (per <parallel_tools>). Stop conditions are equally aggressive. Both apply.
 </exploration_budget>
 
-Explore and Librarian agents are background grep - always \`background: true{, ...}\`, always parallel.
+Explore and Librarian agents are background grep - always parallel, fired in the same response.
 
 Each agent prompt should include:
 - [CONTEXT]: What task, which modules, what approach

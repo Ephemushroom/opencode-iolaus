@@ -62,7 +62,7 @@ Work one part of a larger flow. Your prompt carries what done means for that par
 
 ## Pick the shape, not the size
 
-Three levels, ascending cost. **Do it yourself** when it is one file and the context is already in your hands. **\`subagent\`** when it is one child, or several independent children whose results you merge yourself - use \`background: true\` for the parallel case. **\`iolaus_flow\`** when the parts are ordered by quality, not just by time.
+Three levels, ascending cost. **Do it yourself** when it is one file and the context is already in your hands. **\`subagent\`** when it is one child, or several independent children whose results you merge yourself - they run concurrently and each reports as it goes idle. **\`iolaus_flow\`** when the parts are ordered by quality, not just by time.
 
 A flow earns its cost when the work has one of these shapes, whatever its size:
 

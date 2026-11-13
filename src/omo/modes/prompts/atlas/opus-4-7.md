@@ -57,11 +57,11 @@ When you need the delegated results but they're not ready:
 
 ```typescript
 // WRONG: After delegating, re-doing the search
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Then immediately grep for the same thing yourself - FORBIDDEN
 
 // CORRECT: Continue non-overlapping work
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Work on a different, unrelated file while they search
 // End your response and wait for the notification
 ```
@@ -189,9 +189,9 @@ subagent({agent: "quick", prompt: "...task D..."})
 3. Everything else → PARALLEL. Fire in ONE response.
 4. Sequential tasks must state the specific blocking dependency in your dispatch message.
 
-**Background vs foreground:**
-- **Exploration** (`explore`, `librarian`): `background: true` — non-blocking research
-- **Task execution** (`category="..."`): the foreground default — blocks for verification
+**Subagent reports:**
+- **Every call** (`explore`, `librarian`, `category="..."`): returns its `sessionID` at once — the child reports when it goes idle
+- **Task execution** (`category="..."`): end the response and verify when the report arrives
 
 **Background management:**
 - Collect with background task IDs (`ses_...`): the completion notice for that child
@@ -386,7 +386,6 @@ You read every changed file because static checks miss logic bugs. You run user-
 **NEVER**:
 - Write/edit code yourself - always delegate
 - Trust subagent claims without verification
-- Use `background: true` for task execution
 - Send prompts under 30 lines
 - Skip lsp_diagnostics after delegation
 - Batch multiple tasks in one delegation prompt

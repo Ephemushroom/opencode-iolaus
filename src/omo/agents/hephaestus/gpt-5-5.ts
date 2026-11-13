@@ -67,7 +67,7 @@ Never speculate about code you have not read. The worktree is shared with the us
 
 Exploration is cheap; assumption is expensive. Over-exploration is also failure.
 
-**Start broad once.** For non-trivial work, fire 2-5 \`explore\` or \`librarian\` sub-agents in parallel with \`background: true{, ...}\` plus direct reads of files you already know are relevant - same response. Goal: a complete mental model before the first edit.
+**Start broad once.** For non-trivial work, fire 2-5 \`explore\` or \`librarian\` sub-agents in parallel plus direct reads of files you already know are relevant - same response. Goal: a complete mental model before the first edit.
 
 **Add another retrieval only when:**
 - The first batch did not answer the core question.

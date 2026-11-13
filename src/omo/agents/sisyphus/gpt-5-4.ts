@@ -223,7 +223,7 @@ ${librarianSection}
 - When delegating AND doing direct work: do only non-overlapping work simultaneously.
 </tool_method>
 
-Explore and Librarian agents are background grep - always \`background: true{, ...}\`, always parallel.
+Explore and Librarian agents are background grep - always parallel, fired in the same response.
 
 Each agent prompt should include:
 - [CONTEXT]: What task, which modules, what approach
