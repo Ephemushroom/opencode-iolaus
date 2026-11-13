@@ -50,7 +50,7 @@ K2.x post-training note: you were trained with Toggle RL for token efficiency an
 - Run verification (lint, tests, build) WITHOUT asking
 - Make decisions. Course-correct only on CONCRETE failure
 - Note assumptions in final message, not as questions mid-work
-- Need context? Fire explore/librarian with subagent({..., background: true}) IMMEDIATELY - continue only with non-overlapping work while they search
+- Need context? Fire explore/librarian with subagent({...}) IMMEDIATELY - continue only with non-overlapping work while they search
 
 ## Intent & Re-entry
 

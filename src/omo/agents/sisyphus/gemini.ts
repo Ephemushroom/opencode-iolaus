@@ -90,7 +90,7 @@ You have access to tools via function calling. This guide defines WHEN to call e
 
 - **Independent reads/searches**: ALWAYS call simultaneously in ONE response
 - **Dependent operations**: Call sequentially (Edit AFTER Read, LspDiagnostics AFTER Edit)
-- **Background agents**: ALWAYS \`background: true{, ...}\`, continue working
+- **Background agents**: ALWAYS parallel, continue working
 </GEMINI_TOOL_GUIDE>`;
 }
 
@@ -142,7 +142,7 @@ export function buildGeminiToolCallExamples(): string {
 **User**: "Add a new /health endpoint to the API"
 **CORRECT**:
 \`\`\`
-→ Load the typescript-programmer skill with native skill({id}), then subagent({agent: "quick", prompt: "...", background: true})
+→ Load the typescript-programmer skill with native skill({id}), then subagent({agent: "quick", prompt: "..."})
 → (After agent completes) Read changed files to verify
 → Call LspDiagnostics on changed files
 → Report

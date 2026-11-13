@@ -1,0 +1,50 @@
+ ⠦ SCHEDULER_CHILD_RESULT          Flow · work                   +
+     + 1 tool                                                                                                              ┃                                           ┃
+                                                                                                                           ┃  Iolaus Flow                           x  ┃
+     ◈ Instructions updated: api/iolaus.state                                                                              ┃                                           ┃
+                                                                                                                           ┃  The agent session is not available yet.  ┃
+     NATIVE_CHILD_RESULT                                                                                                   ┃                                           ┃
+                                                                                                                                  0% used
+     Build · GPT-5.5 · 21ms · 1666.7 tok/s · 3ms ttft                                                                             $0.01 spent
+
+     NATIVE_CHILD_RESULT                                                                                                           Iolaus
+
+     Build · GPT-5.5 · 32ms · 2142.9 tok/s · 3ms ttft                                                                              ╭╌ ⠼ running · 3s ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+                                                                                                                                   ╎ Calls · request NXIAEaz4        ╎
+     ◈ Instructions updated: api/iolaus.state                                                                                      ╎ ━━━━━━━━━━━━ 0/1                ╎
+                                                                                                                                               QA on                 ╎
+  ┃                                                                                                                                            ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+  ┃  QA_COMMAND:            Calls · request NXIAEaz4                                                                                 esc close
+  ┃  eyJuYW1lIjoic3ViYWdlbn ⠼ running · 3s  ━━━━━━━━━━━━ 0/1                                                                                    approval · 31s ╌╌╌╌╌╌╮
+  ┃  uSUQiOiJzZXNfZTJhZDY1M                                                                                                                    sion Routing QA       ╎
+  ┃                                                                   ┏━ ⠼ Running ━━━━━━━━━━━━━━━━┓                                           ━━ 2/4                ╎
+                                                                      ┃ › 1-running-qa-on          ┃                                           ble QA              ◇ ╎
+     + 1 tool                                                         ┃ Running QA on              ┃                                           d QA                  ╎
+                                                                      ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                                               ⚖ ╎
+     NATIVE_CHILD_RESULT                                                                                                                       A                     ╎
+                            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     Build · GPT-5.5 · 17ms │ ⠼ 1-running-qa-on · Running QA on                                                                              │
+                            │ Status: Running · agent                                                                                        │
+     NATIVE_CHILD_RESULT    │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 1                                                              │ le Attempt QA
+                            │ Parent call: none (root call)                                                                                  │  in 1s
+     Build · GPT-5.5 · 27ms │ Child calls: none                                                                                              │ quest Mzkn6KnZ
+                            │                                                                                                                │  in 1s
+  ┃                         │ No result yet.                                                                                                 │
+  ┃  QA_COMMAND:            ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯ tails · ctrl+x d
+  ┃  eyJuYW1lIjoic3ViYWdlbn
+  ┃  fUlVOTklOR19RQV9vbiJ9f ↑/↓ j/k select · Enter/o open · c cancel flow · PgUp/PgDn details · Esc close
+  ┃
+                                                                                                                                    ⬖ Getting started                ✕
+     + 1 tool
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 33ms · 2000.0 tok/s · 4ms ttft                                                                                 Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project   ↓ 1 subagent · 15 (0%) · $0.01  ctrl+p commands    /…/iolaus-session-fixes-qpQLQ0/project
+

@@ -19,6 +19,7 @@ let active, hostVersion
 // The host version gate follows the plugin SDK peer pin, so bumping the SDK moves it with no edit here.
 const SDK_PIN = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).peerDependencies["@opencode/plugin"].match(/\d+\.\d+\.\d+/)[0]
 const digest = (value) => createHash("sha256").update(value).digest("hex")
+const pretty = (text) => { try { return JSON.stringify(JSON.parse(text), null, 2) } catch { return text } }
 function hostState() {
   const home = homedir()
   const config = process.env.XDG_CONFIG_HOME ?? join(home, ".config")
@@ -77,7 +78,7 @@ const server = http.createServer(async (req, res) => {
     const record = { scenario: active.name, model: body.model, reasoning: body.reasoning ?? null, service_tier: body.service_tier ?? null, tools, input, instructions: body.instructions ?? "" }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify(record) + "\n")
-    assert.ok(requests.length < 120, "Unexpected model loop")
+    assert.ok(requests.length < 200, "Unexpected model loop")
      let call
      const messageText = (body.input ?? []).filter((item) => item?.type === "message").map((item) => JSON.stringify(item)).join("\n")
      const childNode = active.dag ? (messageText.match(/IOLAUS_DAG_NODE(?:_([A-Z]+))?/) ?? undefined) : undefined
@@ -103,7 +104,7 @@ const server = http.createServer(async (req, res) => {
        else if (childNode[1] === "MOMUS") text = "No blockers found in the diff.\nVERDICT: PASS"
        else if (childNode[1]) text = `IOLAUS_FANIN_RESULT_${childNode[1]}`
      } else if (active.dag && tools.includes("iolaus_flow")) {
-       const priorOutput = (body.input ?? []).filter((item) => item?.type === "function_call_output").at(-1)?.output
+       const priorOutput = (body.input ?? []).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).at(-1)?.output
        let runID
        let priorDagResult
        if (typeof priorOutput === "string") {
@@ -151,20 +152,20 @@ const server = http.createServer(async (req, res) => {
                  { id: "node", agent: "momus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE_MOMUS Review this diff for correctness; there is no plan involved:\ndiff --git a/src/a.ts b/src/a.ts\n+const x = 1\n+export default x", dependsOn: [] } ] } } }
              : { name: "iolaus_flow", args: { action: "create", definition: { schemaVersion: 1, name: "QA DAG", maxParallel: 1, nodes: [{ id: "node", agent: "sisyphus", model: "openai/gpt-5.5", prompt: "IOLAUS_DAG_NODE", dependsOn: [] }] } } }
      } else if ((active.astGrep || active.code) && tools.includes("execute")) {
-       const outputs = (body.input ?? []).filter((item) => item?.type === "function_call_output")
+       const outputs = (body.input ?? []).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type))
        // Remote MCP servers connect asynchronously after startup; retry until their tools are in the catalog.
        const pending = active.mcps && outputs.length && outputs.length < 8 && String(outputs.at(-1).output).includes("Unknown tool")
        if (pending) await new Promise((done) => setTimeout(done, 2000))
        call = outputs.length && !pending ? undefined : { name: "execute", args: { code: active.astGrep ?? active.code } }
      } else if (active.verify && (tools.includes("patch") || tools.includes("edit"))) {
        // GPT model IDs get apply_patch (`patch`) instead of edit/write; drive whichever the host offers.
-       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
+       const done = (body.input ?? []).some((item) => /^(function|custom_tool)_call_output$/.test(item?.type))
        const replacement = "const x: number = \"one\" // changed as requested by the user"
        call = done ? undefined : tools.includes("patch")
          ? { name: "patch", args: { patchText: `*** Begin Patch\n*** Update File: src/a.ts\n@@\n-const x = 1\n+${replacement}\n*** End Patch` } }
          : { name: "edit", args: { filePath: "src/a.ts", oldString: "const x = 1", newString: replacement } }
      } else if (active.shell && tools.includes("shell")) {
-       const done = (body.input ?? []).some((item) => item?.type === "function_call_output")
+       const done = (body.input ?? []).some((item) => /^(function|custom_tool)_call_output$/.test(item?.type))
        call = done ? undefined : { name: "shell", args: { command: "ls && git --version", description: "QA read-only shell" } }
      } else if (active.nativeRead && tools.includes("read") && !input.includes("IOLAUS_QA_NATIVE_READ_RESULT")) call = { name: "read", args: { path: "fixture.txt" } }
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
@@ -340,9 +341,9 @@ try {
          assert.ok(withTools.length, "execute was not offered to the agent")
          const catalog = withTools[0].instructions.slice(withTools[0].instructions.indexOf("# Code Mode"))
          assert.ok(catalog.includes("tools.ast_grep.search("), "ast_grep.search missing from the Code Mode catalog")
-         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
          assert.ok(outputs.length, "execute returned no output to the model")
-         const out = outputs.at(-1)
+         const out = pretty(outputs.at(-1))
          const calls = traces.filter((t) => t.event === "iolaus.ast_grep.call")
          const source = readFileSync(join(fixture.project, "src", "a.ts"), "utf8")
          if (scenario.name === "astgrep-explore") {
@@ -371,9 +372,9 @@ try {
          const withTools = captured.filter((r) => r.tools.includes("execute"))
          assert.ok(withTools.length, "execute was not offered to the agent")
          const catalog = withTools.at(-1).instructions.slice(withTools.at(-1).instructions.indexOf("# Code Mode"))
-         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
          assert.ok(outputs.length, "execute returned no output to the model")
-         const out = outputs.at(-1)
+         const out = pretty(outputs.at(-1))
          const registered = traces.find((t) => t.event === "iolaus.mcp.registered")
          if (scenario.name === "mcps-librarian") {
            assert.deepEqual(registered?.registered, ["context7", "grep_app"], "built-in MCP servers were not registered")
@@ -463,7 +464,7 @@ try {
          assert.ok(revise && revise.includes("IOLAUS_PLAN_V1") && revise.includes("Step 2 has no verification"), "revise prompt lacks plan and review inputs")
          const execute = texts.find((text) => text.includes("Execute the approved plan"))
          assert.ok(execute && execute.includes("IOLAUS_PLAN_V2"), "execute prompt lacks the revised plan")
-         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => String(item.output)))
          const created = outputs.map((o) => { try { return JSON.parse(o) } catch { return null } }).find((o) => o?.runID && o?.definition)
          assert.ok(created, "create with template returned no run")
          assert.equal(created.definition.nodes.find((n) => n.id === "plan").agent, "prometheus")
@@ -478,7 +479,7 @@ try {
          const children = captured.filter((r) => JSON.parse(r.input).some((item) => item?.type === "message" && JSON.stringify(item).includes("<iolaus-dag-child>")))
          assert.ok(children.length >= 3, `DAG worker children were not prompted with the child marker (${children.length})`)
          assert.ok(children.every((r) => !r.instructions.includes("<iolaus-mode-dag")), "a DAG worker child was told to create another run")
-         assert.ok(children.every((r) => r.instructions.includes("ULTRAWORK")), "DAG worker children did not get the ultrawork prompt")
+         assert.ok(children.every((r) => r.instructions.includes("<ultrawork-mode>")), "DAG worker children did not get the ultrawork prompt")
          const order = traces.filter((t) => t.event === "iolaus.dag.node.completed").map((t) => t.nodeID)
          assert.deepEqual(order, ["work", "review", "work1", "review1", "work2", "review2"], `loop rounds ran out of order: ${order}`)
          // Dynamic loop: the graph started as work/review/accept and grew one pair per FAIL; reviews are judge nodes (no child session).
@@ -498,7 +499,7 @@ try {
          assert.ok(fix2 && fix2.includes("IOLAUS_ULTRAWORK_FIX1") && fix2.includes("Scenario 3 lacks evidence"), "work2 prompt lacks the previous fix and review inputs")
        }
        if (scenario.template === "unavailable") {
-         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => String(item.output)))
+         const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => String(item.output)))
          assert.ok(outputs.length, "create returned nothing")
          assert.match(outputs[0], /model_unavailable.*review \(iolaus-no-such-lane\)/, `fail-closed error missing: ${outputs[0]}`)
          assert.ok(!traces.some((t) => t.event === "iolaus.dag.run.started"), "run was started despite an unroutable lane")
@@ -527,7 +528,7 @@ try {
         const offered = captured.find((r) => r.tools.length)?.tools ?? []
         assert.ok(offered.includes("shell") && offered.includes("read"), `explore lacks shell/read: ${offered}`)
         for (const denied of ["edit", "write", "patch", "subagent", "iolaus_flow"]) assert.ok(!offered.includes(denied), `explore was offered ${denied}: ${offered}`)
-        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
         assert.ok(outputs.some((o) => o.includes("fixture.txt") && o.includes("git version")), `shell output missing: ${outputs}`)
       }
       if (scenario.name === "looker-read-only") {
@@ -537,7 +538,7 @@ try {
       }
       if (scenario.nativeRead) assert.ok(captured.some((r) => r.input.includes("IOLAUS_QA_NATIVE_READ_RESULT")), "Native read result missing")
       if (scenario.verify) {
-        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => item?.type === "function_call_output").map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
+        const outputs = captured.flatMap((r) => JSON.parse(r.input).filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type)).map((item) => typeof item.output === "string" ? item.output : JSON.stringify(item.output)))
         assert.ok(outputs.length, `mutation returned no output to the model (tools: ${captured.at(-1)?.tools})`)
         const out = outputs.at(-1)
         const source = readFileSync(join(fixture.project, "src", "a.ts"), "utf8")

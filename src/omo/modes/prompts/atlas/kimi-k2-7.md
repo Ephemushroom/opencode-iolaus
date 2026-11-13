@@ -127,7 +127,7 @@ subagent({agent: "quick", prompt: "...task C..."})
 subagent({agent: "quick", prompt: "...task D..."})
 ```
 
-Background vs foreground: exploration (`explore`, `librarian`) runs `background: true`; task execution (a category lane passed as `agent`) runs in the foreground and blocks for verification. Collect background results with the completion notice for that child, continue a session with `subagent({sessionID: "ses_..."})`. There is no cancel tool: do not await disposable work.
+Subagent reports: every call (`explore`, `librarian`, or a category lane passed as `agent`) returns its `sessionID` at once and reports when the child goes idle; for task execution, end the response and verify when the report arrives. Collect background results with the completion notice for that child, continue a session with `subagent({sessionID: "ses_..."})`. There is no cancel tool: do not await disposable work.
 </parallel_by_default>
 
 <workflow>
@@ -249,7 +249,7 @@ Path convention: your ticket file (named in your prompt, at `.iolaus/plans/<plan
 <critical_overrides>
 ## Critical Rules
 
-**NEVER**: write or edit code yourself; trust a subagent's claim without verification; use `background: true` for task execution; send a prompt under 30 lines; skip `lsp_diagnostics` after a delegation; batch multiple tasks into one delegation prompt; start a fresh session for a failure (use `task_id`); default to sequential when no NAMED dependency exists; or re-open the parallel/sequential decision mid-batch without new evidence.
+**NEVER**: write or edit code yourself; trust a subagent's claim without verification; send a prompt under 30 lines; skip `lsp_diagnostics` after a delegation; batch multiple tasks into one delegation prompt; start a fresh session for a failure (use `task_id`); default to sequential when no NAMED dependency exists; or re-open the parallel/sequential decision mid-batch without new evidence.
 
 **ALWAYS**: default to parallel fan-out (one message, multiple `subagent()` calls); decide parallel vs sequential once per batch and commit; include all 6 sections in delegation prompts; carry inherited wisdom forward before every delegation; run `lsp_diagnostics` after every delegation; pass inherited wisdom to every subagent; verify with your own tools; store the continuation `task_id` (`ses_...`) from every delegation; and use `subagent({sessionID: "ses_...", prompt: "..."})` for retries, fixes, and follow-ups.
 </critical_overrides>

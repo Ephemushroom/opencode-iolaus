@@ -2,6 +2,7 @@ import { Cause, Effect, Stream, type Scope } from "effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { DagController } from "./controller"
 import { assistantText } from "./runner"
+import { createQuiescence } from "./quiesce"
 
 type Trace = (event: string, data?: Record<string, unknown>) => void
 
@@ -67,10 +68,13 @@ interface Child {
  * background runs and completion notices stay the host's. A call made inside a
  * child session hangs under that child's node in the same run. Correlation lives
  * in memory and in the store, so follow-ups retain their original batch after reload.
+ * The tool returns at once, so a node settles from its child session: when the child
+ * and the subagents below it are idle, and again each time a settled child runs anew.
  */
 export function registerSubagentObserver(ctx: Context, controller: DagController, trace: Trace): Effect.Effect<void, never, Scope.Scope> {
   return Effect.gen(function* () {
     const calls = new Map<string, Call>()
+    const quiescence = createQuiescence(ctx.session)
     const children = new Map<string, Child>()
     const safe = (what: string) => <A, E, R>(effect: Effect.Effect<A, E, R>) => effect.pipe(Effect.asVoid,
       Effect.catchCause((cause) => Effect.sync(() => trace("iolaus.subagent.observe-failed", { what, cause: Cause.pretty(cause).slice(0, 500) }))))
@@ -138,7 +142,7 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       const call: Call = { ...node, owner, caller, agent, title }
       calls.set(String(event.id), call)
       if (typeof input.sessionID === "string") yield* attach(call, input.sessionID)
-      trace("iolaus.subagent.observed", { owner, runID: node.runID, nodeID: node.nodeID, agent, nested: observedParent !== undefined, ...(scheduled ? { scheduledNode: scheduled.node } : {}), background: input.background === true })
+      trace("iolaus.subagent.observed", { owner, runID: node.runID, nodeID: node.nodeID, agent, nested: observedParent !== undefined, ...(scheduled ? { scheduledNode: scheduled.node } : {}) })
     }).pipe(safe("before")))
 
     yield* ctx.tool.hook("execute.after", (event) => event.tool !== "subagent" ? Effect.void : Effect.gen(function* () {
@@ -165,13 +169,15 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
       const child = children.get(sessionID)
       if (!child) return
       if (type === "session.execution.succeeded") {
+        // A child that left subagents running reports again when they wake it; until then its answer is not final.
+        yield* quiescence.settle(sessionID).pipe(Effect.catchCause((cause) => Effect.sync(() => trace("iolaus.subagent.observe-failed", { what: "quiesce", cause: Cause.pretty(cause).slice(0, 500) }))))
         const messages = (yield* ctx.session.context({ sessionID: sessionID as never })) as readonly unknown[]
         const model = modelOf(record([...messages].reverse().find((message) => record(message).type === "assistant")).model)
         yield* controller.observed(child.runID, child.nodeID, { status: "completed", text: assistantText(messages), ...(model ? { model } : {}) })
       } else yield* controller.observed(child.runID, child.nodeID, type === "session.execution.interrupted" ? { status: "interrupted", error: "The subagent session was interrupted" } : { status: "failed", error: failure ?? "The subagent session failed" })
     })
 
-    yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: ["session.created", "session.execution.succeeded", "session.execution.failed", "session.execution.interrupted"] }), (event) => {
+    yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: ["session.created", "session.execution.started", "session.execution.succeeded", "session.execution.failed", "session.execution.interrupted"] }), (event) => {
       const data = record((event as { data?: unknown }).data)
       const sessionID = typeof data.sessionID === "string" ? data.sessionID : undefined
       if (!sessionID) return Effect.void
@@ -180,6 +186,11 @@ export function registerSubagentObserver(ctx: Context, controller: DagController
         const candidates = [...calls.values()].filter((call) => call.caller === data.parentID && call.sessionID === undefined && (data.agent === undefined || call.agent === data.agent))
         const call = candidates.find((candidate) => candidate.title === data.title) ?? candidates[0]
         return call ? attach(call, sessionID, modelOf(data.model)).pipe(safe("created")) : Effect.void
+      }
+      if (event.type === "session.execution.started") {
+        // A settled child that runs again (its own background work woke it, or someone prompted it) has a newer answer coming.
+        const child = children.get(sessionID)
+        return child ? controller.observed(child.runID, child.nodeID, { status: "running", woke: true }).pipe(safe("woke")) : Effect.void
       }
       if (event.type === "session.execution.succeeded" || event.type === "session.execution.failed" || event.type === "session.execution.interrupted") {
         return Effect.forkScoped(settle(sessionID, event.type, subagentFailure(data)).pipe(safe("settle"))).pipe(Effect.asVoid)

@@ -148,7 +148,7 @@ ${KIMI_TOOL_LOOP_GUARD}
 
 Budget the search to the task: a clear single target is zero to two calls; a known domain with an unclear location is one parallel wave plus synthesis; a genuinely open question may take a few waves. Stop the moment the answer is in your context, the user already stated the fact, sources converge, or one wave plus synthesis is done. Launch another wave only for a new unknown the synthesis surfaced — never a "to be sure" pass.
 
-Fire explore and librarian children in the background (\`background: true{, ...}\`), always in parallel. Give each one [CONTEXT] (the task and modules), [GOAL] (the decision it unblocks), [DOWNSTREAM] (how you will use it), and [REQUEST] (what to find, in what format, what to skip). After firing, either do non-overlapping work or end your turn; read a child's result only after its completion notice arrives, never before. There is no cancel tool: do not await disposable work. Continue a child's session with \`subagent({sessionID: "ses_..."})\`.
+Fire explore and librarian children in the background, always in parallel. Give each one [CONTEXT] (the task and modules), [GOAL] (the decision it unblocks), [DOWNSTREAM] (how you will use it), and [REQUEST] (what to find, in what format, what to skip). After firing, either do non-overlapping work or end your turn; read a child's result only after its completion notice arrives, never before. There is no cancel tool: do not await disposable work. Continue a child's session with \`subagent({sessionID: "ses_..."})\`.
 
 ${buildAntiDuplicationSection()}
 </exploration>`;

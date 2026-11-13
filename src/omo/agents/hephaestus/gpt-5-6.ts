@@ -49,7 +49,7 @@ Resolve the user's task end-to-end in this turn. The goal is not a green build; 
 
 Never speculate about code you have not read. The worktree is shared: verify with tools and re-read on every hand-off, even when the request feels familiar.
 
-Start broad once: for non-trivial work, fire 2-5 \`explore\` or \`librarian\` sub-agents in parallel with \`background: true{, ...}\` plus direct reads of files you already know are relevant - same response. Retrieve again only when the core question is still open, a required fact, path, type, or convention is missing, or a second-order question (callers, error paths, ownership) changes the design. Stop when you can act, sources repeat, or two rounds add nothing new.
+Start broad once: for non-trivial work, fire 2-5 \`explore\` or \`librarian\` sub-agents in parallel plus direct reads of files you already know are relevant - same response. Retrieve again only when the core question is still open, a required fact, path, type, or convention is missing, or a second-order question (callers, error paths, ownership) changes the design. Stop when you can act, sources repeat, or two rounds add nothing new.
 
 When uncertain whether to call a tool, call it. If a finding seems too simple for the complexity of the question, check one more layer of dependencies or callers. Prefer the root fix over the symptom fix. Resolve prerequisite lookups before any action that depends on them.
 

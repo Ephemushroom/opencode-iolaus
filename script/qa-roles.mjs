@@ -37,6 +37,8 @@ function hostState() {
 const before = hostState()
 
 const requests = []
+/** Model requests parked until the QA releases them, with the session that made them. */
+const holds = new Map()
 let active = ""
 let continuationTargets
 const PLAN = "*** Begin Patch\n*** Add File: .iolaus/plans/cache/spec.md\n+# Cache\n+Problem: x is wrong. Solution: set x to 2 and add b.\n*** Add File: .iolaus/plans/cache/tickets/01-set-x.md\n+# 01: Set x\n+\n+**Blocked by:** None\n+\n+- [ ] x is 2\n*** Add File: .iolaus/plans/cache/tickets/02-add-b.md\n+# 02: Add b\n+\n+**Blocked by:** 01\n+\n+- [ ] src/b.ts exists\n*** End Patch"
@@ -45,9 +47,9 @@ const sleep = (ms) => new Promise((done) => setTimeout(done, ms))
 const tierGraph = (agent, model = "openai/gpt-5.5") => ({ schemaVersion: 1, name: "tier QA", nodes: [{ id: "work", agent, model, prompt: "TIER_FORBIDDEN_WORK", dependsOn: [] }] })
 
 /** Scripted replies: returns { call } or { text } for the request, per scenario and per session role. */
-async function reply(body, instructions, input) {
+async function reply(body, instructions, input, session) {
   const items = body.input ?? []
-  const outs = items.filter((item) => item?.type === "function_call_output")
+  const outs = items.filter((item) => /^(function|custom_tool)_call_output$/.test(item?.type))
   const last = items.at(-1)
   const lastOut = String(outs.at(-1)?.output ?? "")
   const first = JSON.stringify(items.find((item) => item?.type === "message" && item.role === "user") ?? "")
@@ -62,30 +64,41 @@ async function reply(body, instructions, input) {
     return outs.length ? { text: "CONSULT_DONE" } : { call: { name: "shell", args: { command: "ls", description: "consult" } } }
   }
   if (active === "observe-dag") {
-    if (first.includes("OBS_DAG_NESTED")) return { text: "OBS_DAG_NESTED_DONE" }
-    if (first.includes("OBS_DAG_CHILD")) return outs.length ? { text: "OBS_DAG_CHILD_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "dag nested", prompt: "OBS_DAG_NESTED" } } }
+    // The node's subagent outlives the node's turn: the node goes idle with an interim reply and is woken by the report.
+    if (first.includes("OBS_DAG_NESTED")) { await sleep(1500); return { text: "OBS_DAG_NESTED_DONE" } }
+    if (first.includes("OBS_DAG_CHILD")) return !outs.length ? { call: { name: "subagent", args: { agent: "general", description: "dag nested", prompt: "OBS_DAG_NESTED" } } }
+      : { text: input.includes("OBS_DAG_NESTED_DONE") ? "OBS_DAG_CHILD_DONE" : "OBS_DAG_CHILD_WAITING" }
     const runID = lastOut.match(/"runID"\s*:\s*"([0-9a-f-]{36})"/)?.[1]
     if (!outs.length) return { call: { name: "iolaus_flow", args: { action: "create", definition: { ...tierGraph("sisyphus"), nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "OBS_DAG_CHILD" }] } } } }
     return outs.length === 1 && runID ? { call: { name: "iolaus_flow", args: { action: "wait", run_id: runID } } } : { text: "OBS_DAG_PARENT_DONE" }
   }
+  if (active === "cancel-tree") {
+    if (first.includes("CANCEL_SUB")) { await new Promise((done) => holds.set("cancel-sub", { done, session })); return { text: "CANCEL_SUB_DONE" } }
+    if (first.includes("CANCEL_NODE")) return outs.length ? { text: "CANCEL_NODE_WAITING" } : { call: { name: "subagent", args: { agent: "general", description: "held", prompt: "CANCEL_SUB" } } }
+    return outs.length ? { text: "CANCEL_OWNER_DONE" }
+      : { call: { name: "iolaus_flow", args: { action: "create", definition: { ...tierGraph("sisyphus"), name: "cancel QA", nodes: [{ ...tierGraph("sisyphus").nodes[0], prompt: "CANCEL_NODE" }] } } } }
+  }
   if (active === "observe") {
-    const lastUser = JSON.stringify([...items].reverse().find((item) => item?.type === "message" && item.role === "user") ?? "")
-    if (first.includes("OBS_NESTED")) return { text: "OBS_NESTED_DONE" }
-    if (first.includes("OBS_BG")) { await sleep(1500); return { text: "OBS_BG_DONE" } }
-    if (first.includes("OBS_FG")) {
+    // 2.3.0: every call returns at once; a child's answer arrives later as a <subagent> report that wakes its caller.
+    const lastUser = JSON.stringify([...items].reverse().find((item) => item?.type === "message" && item.role === "user" && !JSON.stringify(item).includes("<subagent ")) ?? "")
+    const reported = (text) => new RegExp(`<subagent sessionID=\\\\"ses_\\w+\\\\" state=\\\\"completed\\\\"[^>]*>\\\\n${text}`).test(input)
+    if (first.includes("OBS_NESTED")) { await sleep(1500); return { text: "OBS_NESTED_DONE" } }
+    if (first.includes("OBS_SCAN")) { await sleep(1500); return { text: "OBS_SCAN_DONE" } }
+    if (first.includes("OBS_CHECK")) {
       if (lastUser.includes("OBS_FOLLOW")) return { text: "OBS_FOLLOW_DONE" }
-      return outs.length ? { text: "OBS_FG_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "nested", prompt: "OBS_NESTED" } } }
+      if (!outs.length) return { call: { name: "subagent", args: { agent: "general", description: "nested", prompt: "OBS_NESTED" } } }
+      return { text: reported("OBS_NESTED_DONE") ? "OBS_CHECK_DONE" : "OBS_CHECK_WAITING" }
     }
     if (first.includes("OBS_REFUSED")) {
       return outs.length ? { text: "OBS_REFUSED_DONE" } : { call: { name: "subagent", args: { agent: "general", description: "no tool", prompt: "OBS_NEVER" } } }
     }
-    const fg = outs[1] ? String(outs[1].output).match(/sessionID="(ses_\w+)"/)?.[1] : undefined
-    if (outs.length === 0) return { call: { name: "subagent", args: { agent: "general", description: "bg scan", prompt: "OBS_BG", background: true } } }
-    if (outs.length === 1) return { call: { name: "subagent", args: { agent: "metis", description: "fg check", prompt: "OBS_FG" } } }
-    if (outs.length === 2) return fg ? { call: { name: "subagent", args: { agent: "metis", description: "fg check", sessionID: fg, prompt: "OBS_FOLLOW" } } } : { text: "NO_FG" }
-    if (outs.length === 3) return { call: { name: "subagent", args: { agent: "general", description: "refused nest", prompt: "OBS_REFUSED" } } }
-    await sleep(2500)
-    return { text: "OBS_PARENT_DONE" }
+    const check = outs[1] ? String(outs[1].output).match(/\(sessionID: (ses_\w+)\)/)?.[1] : undefined
+    if (outs.length === 0) return { call: { name: "subagent", args: { agent: "general", description: "scan", prompt: "OBS_SCAN" } } }
+    if (outs.length === 1) return { call: { name: "subagent", args: { agent: "metis", description: "check", prompt: "OBS_CHECK" } } }
+    if (outs.length === 2) return !reported("OBS_CHECK_DONE") ? { text: "OBS_PARENT_WAITING" }
+      : check ? { call: { name: "subagent", args: { agent: "metis", description: "check", sessionID: check, prompt: "OBS_FOLLOW" } } } : { text: "NO_CHECK" }
+    if (outs.length === 3) return reported("OBS_FOLLOW_DONE") ? { call: { name: "subagent", args: { agent: "general", description: "refused nest", prompt: "OBS_REFUSED" } } } : { text: "OBS_PARENT_WAITING" }
+    return { text: reported("OBS_REFUSED_DONE") && reported("OBS_SCAN_DONE") ? "OBS_PARENT_DONE" : "OBS_PARENT_WAITING" }
   }
   if (active.startsWith("tier")) {
     const request = first.match(/TIER_CASE:([A-Za-z0-9_-]+)/)?.[1]
@@ -180,7 +193,15 @@ async function reply(body, instructions, input) {
     case "goal": {
       const rounds = input.split("Continue working toward the active session goal").length - 1
       if (rounds === 0) return outs.length ? { text: "STEP_ONE" } : { call: { name: "read", args: { path: "fixture.txt" } } }
-      return last?.type === "function_call_output" ? { text: "GOAL_DONE" } : { call: { name: "update_goal", args: { status: "complete" } } }
+      return /^(function|custom_tool)_call_output$/.test(last?.type) ? { text: "GOAL_DONE" } : { call: { name: "update_goal", args: { status: "complete" } } }
+    }
+    case "goal-wait": {
+      if (first.includes("GOAL_SUB_SCAN")) { await sleep(2500); return { text: "GOAL_SUB_DONE" } }
+      const rounds = input.split("Continue working toward the active session goal").length - 1
+      if (rounds === 0) return !outs.length ? { call: { name: "subagent", args: { agent: "general", description: "goal scan", prompt: "GOAL_SUB_SCAN" } } }
+        : { text: input.includes("GOAL_SUB_DONE") ? "GOAL_REPORT_READ" : "GOAL_DELEGATED" }
+      // The subagent call is the first output; the second is update_goal's. A state notice may follow it, so count outputs rather than read the last item.
+      return outs.length > 1 ? { text: "GOAL_WAIT_DONE" } : { call: { name: "update_goal", args: { status: "complete" } } }
     }
     default: return { text: `DONE_${active}` }
   }
@@ -211,14 +232,14 @@ const mock = http.createServer(async (req, res) => {
     // Host 2.0.24 sends the session's own ID in x-opencode-session-id and its root (parentID ?? id, for cache affinity)
     // in x-opencode-session; 2.0.20 sent the session itself in x-opencode-session; older hosts put it in the instructions.
     const session = req.headers["x-opencode-session-id"] ?? req.headers["x-opencode-session"] ?? instructions.match(/session ID: (ses_\w+)/)?.[1] ?? null
-    const result = await reply(body, instructions, input)
+    const result = await reply(body, instructions, input, session)
     const record = { scenario: active, session, model: body.model, tools: (body.tools ?? []).map((t) => t.name), call: result.call ?? null, text: result.text ?? null,
-      outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),
+      outputs: (body.input ?? []).filter((i) => /^(function|custom_tool)_call_output$/.test(i?.type)).map((i) => String(i.output).slice(0, 400)),
       roles: ["<iolaus-planner>", "<iolaus-atlas>", "<iolaus-goal-loop>", "<iolaus-mode-dag template=\"ultrawork\">", "You are Hephaestus", "Sisyphus Junior"].filter((m) => instructions.includes(m)),
-      input: input.slice(0, 6000) }
+      input: input.slice(0, 20000) }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), `${JSON.stringify({ ...record, input: undefined })}\n`)
-    assert.ok(requests.length < 200, "Unexpected model loop")
+    assert.ok(requests.length < 260, "Unexpected model loop")
     res.writeHead(200, { "content-type": "text/event-stream" })
     for (const event of sse(`qa_${requests.length}`, result)) res.write(`data: ${JSON.stringify(event)}\n\n`)
     res.end("data: [DONE]\n\n")
@@ -330,13 +351,43 @@ try {
     const scheduled = (await snapshot(id)).runs.find((r) => r.name === "tier QA")
     assert.equal(scheduled?.status, "completed", `scheduled run: ${JSON.stringify(scheduled)}`)
     const child = scheduled.nodes[0].sessionID
+    // The node went idle while its subagent worked; its result is the reply it gave after the report, not the interim one.
+    assert.match(scheduled.nodes[0].result, /OBS_DAG_CHILD_DONE/, `node result: ${scheduled.nodes[0].result}`)
+    assert.deepEqual(requests.filter((r) => r.scenario === "observe-dag" && r.session === child).map((r) => r.text).filter(Boolean), ["OBS_DAG_CHILD_WAITING", "OBS_DAG_CHILD_DONE"])
     assert.deepEqual(observed.nodes.map((n) => [n.id, n.title, n.status, n.dependsOn]), [["1-work-dag-nested", "work › dag nested", "completed", []]])
     assert.match(observed.nodes[0].result, /OBS_DAG_NESTED_DONE/)
     assert.ok(!(await snapshot(child)).runs.some((r) => r.name === "Subagent calls"), "the DAG child got its own observed run")
     assert.ok(traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id && t.scheduledNode === "work"), "scheduled-node trace missing")
   })
 
-  await check("native subagent calls appear as an observed DAG run: background, foreground, nested and a follow-up", async () => {
+  await check("cancelling a run stops the subagents its node left running", async () => {
+    active = "cancel-tree"
+    const id = await create("sisyphus")
+    await api("POST", `/api/session/${id}/prompt`, { text: "CANCEL_PARENT" })
+    await finished(id, "CANCEL_OWNER_DONE")
+    const snapshot = async () => (await api("POST", `/api/rpc/iolaus-dag/snapshot?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID: id } })).output
+    const info = async (sessionID) => (await api("GET", `/api/session/${sessionID}`)).data
+    const executing = (session) => (session.time.busy ?? 0) > (session.time.idle ?? 0)
+    const held = await until(() => holds.get("cancel-sub"), "held subagent request")
+    const node = await until(() => requests.find((r) => r.scenario === active && r.text === "CANCEL_NODE_WAITING"), "node's interim reply")
+    await sleep(700)
+    const before = (await snapshot()).runs.find((r) => r.name === "cancel QA")
+    // The node's session is idle, its subagent is not: the node is not done.
+    assert.deepEqual([before.status, before.nodes[0].status, before.nodes[0].sessionID], ["running", "running", node.session])
+    assert.ok(executing(await info(held.session)) && !executing(await info(node.session)), "expected an idle node session above a working subagent")
+    await api("POST", `/api/rpc/iolaus-dag/action?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID: id, action: "cancel", runID: before.runID, generation: before.generation } })
+    await until(async () => (await info(held.session)).outcome === "interrupted", "subagent interrupted by the cancel", 20000)
+    await sleep(1500)
+    const [sub, parent] = [await info(held.session), await info(node.session)]
+    assert.ok(!executing(sub) && !executing(parent), `sessions still executing after cancel: ${JSON.stringify([sub.time, parent.time])}`)
+    const after = await snapshot()
+    assert.equal(after.runs.find((r) => r.runID === before.runID).status, "cancelled")
+    assert.equal(after.runs.find((r) => r.name === "Subagent calls").nodes[0].status, "interrupted")
+    assert.ok(!requests.some((r) => r.scenario === active && r.text === "CANCEL_SUB_DONE"), "the cancelled subagent finished its turn")
+    held.done(); holds.delete("cancel-sub")
+  })
+
+  await check("native subagent calls appear as an observed DAG run: parallel, nested, a follow-up and a refused call", async () => {
     active = "observe"
     const id = await create("sisyphus")
     await api("POST", `/api/session/${id}/prompt`, { text: "OBS_PARENT" })
@@ -344,25 +395,30 @@ try {
     const snapshot = async () => (await api("POST", `/api/rpc/iolaus-dag/snapshot?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID: id } })).output
     const run = await until(async () => (await snapshot()).runs.find((r) => r.name === "Subagent calls" && !r.nodes.some((n) => n.status === "running")), "observed run to settle", 30000)
     const nodes = Object.fromEntries(run.nodes.map((n) => [n.id, n]))
-    assert.deepEqual(Object.keys(nodes).sort(), ["1-bg-scan", "2-fg-check", "3-nested", "4-refused-nest", "5-no-tool"], `observed nodes: ${Object.keys(nodes)}`)
-    const ran = ["1-bg-scan", "2-fg-check", "3-nested", "4-refused-nest"].map((n) => nodes[n])
+    assert.deepEqual(Object.keys(nodes).sort(), ["1-scan", "2-check", "3-nested", "4-refused-nest", "5-no-tool"], `observed nodes: ${Object.keys(nodes)}`)
+    const ran = ["1-scan", "2-check", "3-nested", "4-refused-nest"].map((n) => nodes[n])
     assert.ok(ran.every((n) => n.status === "completed" && n.sessionID?.startsWith("ses_") && n.model === model), JSON.stringify(run.nodes.map((n) => [n.id, n.status, n.sessionID, n.model])))
     // `general` has no subagent tool here, so the host refuses its nested call before running it: recorded as failed, not left running.
     assert.equal(nodes["5-no-tool"].status, "failed", `refused call: ${JSON.stringify(nodes["5-no-tool"])}`)
     assert.deepEqual(nodes["5-no-tool"].dependsOn, ["4-refused-nest"])
     assert.equal(run.status, "failed")
-    assert.deepEqual(nodes["3-nested"].dependsOn, ["2-fg-check"], "nested call is not under its caller")
-    assert.equal(nodes["2-fg-check"].attempt, 2, "follow-up did not reopen the node")
-    assert.match(nodes["2-fg-check"].result, /OBS_FOLLOW_DONE/)
-    assert.match(nodes["1-bg-scan"].result, /OBS_BG_DONE/, "background child's result was not recorded")
+    assert.deepEqual(nodes["3-nested"].dependsOn, ["2-check"], "nested call is not under its caller")
+    assert.equal(nodes["2-check"].attempt, 2, "follow-up did not reopen the node")
+    assert.match(nodes["2-check"].result, /OBS_FOLLOW_DONE/)
+    assert.match(nodes["1-scan"].result, /OBS_SCAN_DONE/, "child's result was not recorded")
+    // The check child went idle while its own subagent worked; its node settled with the reply it gave after that report, not the interim one.
+    const checkReplies = requests.filter((r) => r.scenario === "observe" && r.session === nodes["2-check"].sessionID).map((r) => r.text).filter(Boolean)
+    assert.deepEqual(checkReplies, ["OBS_CHECK_WAITING", "OBS_CHECK_DONE", "OBS_FOLLOW_DONE"], `check child replies: ${checkReplies}`)
+    const settles = traces().filter((t) => t.event === "iolaus.dag.node.completed" && t.runID === run.runID && t.nodeID === "2-check").length
+    assert.equal(settles, 2, `the check node must settle once per attempt, not on its interim idle: ${settles}`)
     assert.match(nodes["3-nested"].result, /OBS_NESTED_DONE/)
     assert.ok(traces().some((t) => t.event === "iolaus.subagent.observed" && t.owner === id && t.nested), "nested call trace missing")
     assert.ok(traces().some((t) => t.event === "iolaus.subagent.followed" && t.owner === id), "follow-up trace missing")
-    // Native behaviour is untouched: the follow-up reached the same child, the background call returned at once.
+    // Native behaviour is untouched: every call returned at once, the follow-up reached the same child, answers came as reports.
     const parentOutputs = of(id).at(-1).outputs
-    assert.match(parentOutputs[0], /working in the background/)
-    assert.match(parentOutputs[3], /OBS_REFUSED_DONE/)
-    assert.equal(parentOutputs[2].match(/sessionID="(ses_\w+)"/)?.[1], nodes["2-fg-check"].sessionID)
+    assert.ok(parentOutputs.length === 4 && parentOutputs.every((output) => /working in the background/.test(output)), JSON.stringify(parentOutputs))
+    assert.match(of(id).at(-1).input, /state=\\"completed\\"[^>]*>\\nOBS_REFUSED_DONE/)
+    assert.equal(parentOutputs[2].match(/\(sessionID: (ses_\w+)\)/)?.[1], nodes["2-check"].sessionID)
     // An observed run cannot be scheduled.
     const retry = await fetch(`${base}/api/rpc/iolaus-dag/action?location[directory]=${encodeURIComponent(project)}`, { method: "POST", headers: { "content-type": "application/json", authorization }, body: JSON.stringify({ input: { sessionID: id, action: "retry", runID: run.runID, generation: run.generation } }) })
     assert.match(await retry.text(), /records native subagent calls/)
@@ -437,6 +493,23 @@ try {
     assert.equal(goal.status, "complete")
     assert.equal(of(id).length, mine.length, "the loop kept going after the goal completed")
     assert.equal(mine.at(-1).text, "GOAL_DONE")
+  })
+
+  await check("the goal loop waits for a running subagent and continues after its report, counting the delegating turn's tool call", async () => {
+    active = "goal-wait"
+    const id = await create("build")
+    await api("POST", `/api/session/${id}/command`, { name: "goal", text: "IOLAUS_GOAL_WAIT delegate the scan" })
+    await until(() => traces().some((t) => t.event === "iolaus.goal.completed" && t.sessionID === id), "goal completion")
+    await finished(id, "GOAL_WAIT_DONE")
+    await sleep(2500)
+    const mine = traces().filter((t) => t.sessionID === id && String(t.event).startsWith("iolaus.goal."))
+    const order = mine.map((t) => t.event.slice(12))
+    assert.ok(order.includes("waiting") && order.indexOf("waiting") < order.indexOf("continued"), `goal events: ${order}`)
+    const continued = mine.filter((t) => t.event === "iolaus.goal.continued")
+    assert.deepEqual(continued.map((t) => [t.continuations, t.stagnant]), [[1, 0]], `the loop must continue once, after the report, without counting it as an idle turn: ${JSON.stringify(continued)}`)
+    assert.deepEqual(of(id).map((r) => r.text ?? r.call.name), ["subagent", "GOAL_DELEGATED", "GOAL_REPORT_READ", "update_goal", "GOAL_WAIT_DONE"])
+    // The continuation was queued only once the subagent's answer was in the session.
+    assert.ok(of(id).find((r) => r.call?.name === "update_goal").input.includes("GOAL_SUB_DONE"), "the loop continued before the subagent reported")
   })
 
   await check("a goal that makes no progress pauses after three idle turns", async () => {
@@ -589,6 +662,7 @@ try {
     assert.ok(!requests.some((r) => r.scenario === active && r.text === "TIER_FORBIDDEN_EXECUTED"))
   })
 } finally {
+  for (const held of holds.values()) held.done()
   server.kill("SIGTERM")
   await exited
   mock.closeAllConnections(); await new Promise((done) => mock.close(done))

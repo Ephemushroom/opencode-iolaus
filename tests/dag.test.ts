@@ -229,7 +229,7 @@ test("the native runner reattaches a prompted child without prompting it again",
     location: { directory: "/p" },
     experimental: { generate: { text: () => Effect.succeed({ text: "" }) } },
     session: {
-      create: () => Effect.succeed({ id: "ses_new" }), prompt: () => { prompted += 1; return Effect.void }, wait: () => Effect.void,
+      create: () => Effect.succeed({ id: "ses_new" }), prompt: () => { prompted += 1; return Effect.void }, wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }),
       get: () => Effect.succeed({ outcome: "succeeded" }), context: (input: { sessionID: string }) => Effect.succeed(context[input.sessionID] ?? []), interrupt: () => Effect.void,
     },
   } as never)

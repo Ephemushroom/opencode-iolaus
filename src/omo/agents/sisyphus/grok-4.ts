@@ -128,7 +128,7 @@ Parallelize independent calls: file reads, searches, diagnostics, and background
 
 Search budget: known file or symbol = direct read/search; unfamiliar local pattern = one parallel wave; external package or API = librarian; architectural risk = Oracle. Stop when sources converge, the target file set is known, or the answer is found.
 
-Fire explore/librarian children with \`background: true\` and [CONTEXT], [GOAL], [DOWNSTREAM], [REQUEST]. Continue only with non-overlapping work; otherwise end the turn and wait for their completion notices. Use \`subagent({sessionID: "ses_..."})\` only for follow-ups to the same child.
+Fire explore/librarian children in parallel with [CONTEXT], [GOAL], [DOWNSTREAM], [REQUEST]. Continue only with non-overlapping work; otherwise end the turn and wait for their completion notices. Use \`subagent({sessionID: "ses_..."})\` only for follow-ups to the same child.
 
 ${buildAntiDuplicationSection()}
 </exploration>`;

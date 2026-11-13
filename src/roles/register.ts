@@ -1,8 +1,7 @@
 import type { SessionStateStore } from "../database"
 import { Cause, Effect, Exit, Stream, type Scope } from "effect"
-import { Agent } from "@opencode/plugin/effect"
+import { Agent, Tool } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
-import { Tool } from "@opencode/schema/tool"
 import type { Options } from "../options"
 import type { DagController } from "../dag/controller"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
@@ -17,6 +16,7 @@ import { homedir } from "node:os"
 import { resolve } from "node:path"
 import { isTopLevel, subagentTargets, tierDenial, type TierSource } from "./tier"
 import { DagValidationError } from "../dag/errors"
+import { createQuiescence } from "../dag/quiesce"
 
 type Trace = (event: string, data?: Record<string, unknown>) => void
 
@@ -140,12 +140,14 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
       trace("iolaus.goal.set", { sessionID, via: "prompt" })
     }))
 
+    const quiescence = createQuiescence(ctx.session)
     const runtime = createGoalRuntime({
       read: (sessionID) => readGoal(state, sessionID),
       save: (goal) => saveGoal(state, goal),
       isGoalSession: (sessionID) => Effect.runPromise(isGoalSession(sessionID)),
       dispatch: (sessionID, text) => Effect.runPromise(ctx.session.synthetic({ sessionID: sessionID as never, text, delivery: "queue", resume: true }).pipe(Effect.asVoid)),
       settle: () => new Promise((done) => setTimeout(done, 150)),
+      waiting: (sessionID) => Effect.runPromise(quiescence.busy(sessionID).pipe(Effect.catchCause(() => Effect.succeed(false)))),
       trace,
     })
 

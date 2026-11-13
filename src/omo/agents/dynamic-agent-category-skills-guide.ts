@@ -118,7 +118,7 @@ Check the \`skill\` tool for available skills and their descriptions. For EVERY 
 
 \`\`\`typescript
 subagent({agent: "[selected-category]", // Include ALL relevant skills - ESPECIALLY user-installed ones
-  background: true, prompt: "..."})
+  prompt: "..."})
 \`\`\`
 
 **ANTI-PATTERN (will produce poor results):**
@@ -138,10 +138,10 @@ Any task with even a minor visual-design relationship - including UI, UX, CSS, s
 
 \`\`\`typescript
 // CORRECT: Visual work → visual-engineering category
-subagent({agent: "visual-engineering", background: true, prompt: "Redesign the sidebar layout with new spacing..."})
+subagent({agent: "visual-engineering", prompt: "Redesign the sidebar layout with new spacing..."})
 
 // WRONG: Visual work in wrong category - WILL PRODUCE INFERIOR RESULTS
-subagent({agent: "quick", background: true, prompt: "Redesign the sidebar layout with new spacing..."})
+subagent({agent: "quick", prompt: "Redesign the sidebar layout with new spacing..."})
 \`\`\`
 
 | Task Domain | MUST Use Category |

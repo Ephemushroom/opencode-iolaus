@@ -161,11 +161,11 @@ When you need the delegated results but they're not ready:
 
 \`\`\`typescript
 // WRONG: After delegating, re-doing the search
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Then immediately grep for the same thing yourself - FORBIDDEN
 
 // CORRECT: Continue non-overlapping work
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Work on a different, unrelated file while they search
 // End your response and wait for the notification
 \`\`\`

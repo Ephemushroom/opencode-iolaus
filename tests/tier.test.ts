@@ -167,7 +167,7 @@ test("the native DAG runner persists the execution before prompting without unsu
     experimental: { generate: { text: () => Effect.succeed({ text: "review" }) } },
     session: {
       create: (input: { parentID?: unknown; metadata?: Record<string, unknown> }) => { created = input; return Effect.succeed({ id: "ses_child" }) },
-      prompt: () => { prompted = true; return Effect.void }, wait: () => Effect.void,
+      prompt: () => { prompted = true; return Effect.void }, wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }),
       get: () => Effect.succeed({ outcome: "completed" }), context: () => Effect.succeed([]), interrupt: () => Effect.void,
     },
   } as never)

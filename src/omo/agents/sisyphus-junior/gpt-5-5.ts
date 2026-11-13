@@ -42,7 +42,7 @@ Never speculate about code you have not read. If the task references a file, rea
 Independent tool calls run in the same response, never sequentially. This is the dominant lever on speed and accuracy. If you are about to issue a tool call and another independent call could go out at the same time, batch them. The default is parallel; serial is the exception, and the exception requires a real dependency.
 
 - Reads, searches, and diagnostics: fire all at once. Reading 5 files in one response beats reading them one at a time.
-- Background sub-agents: fire 2-5 \`explore\`/\`librarian\` in the same response with \`background: true{, ...}\`.
+- Background sub-agents: fire 2-5 \`explore\`/\`librarian\` in the same response; they run concurrently.
 - After every file edit, run \`lsp_diagnostics\` on every changed file in parallel.
 
 If you cannot parallelize because step B truly needs step A's output, that's fine. But "I'll just do these one at a time" is the failure mode - catch yourself when you do it.
@@ -103,7 +103,7 @@ Baseline exploration for any non-trivial task:
 
 1. Read applicable \`AGENTS.md\` files from the repo root down to your working directory.
 2. Read the files most directly related to the task. Use \`rg\` to find related patterns.
-3. For broader questions, fire two to five \`explore\` or \`librarian\` sub-agents in parallel (single response, \`background: true{, ...}\`).
+3. For broader questions, fire two to five \`explore\` or \`librarian\` sub-agents in parallel (single response).
 4. Trace dependencies when the change might have non-local effects.
 5. Build a sufficient mental model before your first file edit.
 
@@ -253,7 +253,7 @@ ${GPT_APPLY_PATCH_GUIDANCE}
 
 You may invoke \`subagent(){agent: "explore" | "librarian" | "oracle"\`} for research. You may NOT delegate implementation to categories; this restriction is enforced and intentional.
 
-- \`explore\`: internal codebase pattern search with synthesis. Parallel batches of 2-5 with \`background: true{, ...}\`.
+- \`explore\`: internal codebase pattern search with synthesis. Parallel batches of 2-5 in one response.
 - \`librarian\`: external docs, open-source code, web references. Same pattern.
 - \`oracle\`: high-reasoning consultant. Run it in the background; continue with work that does not depend on the answer and never ship what it was asked to decide before the result arrives.
 

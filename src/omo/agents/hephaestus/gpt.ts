@@ -146,7 +146,7 @@ ${librarianSection}
 
 <tool_usage_rules>
 - Parallelize independent tool calls: multiple file reads, grep searches, agent fires - all at once
-- Explore/Librarian = background grep. ALWAYS \`background: true{, ...}\`, ALWAYS parallel
+- Explore/Librarian = background grep. ALWAYS parallel - fire them in the same response
 - After any file edit: restate what changed, where, and what validation follows
 - Prefer tools over guessing whenever you need specific data (files, configs, patterns)
 </tool_usage_rules>
@@ -154,17 +154,17 @@ ${librarianSection}
 **How to call explore/librarian:**
 \`\`\`
 // Codebase search - use subagent({agent: "explore", ...})
-subagent({agent: "explore", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
+subagent({agent: "explore", description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 
 // External docs/OSS search - use subagent({agent: "librarian", ...})
-subagent({agent: "librarian", background: true, description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
+subagent({agent: "librarian", description: "Find [what]", prompt="[CONTEXT]: ... [GOAL]: ... [REQUEST]: ..."})
 
 \`\`\`
 
 **Rules:**
 - Fire 2-5 explore agents in parallel for any non-trivial codebase question
 - Parallelize independent file reads - don't read files one at a time
-- Explore and librarian children always run with \`background: true\`
+- Explore and librarian children always run in the background
 - Continue only with non-overlapping work after launching background agents
 - Keep IDs separate: a background child reports through its completion notice; continue it with \`subagent({sessionID: "ses_..."})\`
 - BEFORE final answer, cancel DISPOSABLE tasks individually

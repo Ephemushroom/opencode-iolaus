@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT          Flow · work                   +
+     NATIVE_CHILD_RESULT                                                                                                 ┃                                             ┃
+                                                                                                                         ┃  Iolaus Flow                             x  ┃
+     Build · GPT-5.5 · 24ms · 1428.6 tok/s · 4ms ttft                                                                    ┃                                             ┃
+                                                                                                                                               have an agent session.  ┃
+     ◈ Instructions updated                                                                                                                                            ┃
+                            Flow · Session Routing QA                                                                                esc close
+  ┃                         ⏸ waiting approval · 20s  ━━━━━━━━━━━━ 2/4
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoiaW9sYXVzX2                                           ╭─ ✓ Done ───────────────────╮
+  ┃  4MTA2Iiwibm9kZV9pZCI6I                                           │   work                     │
+  ┃                                                                   │ Scheduled QA               │                                            approval · 20s ╌╌╌╌╌╌╮
+                                                                      ╰────────────────────────────╯                                           sion Routing QA       ╎
+     + 1 tool                                                                       │                                                          ━━ 2/4                ╎
+                                                                                    ▼                                                          ble QA              ◇ ╎
+     ◈ Instructions updated                                           ╭─ ✓ Done ───────────────────╮                                           d QA                  ╎
+                                                                      │ ↑ judge                  ⚖ │                                                               ⚖ ╎
+     NATIVE_CHILD_RESULT                                              │ Judge QA                   │                                           A                     ╎
+                                                                      ╰────────────────────────────╯                                           ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     Build · GPT-5.5 · 21ms                                                         │
+                                                                                    ▼
+     NATIVE_CHILD_RESULT                                              ┏━ ⏸ Waiting approval ━━━━━━━┓                                           le Attempt QA
+                                                                      ┃ › gate                   ◇ ┃                                            in 1s
+     Build · GPT-5.5 · 32ms                                           ┃ Unavailable QA             ┃                                           quest Mzkn6KnZ
+                                                                      ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                            in 1s
+     ◈ Instructions updated                                                         │
+                                                                                    ▼                                                          tails · ctrl+x d
+  ┃                                                                   ╭─ · Pending ────────────────╮
+  ┃  QA_COMMAND:                                                      │ ↓ future                   │
+  ┃  eyJuYW1lIjoic3ViYWdlbn                                           │ Future QA                  │
+  ┃  uSUQiOiJzZXNfZTJhZDY1M                                           ╰────────────────────────────╯
+  ┃
+                            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+     + 1 tool               │ ⏸ gate · Unavailable QA                                                                                        │
+                            │ Status: Waiting approval · gate                                                                                │
+     NATIVE_CHILD_RESULT    │ Agent: human · Model: none · Attempt: 1                                                                        │
+                            │ Depends on: judge                                                                                              │ tarted                ✕
+     Build · GPT-5.5 · 17ms │ Unblocks: future                                                                                               │
+                            │ Human gates do not have an agent session.                                                                      │ includes free models so
+     NATIVE_CHILD_RESULT    │                                                                                                                │ tart immediately.
+                            │ Approval request                                                                                               │
+     Build · GPT-5.5 · 27ms │ Keep waiting                                                                                                   │ rom 75+ providers to
+                            ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯  models, including
+  ┃                                                                                                                                            PT, Gemini etc
+  ┃                         ↑/↓ j/k select · a approve · r reject · c cancel flow · PgUp/PgDn details · Esc close
+  ┃                                                                                                                                            rovider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-qpQLQ0/project
+

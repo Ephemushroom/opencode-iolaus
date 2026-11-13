@@ -1,0 +1,45 @@
+   IOLAUS_TUI_QA_DONE              Flow · execute                +
+
+     ◈ Instructions updated: api/iolaus.state                                                                           IOLAUS_TUI_QA_DONE
+
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]                                       Context
+                                                                                                                        15 tokens
+     ◈ Instructions updated: api/iolaus.state                                                                           0% used
+                                                                                                                        $0.00 spent
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+                                                                                                                         Iolaus
+     ◈ Instructions updated: api/iolaus.state
+                                                                                                                         Recent
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]                                        ✓ Flow · plan-re... IOLAUS_TUI_TASK
+                                                                                                                           6/6 · done in 24s
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+                                                                                                                         Click for details · ctrl+x d
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+
+     ✓ iolaus_flow [action=snapshot, run_id=e4db1f3b-a715-47b6-8b69-1eeb6ae58c7f]
+
+     ◈ Instructions updated: api/iolaus.state
+
+     IOLAUS_TUI_QA_DONE
+
+     Build · GPT-5.5 · 27.2s · 820.9 tok/s · 12ms ttft
+
+     IOLAUS_TUI_QA_DONE
+
+     Build · GPT-5.5 · 27.2s · 869.6 tok/s · 12ms ttft
+
+     IOLAUS_TUI_QA_DONE
+
+     Build · GPT-5.5 · 27.3s · 915.5 tok/s · 12ms ttft
+
+  ┃
+  ┃  jkoar
+  ┃
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-tui-qa-qxOM9O/project   15 (0%) · $0.00  ctrl+p commands    /…/qc1…/T/iolaus-tui-qa-qxOM9O/project
+

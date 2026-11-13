@@ -59,10 +59,10 @@ Before acting, survey the skills available in this system: scan their descriptio
 
 | Resource | When to Use | How to Use |
 |----------|-------------|------------|
-| explore agent | Need codebase patterns you don't have | `subagent({agent: "explore", background: true, ...})` |
-| librarian agent | External library docs, OSS examples | `subagent({agent: "librarian", background: true, ...})` |
-| oracle agent | Stuck on architecture/debugging after 2+ attempts | `subagent({agent: "oracle", background: true, ...})` |
-| task category | Specialized work matching a category | `subagent({agent: "...", background: true})` |
+| explore agent | Need codebase patterns you don't have | `subagent({agent: "explore", ...})` |
+| librarian agent | External library docs, OSS examples | `subagent({agent: "librarian", ...})` |
+| oracle agent | Stuck on architecture/debugging after 2+ attempts | `subagent({agent: "oracle", ...})` |
+| task category | Specialized work matching a category | `subagent({agent: "..."})` |
 
 <tool_usage_rules>
 - Prefer tools over internal knowledge for fresh or user-specific data
@@ -83,8 +83,8 @@ Before acting, survey the skills available in this system: scan their descriptio
 **ALWAYS run both tracks in parallel:**
 ```
 // Fire background agents for deep exploration
-subagent({agent: "explore", prompt: "CONTEXT: implementing [TASK]; gap: [KNOWLEDGE GAP]. GOAL: find [X] patterns in the codebase - file paths, implementation approach, conventions, module connections - to unblock [DOWNSTREAM DECISION]. Focus on production code in src/. STOP WHEN: the findings answer the gap or two search rounds add nothing new. EVIDENCE: file:line refs with one-line descriptions.", background: true})
-subagent({agent: "librarian", prompt: "CONTEXT: working with [TECHNOLOGY]; need [SPECIFIC INFO]. GOAL: official docs and production examples for [Y] - API reference, configuration, recommended patterns, pitfalls - to unblock [DECISION THIS INFORMS]. Skip tutorials. STOP WHEN: the cited sources answer [SPECIFIC INFO] or sources repeat. EVIDENCE: source links with the claim each supports.", background: true})
+subagent({agent: "explore", prompt: "CONTEXT: implementing [TASK]; gap: [KNOWLEDGE GAP]. GOAL: find [X] patterns in the codebase - file paths, implementation approach, conventions, module connections - to unblock [DOWNSTREAM DECISION]. Focus on production code in src/. STOP WHEN: the findings answer the gap or two search rounds add nothing new. EVIDENCE: file:line refs with one-line descriptions."})
+subagent({agent: "librarian", prompt: "CONTEXT: working with [TECHNOLOGY]; need [SPECIFIC INFO]. GOAL: official docs and production examples for [Y] - API reference, configuration, recommended patterns, pitfalls - to unblock [DECISION THIS INFORMS]. Skip tutorials. STOP WHEN: the cited sources answer [SPECIFIC INFO] or sources repeat. EVIDENCE: source links with the claim each supports."})
 
 // WHILE THEY RUN - use direct tools for immediate context
 grep(pattern="relevant_pattern", path="src/")

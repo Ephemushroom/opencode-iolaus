@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT        +
+                                                                                                                                            ┃                          ┃
+  ┃                                                                                                                                         ┃  Session failed  › Open  ┃
+  ┃  You are a subagent spawned by another session.                                                                                         ┃                          ┃
+  ┃  NATIVE_CHILD_QA                                                                                                                        ┃  QA failed attempt A     ┃
+  ┃                                                                                                                                         ┃                          ┃
+
+     NATIVE_CHILD_RESULT
+
+     Quick · GPT-5.5 · 16ms · 5000.0 tok/s · 12ms ttft
+
+  ┃
+  ┃  NATIVE_CHILD_QA followup
+  ┃
+
+     NATIVE_CHILD_RESULT
+
+     Quick · GPT-5.5 · 9ms · 5000.0 tok/s · 4ms ttft
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  ┃
+  ┃  Subagents  Shell  Terminals                                                                                                                                   esc
+  ┃
+  ┃  No active subagents
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃
+  ┃  show inactive ctrl+a  tabs ←/→
+  ┃
+

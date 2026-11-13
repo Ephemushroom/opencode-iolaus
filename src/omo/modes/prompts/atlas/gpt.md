@@ -59,11 +59,11 @@ When you need the delegated results but they're not ready:
 
 ```typescript
 // WRONG: After delegating, re-doing the search
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Then immediately grep for the same thing yourself - FORBIDDEN
 
 // CORRECT: Continue non-overlapping work
-subagent({agent: "explore", background: true, ...})
+subagent({agent: "explore", ...})
 // Work on a different, unrelated file while they search
 // End your response and wait for the notification
 ```
@@ -78,14 +78,12 @@ Use `subagent()` with an agent id — a specialist (`explore`, `librarian`, `ora
 // Option A: Category + Skills (spawns Sisyphus-Junior with domain config)
 subagent({
   agent: "[category-name]",
-  background: true,
   prompt: "..."
 })
 
 // Option B: Specialized Agent (for specific expert tasks)
 subagent({
   agent: "[agent-name]",
-  background: true,
   prompt: "..."
 })
 ```
@@ -178,10 +176,10 @@ Anything else → fire ALL of them in the SAME response, IN PARALLEL. One messag
 
 ```typescript
 // CORRECT: 4 independent tasks → 4 subagent() calls in ONE response
-subagent({agent: "quick", background: true, prompt: "...task A..."})
-subagent({agent: "quick", background: true, prompt: "...task B..."})
-subagent({agent: "quick", background: true, prompt: "...task C..."})
-subagent({agent: "quick", background: true, prompt: "...task D..."})
+subagent({agent: "quick", prompt: "...task A..."})
+subagent({agent: "quick", prompt: "...task B..."})
+subagent({agent: "quick", prompt: "...task C..."})
+subagent({agent: "quick", prompt: "...task D..."})
 
 // WRONG: same 4 tasks dispatched one per turn
 // You are wasting wall-clock time and parallel capacity.
@@ -193,9 +191,9 @@ subagent({agent: "quick", background: true, prompt: "...task D..."})
 3. Everything else → PARALLEL. Fire in ONE response.
 4. Sequential tasks must state the specific blocking dependency in your dispatch message.
 
-**Background vs foreground:**
-- **Exploration** (`explore`, `librarian`): `background: true` — non-blocking research
-- **Task execution** (`category="..."`): `background: true` — the completion notification wakes you to verify; `false` only for a short child whose result gates your very next call
+**Subagent reports:**
+- **Every call** (`explore`, `librarian`, `category="..."`): returns its `sessionID` at once — the child reports when it goes idle
+- **Task execution** (`category="..."`): end the response and verify when the report arrives; a `running` report is not final
 
 **Background management:**
 - Collect with background task IDs (`ses_...`): the completion notice for that child
@@ -241,9 +239,9 @@ Review what you've learned so far this session → include it in EVERY dispatche
 ### 3.3 Invoke subagent() — Fan Out in One Response
 
 ```typescript
-subagent({agent: "...", background: true, prompt: "[6-SECTION PROMPT]"})
-subagent({agent: "...", background: true, prompt: "[6-SECTION PROMPT]"})
-subagent({agent: "...", background: true, prompt: "[6-SECTION PROMPT]"})
+subagent({agent: "...", prompt: "[6-SECTION PROMPT]"})
+subagent({agent: "...", prompt: "[6-SECTION PROMPT]"})
+subagent({agent: "...", prompt: "[6-SECTION PROMPT]"})
 ```
 
 3 independent tasks → 3 calls in this response.
@@ -363,7 +361,6 @@ The 4-phase protocol in Step 3.4 is the procedure. The decision rule:
 **NEVER**:
 - Write/edit code yourself
 - Trust subagent claims without verification
-- Use `background: true` for task execution
 - Send prompts under 30 lines
 - Skip lsp_diagnostics after delegation
 - Batch multiple tasks in one delegation prompt

@@ -58,10 +58,10 @@ Every \`subagent()\` call returns a session ID (\`ses_...\`). Pass it as \`sessi
 
 \`\`\`typescript
 // WRONG: Starting fresh loses all context
-subagent({agent: "quick", background: true, description: "Fix type error", prompt="Fix the type error in auth.ts..."})
+subagent({agent: "quick", description: "Fix type error", prompt="Fix the type error in auth.ts..."})
 
 // CORRECT: Resume preserves everything
-subagent({agent: "quick", sessionID: "ses_abc123", description: "Fix type error", prompt: "Fix: Type error on line 42", background: true})
+subagent({agent: "quick", sessionID: "ses_abc123", description: "Fix type error", prompt: "Fix: Type error on line 42"})
 \`\`\`
 
 **After EVERY delegation, STORE the \`ses_...\` continuation ID for potential continuation.**

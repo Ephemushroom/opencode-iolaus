@@ -319,7 +319,7 @@ Each prompt has 4 fields:
 
 Example (1 of 2-3 parallel agents for "Add JWT auth"):
 \`\`\`typescript
-subagent({agent: "explore", background: true, description: "Find auth implementations", prompt="[CONTEXT] Implementing JWT auth in src/api/routes/. Need existing conventions. [GOAL] Decide middleware structure. [DOWNSTREAM] Token flow design. [REQUEST] Find auth middleware, login/signup handlers, token generation. Skip tests. Return paths + pattern descriptions."})
+subagent({agent: "explore", description: "Find auth implementations", prompt="[CONTEXT] Implementing JWT auth in src/api/routes/. Need existing conventions. [GOAL] Decide middleware structure. [DOWNSTREAM] Token flow design. [REQUEST] Find auth middleware, login/signup handlers, token generation. Skip tests. Return paths + pattern descriptions."})
 \`\`\`
 
 If a second angle is genuinely needed (e.g. JWT security best practices via librarian), fire it in the SAME response - then STOP and work with what comes back.

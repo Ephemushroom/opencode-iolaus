@@ -104,7 +104,8 @@ const returnOwner = async (owner) => {
   await sleep(700)
 }
 const selectNode = async (label, name) => {
-  const sidebarLabel = label === "Native QA" ? "Subagent calls" : label
+  // An observed batch is listed by its source, not by a node title.
+  const sidebarLabel = label === "Native QA" ? `Calls · request ${nativeBatch.slice(-8)}` : label
   const text = screen(`${name}-before`).split("\n")
   const row = text.findIndex((line) => line.lastIndexOf(sidebarLabel) > 125)
   assert.ok(row >= 0, `missing sidebar node ${label}`)
@@ -118,7 +119,7 @@ const selectNode = async (label, name) => {
   }
   assert.match(screen(name), /Node details/)
 }
-let failure, owner, native, scheduled
+let failure, owner, native, nativeBatch, scheduled
 try {
   mock.listen(0, "127.0.0.1"); await once(mock, "listening")
   symlinkSync(join(root, "dist"), join(pkg, "dist"), "dir")
@@ -149,14 +150,17 @@ export default Plugin.define({id:"qa-route-probe", setup(ctx) { ctx.ui.slot({app
   assert.match(refused, /scheduler-owned/)
   assert.deepEqual(sql("SELECT * FROM dag_nodes ORDER BY run_id,node_id"), nodesBefore)
   checks.push("Flow continuation refused before any observed node creation")
+  const observedNodes = () => sql("SELECT * FROM dag_nodes WHERE run_id IN (SELECT run_id FROM dag_runs WHERE json_extract(definition_json,'$.observed')=1)")
   await command("subagent", { agent: "quick", description: "Native QA", prompt: "NATIVE_CHILD_QA" })
-  native = JSON.parse(sql("SELECT execution_json FROM dag_nodes WHERE node_id LIKE '%subagent%' OR run_id IN (SELECT run_id FROM dag_runs WHERE json_extract(definition_json,'$.observed')=1)")[0].execution_json).sessionID
-  const observedBefore = sql("SELECT * FROM dag_nodes WHERE run_id IN (SELECT run_id FROM dag_runs WHERE json_extract(definition_json,'$.observed')=1)")
+  // The tool returns at once; the node settles from the child session.
+  const observedBefore = await until(() => { const rows = observedNodes(); return rows[0]?.status === "completed" && rows }, "native child settled")
+  native = JSON.parse(observedBefore[0].execution_json).sessionID
+  nativeBatch = JSON.parse(sql(`SELECT definition_json FROM dag_runs WHERE run_id='${observedBefore[0].run_id}'`)[0].definition_json).observedBatch.id
   const followed = await command("subagent", { agent: "quick", description: "Native QA", sessionID: native, prompt: "NATIVE_CHILD_QA followup" })
-  assert.match(followed, /NATIVE_CHILD_RESULT/)
-  const observedAfter = sql("SELECT * FROM dag_nodes WHERE run_id IN (SELECT run_id FROM dag_runs WHERE json_extract(definition_json,'$.observed')=1)")
+  assert.match(followed, new RegExp(`working in the background \\(sessionID: ${native}\\)`))
+  const observedAfter = await until(() => { const rows = observedNodes(); return rows[0]?.status === "completed" && rows[0].attempt === observedBefore[0].attempt + 1 && rows }, "follow-up settled the reopened node")
   assert.equal(observedAfter.length, 1)
-  assert.equal(observedAfter[0].attempt, observedBefore[0].attempt + 1)
+  assert.match(observedAfter[0].result_json, /NATIVE_CHILD_RESULT/)
   const beforeRefusal = sql("SELECT * FROM dag_nodes ORDER BY run_id,node_id")
   assert.match(await command("subagent", { agent: "quick", description: "Wrong Flow continuation again", sessionID: scheduled, prompt: "Another follow up" }), /scheduler-owned/)
   assert.deepEqual(sql("SELECT * FROM dag_nodes ORDER BY run_id,node_id"), beforeRefusal)
@@ -199,7 +203,7 @@ export default Plugin.define({id:"qa-route-probe", setup(ctx) { ctx.ui.slot({app
       checks.push(`${mode}-${label} explains unavailable session and stays in details`)
     }
     await returnOwner(owner)
-    await command("subagent", { agent: "quick", description: `Running QA ${mode}`, prompt: `NATIVE_RUNNING_QA_${mode}`, background: true })
+    await command("subagent", { agent: "quick", description: `Running QA ${mode}`, prompt: `NATIVE_RUNNING_QA_${mode}` })
     await until(() => runningHolds.has(mode), `running native child ${mode}`)
     const runningNode = await until(() => sql(`SELECT * FROM dag_nodes WHERE status='running' AND json_extract(node_json,'$.title')='Running QA ${mode}'`)[0], "running observed node")
     const runningID = JSON.parse(runningNode.execution_json).sessionID

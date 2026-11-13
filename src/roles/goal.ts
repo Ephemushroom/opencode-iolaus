@@ -104,6 +104,8 @@ export interface GoalRuntimePorts {
   readonly isGoalSession: (sessionID: string) => Promise<boolean>
   readonly dispatch: (sessionID: string, text: string) => Promise<void>
   readonly settle: () => Promise<void>
+  /** Subagents of the session are still working; their report wakes it, and the loop decides at that turn's end. */
+  readonly waiting?: (sessionID: string) => Promise<boolean>
   readonly now?: () => number
   readonly trace?: (event: string, data: Record<string, unknown>) => void
 }
@@ -126,6 +128,8 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
   /** Sessions whose continuation was queued but has not started; their late idle edges are the previous turn's. */
   const awaiting = new Map<string, number>()
   const inflight = new Set<string>()
+  /** Sessions whose last turn ended waiting on subagents; the turn their report starts continues that turn's tool count. */
+  const waited = new Set<string>()
 
   const continueGoal = async (sessionID: string): Promise<void> => {
     const goal = ports.read(sessionID)
@@ -137,6 +141,12 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
       if (activity.get(sessionID) !== "idle" || !(await ports.isGoalSession(sessionID))) return
       const current = ports.read(sessionID)
       if (!current || current.status !== "active") return
+      if (await ports.waiting?.(sessionID)) {
+        waited.add(sessionID)
+        ports.trace?.("iolaus.goal.waiting", { sessionID })
+        return
+      }
+      waited.delete(sessionID)
       const stagnant = (calls.get(sessionID) ?? 0) === 0 ? current.stagnant + 1 : 0
       const stop = stagnant >= GOAL_STAGNATION_LIMIT ? "stagnated" : current.continuations >= GOAL_MAX_CONTINUATIONS ? "continuation limit" : undefined
       if (stop) {
@@ -169,7 +179,7 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
         case "session.execution.started":
           activity.set(sessionID, "busy")
           awaiting.delete(sessionID)
-          calls.set(sessionID, 0)
+          if (!waited.has(sessionID)) calls.set(sessionID, 0)
           return
         case "session.execution.succeeded":
         case "session.idle":
@@ -181,7 +191,7 @@ export function createGoalRuntime(ports: GoalRuntimePorts) {
           activity.set(sessionID, "idle")
           return
         case "session.deleted":
-          activity.delete(sessionID); calls.delete(sessionID); awaiting.delete(sessionID)
+          activity.delete(sessionID); calls.delete(sessionID); awaiting.delete(sessionID); waited.delete(sessionID)
           return
       }
     },

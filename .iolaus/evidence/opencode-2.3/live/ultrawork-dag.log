@@ -1,0 +1,88 @@
+timestamp=2026-11-13T14:03:15.853Z level=INFO run=cc49eefb message="cli starting" version=2.3.0 channel=latest local=false args="[\"serve\",\"--stdio\",\"--port\",\"0\"]" role=cli
+timestamp=2026-11-13T14:03:15.908Z level=INFO run=cc49eefb message="database schema bootstrap started" migrations=59 role=server
+timestamp=2026-11-13T14:03:15.914Z level=INFO run=cc49eefb message="database schema bootstrap completed" migrations=59 durationMs=6 role=server
+timestamp=2026-11-13T14:03:15.939Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode type=directory ignores=6 http.span=11 role=server
+timestamp=2026-11-13T14:03:15.940Z level=INFO run=cc49eefb message="watcher subscribe" path="/Library/Application Support" type=entries ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher started" path="/Library/Application Support" type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher subscribe" path=/ type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher started" path=/ type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher subscribe" path=/private type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher started" path=/private type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.941Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:15.942Z level=INFO run=cc49eefb message="watcher started" path=/private/var type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:15.942Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:15.942Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:15.942Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy type=entries backend=node ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries backend=node ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries backend=node ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries backend=node ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag type=entries ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag type=entries backend=node ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.943Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home type=entries ignores=0 http.span=15 role=server
+timestamp=2026-11-13T14:03:15.944Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home type=entries backend=node ignores=0 http.span=16 role=server
+timestamp=2026-11-13T14:03:15.944Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project type=entries ignores=0 http.span=16 role=server
+timestamp=2026-11-13T14:03:15.944Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project type=entries backend=node ignores=0 http.span=16 role=server
+timestamp=2026-11-13T14:03:15.951Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode type=directory backend=fs-events ignores=6 http.span=23 role=server
+timestamp=2026-11-13T14:03:15.953Z level=INFO run=cc49eefb message="location services booted" directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project workspaceID=undefined durationMs=24 http.span=25 role=server
+timestamp=2026-11-13T14:03:15.956Z level=INFO run=cc49eefb message="watcher subscribe" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory ignores=0 http.span=28 role=server
+timestamp=2026-11-13T14:03:15.956Z level=INFO run=cc49eefb msg="loading plugin" id=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist entrypoint=file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js http.span=28 role=server
+timestamp=2026-11-13T14:03:15.990Z level=INFO run=cc49eefb message="watcher started" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory backend=fs-events ignores=0 http.span=62 role=server
+timestamp=2026-11-13T14:03:15.990Z level=INFO run=cc49eefb message="watcher subscribe" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file ignores=0 http.span=62 role=server
+timestamp=2026-11-13T14:03:15.990Z level=INFO run=cc49eefb message="watcher started" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file backend=node ignores=0 http.span=62 role=server
+timestamp=2026-11-13T14:03:16.237Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:16.237Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:16.237Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:16.237Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:16.237Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:16.238Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:16.246Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skill type=file ignores=0
+timestamp=2026-11-13T14:03:16.246Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skill type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:16.247Z level=INFO run=cc49eefb message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skills type=file ignores=0
+timestamp=2026-11-13T14:03:16.247Z level=INFO run=cc49eefb message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skills type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:16.253Z level=INFO run=cc49eefb message=event event.id=evt_1d538419d001L0fipufbu0vTfO event.created=1794578596253 event.type=provider.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project event.location.workspaceID=undefined event.data={} http.span=325 role=server
+timestamp=2026-11-13T14:03:16.259Z level=INFO run=cc49eefb message=event event.id=evt_1d53841a30010oD80dtQTIx3dN event.created=1794578596259 event.type=model.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project event.location.workspaceID=undefined event.data={} http.span=331 role=server
+timestamp=2026-11-13T14:03:16.261Z level=INFO run=cc49eefb message=event event.id=evt_1d53841a5001CwxFWrkEj73w5I event.created=1794578596261 event.type=agent.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project event.location.workspaceID=undefined event.data={} http.span=333 role=server
+timestamp=2026-11-13T14:03:16.261Z level=INFO run=cc49eefb message=event event.id=evt_1d53841a5002PfMbrul7PncBR4 event.created=1794578596261 event.type=command.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project event.location.workspaceID=undefined event.data={} http.span=333 role=server
+timestamp=2026-11-13T14:03:16.297Z level=WARN run=cc49eefb message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+[0m
+> sisyphus · gpt-5.5
+[0m⚙ [0miolaus_flow {"action":"create","template":{"template":"ultrawork","task":"IOLAUS_ULTRAWORK_TASK","iterations":3,"executor":"sisyphus"}} 
+timestamp=2026-11-13T14:03:16.331Z level=WARN run=cc49eefb message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+timestamp=2026-11-13T14:03:16.359Z level=WARN run=cc49eefb message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+timestamp=2026-11-13T14:03:16.385Z level=WARN run=cc49eefb message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+> sisyphus · gpt-5.5
+[0m⚙ [0miolaus_flow {"action":"snapshot","run_id":"c312f437-f2fd-425b-97bc-454bf3ae01c9"} 
+> sisyphus · gpt-5.5
+[0m⚙ [0miolaus_flow {"action":"approve","run_id":"c312f437-f2fd-425b-97bc-454bf3ae01c9","node_id":"accept","note":"QA approved"} 
+> sisyphus · gpt-5.5
+IOLAUS_QA_DONE
+> sisyphus · gpt-5.5
+IOLAUS_QA_DONE
+> sisyphus · gpt-5.5
+IOLAUS_QA_DONE
+timestamp=2026-11-13T14:03:17.917Z level=INFO run=cc49eefb message="Sent HTTP response" http.span=1751 role=server http.method=GET http.url=/api/event http.status=200
+timestamp=2026-11-13T14:03:17.926Z level=INFO run=cc49eefb message="shutdown started" signal=SIGTERM role=cli
+timestamp=2026-11-13T14:03:17.926Z level=INFO run=cc49eefb message="watcher stopped" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file http.span=1998 role=server
+timestamp=2026-11-13T14:03:17.926Z level=INFO run=cc49eefb message="watcher stopped" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory http.span=1998 role=server
+timestamp=2026-11-13T14:03:17.927Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skill type=file role=server
+timestamp=2026-11-13T14:03:17.927Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/skills type=file role=server
+timestamp=2026-11-13T14:03:17.928Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:17.928Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:17.928Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path="/Library/Application Support" type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/ type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/home/project type=entries http.span=2009 role=server
+timestamp=2026-11-13T14:03:17.937Z level=INFO run=cc49eefb message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/ultrawork-dag/config/opencode type=directory http.span=2009 role=server
