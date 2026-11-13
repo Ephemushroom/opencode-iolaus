@@ -199,7 +199,7 @@ test("native steering keeps the pinned identity and requires a delivered supplem
     session: {
       get: () => Effect.succeed({ agent, model: { providerID: "test", id: "visual", variant: "high" }, metadata: { iolaus_execution_token: identity.token }, outcome: "succeeded" }),
       synthetic: (input: unknown) => { calls.push(input); return Effect.succeed({ id: request.messageID }) },
-      wait: () => Effect.void, context: () => Effect.succeed(messages),
+      wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }), context: () => Effect.succeed(messages),
     },
   } as never)
   expect(await Effect.runPromise(runner.steer!(ref, request))).toEqual({ messageID: request.messageID })

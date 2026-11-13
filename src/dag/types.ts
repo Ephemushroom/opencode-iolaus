@@ -156,7 +156,9 @@ export interface DagObservedStart {
 
 export type DagObservedUpdate =
   /** A follow-up to the node, or the child session and model becoming known. */
-  | { readonly status: "running"; readonly sessionID?: string; readonly model?: string }
+  | { readonly status: "running"; readonly sessionID?: string; readonly model?: string
+      /** The child ran again by itself; only a completed node of a live run is reopened. */
+      readonly woke?: boolean }
   | { readonly status: "completed"; readonly text: string; readonly model?: string }
   | { readonly status: "failed" | "interrupted"; readonly error: string }
 

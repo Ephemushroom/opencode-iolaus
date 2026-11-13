@@ -149,7 +149,7 @@ function host(options: { agent?: string; outcome?: string } = {}) {
     switchModel: (input: { model: typeof model }) => { calls.push(["switchModel", input]); model = input.model; return Effect.void },
     update: (input: { metadata: Record<string, unknown> }) => { calls.push(["update", input]); metadata = input.metadata; return Effect.void },
     prompt: (input: unknown) => { calls.push(["prompt", input]); outcome = "succeeded"; return Effect.succeed({}) },
-    wait: () => Effect.void,
+    wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }),
     context: () => Effect.succeed([{ type: "user", id: "msg_t2" }, { type: "assistant", content: [{ type: "text", text: "continued" }] }]),
     synthetic: () => Effect.die("unused"), interrupt: () => Effect.void,
   }
@@ -183,7 +183,7 @@ test("a failed turn after a delivered supplement is a model failure that names t
   const request: DagSteerRequest = { runID: "run", nodeID: "work", requestID: "r1", text: "fontsource", execution: from, generation: 1, revision: 1, messageID: "msg_r1", state: "admitted", receipt: { messageID: "msg_r1" }, createdAt: 1 }
   const runner = createOpenCodeDagRunner({ location: { directory: "/project" }, experimental: { generate: { text: () => Effect.die("unused") } }, session: {
     get: () => Effect.succeed({ agent: "deep-low", model: { providerID: "a", id: "one" }, metadata: { iolaus_execution_token: "t1" }, outcome: "failed" }),
-    wait: () => Effect.void, context: () => Effect.succeed([{ type: "user", id: "msg_t1" }, { type: "synthetic", id: "msg_r1", text: "fontsource" }]),
+    wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }), context: () => Effect.succeed([{ type: "user", id: "msg_t1" }, { type: "synthetic", id: "msg_r1", text: "fontsource" }]),
   } } as never)
   const error = await Effect.runPromise(Effect.flip(runner.wait(from, [request])))
   expect(error).toMatchObject({ model: true, deliveredRequests: ["r1"] })

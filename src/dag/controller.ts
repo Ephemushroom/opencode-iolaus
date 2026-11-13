@@ -865,6 +865,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const run = store.getRun(runID)
       const node = run?.nodes.find((candidate) => candidate.definition.id === nodeID)
       if (!run || !node || !run.definition.observed) return
+      if (update.status === "running" && update.woke && (node.status !== "completed" || run.status === "cancelled")) return
       const at = now()
       // A child's settle can arrive twice (its idle event and the tool result); the first one wins, a later one only fills a missing model.
       if (update.status !== "running" && node.status !== "running") {

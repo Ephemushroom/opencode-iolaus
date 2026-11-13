@@ -1,6 +1,6 @@
 import { Effect, type Scope } from "effect"
+import { Tool } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
-import { Tool } from "@opencode/schema/tool"
 import type { DagController } from "./controller"
 
 export function registerFlowContinuationGuard(ctx: Context, controller: DagController): Effect.Effect<void, never, Scope.Scope> {

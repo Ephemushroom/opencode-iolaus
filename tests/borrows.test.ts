@@ -135,7 +135,7 @@ test("worktree nodes get their own branch and directory; a run directory must be
   const native = createOpenCodeDagRunner({
     location: { directory: repo },
     experimental: { generate: { text: () => Effect.succeed({ text: "" }) } },
-    session: { create: (input: { location: { directory: string } }) => { created.push(input.location); return Effect.succeed({ id: `ses_${created.length}` }) }, prompt: () => Effect.void, wait: () => Effect.void, get: () => Effect.succeed({ outcome: "succeeded" }), context: () => Effect.succeed([]), interrupt: () => Effect.void },
+    session: { create: (input: { location: { directory: string } }) => { created.push(input.location); return Effect.succeed({ id: `ses_${created.length}` }) }, prompt: () => Effect.void, wait: () => Effect.void, list: () => Effect.succeed({ data: [], cursor: {} }), get: () => Effect.succeed({ outcome: "succeeded" }), context: () => Effect.succeed([]), interrupt: () => Effect.void },
   } as never)
   await Effect.runPromise(native.start({ runID: "abcdef12-run", node: { id: "member1", agent: "deep-low", worktree: true, prompt: "p", dependsOn: [] }, prompt: "p", attempt: 1 }))
   const path = join(root, "repo-wt", "iolaus-abcdef12-member1")

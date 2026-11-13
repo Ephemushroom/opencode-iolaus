@@ -5,6 +5,7 @@ import { DagRunnerError } from "./errors"
 import type { DagExecutionIdentity, DagExecutionRef, DagNodeDefinition, DagSteerRequest, JsonValue } from "./types"
 import { defaultWorktreePath, ensureWorktree, repositoryRoot } from "./worktree"
 import { continuationPrompt, normalizedModel } from "./rescue"
+import { createQuiescence } from "./quiesce"
 
 export interface DagExecutionResult {
   readonly payload: JsonValue
@@ -92,7 +93,7 @@ export function assistantText(messages: readonly unknown[]): string {
 }
 
 /** `switchModel` and `update` enable same-session continuation; without them a retry starts a new session. */
-type SessionApi = Pick<Context["session"], "create" | "prompt" | "synthetic" | "wait" | "get" | "context" | "interrupt"> & Partial<Pick<Context["session"], "switchModel" | "update">>
+type SessionApi = Pick<Context["session"], "create" | "prompt" | "synthetic" | "wait" | "list" | "get" | "context" | "interrupt"> & Partial<Pick<Context["session"], "switchModel" | "update">>
 type GenerateApi = Pick<Context["experimental"]["generate"], "text">
 
 function runnerError(nodeID: string, model = false) {
@@ -117,6 +118,7 @@ const JUDGE_REF = "judge:"
  */
 export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; readonly experimental: { readonly generate: GenerateApi }; readonly location: { readonly directory: string } }): DagRunner {
   const judgeReplies = new Map<string, string>()
+  const quiescence = createQuiescence(ctx.session)
   const pendingPrompts = new Map<string, string>()
   const verify = (ref: DagExecutionRef) => Effect.gen(function* () {
     if (!ref.identity || ref.sessionID.startsWith(JUDGE_REF)) return
@@ -138,7 +140,8 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
   })
   const finish = (ref: DagExecutionRef, requests: readonly DagSteerRequest[] = []) => Effect.gen(function* () {
     const sessionID = ref.sessionID as never
-    yield* ctx.session.wait({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+    // A child that delegated is idle while its subagents work; its reply so far is not the node's result.
+    yield* quiescence.settle(ref.sessionID).pipe(Effect.mapError(runnerError(ref.nodeID)))
     const session = yield* ctx.session.get({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
     const messages = yield* ctx.session.context({ sessionID }).pipe(Effect.mapError(runnerError(ref.nodeID)))
     yield* verify(ref)
@@ -245,7 +248,7 @@ export function createOpenCodeDagRunner(ctx: { readonly session: SessionApi; rea
     cancel: (ref) => Effect.gen(function* () {
       if (ref.sessionID.startsWith(JUDGE_REF)) { judgeReplies.delete(ref.sessionID); return }
       pendingPrompts.delete(ref.sessionID)
-      yield* ctx.session.interrupt({ sessionID: ref.sessionID as never, resume: false }).pipe(Effect.mapError(runnerError(ref.nodeID)))
+      yield* quiescence.stop(ref.sessionID).pipe(Effect.mapError(runnerError(ref.nodeID)))
     }),
   }
 }

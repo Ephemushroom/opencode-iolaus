@@ -37,8 +37,8 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 ## Runtime
 
-- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.2.0
-  (`@opencode/plugin: 2.2.0`, `@opencode/schema: 2.2.0`). The entry is
+- Iolaus is written against `@opencode/plugin/effect` targeting OpenCode 2.3.0
+  (`@opencode/plugin: 2.3.0`, `@opencode/schema: 2.3.0`). The entry is
   `Plugin.define({ id, effect })`; every registration (`agent.transform`,
   `command.transform`, `mcp.transform`, `tool.transform`, `session.hook`,
   `tool.hook`, `rpc.register`) is an Effect in the plugin's `Scope`, and the
@@ -49,23 +49,37 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `Deferred`; launch fibers are forked into the controller scope so `close`
   interrupts them. `src/dag/promise.ts` is a Promise view for tests and QA;
   `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
-  the Effect editor. `effect@4.0.1` is an exact peer and dependency pinned to the
-  host's version and client peer contract (Effect 4.0.3 deferred), with
-  `@opentui/core` and `@opentui/solid` `0.7.0` (the host's OpenTUI 0.7 line; 0.6 plugins fail to install). Bundled builds externalize
+  the Effect editor. `effect@4.1.0` is an exact peer and dependency pinned to the
+  host's version and client peer contract, with
+  `@opentui/core` and `@opentui/solid` `>=0.8.4` (the host's OpenTUI 0.8 line). `Tool` is imported from
+  `@opencode/plugin/effect` (exported since 2.3.0), so `Tool.Error` is the host's class, not a bundled copy. Bundled builds externalize
   `effect`, `effect/*`, `@opencode/plugin`, and `@opentui/core` so runtime execution
   consumes the host's singleton instances and avoids symbol/type mismatches across packages.
 
 - `src/dag/` is the active Iolaus durable DAG module. It uses shared SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
   cancellation and JSON-safe result envelopes.
+- `src/dag/quiesce.ts` is the one place that knows a host subagent always runs in the
+  background (2.3.0: no `background` input, no inline result, the parent idles and is woken
+  by the child's report). `session.wait` only means "no active execution", so `settle`
+  waits on the session, then on every subagent session below it (`session.list({parentID})`,
+  per generation), then on the session again, until `time.busy`/`time.idle` of the subtree
+  stop changing; `busy` reads the same subtree without waiting; `stop` interrupts each
+  generation deepest first and the session last, because the host leaves children running
+  when their parent is interrupted. The native runner's `finish` and `cancel`, the
+  subagent observer and the goal loop (`GoalRuntimePorts.waiting`) use it. Background
+  shells are not followed. Unit coverage: `tests/background-subagents.test.ts`.
 - `src/dag/observe.ts` records native `subagent` calls without changing them. The
   `execute.before` hook (registered after the role guard, so refused calls are not
   recorded) appends a node to an owner-scoped observed batch
   (`definition.observed: true`, name "Subagent calls") via `controller.observe`; the
   child session comes from `session.created` (`parentID`) or the tool result
   (`{output: {sessionID, status, output}}`, the `<subagent …>` text or the background
-  notice), and settles on the tool result or the child's
-  `session.execution.succeeded|failed|interrupted`, whichever comes first. A call
+  notice). The 2.3.0 tool always returns `running`, so a node settles from its child
+  session: on `session.execution.succeeded` once the child and the subagents below it
+  are idle (`quiescence.settle`), or on `failed|interrupted`; a settled child that runs
+  again (`session.execution.started`: its own background work woke it) reopens the
+  completed node as a new attempt (`woke`), so the final answer replaces the interim one. A call
   inside a child hangs under the child's node (`dependsOn` is the parent link, not
   a data edge); a follow-up by `sessionID` reopens the same node as a new attempt; a
   call the host refuses before running it fails when its caller's turn ends.
@@ -355,7 +369,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   (`goal.ts`, after OMO's goal hook) continues a top-level Hephaestus session on
   `session.execution.succeeded` via `session.synthetic` until `update_goal`
   complete, pausing after 3 tool-less turns or 50 continuations; DAG nodes and
-  subagents never loop. `get_goal`/`create_goal`/`update_goal` are denied by name to
+  subagents never loop. A session whose subagents are still working is not continued
+  (`iolaus.goal.waiting`): their report wakes it, the loop decides at the end of that
+  turn, and the delegating turn's tool calls count for it. `get_goal`/`create_goal`/`update_goal` are denied by name to
   every Iolaus lane but Hephaestus. Hephaestus renders its GPT variant on GPT models
   and the generic GPT body elsewhere. `script/qa-roles.mjs` is the live QA.
 - `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
@@ -408,6 +424,6 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 
 Use Bun for development. Verify model routing, registration, configuration, native tool contracts, and shipped-copy equality. Do not test authored prose wording, section order, or length. Standard test checks include `bun test` (unit and steering regression suites), `bun run typecheck`, `bun run check:package` (build and active manifest hashes), and `bun run check:reference` (800 snapshot files).
 
-Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Same-session fallback and owner-model rescue run on stock OpenCode 2.0.28 with no host patch: `node script/qa-owner-rescue.mjs <evidence-dir>` (evidence `.iolaus/evidence/owner-rescue/same-session-live`), host contract probe `.iolaus/evidence/owner-rescue/same-session-probe/run3`. The `host-contract/`, `upstream-inbox/` and `implementation-smoke/` directories record the superseded fresh-session handoff design and its `session.inbox.list` patch; they are historical only. Claims of live compatibility are strictly bounded to verified evidence.
+Runtime changes require a real OpenCode session in an isolated HOME/XDG sandbox with a local mock model. Record both positive and negative cases, host-state isolation and process cleanup under `.iolaus/evidence/`. Reusable live validation is executed via `node script/qa-flow-steering.mjs <evidence-dir>`. Shipped verification evidence lives in `.iolaus/evidence/flow-steering-sdk/` (`owner-interruption-final` recording 35 checks, alongside `dependencies-live-final` and `runtime-final`), verifying nonblocking creation, live supplement delivery, child response capture, unchanged agent/model, queued non-waking terminal notices, host-state isolation, and sandbox process cleanup. Same-session fallback and owner-model rescue run on stock OpenCode 2.0.28 with no host patch: `node script/qa-owner-rescue.mjs <evidence-dir>` (evidence `.iolaus/evidence/owner-rescue/same-session-live`), host contract probe `.iolaus/evidence/owner-rescue/same-session-probe/run3`. The `host-contract/`, `upstream-inbox/` and `implementation-smoke/` directories record the superseded fresh-session handoff design and its `session.inbox.list` patch; they are historical only. Claims of live compatibility are strictly bounded to verified evidence. The OpenCode 2.3.0 runs of the live QA scripts (`qa-roles`, `qa-live`, `qa-borrows`, `qa-flow-steering`, `qa-flow-session-fixes`, `qa-subagent-batches`, `qa-dag-recover`, `qa-tui`, `qa-owner-rescue`) are under `.iolaus/evidence/opencode-2.3/`; `qa-roles` carries the always-background subagent cases (a delegating Flow node settles with its post-report reply, cancel stops a node's subagents, the goal loop waits for a report).
 
 Deliver changes through task-owned worktrees and pull requests. Preserve user changes and merge using merge commits after the relevant checks pass.

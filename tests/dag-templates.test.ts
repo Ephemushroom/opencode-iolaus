@@ -191,7 +191,7 @@ test("judge nodes run one generate.text call with no session; agent nodes still 
     experimental: { generate: { text: (input: { prompt: string; model?: unknown }) => { calls.push(`generate:${input.prompt.slice(0, 10)}:${input.model ? "model" : "nomodel"}`); return Effect.succeed({ text: `judged\n${REVIEW_VERDICT_PASS}` }) } } },
     session: {
       create: () => { calls.push("session.create"); return Effect.succeed({ id: "ses_child" }) },
-      prompt: () => Effect.succeed(undefined), wait: () => Effect.succeed(undefined),
+      prompt: () => Effect.succeed(undefined), wait: () => Effect.succeed(undefined), list: () => Effect.succeed({ data: [], cursor: {} }),
       get: () => Effect.succeed({ outcome: "completed" }), context: () => Effect.succeed([{ type: "assistant", content: [{ type: "text", text: "child done" }] }]), interrupt: () => Effect.succeed(undefined),
     },
   }
