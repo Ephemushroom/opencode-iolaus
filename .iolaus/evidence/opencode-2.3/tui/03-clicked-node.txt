@@ -1,0 +1,45 @@
+ ⠇ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    Flow · plan-review: IOLAUS_TUI_TASK                                                                      esc close
+                       ⏸ waiting approval · 9s  ━━━━━━━━━━━━ 4/6 · gen 2
+     ✓ iolaus_flow [ac
+                                                                ╭─ ✓ Done ───────────────────╮
+     ◈ Instructions up                                          │   review                 ⚖ │
+                                                                │ Review the plan            │
+     ✓ iolaus_flow [ac                                          ╰────────────────────────────╯
+                                                                              │                                                         █ oval · 9s ╌╌╌╌╌╌╌╮
+     ◈ Instructions up                                                        ▼                                                         █ ..OLAUS_TUI_TASK ╎
+                                                                ╭─ ✓ Done ───────────────────╮                                          █ 6 · gen 2        ╎
+     ✓ iolaus_flow [ac                                          │   plan1                    │                                          █ lan            ◇ ╎
+                                                                │ Fix round 1                │                                          █ n                ╎
+     ◈ Instructions up                                          ╰────────────────────────────╯                                          █ an             ⚖ ╎
+                                                                              │                                                         █                  ╎
+     ✓ iolaus_flow [ac                                                        ▼                                                         █ 1              ⚖ ╎
+                                                                ╭─ ✓ Done ───────────────────╮                                          █ pproved plan     ╎
+     ◈ Instructions up                                          │ ↑ review1                ⚖ │                                          █ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                │ Review round 1             │                                          █
+     ✓ iolaus_flow [ac                                          ╰────────────────────────────╯                                          █  · ctrl+x d
+                                                                              │                                                         █
+     ✓ iolaus_flow [ac                                                        ▼                                                         █
+                                                                ┏━ ⏸ Waiting approval ━━━━━━━┓
+                                                                ┃ › approve                ◇ ┃
+                                                                ┃ Approve the plan           ┃
+                                                                ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ⏸ approve · Approve the plan                                                                                   │
+                       │ Status: Waiting approval · gate                                                                                │
+                       │ Agent: human · Model: none · Attempt: 1                                                                        │
+                       │ Depends on: review1                                                                                            │
+                       │ Unblocks: execute                                                                                              │
+                       │ Human gates do not have an agent session.                                                                      │
+                       │                                                                                                                │
+  ┃                    │ Approval request                                                                                               │
+  ┃                    │ Plan for "IOLAUS_TUI_TASK" passed review. Approve to start execution or reject to stop.                        │
+  ┃                    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · a approve · r reject · c cancel flow · PgUp/PgDn details · Esc close
+   ■■■⬝⬝⬝⬝⬝ esc interr                                                                                                                    ui-qa-qxOM9O/project
+

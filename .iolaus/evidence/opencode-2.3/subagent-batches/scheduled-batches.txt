@@ -1,0 +1,55 @@
+   QA_DONE                       +
+  ┃
+                                                                                                                                       QA_DONE
+     + 1 tool
+                                                                                                                                       Context
+     QA_DONE                                                                                                                           15 tokens
+                                                                                                                                       0% used
+     Build · GPT-5.5 · 33ms · 1666.7 tok/s · 4ms ttft                                                                                  $0.01 spent
+
+     ↳ Quick finished · Native parent                                                                                                   Iolaus
+
+     + 1 tool                                                                                                                           Recent
+                                                                                                                                        ✓ Flow · Source B
+     ↳ Quick finished · Native parent                                                                                                     1/1 · done in 0s
+                                                                                                                                        ✓ Calls · flow a59f6740
+     QA_DONE                                                                                                                              2/2 · done in 0s
+                                                                                                                                        ✓ Calls · flow 734bb543
+     Build · GPT-5.5 · 54ms · 1000.0 tok/s · 10ms ttft                                                                                    2/2 · done in 0s
+                                                                                                                                        +4 older (details: ctrl+x d)
+     ↳ Quick finished · Independent
+                                                                                                                                        Click for details · ctrl+x d
+     QA_DONE
+
+     Build · GPT-5.5 · 9ms · 2500.0 tok/s · 4ms ttft
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJpb2xhdXNfZmxvdyIsImFyZ3MiOnsiYWN0aW9uIjoiY3JlYXRlIiwiZGVmaW5pdGlvbiI6eyJzY2hlbWFWZXJzaW9uIjoxLCJuYW1lIjoiU291
+  ┃  cmNlIEEiLCJub2RlcyI6W3siaWQiOiJ3b3JrIiwiYWdlbnQiOiJxdWljayIsInByb21wdCI6IlFBX1BMQU46VzF0N0ltNWhiV1VpT2lKemRXSmhaMlZ1ZENJc0lt
+  ┃  RnlaM01pT25zaVlXZGxiblFpT2lKeGRXbGpheUlzSW1SbGMyTnlhWEIwYVc5dUlqb2lVMjkxY21ObElFRWdZMmhwYkdRaUxDSndjbTl0Y0hRaU9pSlJRVjlRVEVG
+  ┃  T09sY3hkRGRKYlRWb1lsZFZhVTlwU25wa1YwcG9XakpXZFdSRFNYTkpiVVo1V2pOTmFVOXVjMmxaVjJSc1ltNVJhVTlwU25oa1YyeHFZWGxKYzBsdFVteGpNazU1
+  ┃  WVZoQ01HRlhPWFZKYW05cFVqTkthR0p0VW1waFIyeHpXa05KYzBsdVFubGlNakYzWkVOSk5rbHJUa2xUVlhoRldEQTVURWx1TVRsWVZqQTlJbjE5WFYwPSIsImRl
+  ┃  cGVuZHNPbiI6W119XX19fSx7Im5hbWUiOiJpb2xhdXNfZmxvdyIsImFyZ3MiOnsiYWN0aW9uIjoiY3JlYXRlIiwiZGVmaW5pdGlvbiI6eyJzY2hlbWFWZXJzaW9u
+  ┃  IjoxLCJuYW1lIjoiU291cmNlIEIiLCJub2RlcyI6W3siaWQiOiJ3b3JrIiwiYWdlbnQiOiJxdWljayIsInByb21wdCI6IlFBX1BMQU46VzF0N0ltNWhiV1VpT2lK
+  ┃  emRXSmhaMlZ1ZENJc0ltRnlaM01pT25zaVlXZGxiblFpT2lKeGRXbGpheUlzSW1SbGMyTnlhWEIwYVc5dUlqb2lVMjkxY21ObElFSWdZMmhwYkdRaUxDSndjbTl0
+  ┃  Y0hRaU9pSlJRVjlRVEVGT09sY3hkRGRKYlRWb1lsZFZhVTlwU25wa1YwcG9XakpXZFdSRFNYTkpiVVo1V2pOTmFVOXVjMmxaVjJSc1ltNVJhVTlwU25oa1YyeHFZ
+  ┃  WGxKYzBsdFVteGpNazU1WVZoQ01HRlhPWFZKYW05cFVqTkthR0p0VW1waFIyeHpXa05KYzBsdVFubGlNakYzWkVOSk5rbHJUa2xUVlhoRldEQTVURWx1TVRsWVZq
+  ┃  QTlJbjE5WFYwPSIsImRlcGVuZHNPbiI6W119XX19fV1d
+  ┃
+
+     + 2 tools
+                                                                                                                                         ⬖ Getting started                ✕
+     ◈ Instructions updated: api/iolaus.state
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 56ms · 526.3 tok/s · 7ms ttft                                                                                       Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-HsWZkX/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-HsWZkX/project
+

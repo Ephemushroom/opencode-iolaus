@@ -1,0 +1,45 @@
+ ⠸ IOLAUS_TUI_QA_DONE            +
+
+  ┃
+  ┃  Run a plan-review
+  ┃                    Flow · plan-review: IOLAUS_TUI_TASK                                                                      esc close
+                       ⏸ waiting approval · 10s  ━━━━━━━━━━━━ 4/6 · gen 2
+     ✓ iolaus_flow [ac
+                                                                ╭─ ✓ Done ───────────────────╮
+     ◈ Instructions up                                          │ ↑ review                 ⚖ │
+                                                                │ Review the plan            │
+     ✓ iolaus_flow [ac                                          ╰────────────────────────────╯
+                                                                              │                                                         █ oval · 10s ╌╌╌╌╌╌╮
+     ◈ Instructions up                                                        ▼                                                         █ ..OLAUS_TUI_TASK ╎
+                                                                ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓                                          █ 6 · gen 2        ╎
+     ✓ iolaus_flow [ac                                          ┃ › plan1                    ┃                                          █ lan            ◇ ╎
+                                                                ┃ Fix round 1                ┃                                          █ n                ╎
+     ◈ Instructions up                                          ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                          █ an             ⚖ ╎
+                                                                              │                                                         █                  ╎
+     ✓ iolaus_flow [ac                                                        ▼                                                         █ 1              ⚖ ╎
+                                                                ╭─ ✓ Done ───────────────────╮                                          █ pproved plan     ╎
+     ◈ Instructions up                                          │ ↓ review1                ⚖ │                                          █ ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+                                                                │ Review round 1             │                                          █
+     ✓ iolaus_flow [ac                                          ╰────────────────────────────╯                                          █  · ctrl+x d
+                                                                              │                                                         █
+     ✓ iolaus_flow [ac                                                        ▼                                                         █
+                                                                ╭─ ⏸ Waiting approval ───────╮                                          █
+                                                                │   approve                ◇ │                                          ▀
+                                                                │ Approve the plan           │
+                                                                ╰────────────────────────────╯
+                                                                              │
+
+                       ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                       │ ✓ plan1 · Fix round 1                                                                                          │
+                       │ Status: Done · agent                                                                                           │
+                       │ Agent: prometheus · Model: openai/gpt-5.5 · Attempt: 1                                                         │
+                       │ Depends on: review                                                                                             │
+                       │ Unblocks: review1                                                                                              │
+                       │                                                                                                                │
+  ┃                    │ Result                                                                                                         │
+  ┃                    │ IOLAUS_TUI_PLAN_V2                                                                                             │
+  ┃                    ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+  ┃  Build · GPT-5.5 O
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ↑/↓ j/k select · Enter/o open · c cancel flow · PgUp/PgDn details · Esc close
+   ⬝⬝⬝⬝⬝⬝⬝■ esc interr                                                                                                                    ui-qa-qxOM9O/project
+

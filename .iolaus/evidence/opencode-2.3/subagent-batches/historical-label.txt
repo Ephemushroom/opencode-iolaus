@@ -1,0 +1,55 @@
+   QA_DONE                       +
+  ┃  bXB0IjoiQ0hJTERfT0sifX1dXQ==
+  ┃                                                                                                                                    QA_DONE
+
+     + 2 tools                                                                                                                         Context
+                                                                                                                                       15 tokens
+     QA_DONE                                                                                                                           0% used
+                                                                                                                                       $0.01 spent
+     Build · GPT-5.5 · 49ms · 1363.6 tok/s · 3ms ttft
+                                                                                                                                        Iolaus
+  ┃
+  ┃  QA_PLAN:                                                                                                                           Recent
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiUXVldWVkIHJlcXVlc3QgY2hpbGQiLCJwcm9tcHQiOiJD       ✓ Calls · request l6mQ59gx
+  ┃  SElMRF9PSyJ9fV1d                                                                                                                     1/1 · done in 0s
+  ┃                                                                                                                                     ✗ Calls · historical aggregate
+                                                                                                                                          0/1 · failed in 31h 0m
+     + 1 tool                                                                                                                           ✓ Calls · request Bv51030y
+                                                                                                                                          1/1 · done in 0s
+     ↳ Quick finished · Before queued delivery                                                                                          +8 older (details: ctrl+x d)
+
+     QA_DONE                                                                                                                            Click for details · ctrl+x d
+
+     Build · GPT-5.5 · 105ms · 1136.4 tok/s · 3ms ttft
+
+     ↳ Quick finished · Queued request child
+
+     QA_DONE
+
+     Build · GPT-5.5 · 10ms · 2500.0 tok/s · 5ms ttft
+
+  ┃
+  ┃  QA_PLAN:
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiTmV3IGFmdGVyIGxlZ2FjeSIsInByb21wdCI6IkNISUxE
+  ┃  X09LIn19XV0=
+  ┃
+
+     + 1 tool
+
+     QA_DONE
+
+     Build · GPT-5.5 · 66ms · 555.6 tok/s · 7ms ttft
+                                                                                                                                         ⬖ Getting started                ✕
+     ↳ Quick finished · New after legacy
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 11ms · 5000.0 tok/s · 5ms ttft                                                                                      Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-HsWZkX/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-HsWZkX/project
+

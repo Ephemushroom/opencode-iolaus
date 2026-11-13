@@ -1,0 +1,50 @@
+ ⠇ SCHEDULER_CHILD_RESULT          Flow · work                   +
+     + 1 tool                                                                                                              ┃                                           ┃
+                                                                                                                           ┃  Iolaus Flow                           x  ┃
+     ◈ Instructions updated: api/iolaus.state                                                                              ┃                                           ┃
+                                                                                                                           ┃  The agent session is not available yet.  ┃
+     NATIVE_CHILD_RESULT                                                                                                   ┃                                           ┃
+                                                                                                                                  0% used
+     Build · GPT-5.5 · 21ms · 1666.7 tok/s · 3ms ttft                                                                             $0.01 spent
+
+     NATIVE_CHILD_RESULT                                                                                                           Iolaus
+
+     Build · GPT-5.5 · 32ms · 2142.9 tok/s · 3ms ttft                                                                              ╭╌ ⠙ running · 2s ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╮
+                                                                                                                                   ╎ Calls · request NXIAEaz4        ╎
+     ◈ Instructions updated: api/iolaus.state                                                                                      ╎ ━━━━━━━━━━━━ 0/1                ╎
+                                                                                                                                   ╎ ⠙ Running QA on                 ╎
+  ┃                                                                                                                                ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlN0YWxlIGF0dGVtcHQgZm9sbG93dXAiLCJzZXNzaW9       ╭╌ ⏸ waiting approval · 30s ╌╌╌╌╌╌╮
+  ┃  uSUQiOiJzZXNfZTJhZDY1MGE4ZmZlRlY3bGZqYlFsREVuMkgiLCJwcm9tcHQiOiJGb2xsb3cgdXAgb2xkIGZhaWxlZCBhdHRlbXB0In19                     ╎ Flow · Session Routing QA       ╎
+  ┃                                                                                                                                ╎ ━━━━━━━━━━━━ 2/4                ╎
+                                                                                                                                   ╎ ⏸ Unavailable QA              ◇ ╎
+     + 1 tool                                                                                                                      ╎ ✓ Scheduled QA                  ╎
+                                                                                                                                   ╎ ✓ Judge QA                    ⚖ ╎
+     NATIVE_CHILD_RESULT                                                                                                           ╎ · Future QA                     ╎
+                                                                                                                                   ╰╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     Build · GPT-5.5 · 17ms · 2500.0 tok/s · 3ms ttft
+                                                                                                                                   Recent
+     NATIVE_CHILD_RESULT                                                                                                           ✓ Flow · Stale Attempt QA
+                                                                                                                                     1/1 · done in 1s
+     Build · GPT-5.5 · 27ms · 3000.0 tok/s · 3ms ttft                                                                              ✓ Calls · request Mzkn6KnZ
+                                                                                                                                     1/1 · done in 1s
+  ┃
+  ┃  QA_COMMAND:                                                                                                                   Click for details · ctrl+x d
+  ┃  eyJuYW1lIjoic3ViYWdlbnQiLCJhcmdzIjp7ImFnZW50IjoicXVpY2siLCJkZXNjcmlwdGlvbiI6IlJ1bm5pbmcgUUEgb24iLCJwcm9tcHQiOiJOQVRJVkV
+  ┃  fUlVOTklOR19RQV9vbiJ9fQ==
+  ┃
+                                                                                                                                    ⬖ Getting started                ✕
+     + 1 tool
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 33ms · 2000.0 tok/s · 4ms ttft                                                                                 Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project   ↓ 1 subagent · 15 (0%) · $0.01  ctrl+p commands    /…/iolaus-session-fixes-qpQLQ0/project
+

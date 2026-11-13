@@ -1,0 +1,55 @@
+   QA_DONE                       +
+                                                                                                                                                    ┃                       ┃
+     + 1 tool                                                                                                                          QA_DONE      ┃  Session failed    x  ┃
+                                                                                                                                                    ┃                       ┃
+     ↳ Quick finished · Work 3                                                                                                         Context      ┃  QA old failed batch  ┃
+                                                                                                                                       15 tokens    ┃                       ┃
+     + 1 tool                                                                                                                          0% used
+                                                                                                                                       $0.01 spent
+     ↳ Quick finished · Work 4
+                                                                                                                                        Iolaus
+     + 1 tool
+                                                                                                                                        Recent
+     ↳ Quick finished · Work 5                                                                                                          ✓ Calls · request TnSVmfyQ
+                                                                                                                                          12/12 · done in 0s
+     + 1 tool                                                                                                                           ✗ Calls · request 3E1T2n6n
+                                                                                                                                          0/1 · failed in 0s
+     ↳ Quick finished · Work 6
+                                                                                                                                        Click for details · ctrl+x d
+     + 1 tool
+
+     ↳ Quick finished · Work 7
+
+     + 1 tool
+
+     ↳ Quick finished · Work 8
+
+     + 1 tool
+
+     ↳ Quick finished · Work 9
+
+     + 1 tool
+
+     ↳ Quick finished · Work 10
+
+     + 1 tool
+
+     ↳ Quick finished · Work 11
+
+     QA_DONE
+
+     Build · GPT-5.5 · 405ms · 857.1 tok/s · 3ms ttft
+                                                                                                                                         ⬖ Getting started                ✕
+     ↳ Quick finished · Work 12
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 12ms · 5000.0 tok/s · 7ms ttft                                                                                      Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-HsWZkX/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-HsWZkX/project
+

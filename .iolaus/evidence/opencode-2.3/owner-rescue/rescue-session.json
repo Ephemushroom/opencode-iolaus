@@ -1,0 +1,282 @@
+{
+  "session": {
+    "id": "ses_e2ad4fe6affeDiRiHOguleHula",
+    "projectID": "c45c5968bc0272ba08bb8f644202be83f3c3fe6f",
+    "agent": "deep-low",
+    "model": {
+      "id": "gpt-owner",
+      "providerID": "openai",
+      "variant": "default"
+    },
+    "cost": 0,
+    "tokens": {
+      "input": 20,
+      "output": 10,
+      "reasoning": 0,
+      "cache": {
+        "read": 0,
+        "write": 0
+      }
+    },
+    "outcome": "succeeded",
+    "time": {
+      "created": 1794577727900,
+      "updated": 1794577728033,
+      "busy": 1794577728023,
+      "idle": 1794577728034
+    },
+    "title": "Flow · work",
+    "metadata": {
+      "iolaus_dag_node": "work",
+      "iolaus_dag_attempt": 3,
+      "iolaus_execution_token": "cd43f60b-76a5-4e06-b2dc-0ddd82600d7e",
+      "iolaus_dag_run": "2e86c783-4bee-4df6-a254-3da109ab4b29"
+    },
+    "location": {
+      "directory": "/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-rescue-qa-jPCtRR/project"
+    }
+  },
+  "messages": [
+    {
+      "id": "msg_2f1ffc0609d04e239471c44fdddf5987",
+      "time": {
+        "created": 1794577727906
+      },
+      "text": "QA_CHILD:rescue finish the task",
+      "type": "user"
+    },
+    {
+      "id": "msg_1d52b01a4001wO6yQBEYK3zqds",
+      "time": {
+        "created": 1794577727910,
+        "firstToken": 1794577727916,
+        "streamed": 1794577727920,
+        "completed": 1794577727991
+      },
+      "type": "assistant",
+      "agent": "deep-low",
+      "model": {
+        "id": "gpt-a",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "tool",
+          "id": "qa_3",
+          "name": "shell",
+          "executed": false,
+          "native": {
+            "itemId": "qa_3"
+          },
+          "state": {
+            "status": "completed",
+            "input": {
+              "command": "echo STEP_A >> progress.txt && cat progress.txt",
+              "description": "qa step"
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "STEP_A\n"
+              }
+            ],
+            "metadata": {
+              "status": "completed",
+              "truncated": false,
+              "exit": 0
+            }
+          },
+          "time": {
+            "created": 1794577727916,
+            "ran": 1794577727918,
+            "completed": 1794577727990
+          }
+        }
+      ],
+      "finish": "tool-calls",
+      "cost": 0,
+      "tokens": {
+        "input": 10,
+        "output": 5,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b01fa0013exumDCJx5KklD",
+      "time": {
+        "created": 1794577727996,
+        "completed": 1794577728000
+      },
+      "type": "assistant",
+      "agent": "deep-low",
+      "model": {
+        "id": "gpt-a",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [],
+      "finish": "error",
+      "error": {
+        "type": "provider.auth",
+        "message": "qa: provider auth failure",
+        "status": 401,
+        "response": {
+          "body": "{\"error\":{\"message\":\"qa: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b0202001nYfisUseKb2mj0",
+      "time": {
+        "created": 1794577728002
+      },
+      "type": "idle",
+      "outcome": "failed",
+      "error": {
+        "type": "provider.auth",
+        "message": "qa: provider auth failure",
+        "status": 401,
+        "response": {
+          "body": "{\"error\":{\"message\":\"qa: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b0207001Ly5MrYVtgYgtqF",
+      "time": {
+        "created": 1794577728007
+      },
+      "type": "model-switched",
+      "model": {
+        "id": "gpt-b",
+        "providerID": "openai"
+      },
+      "previous": {
+        "id": "gpt-a",
+        "providerID": "openai",
+        "variant": "default"
+      }
+    },
+    {
+      "id": "msg_5e705b3cd7ab41cfbd03ad41858be19e",
+      "time": {
+        "created": 1794577728011
+      },
+      "text": "<iolaus-continuation from=\"openai/gpt-a\" to=\"openai/gpt-b\">\nThe previous model (openai/gpt-a) stopped with a provider failure before finishing. You are openai/gpt-b, continuing in the same session. Everything above is the real history: the task, any supplements and the tool calls that already ran. Their effects are already in the working directory, so inspect the current state and do not repeat completed work. Continue the task from where it stopped and deliver the final result.\n</iolaus-continuation>",
+      "type": "user"
+    },
+    {
+      "id": "msg_1d52b020c0011lIlKRFKjB52ix",
+      "time": {
+        "created": 1794577728014,
+        "completed": 1794577728017
+      },
+      "type": "assistant",
+      "agent": "deep-low",
+      "model": {
+        "id": "gpt-b",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [],
+      "finish": "error",
+      "error": {
+        "type": "provider.auth",
+        "message": "qa: provider auth failure",
+        "status": 401,
+        "response": {
+          "body": "{\"error\":{\"message\":\"qa: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b0212001vJWzi4J1ZPRYws",
+      "time": {
+        "created": 1794577728018
+      },
+      "type": "idle",
+      "outcome": "failed",
+      "error": {
+        "type": "provider.auth",
+        "message": "qa: provider auth failure",
+        "status": 401,
+        "response": {
+          "body": "{\"error\":{\"message\":\"qa: provider auth failure\",\"type\":\"invalid_request_error\",\"code\":\"invalid_api_key\"}}"
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b02160011fyWVOb3fMpGth",
+      "time": {
+        "created": 1794577728022
+      },
+      "type": "model-switched",
+      "model": {
+        "id": "gpt-owner",
+        "providerID": "openai"
+      },
+      "previous": {
+        "id": "gpt-b",
+        "providerID": "openai",
+        "variant": "default"
+      }
+    },
+    {
+      "id": "msg_cd43f60b76a54e06b2dc0ddd82600d7e",
+      "time": {
+        "created": 1794577728024
+      },
+      "text": "<iolaus-continuation from=\"openai/gpt-b\" to=\"openai/gpt-owner\">\nThe previous model (openai/gpt-b) stopped with a provider failure before finishing. You are openai/gpt-owner, continuing in the same session. Everything above is the real history: the task, any supplements and the tool calls that already ran. Their effects are already in the working directory, so inspect the current state and do not repeat completed work. Continue the task from where it stopped and deliver the final result.\n</iolaus-continuation>",
+      "type": "user"
+    },
+    {
+      "id": "msg_1d52b021a001psLw1ULaQeZgLk",
+      "time": {
+        "created": 1794577728028,
+        "firstToken": 1794577728032,
+        "streamed": 1794577728033,
+        "completed": 1794577728033
+      },
+      "type": "assistant",
+      "agent": "deep-low",
+      "model": {
+        "id": "gpt-owner",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "RESCUED_DONE step=true",
+          "native": {
+            "itemId": "qa_6"
+          }
+        }
+      ],
+      "finish": "stop",
+      "cost": 0,
+      "tokens": {
+        "input": 10,
+        "output": 5,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      }
+    },
+    {
+      "id": "msg_1d52b02220027VwQZ2DjCMPV8D",
+      "time": {
+        "created": 1794577728034
+      },
+      "type": "idle",
+      "outcome": "succeeded"
+    }
+  ]
+}

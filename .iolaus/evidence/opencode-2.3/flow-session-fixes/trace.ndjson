@@ -1,0 +1,206 @@
+{"event":"iolaus.loaded","enabled":true,"host":"2.3.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project/.iolaus","created":["/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/home/.iolaus/README.md"]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.unavailable","enabled":false,"binary":null}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.hidden","agent":"sisyphus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"atlas","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.tui.loaded","host":"2.3.0"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.dag.run.started","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"work","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"work","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.dag.node.completed","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"work","sequence":4}
+{"event":"iolaus.dag.node.ready","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"judge","sequence":5}
+{"event":"iolaus.dag.node.started","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"judge","sequence":6}
+{"event":"iolaus.dag.node.completed","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"judge","sequence":7}
+{"event":"iolaus.dag.node.waiting","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"nodeID":"gate","sequence":8}
+{"event":"iolaus.dag.run.paused","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","generation":1,"sequence":9}
+{"event":"iolaus.dag.run.started","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"nodeID":"1-native-qa","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","nodeID":"1-native-qa","agent":"quick","nested":false}
+{"event":"iolaus.dag.node.started","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"nodeID":"1-native-qa","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.dag.node.completed","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"nodeID":"1-native-qa","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"sequence":5}
+{"event":"iolaus.dag.node.started","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"nodeID":"1-native-qa","sequence":6}
+{"event":"iolaus.subagent.followed","owner":"ses_e2ad65e0affeDEZQ9VGTY65DnB","nodeID":"1-native-qa"}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.dag.node.completed","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"nodeID":"1-native-qa","sequence":7}
+{"event":"iolaus.dag.run.completed","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","generation":1,"sequence":8}
+{"event":"iolaus.dag.run.started","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.ready","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":1,"nodeID":"stale","sequence":2}
+{"event":"iolaus.dag.node.started","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":1,"nodeID":"stale","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad650a8ffeFV7lfjbQlDEn2H"}
+{"event":"iolaus.dag.node.failed","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":1,"nodeID":"stale","sequence":4}
+{"event":"iolaus.dag.run.failed","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":1,"sequence":5}
+{"event":"iolaus.dag.node.retrying","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":2,"nodeID":"stale","sequence":6}
+{"event":"iolaus.dag.node.ready","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":2,"nodeID":"stale","sequence":7}
+{"event":"iolaus.dag.node.started","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":2,"nodeID":"stale","sequence":8}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad64e31ffeQU1gxl9ZeD3K3Z"}
+{"event":"iolaus.dag.node.completed","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":2,"nodeID":"stale","sequence":9}
+{"event":"iolaus.dag.run.completed","runID":"173b8111-9aff-4cf0-9886-15c778548106","generation":2,"sequence":10}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-native-qa"}
+{"event":"iolaus.tui.open","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","nodeID":"1-native-qa","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-native-qa"}
+{"event":"iolaus.tui.open","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","nodeID":"1-native-qa","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"work"}
+{"event":"iolaus.tui.open","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"work"}
+{"event":"iolaus.tui.open","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"gate"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"gate"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"judge"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"judge"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"future"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"future"}
+{"event":"iolaus.dag.run.started","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","generation":1,"nodeID":"1-running-qa-on","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","nodeID":"1-running-qa-on","agent":"quick","nested":false}
+{"event":"iolaus.dag.node.started","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","generation":1,"nodeID":"1-running-qa-on","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad5f00bffdpCJhEG1O1QaF5o"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","nodeID":"1-running-qa-on"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-running-qa-on"}
+{"event":"iolaus.tui.open","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","nodeID":"1-running-qa-on","sessionID":"ses_e2ad5f00bffdpCJhEG1O1QaF5o"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","nodeID":"1-running-qa-on"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-running-qa-on"}
+{"event":"iolaus.tui.open","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","nodeID":"1-running-qa-on","sessionID":"ses_e2ad5f00bffdpCJhEG1O1QaF5o"}
+{"event":"iolaus.dag.node.completed","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","generation":1,"nodeID":"1-running-qa-on","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"9d032cce-3b3e-4d49-ac09-e43e67a379b8","generation":1,"sequence":5}
+{"event":"iolaus.tui.closed"}
+{"event":"iolaus.loaded","enabled":true,"host":"2.3.0"}
+{"event":"iolaus.home.ready","user":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/home/.iolaus","project":"/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project/.iolaus","created":[]}
+{"event":"iolaus.models.loaded","source":"iolaus.json"}
+{"event":"iolaus.roles.registered","goal":true,"startWork":true}
+{"event":"iolaus.subagent.observer-registered"}
+{"event":"iolaus.ast_grep.unavailable","enabled":false,"binary":null}
+{"event":"iolaus.gh.unavailable","enabled":false,"binary":null,"version":null,"authenticated":false}
+{"event":"iolaus.verify.registered","enabled":false,"configured":false}
+{"event":"iolaus.agent.hidden","agent":"sisyphus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"hephaestus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"prometheus","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"atlas","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"sisyphus-junior","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"oracle","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"librarian","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"explore","reason":"no configured model"}
+{"event":"iolaus.agent.hidden","agent":"metis","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"momus","name":"Momus","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.agent.hidden","agent":"multimodal-looker","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"visual-engineering","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"ultrabrain","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"deep-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"artistry","reason":"no configured model"}
+{"event":"iolaus.agent.model","agent":"quick","name":"Quick","model":"openai/gpt-5.5","variant":null,"source":"config"}
+{"event":"iolaus.category.hidden","category":"unspecified-low","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"unspecified-high","reason":"no configured model"}
+{"event":"iolaus.category.hidden","category":"writing","reason":"no configured model"}
+{"event":"iolaus.tui.loaded","host":"2.3.0"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-native-qa"}
+{"event":"iolaus.tui.open","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","nodeID":"1-native-qa","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-native-qa"}
+{"event":"iolaus.tui.open","runID":"7798e948-062c-4b1b-92a3-aa565c10ce59","nodeID":"1-native-qa","sessionID":"ses_e2ad65869ffdXAYNr6v8J8n1cx"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"work"}
+{"event":"iolaus.tui.open","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"work"}
+{"event":"iolaus.tui.open","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"work","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65dadffejiRYtlhiCvZVr8"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"gate"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"gate"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"judge"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"judge"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20","nodeID":"future"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"d8c0ec79-8323-4410-b89f-007b9bdaee20"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"future"}
+{"event":"iolaus.dag.run.started","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","generation":1,"sequence":1}
+{"event":"iolaus.dag.node.started","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","generation":1,"nodeID":"1-running-qa-off","sequence":2}
+{"event":"iolaus.subagent.observed","owner":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","nodeID":"1-running-qa-off","agent":"quick","nested":false}
+{"event":"iolaus.dag.node.started","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","generation":1,"nodeID":"1-running-qa-off","sequence":3}
+{"event":"iolaus.agent.rendered","agent":"quick","kind":"category","model":"openai/gpt-5.5","sessionID":"ses_e2ad56f09ffepOi5iiNbImVoCC"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","nodeID":"1-running-qa-off"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-running-qa-off"}
+{"event":"iolaus.tui.open","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","nodeID":"1-running-qa-off","sessionID":"ses_e2ad56f09ffepOi5iiNbImVoCC"}
+{"event":"iolaus.tui.sidebar.mounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.open","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","nodeID":"1-running-qa-off"}
+{"event":"iolaus.tui.sidebar.unmounted","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB"}
+{"event":"iolaus.tui.dialog.closed","sessionID":"ses_e2ad65e0affeDEZQ9VGTY65DnB","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd"}
+{"event":"iolaus.tui.dialog.reveal.stop","reason":"closed","nodeID":"1-running-qa-off"}
+{"event":"iolaus.tui.open","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","nodeID":"1-running-qa-off","sessionID":"ses_e2ad56f09ffepOi5iiNbImVoCC"}
+{"event":"iolaus.dag.node.completed","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","generation":1,"nodeID":"1-running-qa-off","sequence":4}
+{"event":"iolaus.dag.run.completed","runID":"a9b84f44-8147-426d-9835-fe6a9ade4ffd","generation":1,"sequence":5}
+{"event":"iolaus.tui.closed"}

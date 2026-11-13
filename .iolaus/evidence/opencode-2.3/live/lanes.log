@@ -1,0 +1,83 @@
+timestamp=2026-11-13T14:03:18.044Z level=INFO run=bc652251 message="cli starting" version=2.3.0 channel=latest local=false args="[\"serve\",\"--stdio\",\"--port\",\"0\"]" role=cli
+timestamp=2026-11-13T14:03:18.096Z level=INFO run=bc652251 message="database schema bootstrap started" migrations=59 role=server
+timestamp=2026-11-13T14:03:18.100Z level=INFO run=bc652251 message="database schema bootstrap completed" migrations=59 durationMs=4 role=server
+timestamp=2026-11-13T14:03:18.123Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode type=directory ignores=6 http.span=10 role=server
+timestamp=2026-11-13T14:03:18.124Z level=INFO run=bc652251 message="watcher subscribe" path="/Library/Application Support" type=entries ignores=0 http.span=11 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher started" path="/Library/Application Support" type=entries backend=node ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher subscribe" path=/ type=entries ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher started" path=/ type=entries backend=node ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher subscribe" path=/private type=entries ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher started" path=/private type=entries backend=node ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.125Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var type=entries ignores=0 http.span=12 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher started" path=/private/var type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.126Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries backend=node ignores=0 http.span=13 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project type=entries ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.127Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project type=entries backend=node ignores=0 http.span=14 role=server
+timestamp=2026-11-13T14:03:18.134Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode type=directory backend=fs-events ignores=6 http.span=21 role=server
+timestamp=2026-11-13T14:03:18.137Z level=INFO run=bc652251 message="location services booted" directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project workspaceID=undefined durationMs=23 http.span=24 role=server
+timestamp=2026-11-13T14:03:18.139Z level=INFO run=bc652251 message="watcher subscribe" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory ignores=0 http.span=26 role=server
+timestamp=2026-11-13T14:03:18.140Z level=INFO run=bc652251 msg="loading plugin" id=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist entrypoint=file:///Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js http.span=27 role=server
+timestamp=2026-11-13T14:03:18.173Z level=INFO run=bc652251 message="watcher started" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory backend=fs-events ignores=0 http.span=60 role=server
+timestamp=2026-11-13T14:03:18.173Z level=INFO run=bc652251 message="watcher subscribe" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file ignores=0 http.span=60 role=server
+timestamp=2026-11-13T14:03:18.174Z level=INFO run=bc652251 message="watcher started" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file backend=node ignores=0 http.span=61 role=server
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/AGENTS.md type=file ignores=0
+timestamp=2026-11-13T14:03:18.412Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/AGENTS.md type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:18.424Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skill type=file ignores=0
+timestamp=2026-11-13T14:03:18.424Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skill type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:18.425Z level=INFO run=bc652251 message="watcher subscribe" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skills type=file ignores=0
+timestamp=2026-11-13T14:03:18.425Z level=INFO run=bc652251 message="watcher started" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skills type=file backend=node ignores=0 role=server
+timestamp=2026-11-13T14:03:18.431Z level=INFO run=bc652251 message=event event.id=evt_1d5384a1f001mJsnY73L5fapzJ event.created=1794578598431 event.type=provider.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project event.location.workspaceID=undefined event.data={} http.span=318 role=server
+timestamp=2026-11-13T14:03:18.437Z level=INFO run=bc652251 message=event event.id=evt_1d5384a25001WFYeLnZOATGC2g event.created=1794578598437 event.type=model.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project event.location.workspaceID=undefined event.data={} http.span=324 role=server
+timestamp=2026-11-13T14:03:18.438Z level=INFO run=bc652251 message=event event.id=evt_1d5384a26001g2b5DKe38b2364 event.created=1794578598438 event.type=agent.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project event.location.workspaceID=undefined event.data={} http.span=325 role=server
+timestamp=2026-11-13T14:03:18.439Z level=INFO run=bc652251 message=event event.id=evt_1d5384a27001FVSqiZ0wFfSgqw event.created=1794578598439 event.type=command.updated event.location.directory=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project event.location.workspaceID=undefined event.data={} http.span=326 role=server
+timestamp=2026-11-13T14:03:18.471Z level=WARN run=bc652251 message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+[0m
+> build · gpt-5.5
+[0m⚙ [0miolaus_flow {"action":"create","definition":{"schemaVersion":1,"name":"QA lanes","maxParallel":2,"nodes":[{"id":"quick","agent":"quick","prompt":"IOLAUS_DAG_NODE_QUICK","dependsOn":[]},{"id":"oracle","agent":"oracle","prompt":"IOLAUS_DAG_NODE_ORACLE","dependsOn":[]}]}} 
+> build · gpt-5.5
+timestamp=2026-11-13T14:03:18.515Z level=WARN run=bc652251 message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+timestamp=2026-11-13T14:03:18.515Z level=WARN run=bc652251 message="session websocket connect failed; using http" sessionTransport=websocket phase=connect delivery=not-sent code=undefined role=server
+[0m⚙ [0miolaus_flow {"action":"wait","run_id":"3ef8bea7-d4a8-4139-8bb8-9380fdf6ec16"} 
+> build · gpt-5.5
+IOLAUS_QA_DONE
+> build · gpt-5.5
+IOLAUS_QA_DONE
+timestamp=2026-11-13T14:03:18.566Z level=INFO run=bc652251 message="Sent HTTP response" http.span=220 role=server http.method=GET http.url=/api/event http.status=200
+timestamp=2026-11-13T14:03:18.575Z level=INFO run=bc652251 message="shutdown started" signal=SIGTERM role=cli
+timestamp=2026-11-13T14:03:18.575Z level=INFO run=bc652251 message="watcher stopped" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist/index.js type=file http.span=462 role=server
+timestamp=2026-11-13T14:03:18.575Z level=INFO run=bc652251 message="watcher stopped" path=/Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-opencode-2.3/dist type=directory http.span=462 role=server
+timestamp=2026-11-13T14:03:18.575Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skill type=file role=server
+timestamp=2026-11-13T14:03:18.575Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/skills type=file role=server
+timestamp=2026-11-13T14:03:18.576Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:18.576Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:18.576Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode/AGENTS.md type=file role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path="/Library/Application Support" type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/ type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6 type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/home/project type=entries http.span=472 role=server
+timestamp=2026-11-13T14:03:18.585Z level=INFO run=bc652251 message="watcher stopped" path=/private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-qa-I4IFS6/lanes/config/opencode type=directory http.span=472 role=server

@@ -1,0 +1,50 @@
+   SCHEDULER_CHILD_RESULT        +
+     NATIVE_CHILD_RESULT
+                                                                                                                                  SCHEDULER_CHILD_RESULT
+     Build · GPT-5.5 · 24ms · 1428.6 tok/s · 4ms ttft
+                                                                                                                                  Context
+     ◈ Instructions updated: api/iolaus.state                                                                                     15 tokens
+                                                                                                                                  0% used
+  ┃                                                                                                                               $0.00 spent
+  ┃  QA_COMMAND:
+  ┃  eyJuYW1lIjoiaW9sYXVzX2Zsb3ciLCJhcmdzIjp7ImFjdGlvbiI6InJldHJ5IiwicnVuX2lkIjoiMTczYjgxMTEtOWFmZi00Y2YwLTk4ODYtMTVjNzc4NTQ       Iolaus
+  ┃  4MTA2Iiwibm9kZV9pZCI6InN0YWxlIn19
+  ┃                                                                                                                                ╭╌ ⏸ waiting approval · 10s ╌╌╌╌╌╌╮
+                                                                                                                                   ╎ Flow · Session Routing QA       ╎
+     + 1 tool                                                                                                                      ╎ ━━━━━━━━━━━━ 2/4                ╎
+                                                                                                                                               ble QA              ◇ ╎
+     ◈ Instructions updated                                                                                                                    d QA                  ╎
+                            Calls · request Mzkn6KnZ                                                                                 esc close                     ⚖ ╎
+     NATIVE_CHILD_RESULT    ✓ done in 1s  ━━━━━━━━━━━━ 1/1                                                                                     A                     ╎
+                                                                                                                                               ╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╯
+     Build · GPT-5.5 · 21ms                                           ┏━ ✓ Done · attempt 2 ━━━━━━━┓
+                                                                      ┃ › 1-native-qa              ┃
+     NATIVE_CHILD_RESULT                                              ┃ Native QA                  ┃                                           le Attempt QA
+                                                                      ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛                                            in 1s
+     Build · GPT-5.5 · 32ms                                                                                                                    quest Mzkn6KnZ
+                            ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮  in 1s
+     ◈ Instructions updated │ ✓ 1-native-qa · Native QA                                                                                      │
+                            │ Status: Done · agent                                                                                           │ tails · ctrl+x d
+  ┃                         │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 2                                                              │
+  ┃  QA_COMMAND:            │ Parent call: none (root call)                                                                                  │
+  ┃  eyJuYW1lIjoic3ViYWdlbn │ Child calls: none                                                                                              │
+  ┃  uSUQiOiJzZXNfZTJhZDY1M │                                                                                                                │
+  ┃                         │ Result                                                                                                         │
+                            │ NATIVE_CHILD_RESULT                                                                                            │
+     + 1 tool               ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
+     NATIVE_CHILD_RESULT    ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+                                                                                                                                               tarted                ✕
+     Build · GPT-5.5 · 17ms · 2500.0 tok/s · 3ms ttft
+                                                                                                                                      OpenCode includes free models so
+     NATIVE_CHILD_RESULT                                                                                                              you can start immediately.
+
+     Build · GPT-5.5 · 27ms · 3000.0 tok/s · 3ms ttft                                                                                 Connect from 75+ providers to
+                                                                                                                                      use other models, including
+  ┃                                                                                                                                   Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                   Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /…/pr…/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-session-fixes-qpQLQ0/project  15 (0%) · $0.00  ctrl+p commands    /…/iolaus-session-fixes-qpQLQ0/project
+

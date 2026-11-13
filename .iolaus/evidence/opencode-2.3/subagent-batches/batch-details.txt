@@ -1,0 +1,55 @@
+   QA_DONE                       +
+  ┃  bXB0IjoiQ0hJTERfT0sifX1dXQ==
+  ┃                                                                                                                                    QA_DONE
+
+     + 2 tools                                                                                                                         Context
+                                                                                                                                       15 tokens
+     QA_DONE                                                                                                                           0% used
+                                                                                                                                       $0.01 spent
+     Build · GPT-5.5 · 49ms · 1363.6 tok/s · 3ms ttft
+                                                                                                                                        Iolaus
+  ┃
+  ┃  QA_PLAN:                                                                                                                           Recent
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2VudCIsImFyZ3MiOnsiYWdlbnQiOiJxdWljayIsImRlc2NyaXB0aW9uIjoiUXVldWVkIHJlcXVlc3QgY2hpbGQiLCJwcm9tcHQiOiJD       ✓ Calls · request l6mQ59gx
+  ┃  SElMRF9PSyJ9fV1d                                                                                                                     1/1 · done in 0s
+  ┃                                                                                                                                     ✗ Calls · historical aggregate
+                                                                                                                                          0/1 · failed in 31h 0m
+     + 1 tool                                                                                                                                     request Bv51030y
+                                                                                                                                                  ne in 0s
+     ↳ Quick finished · Before Calls · request l6mQ59gx                                                                                 esc close details: ctrl+x d)
+                               ✓ done in 0s  ━━━━━━━━━━━━ 1/1
+     QA_DONE                                                                                                                                      details · ctrl+x d
+                                                                         ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓
+     Build · GPT-5.5 · 105ms ·                                           ┃ › 1-new-after-legacy       ┃
+                                                                         ┃ New after legacy           ┃
+     ↳ Quick finished · Queued                                           ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+     QA_DONE                   ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                               │ ✓ 1-new-after-legacy · New after legacy                                                                        │
+     Build · GPT-5.5 · 10ms ·  │ Status: Done · agent                                                                                           │
+                               │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 1                                                              │
+  ┃                            │ Parent call: none (root call)                                                                                  │
+  ┃  QA_PLAN:                  │ Child calls: none                                                                                              │
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2Vud │                                                                                                                │
+  ┃  X09LIn19XV0=              │ Result                                                                                                         │
+  ┃                            │ QA_DONE                                                                                                        │
+                               ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+     + 1 tool
+                               ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+     QA_DONE
+
+     Build · GPT-5.5 · 66ms · 555.6 tok/s · 7ms ttft
+                                                                                                                                         ⬖ Getting started                ✕
+     ↳ Quick finished · New after legacy
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 11ms · 5000.0 tok/s · 5ms ttft                                                                                      Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-HsWZkX/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-HsWZkX/project
+

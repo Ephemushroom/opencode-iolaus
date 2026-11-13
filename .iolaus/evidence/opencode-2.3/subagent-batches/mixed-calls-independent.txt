@@ -1,0 +1,55 @@
+   QA_DONE                       +
+
+     ↳ Quick finished · Work 10                                                                                                        QA_DONE
+
+     + 1 tool                                                                                                                          Context
+                                                                                                                                       15 tokens
+     ↳ Quick finished · Work 11                                                                                                        0% used
+                                                                                                                                       $0.01 spent
+     QA_DONE
+                                                                                                                                        Iolaus
+     Build · GPT-5.5 · 405ms · 857.1 tok/s · 3ms ttft
+                                                                                                                                        Recent
+     ↳ Quick finished · Work 12                                                                                                         ✓ Calls · request 7gTCSq6b
+                                                                                                                                          3/3 · done in 0s
+     QA_DONE                                                                                                                            ✓ Calls · request TnSVmfyQ
+                                                                                                                                          12/12 · done in 0s
+     Build · GPT-5.5 · 12ms ·                                                                                                                     request 3E1T2n6n
+                                                                                                                                                  iled in 0s
+  ┃                            Calls · request 7gTCSq6b                                                                                 esc close
+  ┃  QA_PLAN:                  ✓ done in 0s  ━━━━━━━━━━━━ 3/3                                                                                     details · ctrl+x d
+  ┃  W1t7Im5hbWUiOiJzdWJhZ2Vud
+  ┃  VzF0N0ltNWhiV1VpT2lKemRXS            ╭─ ✓ Done ───────────────────╮ ╭─ ✓ Done ───────────────────╮ ┏━ ✓ Done ━━━━━━━━━━━━━━━━━━━┓
+  ┃  Q0lzSW5CeWIyMXdkQ0k2SWtOS            │   1-native-parent          │ │   2-grandchild             │ ┃ › 3-independent            ┃
+  ┃  aWNrIiwiZGVzY3JpcHRpb24iO            │ Native parent              │ │ Grandchild                 │ ┃ Independent                ┃
+  ┃                                       ╰────────────────────────────╯ ╰────────────────────────────╯ ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+     + 1 tool                  ╭─ Node details ─────────────────────────────────────────────────────────────────────────────────────────────────╮
+                               │ ✓ 3-independent · Independent                                                                                  │
+     QA_DONE                   │ Status: Done · agent                                                                                           │
+                               │ Agent: quick · Model: openai/gpt-5.5 · Attempt: 1                                                              │
+     Build · GPT-5.5 · 33ms ·  │ Parent call: none (root call)                                                                                  │
+                               │ Child calls: none                                                                                              │
+     ↳ Quick finished · Native │                                                                                                                │
+                               │ Result                                                                                                         │
+     + 1 tool                  │ QA_DONE                                                                                                        │
+                               ╰────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+     ↳ Quick finished · Native
+                               ↑/↓ j/k select · Enter/o open · PgUp/PgDn details · Esc close
+     QA_DONE
+
+     Build · GPT-5.5 · 54ms · 1000.0 tok/s · 10ms ttft
+                                                                                                                                         ⬖ Getting started                ✕
+     ↳ Quick finished · Independent
+                                                                                                                                           OpenCode includes free models so
+     QA_DONE                                                                                                                               you can start immediately.
+
+     Build · GPT-5.5 · 9ms · 2500.0 tok/s · 4ms ttft                                                                                       Connect from 75+ providers to
+                                                                                                                                           use other models, including
+  ┃                                                                                                                                        Claude, GPT, Gemini etc
+  ┃
+  ┃                                                                                                                                        Connect provider        /connect
+  ┃  Build · GPT-5.5 OpenAI
+  ╹▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
+  /private/var/folders/cy/qc1d9pgd1hq599hhhw_z2l2w0000gn/T/iolaus-batches-HsWZkX/project           15 (0%) · $0.01  ctrl+p commands    /…/qc…/T/iolaus-batches-HsWZkX/project
+

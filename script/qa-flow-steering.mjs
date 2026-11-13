@@ -133,6 +133,11 @@ try {
   }
   const runs = async (id = owner) => (await api("POST", `/api/rpc/iolaus-dag/snapshot?location[directory]=${encodeURIComponent(project)}`, { input: { sessionID: id } })).output.runs
   const run = async (runID) => (await runs()).find((item) => item.runID === runID)
+  // The host answers the reload before the replacement location has activated its plugins, so wait for the Flow RPC to return.
+  const reloadHost = async () => {
+    await api("POST", "/api/location/reload")
+    await until(() => runs().then(() => true, (error) => { if (/rpc\.unavailable/.test(String(error))) return false; throw error }), "Flow RPC after reload")
+  }
   const create = async (name, nodes) => {
     const result = await command(owner, { action: "create", definition: { schemaVersion: 1, name, nodes } })
     assert.ok(result.runID, JSON.stringify(result)); return result
@@ -196,7 +201,7 @@ try {
   assert.ok(noticesBefore.length > 0)
   const count = requests.length; await sleep(350); assert.equal(requests.length, count)
   assert.equal((await run(gate.runID)).status, "paused")
-  await api("POST", "/api/location/reload")
+  await reloadHost()
   const noticesAfter = (await inbox(owner)).filter((item) => item.payload?.metadata?.iolaus_flow_notice)
   assert.deepEqual(noticesAfter.map((item) => item.id), noticesBefore.map((item) => item.id))
   assert.equal((await run(gate.runID)).status, "paused")
@@ -240,7 +245,7 @@ try {
   await until(() => holds.has("reload:new"), "reload supplement")
   const db = join(iolaus, "iolaus.db")
   execFileSync("sqlite3", [db, "UPDATE dag_steering SET value_json=json_remove(json_set(value_json,'$.state','reserved'),'$.receipt') WHERE request_id='reload-request'"])
-  await api("POST", "/api/location/reload")
+  await reloadHost()
   assert.equal((await steer(reload.runID, "implement", "reload-request")).messageID, reloadReceipt.messageID)
   release("reload:old"); release("reload:new")
   await until(async () => (await run(reload.runID)).status === "completed", "reload recovered result")
@@ -258,7 +263,7 @@ try {
   assert.equal((await run(cancel.runID)).status, "cancelled")
   await reject("steered execution cannot retry", () => command(owner, { action: "retry", run_id: cancel.runID }), /steered execution/)
   await reject("steered execution cannot resume", () => command(owner, { action: "resume", run_id: cancel.runID }), /steered execution/)
-  await api("POST", "/api/location/reload")
+  await reloadHost()
   assert.equal((await run(cancel.runID)).status, "cancelled")
   passed("cancel/admission race and reload cannot publish late result or retry supplement")
   const native = await session()
@@ -297,7 +302,7 @@ try {
   const notice = notificationSnapshot.notices[0]
   assert.equal(notice.state, "admitted")
   execFileSync("sqlite3", [db, `UPDATE dag_notices SET value_json=json_set(value_json,'$.state','reserved') WHERE run_id='${notification.runID}'`])
-  await api("POST", "/api/location/reload")
+  await reloadHost()
   const afterNotice = await command(owner, { action: "snapshot", run_id: notification.runID })
   assert.equal(afterNotice.notices[0].state, "admitted")
   assert.equal((await context(owner)).filter((item) => item.id === notice.messageID).length, 1)
@@ -344,7 +349,7 @@ try {
   for (const [match, replacement] of injections) { assert.ok(bundle.includes(match), `QA injection seam missing: ${match}`); bundle = bundle.replace(match, replacement) }
   writeFileSync(bundlePath, bundle)
   writeFileSync(join(evidence, "fault-injection.json"), JSON.stringify({ scope: "sandbox plugin copy only, after all unmodified-plugin scenarios", effectName, injections }, null, 2))
-  await api("POST", "/api/location/reload")
+  await reloadHost()
   const pauseHit = (key) => until(() => existsSync(join(pauses, `${key}.hit`)), `${key} pause`)
   const pauseRelease = (key) => writeFileSync(join(pauses, `${key}.release`), "release")
   const initial = await create("initial admission race", [node("initial-pause", "initial")])

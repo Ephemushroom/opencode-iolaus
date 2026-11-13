@@ -48,15 +48,18 @@ const mock = http.createServer(async (req, res) => {
   if (body.tools?.length && text.includes("CHILD_FAIL")) return res.writeHead(401, { "content-type": "application/json" }).end(JSON.stringify({ error: { message: "QA old failed batch", type: "invalid_request_error", code: "invalid_api_key" } }))
   const encoded = text.match(/QA_PLAN:([A-Za-z0-9+/=]+)/)?.[1]
   const outputs = input.slice(lastUser).filter((item) => item.type === "function_call_output")
-  let calls
+  let calls, waiting = false
   if (body.tools?.length && encoded) {
     let offset = 0
+    // Subagent calls return at once. A `{ reports: n }` step ends the turn until n child reports have woken this session.
+    const reports = input.slice(lastUser).filter((item) => /<subagent sessionID=/.test(JSON.stringify(item))).length
     for (const step of JSON.parse(Buffer.from(encoded, "base64").toString())) {
+      if (!Array.isArray(step)) { if (outputs.length === offset && reports < step.reports) { waiting = true; break } continue }
       if (outputs.length === offset) { calls = step; break }
       offset += step.length
     }
   }
-  requests.push({ encoded, outputs: outputs.map((item) => item.output), done: !calls })
+  requests.push({ encoded, outputs: outputs.map((item) => item.output), done: !calls && !waiting })
   res.writeHead(200, { "content-type": "text/event-stream" })
   for (const event of events(`qa_${requests.length}`, calls)) res.write(`data: ${JSON.stringify(event)}\n\n`)
   res.end("data: [DONE]\n\n")
@@ -90,6 +93,8 @@ const submit = async (steps) => {
   const prompt = plan(steps), encoded = prompt.slice(8), start = requests.length
   keys("-l", prompt); keys("Enter")
   const result = await until(() => requests.slice(start).find((item) => item.encoded === encoded && item.done), "plan finished", 90000)
+  // The plan's last turn only launched its calls; their nodes settle from the child sessions.
+  await until(() => !observed().some((run) => run.status === "running"), "calls settled", 90000)
   await sleep(600)
   return result
 }
@@ -128,7 +133,7 @@ export default Plugin.define({id:"qa-batch-probe",async setup(ctx){await ctx.too
   checks.push("One real user request: 2 parallel + 10 sequential calls share one request batch; next request isolates old failure/count/time; stable 1..12 definition order")
   const child = nodes(fresh.run_id).find((node) => node.node_id === "1-work-1").execution.sessionID
   const nestedPrompt = plan([[native("Grandchild")]])
-  await submit([[native("Native parent", nestedPrompt)], [native("Independent")]])
+  await submit([[native("Native parent", nestedPrompt)], { reports: 1 }, [native("Independent")]])
   const nested = observed().at(-1); assert.equal(nodes(nested.run_id).length, 3)
   assert.equal(nodes(nested.run_id).filter((node) => node.definition.dependsOn.length === 1).length, 1)
   checks.push("Native nesting inherits exact observed run and local parent edge")
@@ -201,7 +206,7 @@ export default Plugin.define({id:"qa-batch-probe",async setup(ctx){await ctx.too
   checks.push("Seeded isolated legacy unkeyed aggregate retained without reassignment or append")
   const hookRows = readFileSync(hooks, "utf8").trim().split("\n").map(JSON.parse)
   assert.ok(hookRows.every((row) => row.messages.some((message) => message.id === row.messageID && message.type === "assistant")))
-  checks.push("Real 2.2 tool hooks expose current assistant in delivered context; persisted user IDs used instead of admission or assistant IDs")
+  checks.push("Real tool hooks expose current assistant in delivered context; persisted user IDs used instead of admission or assistant IDs")
   writeFileSync(join(evidence, "groups.json"), JSON.stringify(runs().map((run) => ({ id: run.run_id, source: run.definition.observedBatch, observed: !!run.definition.observed, status: run.status, created: run.created_at, updated: run.updated_at, nodes: run.definition.nodes.map((node) => ({ id: node.id, parents: node.dependsOn })) })), null, 2))
   keys("C-x", "d"); await sleep(800)
   assert.match(screen("batch-details"), /Calls.*request/)

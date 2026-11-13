@@ -119,7 +119,7 @@ writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
     "gpt-5.5": { tool_call: true, limit: { context: 200000, output: 8192 } },
   } } },
 }))
-writeFileSync(join(config, "opencode/cli.json"), JSON.stringify({ plugins: [localPackage], theme: { name: "opencode", mode } }))
+writeFileSync(join(config, "opencode/cli.json"), JSON.stringify({ plugins: [localPackage], theme: { name: "opencode", mode }, session: { verbosity: "medium" } }))
 writeFileSync(join(config, "opencode/plugins/iolaus/package.json"), JSON.stringify({ type: "module", exports: { "./tui": "./tui.ts" } }))
 writeFileSync(join(config, "opencode/plugins/iolaus/tui.ts"), `export { default } from ${JSON.stringify(join(packageRoot, "dist/tui.js"))}\n`)
 
