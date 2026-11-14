@@ -117,7 +117,10 @@ const mock = http.createServer(async (req, res) => {
       first: JSON.stringify((body.input ?? []).find((i) => i?.type === "message" && i.role === "user") ?? "").slice(0, 3000),
       last: JSON.stringify((body.input ?? []).findLast((i) => i?.type === "message" && i.role === "user") ?? "").slice(0, 3000),
       outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),
-      state: stateBlock(instructions + JSON.stringify(body.input ?? [])) }
+      // What the current instruction block says, and whether the host has told the model it no longer applies.
+      state: stateBlock(instructions + JSON.stringify(body.input ?? [])),
+      removal: (body.input ?? []).some((item) => Array.isArray(item.content) && item.content.some((part) =>
+        typeof part.text === "string" && part.text.includes('The context under "iolaus.state" no longer applies. Disregard it.'))) }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), `${JSON.stringify(record)}\n`)
     assert.ok(requests.length < 300, "Unexpected model loop")
@@ -278,6 +281,15 @@ try {
     await api("POST", `/api/session/${orchestrator}/compact`, {})
     const request = await until(() => requests.find((r) => r.compaction && r.state?.includes(startRun.runID)), "compaction request with state")
     assert.match(request.state, /Session role: orchestrator for plan "cache"/)
+  })
+
+  await check("a fork does not inherit the parent's session state", async () => {
+    const forked = (await api("POST", `/api/session/${orchestrator}/fork`, {})).data.id
+    await api("POST", `/api/session/${forked}/prompt`, { text: "QA_FORK_PROBE" })
+    const request = await until(() => requests.find((r) => r.last.includes("QA_FORK_PROBE")), "fork request")
+    // A fork adopts the parent's instruction values as its baseline and cannot unsee them, so Iolaus recomputes the
+    // fork's own state (normally nothing) and has the host announce that the inherited block no longer applies.
+    assert.ok(request.removal, "the fork was not told the inherited state no longer applies")
   })
 
   await check("approving the gate runs the PR node in the worktree", async () => {

@@ -78,6 +78,22 @@ export function validateDefinition(definition: DagDefinition): void {
     visited.add(id)
   }
   for (const node of definition.nodes) visit(node.id)
+  // A bound result must be settled before its consumer runs, so the node it names has to be upstream of the consumer.
+  const upstream = new Map<string, ReadonlySet<string>>()
+  const above = (id: string): ReadonlySet<string> => {
+    const known = upstream.get(id)
+    if (known) return known
+    const found = new Set<string>()
+    for (const dependency of nodes.get(id)?.dependsOn ?? []) {
+      found.add(dependency)
+      for (const further of above(dependency)) found.add(further)
+    }
+    upstream.set(id, found)
+    return found
+  }
+  for (const node of definition.nodes) for (const input of node.inputs ?? []) {
+    if (input.node !== "*" && !above(node.id).has(input.node)) throw new DagValidationError(`Input node ${input.node} is not upstream of ${node.id}: add it to dependsOn`)
+  }
 }
 
 /**

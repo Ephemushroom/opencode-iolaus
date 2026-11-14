@@ -10,7 +10,8 @@ import { canonicalJson } from "../src/dag/canonical-json"
 import { fingerprint, graphFingerprint } from "../src/dag/fingerprint"
 import { DagValidationError, validateDefinition } from "../src/dag/graph"
 import { DagStore } from "../src/dag/store"
-import { Effect } from "effect"
+import { createDagTool } from "../src/dag/tool"
+import { Deferred, Effect } from "effect"
 import type { DagDefinition, DagExecutionRef, DagNodeDefinition } from "../src/dag/types"
 
 let directory: string | undefined
@@ -478,4 +479,198 @@ test("subagent results parse from the structured output, the tagged text and the
   expect(subagentOutcome({ content: [{ type: "text", text: '<subagent sessionID="ses_2" state="failed">\nbad\n</subagent>' }] })).toEqual({ sessionID: "ses_2", status: "failed", text: "bad" })
   expect(subagentOutcome({ content: "The subagent is working in the background (sessionID: ses_3). You will be notified" })).toEqual({ sessionID: "ses_3", status: "running" })
   expect(subagentOutcome({ content: "nothing" })).toEqual({})
+})
+
+test("an explicit input must name a node upstream of its consumer", () => {
+  const stray: DagNodeDefinition = { ...node("report"), inputs: [{ node: "work" }] }
+  expect(() => validateDefinition(definition([node("work"), stray]))).toThrow(/work is not upstream of report/)
+  expect(() => validateDefinition(definition([{ ...node("report"), inputs: [{ node: "report" }] }]))).toThrow(/not upstream/)
+  // Upstream through another dependency is settled before the consumer runs, so it may be bound.
+  const transitive: DagNodeDefinition = { ...node("report", ["review"]), inputs: [{ node: "work" }, { node: "review" }] }
+  expect(() => validateDefinition(definition([node("work"), node("review", ["work"]), transitive]))).not.toThrow()
+})
+
+test("rejecting a gate blocks everything downstream of it and ends the run", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const runner = fakeRunner()
+  const controller = createDagController({ directory, runner })
+  const gate: DagNodeDefinition = { id: "gate", kind: "gate", prompt: "Ship it?", dependsOn: [] }
+  const run = await controller.create(definition([gate, node("build", ["gate"]), node("deploy", ["build"]), node("announce", ["deploy"])]), "owner")
+  const rejected = await controller.reject(run.runID, "owner", "gate")
+  expect(rejected.nodes.map((n) => n.status)).toEqual(["failed", "blocked", "blocked", "blocked"])
+  expect(rejected.status).toBe("failed")
+  expect((await controller.wait(run.runID, "owner")).status).toBe("failed")
+  expect(runner.started).toEqual([])
+  controller.close()
+})
+
+test("retrying a node reruns everything downstream of it, and an unknown node is refused", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const runner = fakeRunner()
+  const controller = createDagController({ directory, runner })
+  const gate: DagNodeDefinition = { id: "gate", kind: "gate", prompt: "Accept?", dependsOn: ["test"] }
+  const run = await controller.create(definition([node("build"), node("test", ["build"]), gate, node("lint")]), "owner")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  expect((await controller.approve(run.runID, "owner", "gate")).status).toBe("completed")
+  await expect(controller.retry(run.runID, "owner", "nope")).rejects.toThrow("Unknown DAG node: nope")
+  expect((await controller.snapshot(run.runID, "owner")).run.generation).toBe(1)
+
+  await controller.retry(run.runID, "owner", "build")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  const again = (await controller.snapshot(run.runID, "owner")).run
+  // The approval was given for the old build; lint does not depend on it and keeps its result.
+  expect(runner.started).toEqual(["build", "lint", "test", "build", "test"])
+  expect(again.status).toBe("paused")
+  expect(Object.fromEntries(again.nodes.map((n) => [n.definition.id, [n.status, n.attempt]]))).toEqual({ build: ["completed", 2], test: ["completed", 2], gate: ["waiting_approval", 2], lint: ["completed", 1] })
+  controller.close()
+})
+
+test("restart recovery starts only once the plugin has finished registering", async () => {
+  const runID = await stalledRun("wait")
+  const ready = Deferred.makeUnsafe<void>()
+  const reattached: string[] = []
+  const second = createDagController({ directory: directory!, recoveryReady: Deferred.await(ready), runner: { ...fakeRunner(), async reattach(ref) { reattached.push(ref.sessionID); return { payload: { text: "finished while detached" } } } } })
+  await new Promise((resolve) => setTimeout(resolve, 40))
+  expect(reattached).toEqual([])
+  expect((await second.snapshot(runID, "caller")).run.nodes[0]?.status).toBe("running")
+  Effect.runSync(Deferred.succeed(ready, undefined))
+  expect((await second.wait(runID, "caller")).status).toBe("completed")
+  expect(reattached).toEqual(["session-a"])
+  second.close()
+})
+
+test("cancelling a run reports a child session that could not be stopped", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const traces: string[] = []
+  const controller = createDagController({ directory, trace: (event) => { traces.push(event) },
+    runner: { ...stalledRunner("wait"), async cancel(ref) { if (ref.nodeID === "a") throw new Error("host refused the interrupt") } } })
+  const run = await controller.create(definition([node("a"), node("b")]), "owner")
+  await new Promise((resolve) => setTimeout(resolve, 20))
+  const cancelled = await controller.cancel(run.runID, "owner")
+  expect(cancelled.status).toBe("cancelled")
+  expect(cancelled.nodes.map((n) => [n.definition.id, n.status, n.error])).toEqual([
+    ["a", "cancelled", "Cancelled, but its session could not be stopped: host refused the interrupt"],
+    ["b", "cancelled", undefined],
+  ])
+  expect(traces).toContain("iolaus.dag.cancel-failed")
+  const events = (await controller.snapshot(run.runID, "owner")).events
+  expect(events.filter((e) => e.type === "node.failed").map((e) => [e.nodeID, e.payload])).toEqual([["a", { message: "Cancelled, but its session could not be stopped: host refused the interrupt", status: "cancelled" }]])
+  controller.close()
+})
+
+test("amend reuses a node only while it and everything upstream of it are unchanged, whatever the node order", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const runner = fakeRunner()
+  const controller = createDagController({ directory, runner, directoryAllowed: () => true })
+  // The consumer may be listed before the node it depends on.
+  const graph = (prompt: string, order: readonly string[]) => definition(order.map((id) => id === "a" ? { ...node("a"), prompt } : node("b", ["a"])))
+  const run = await controller.create(graph("build", ["b", "a"]), "owner")
+  await controller.wait(run.runID, "owner")
+  expect(runner.started).toEqual(["a", "b"])
+
+  const reordered = await controller.amend(run.runID, "owner", graph("build", ["a", "b"]))
+  expect(reordered.nodes.map((n) => n.status)).toEqual(["reused", "reused"])
+  expect(runner.started).toEqual(["a", "b"])
+
+  await controller.amend(run.runID, "owner", graph("build differently", ["b", "a"]))
+  await controller.wait(run.runID, "owner")
+  expect(runner.started).toEqual(["a", "b", "a", "b"])
+
+  // The same nodes in another directory are different work.
+  await controller.amend(run.runID, "owner", { ...graph("build differently", ["b", "a"]), directory: join(directory, "elsewhere") })
+  await controller.wait(run.runID, "owner")
+  expect(runner.started).toEqual(["a", "b", "a", "b", "a", "b"])
+  controller.close()
+})
+
+test("a session's runs can be listed open-only or up to a limit", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const controller = createEffectController({ directory, databasePath: join(directory, "iolaus.db"), runner: runnerFromPromise(fakeRunner()) })
+  const run = <A, E>(effect: Effect.Effect<A, E>) => Effect.runPromise(effect)
+  const done = await run(controller.create(definition([node("a")]), "owner"))
+  await run(controller.wait(done.runID, "owner"))
+  const held = await run(controller.create(definition([{ id: "gate", kind: "gate", prompt: "Go?", dependsOn: [] }]), "owner"))
+  expect((await run(controller.list("owner"))).map((value) => value.runID).sort()).toEqual([done.runID, held.runID].sort())
+  expect((await run(controller.list("owner", { open: true }))).map((value) => value.runID)).toEqual([held.runID])
+  expect(await run(controller.list("owner", { limit: 1 }))).toHaveLength(1)
+  await run(controller.close)
+})
+
+test("retry refuses an empty node id and an empty selection, and resume reruns what a cancel stopped", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const runner = fakeRunner()
+  const effect = createEffectController({ directory, databasePath: join(directory, "iolaus.db"), runner: runnerFromPromise(runner) })
+  const controller = promiseController(effect)
+  const done = await controller.create(definition([node("a")]), "owner")
+  await controller.wait(done.runID, "owner")
+  await expect(controller.retry(done.runID, "owner", "")).rejects.toThrow("Unknown DAG node")
+  await expect(controller.retry(done.runID, "owner")).rejects.toThrow("Nothing to retry")
+  const tool = createDagTool(effect)
+  const call = async (input: unknown) => JSON.parse(String((await Effect.runPromise(tool.execute(input as never, { sessionID: "owner" } as never))).content))
+  expect((await call({ action: "retry", run_id: done.runID, node_id: "" })).error).toMatch(/node_id is required/)
+  expect((await controller.snapshot(done.runID, "owner")).run.generation).toBe(1)
+
+  const gate: DagNodeDefinition = { id: "gate", kind: "gate", prompt: "Go?", dependsOn: ["a"] }
+  const held = await controller.create(definition([node("a"), gate, node("b", ["gate"])]), "owner")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  expect((await controller.cancel(held.runID, "owner")).nodes.map((n) => n.status)).toEqual(["completed", "cancelled", "cancelled"])
+  await controller.resume(held.runID, "owner")
+  await new Promise((resolve) => setTimeout(resolve, 50))
+  const again = (await controller.snapshot(held.runID, "owner")).run
+  expect([again.status, again.nodes.map((n) => n.status)]).toEqual(["paused", ["completed", "waiting_approval", "pending"]])
+  expect(runner.started).toEqual(["a", "a"])
+  controller.close()
+})
+
+test("recovery leaves alone a node that changed while it waited to start", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const path = join(directory, "iolaus.db")
+  const run = <A, E>(effect: Effect.Effect<A, E>) => Effect.runPromise(effect)
+  const first = createEffectController({ directory, databasePath: path, runner: runnerFromPromise(fakeRunner()) })
+  // One call whose child session was never recorded, and one whose child is known.
+  const unknown = await run(first.observe({ ownerSessionID: "owner", agent: "explore", title: "Unknown child", prompt: "go" }))
+  const known = await run(first.observe({ ownerSessionID: "owner", runID: unknown.runID, agent: "explore", title: "Known child", prompt: "go" }))
+  await run(first.observed(known.runID, known.nodeID, { status: "running", sessionID: "ses_known" }))
+  Effect.runSync(first.close)
+
+  const ready = Deferred.makeUnsafe<void>()
+  let release!: (value: { payload: { text: string } }) => void
+  const reattach = new Promise<{ payload: { text: string } }>((resolve) => { release = resolve })
+  const second = createEffectController({ directory, databasePath: path, recoveryReady: Deferred.await(ready), runner: runnerFromPromise({ ...fakeRunner(), reattach: () => reattach }) })
+  // The live observer learns the first child's session before recovery starts.
+  await run(second.observed(unknown.runID, unknown.nodeID, { status: "running", sessionID: "ses_late" }))
+  Effect.runSync(Deferred.succeed(ready, undefined))
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  expect((await run(second.node(unknown.runID, "owner", unknown.nodeID))).status).toBe("running")
+  // The second child answers and is followed up while its reattach still waits; that stale wait must not settle the new attempt.
+  await run(second.observed(known.runID, known.nodeID, { status: "completed", text: "live answer" }))
+  await run(second.observed(known.runID, known.nodeID, { status: "running" }))
+  release({ payload: { text: "stale answer" } })
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  const followed = await run(second.node(known.runID, "owner", known.nodeID))
+  expect([followed.status, followed.attempt, followed.result?.payload]).toEqual(["running", 2, { text: "live answer" }])
+  Effect.runSync(second.close)
+})
+
+test("a child created after its run was cancelled is reported when it cannot be stopped", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-test-"))
+  const traces: string[] = []
+  let created!: () => void, release!: () => void
+  const creating = new Promise<void>((resolve) => { created = resolve }), held = new Promise<void>((resolve) => { release = resolve })
+  const controller = createDagController({ directory, trace: (event) => { traces.push(event) }, runner: {
+    async start(input) { created(); await held; return { nodeID: input.node.id, attempt: input.attempt, sessionID: "late" } },
+    wait: () => new Promise<never>(() => {}),
+    async cancel() { throw new Error("host refused the interrupt") },
+  } })
+  const run = await controller.create(definition([node("a")]), "owner")
+  await creating
+  expect((await controller.cancel(run.runID, "owner")).status).toBe("cancelled")
+  release()
+  await new Promise((resolve) => setTimeout(resolve, 30))
+  const snapshot = await controller.snapshot(run.runID, "owner")
+  const message = "Cancelled, but its session could not be stopped: host refused the interrupt"
+  expect([snapshot.run.status, snapshot.run.nodes[0]?.status, snapshot.run.nodes[0]?.error]).toEqual(["cancelled", "cancelled", message])
+  expect(snapshot.events.filter((e) => e.type === "node.failed").map((e) => e.payload)).toEqual([{ message, status: "cancelled" }])
+  expect(traces).toContain("iolaus.dag.cancel-failed")
+  controller.close()
 })

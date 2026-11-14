@@ -1,4 +1,4 @@
-import { Deferred, Effect, Stream } from "effect"
+import { Deferred, Effect } from "effect"
 import { Agent, Plugin } from "@opencode/plugin/effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import { parseOptions } from "./options"
@@ -103,6 +103,9 @@ export default Plugin.define({
     })
     const stateSync = createStateSync(ctx.session.instructions, { controller, state, trace })
     state.onSave = (sessionID) => { Effect.runFork(stateSync.refresh(sessionID)) }
+    // The host copies the parent's instruction entries into a fork, but the goal, role and runs they describe stay
+    // with the parent: the fork owns none of them, so its entry is recomputed (and normally removed).
+    yield* ctx.session.hook("fork", (event) => stateSync.refresh(String(event.sessionID)))
     yield* Effect.addFinalizer(() => controller.close)
     yield* ctx.tool.transform((editor) => editor.add(createDagTool(controller)))
     yield* registerRoles(ctx, options, { controller, source, directory: (sessionID) => sessionDirectory(ctx, sessionID), state, trace })
@@ -145,11 +148,8 @@ export default Plugin.define({
 
     const rpc = yield* registerDagRpc(ctx, controller).pipe(Effect.orDie)
     emit = (sessionID, runID, sequence, type) => rpc.events.emit("updated", { sessionID, runID, sequence, type })
-    yield* ctx.event.subscribe({ types: ["plugin.updated"] }).pipe(
-      Stream.filter((event) => event.location?.directory === ctx.location.directory && event.location.workspaceID === ctx.location.workspaceID),
-      Stream.take(1),
-      Stream.runForEach(() => Deferred.succeed(recoveryReady, undefined)),
-      Effect.forkScoped({ startImmediately: true }),
-    )
+    // Everything is registered: recovery may settle and launch nodes now. The host publishes `plugin.updated` only
+    // when its plugin inventory changes, which a hot reload of this plugin does not, so that event cannot be the signal.
+    yield* Deferred.succeed(recoveryReady, undefined)
   }),
 })

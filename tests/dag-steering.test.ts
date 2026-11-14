@@ -598,3 +598,125 @@ test("recovery preserves an admitted receipt but stops downstream when host deli
   expect(done.nodes[0]?.result).toBeUndefined()
   expect((await restored.snapshot(run.runID, "owner")).steering?.[0]).toEqual(expect.objectContaining({ state: "unresolved", receipt: { messageID: "msg_admitted" } }))
 })
+
+test("retrying a node that was ever steered, or anything upstream of it, is refused even after it finished on a fallback model", async () => {
+  const waiting = deferred<void>()
+  const starts: string[] = []
+  const { controller } = setup({
+    continues: true,
+    async start(input) { starts.push(`${input.node.id}:${input.node.model}`); return { nodeID: input.node.id, attempt: input.attempt, sessionID: input.continueFrom?.sessionID ?? input.node.id } },
+    async admit() {}, async verify() {}, async steer(_ref, request) { return { messageID: request.messageID } },
+    async wait(ref, requests) {
+      if (ref.nodeID !== "implement") return { payload: "done" }
+      if (ref.identity?.model !== "test/visual") return { payload: "done on the fallback" }
+      if (!requests?.length) { waiting.resolve(); return new Promise<never>(() => {}) }
+      throw new DagRunnerError({ message: "provider failed", model: true, deliveredRequests: requests.map((request) => request.requestID) })
+    }, async cancel() {},
+  })
+  const run = await controller.create({ ...graph, nodes: [
+    { id: "plan", agent: "quick", model: "test/quick", prompt: "Plan", dependsOn: [] },
+    { ...graph.nodes[0]!, dependsOn: ["plan"], fallbackModels: ["test/backup"] }, graph.nodes[1]!,
+  ] }, "owner")
+  await waiting.promise
+  await controller.steer(run.runID, "owner", "implement", "use fontsource", "supplement")
+  const done = await controller.wait(run.runID, "owner")
+  expect([done.status, done.nodes[1]?.result?.payload]).toEqual(["completed", "done on the fallback"])
+  expect(starts).toEqual(["plan:test/quick", "implement:test/visual", "implement:test/backup", "review:test/review"])
+  // A fresh session would run the task without the supplement the user gave.
+  await expect(controller.retry(run.runID, "owner", "plan")).rejects.toThrow("steered execution")
+  await expect(controller.retry(run.runID, "owner", "implement")).rejects.toThrow("steered execution")
+  expect(starts).toHaveLength(4)
+  expect((await controller.snapshot(run.runID, "owner")).run.generation).toBe(done.generation)
+})
+
+test.each(["non-model failure", "escalation", "model failure"] as const)("steering history survives fallback before a subsequent %s", async (outcome) => {
+  const waiting = deferred<void>()
+  const starts: { attempt: number; agent: string | undefined; session: string | undefined }[] = []
+  let supplements = 0
+  const { controller } = setup({
+    continues: true,
+    async start(input) {
+      starts.push({ attempt: input.attempt, agent: input.node.agent, session: input.continueFrom?.sessionID })
+      return { nodeID: input.node.id, attempt: input.attempt, sessionID: input.continueFrom?.sessionID ?? `session-${input.attempt}` }
+    },
+    async admit() {}, async verify() {},
+    async steer(_ref, request) { supplements++; return { messageID: request.messageID } },
+    async wait(ref, requests) {
+      if (ref.attempt === 1) {
+        if (!requests?.length) { waiting.resolve(); return new Promise<never>(() => {}) }
+        throw new DagRunnerError({ message: "provider failed", model: true, deliveredRequests: requests.map((request) => request.requestID) })
+      }
+      if (ref.attempt === 2) {
+        expect(requests ?? []).toHaveLength(0)
+        if (outcome === "escalation") return { payload: "Findings\nESCALATE: deep-high" }
+        throw new DagRunnerError({ message: "second failure", model: outcome === "model failure" })
+      }
+      return { payload: "continued with supplement" }
+    },
+    async cancel() {},
+  }, { defaultModel: (agent) => agent === "deep-high" ? "test/high" : undefined })
+  const run = await controller.create({ ...graph, nodes: [{ ...graph.nodes[0]!, agent: "deep-low", maxAttempts: 3, fallbackModels: ["test/backup"] }] }, "owner")
+  await waiting.promise
+  await controller.steer(run.runID, "owner", "implement", "use fontsource", "supplement")
+  const done = await controller.wait(run.runID, "owner")
+  const snapshot = await controller.snapshot(run.runID, "owner")
+  expect(starts).toEqual([
+    { attempt: 1, agent: "deep-low", session: undefined },
+    { attempt: 2, agent: "deep-low", session: "session-1" },
+    ...(outcome === "model failure" ? [{ attempt: 3, agent: "deep-low", session: "session-1" }] : []),
+  ])
+  expect(supplements).toBe(1)
+  expect(snapshot.steering?.[0]?.state).toBe("delivered")
+  expect(snapshot.events.some((event) => event.type === "node.escalated")).toBe(false)
+  expect(done.status).toBe(outcome === "non-model failure" ? "failed" : "completed")
+  expect(done.nodes[0]?.result?.payload).toBe(outcome === "non-model failure" ? undefined : outcome === "escalation" ? "Findings\nESCALATE: deep-high" : "continued with supplement")
+})
+
+test("a stale unprompted reattach cannot interrupt a newly admitted supplement revision", async () => {
+  const waiting = deferred<void>()
+  const never = new Promise<never>(() => {})
+  const { controller, directory } = setup({
+    async start(input) { return { nodeID: input.node.id, attempt: input.attempt, sessionID: "session-1" } },
+    async admit() {}, async verify() {},
+    async wait() { waiting.resolve(); return never }, async cancel() {},
+  })
+  const run = await controller.create(graph, "owner")
+  await waiting.promise
+  controller.close()
+  controllers.splice(controllers.indexOf(controller), 1)
+  const reattaching = deferred<void>()
+  const stale = deferred<undefined>()
+  const steeredWait = deferred<void>()
+  const result = deferred<{ payload: string }>()
+  const starts: string[] = []
+  const restored = promiseController(createDagController({ directory, databasePath: join(directory, "state.db"), runner: runnerFromPromise({
+    async start(input) { starts.push(input.node.id); return { nodeID: input.node.id, attempt: input.attempt, sessionID: input.node.id } },
+    async admit() {}, async verify() {},
+    async steer(_ref, request) { return { messageID: request.messageID } },
+    async reattach(_ref, requests) { expect(requests ?? []).toHaveLength(0); reattaching.resolve(); return stale.promise },
+    async wait(ref, requests) {
+      if (ref.nodeID === "review") return { payload: "reviewed" }
+      expect(requests?.map((request) => request.requestID)).toEqual(["new-revision"])
+      steeredWait.resolve(); return result.promise
+    },
+    async cancel() { throw new Error("must not cancel the newer revision") },
+  }) }))
+  controllers.push(restored)
+  await reattaching.promise
+  expect((await restored.steer(run.runID, "owner", "implement", "use fontsource", "new-revision")).state).toBe("admitted")
+  await steeredWait.promise
+  stale.resolve(undefined)
+  await new Promise<void>((resolve) => setImmediate(resolve))
+  const snapshot = await restored.snapshot(run.runID, "owner")
+  expect(snapshot.run.nodes[0]?.status).toBe("running")
+  expect(snapshot.run.nodes[0]?.runtime?.inputRevision).toBe(1)
+  expect(snapshot.steering?.[0]?.state).toBe("admitted")
+  expect(snapshot.events.filter((event) => event.type === "node.failed")).toHaveLength(0)
+  result.resolve({ payload: "fontsource applied" })
+  const done = await restored.wait(run.runID, "owner")
+  expect(done.status).toBe("completed")
+  expect(done.nodes[0]?.result?.payload).toBe("fontsource applied")
+  expect(done.nodes[0]?.result?.inputRevision).toBe(1)
+  expect((await restored.snapshot(run.runID, "owner")).steering?.[0]?.state).toBe("delivered")
+  expect(starts).toEqual(["review"])
+})

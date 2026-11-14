@@ -1,17 +1,18 @@
 import { randomUUID } from "node:crypto"
-import { Cause, Deferred, Effect, Exit, Fiber, Scope, Semaphore } from "effect"
+import { Cause, Deferred, Effect, Exit, Fiber, Scope } from "effect"
 import { evaluateCondition } from "./condition"
 import { DagRunnerError, DagValidationError, errorMessage } from "./errors"
 import { dependencyState, isGate, validateDefinition } from "./graph"
-import { growLoop } from "./loop"
+import { growLoop, shrinkLoop } from "./loop"
 import { fingerprint, graphFingerprint, nodeFingerprint } from "./fingerprint"
 import type { DagRunner } from "./runner"
-import { DagStore, resolveDagDatabasePath } from "./store"
+import { DagStore, resolveDagDatabasePath, type ListRunsOptions } from "./store"
+import { createKeyedLock } from "../keyed-lock"
 import { sameRepository } from "./worktree"
 import { canonicalProject } from "../database"
 import type { DagNotifier } from "./notices"
 import { normalizedModel, type NodeRecovery } from "./rescue"
-import type { DagDefinition, DagEvent, DagNodeDefinition, DagNodeRecord, DagObservedStart, DagObservedUpdate, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, DagSteerRequest, JsonValue } from "./types"
+import type { DagDefinition, DagEvent, DagExecutionRef, DagNodeDefinition, DagNodeRecord, DagObservedStart, DagObservedUpdate, DagResolvedInput, DagResultEnvelope, DagRunRecord, DagSnapshot, DagSteerRequest, JsonValue } from "./types"
 
 export { DagValidationError }
 
@@ -22,7 +23,8 @@ export { DagValidationError }
 export interface DagController {
   readonly lineage: (runID: string, nodeID: string, sessionID: string) => Effect.Effect<DagRunRecord | undefined>
   readonly create: (definition: DagDefinition, ownerSessionID: string, authorizedPlan?: string) => Effect.Effect<DagRunRecord, DagValidationError>
-  readonly list: (ownerSessionID?: string) => Effect.Effect<readonly DagRunRecord[]>
+  /** Newest first. `open` leaves out finished runs; `limit` bounds how much history is read. */
+  readonly list: (ownerSessionID?: string, options?: ListRunsOptions) => Effect.Effect<readonly DagRunRecord[]>
   readonly snapshot: (runID: string, ownerSessionID: string) => Effect.Effect<DagSnapshot, DagValidationError>
   readonly node: (runID: string, ownerSessionID: string, nodeID: string) => Effect.Effect<DagNodeRecord, DagValidationError>
   readonly wait: (runID: string, ownerSessionID: string) => Effect.Effect<DagRunRecord, DagValidationError>
@@ -48,7 +50,7 @@ export interface DagControllerOptions {
   readonly runner: DagRunner
   /** Global opt-in: after a node's fallbacks and attempts are spent on model failures, continue it once on the owner's model. */
   readonly rescue?: { readonly ownerModel: boolean }
-  /** Restart recovery waits for this, so reattached children see a fully loaded host. */
+  /** Restart recovery starts after this, so the nodes it settles and launches see every hook, tool and RPC the plugin registers. */
   readonly recoveryReady?: Effect.Effect<void>
   /** Returns the configured "provider/model[#variant]" for an agent ID, or undefined. */
   readonly defaultModel?: (agent: string) => string | undefined
@@ -154,7 +156,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const runner = options.runner
   const now = options.now ?? Date.now
   const maxParallel = options.maxParallel ?? 5
-  const locks = new Map<string, Semaphore.Semaphore>()
+  const locks = createKeyedLock()
   const waiters = new Map<string, Set<Deferred.Deferred<DagRunRecord>>>()
   // Every launch fiber lives in this scope; closing the controller interrupts them.
   const scope = Scope.makeUnsafe()
@@ -181,15 +183,11 @@ export function createDagController(options: DagControllerOptions): DagControlle
     if (options.notifier) Effect.runFork(Effect.forkIn(deliverNotice(created.eventID), scope))
   }
   /** Per-run critical section. Each run has one permit, so state transitions never interleave. */
-  const locked = <A, E>(runID: string, task: Effect.Effect<A, E>): Effect.Effect<A, E> => {
-    let lock = locks.get(runID)
-    if (!lock) { lock = Semaphore.makeUnsafe(1); locks.set(runID, lock) }
-    return lock.withPermit(task)
-  }
+  const locked = <A, E>(runID: string, task: Effect.Effect<A, E>): Effect.Effect<A, E> => locks.withLock(runID, task)
   const operating = <A, E>(runID: string, task: Effect.Effect<A, E>): Effect.Effect<A, E> => locked(`operation:${runID}`, task)
   const deliverNotice = (eventID: string): Effect.Effect<void> => locked(`notice:${eventID}`, Effect.gen(function* () {
     if (closed || !options.notifier) return
-    const notice = store.notices().find((value) => value.eventID === eventID)
+    const notice = store.notice(eventID)
     if (!notice || notice.state === "admitted") return
     const fresh = notice.state === "pending"
     store.saveNotice({ ...notice, state: "reserved" })
@@ -213,6 +211,14 @@ export function createDagController(options: DagControllerOptions): DagControlle
     for (const waiter of pending) Deferred.doneUnsafe(waiter, Exit.succeed(run))
   }
   const save = (run: DagRunRecord): DagRunRecord => { store.saveRun(run); return run }
+  /** The run is cancelled either way, but a child that kept running is still editing and spending: say so on its node. */
+  const cancelFailed = (run: DagRunRecord, ref: DagExecutionRef, cause: Cause.Cause<unknown>): DagRunRecord => {
+    const message = `Cancelled, but its session could not be stopped: ${errorMessage(Cause.squash(cause))}`
+    trace("iolaus.dag.cancel-failed", { runID: run.runID, nodeID: ref.nodeID, sessionID: ref.sessionID, error: message })
+    const updated = updateNode(run, ref.nodeID, (value) => ({ ...value, error: message, updatedAt: now() }))
+    event(updated, "node.failed", ref.nodeID, { message, status: "cancelled" })
+    return updated
+  }
   const activeCount = (run: DagRunRecord): number => run.nodes.filter((node) => node.status === "starting" || node.status === "running").length
   const updateNode = (run: DagRunRecord, nodeID: string, update: (node: DagNodeRecord) => DagNodeRecord): DagRunRecord => ({
     ...run,
@@ -309,6 +315,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       if (!live || (live.status !== "starting" && live.status !== "running") || live.attempt !== node.attempt || live.runtime?.identity.token !== node.runtime?.identity.token) return
       if ((live.runtime?.inputRevision ?? 0) !== (node.runtime?.inputRevision ?? 0)) return
       const requests = executionRequests(runID, live)
+      const steered = store.steering(runID).some((request) => request.nodeID === nodeID)
       if (requests.some((request) => request.state === "reserved" || request.state === "unresolved")) return
       if (live.execution && runner.verify) {
         const checked = yield* Effect.exit(runner.verify(live.execution))
@@ -330,7 +337,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
         const { ref, payload } = outcome.value
         const text = replyText(payload)
         const escalated = live.definition.agent === "deep-low" && text !== undefined && ESCALATE_LINE.test(text) ? options.defaultModel?.("deep-high") : undefined
-        if (escalated && requests.length === 0 && !rescued) {
+        if (escalated && !steered && !rescued) {
           // The goal's central decision needs the escalation lane: rerun it there with the findings so far.
           const fallbacks = options.fallbackModels?.("deep-high") ?? []
           const definition: DagNodeDefinition = { ...live.definition, agent: "deep-high", model: escalated, fallbackModels: fallbacks.length ? fallbacks : undefined,
@@ -360,7 +367,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
       // taking the session over (the model switch itself failed), the one it was meant to continue.
       const session = (live.definition.kind ?? "agent") === "agent" && runner.continues
         ? live.execution && live.runtime?.initial === "admitted" ? live.execution : live.recovery?.continueFrom : undefined
-      const continuable = modelFailure && !nonRetryable && delivered && (session !== undefined || !store.steering(runID).some((request) => request.nodeID === nodeID))
+      const continuable = modelFailure && !nonRetryable && delivered && (session !== undefined || !steered)
       const failedModels = live.definition.model ? [...new Set([...(live.recovery?.failedModels ?? []), normalizedModel(live.definition.model)])] : live.recovery?.failedModels ?? []
       const retryRecovery: NodeRecovery = { failedModels, ...(session ? { continueFrom: session } : {}), ...(rescue ? { rescue } : {}) }
       const retry = (definition: DagNodeDefinition, type: "node.fallback" | "node.rescued", payload: JsonValue, recovery: NodeRecovery = retryRecovery) => {
@@ -400,7 +407,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
         event(current, "node.rescue-skipped", nodeID, { reason: errorMessage(Cause.squash(decision.cause)) })
       }
       const status: DagNodeRecord["status"] = requests.length && !delivered ? "interrupted"
-        : !modelFailure && !nonRetryable && requests.length === 0 && live.attempt < maxAttempts ? "needs_retry" : "failed"
+        : !modelFailure && !nonRetryable && !steered && live.attempt < maxAttempts ? "needs_retry" : "failed"
       const recovery = live.recovery || failedModels.length ? { ...closedRecovery(live.recovery ?? { failedModels }), failedModels } : undefined
       const updated = updateNode(current, nodeID, (value) => ({ ...value, status, error: message, ...(recovery ? { recovery } : {}), updatedAt: now() }))
       event(updated, "node.failed", nodeID, { message, status })
@@ -431,7 +438,15 @@ export function createDagController(options: DagControllerOptions): DagControlle
         return true
       }))
       if (!published) {
-        yield* runner.cancel(ref)
+        // The child was created after the run stopped waiting for it, so nobody else knows its session.
+        const stopped = yield* Effect.exit(runner.cancel(ref))
+        if (Exit.isFailure(stopped)) yield* locked(runID, Effect.sync(() => {
+          const current = store.getRun(runID)
+          const live = current?.nodes.find((value) => value.definition.id === nodeID)
+          // Only the attempt that was cancelled is marked; a retry since then owns the node's state.
+          if (current && live?.status === "cancelled" && live.attempt === node.attempt && live.runtime?.identity.token === node.runtime?.identity.token) cancelFailed(current, ref, stopped.cause)
+          else trace("iolaus.dag.cancel-failed", { runID, nodeID, sessionID: ref.sessionID, error: errorMessage(Cause.squash(stopped.cause)) })
+        }))
         return yield* new DagRunnerError({ message: "Execution was cancelled before initial admission", nodeID })
       }
       yield* operating(runID, Effect.gen(function* () {
@@ -481,10 +496,25 @@ export function createDagController(options: DagControllerOptions): DagControlle
     const current = store.getRun(runID)
     const live = current?.nodes.find((candidate) => candidate.definition.id === node.definition.id)
     if (!current || terminal(current.status) || !live || (live.status !== "starting" && live.status !== "running") || live.attempt !== node.attempt || live.runtime?.identity.token !== node.runtime?.identity.token) return
+    if ((live.runtime?.inputRevision ?? 0) !== (node.runtime?.inputRevision ?? 0) || live.execution?.sessionID !== node.execution?.sessionID) return
     const updated = updateNode(current, node.definition.id, (value) => ({ ...value, status: "interrupted", error: message, updatedAt: now() }))
     event(updated, "node.failed", node.definition.id, { message, status: "interrupted" })
     save(updateRunStatus(updated))
   }))
+
+  /**
+   * Whether a node read when the controller was built is still that same stranded execution. Recovery runs later
+   * (it waits for the plugin to finish registering) and its reattach later still, so everything it writes is
+   * fenced by the node's status, attempt and execution identity as they were then.
+   */
+  const stranded = (runID: string, node: DagNodeRecord): boolean => {
+    const run = store.getRun(runID)
+    if (!run || terminal(run.status)) return false
+    const live = run.nodes.find((candidate) => candidate.definition.id === node.definition.id)
+    return live !== undefined && live.status === node.status && live.attempt === node.attempt
+      && live.runtime?.inputRevision === node.runtime?.inputRevision
+      && live.runtime?.identity.token === node.runtime?.identity.token && live.execution?.sessionID === node.execution?.sessionID
+  }
 
   /**
    * An observed run's correlation with its subagent sessions lives in the observer's memory, so after a reload the
@@ -492,21 +522,23 @@ export function createDagController(options: DagControllerOptions): DagControlle
    */
   const recoverObserved = (run: DagRunRecord): Effect.Effect<void> => Effect.gen(function* () {
     for (const node of run.nodes) {
-      if (node.status !== "running") continue
+      if (node.status !== "running" || !stranded(run.runID, node)) continue
+      // The live observer may follow the call up while recovery waits; its newer state wins over the stranded one.
+      const settle = (update: DagObservedUpdate) => Effect.sync(() => { if (stranded(run.runID, node)) observed(run.runID, node.definition.id, update) })
       const ref = node.execution
       if (!ref) {
         trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "interrupted" })
-        yield* controller.observed(run.runID, node.definition.id, { status: "interrupted", error: "The controller stopped before the subagent session was known" })
+        yield* settle({ status: "interrupted", error: "The controller stopped before the subagent session was known" })
         continue
       }
       trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "reattached", sessionID: ref.sessionID })
       yield* Effect.forkIn(Effect.gen(function* () {
         const outcome = yield* Effect.exit(runner.reattach(ref))
-        if (!Exit.isSuccess(outcome)) return yield* controller.observed(run.runID, node.definition.id, { status: "failed", error: errorMessage(Cause.squash(outcome.cause)) })
-        if (outcome.value === undefined) return yield* controller.observed(run.runID, node.definition.id, { status: "interrupted", error: "The controller stopped before the subagent session received its prompt" })
+        if (!Exit.isSuccess(outcome)) return yield* settle({ status: "failed", error: errorMessage(Cause.squash(outcome.cause)) })
+        if (outcome.value === undefined) return yield* settle({ status: "interrupted", error: "The controller stopped before the subagent session received its prompt" })
         const payload = outcome.value.payload
         const text = payload !== null && typeof payload === "object" && !Array.isArray(payload) && typeof payload.text === "string" ? payload.text : ""
-        yield* controller.observed(run.runID, node.definition.id, { status: "completed", text })
+        yield* settle({ status: "completed", text })
       }), scope)
     }
   })
@@ -519,7 +551,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
   const recover = (run: DagRunRecord): Effect.Effect<void> => Effect.gen(function* () {
     if (run.definition.observed) return yield* recoverObserved(run)
     for (const node of run.nodes) {
-      if (node.status !== "starting" && node.status !== "running") continue
+      if ((node.status !== "starting" && node.status !== "running") || !stranded(run.runID, node)) continue
       const ref = node.execution
       if (!ref) {
         trace("iolaus.dag.recovered", { runID: run.runID, nodeID: node.definition.id, outcome: "interrupted" })
@@ -532,10 +564,13 @@ export function createDagController(options: DagControllerOptions): DagControlle
         const outcome = yield* Effect.exit(runner.reattach(ref, requests))
         if (requests.length) {
           const recovered = Exit.isSuccess(outcome) && outcome.value !== undefined
-          yield* locked(run.runID, Effect.sync(() => {
+          const current = yield* locked(run.runID, Effect.sync(() => {
+            if (!stranded(run.runID, node)) return false
             for (const request of requests) store.saveSteering({ ...request, state: recovered ? "admitted" : "unresolved",
               ...(recovered ? { receipt: request.receipt ?? { messageID: request.messageID } } : { error: "Host delivery or resulting execution could not be reconciled; nothing was replayed" }) })
+            return true
           }))
+          if (!current) return
           if (!recovered) {
             yield* interrupt(run.runID, node, "Steering delivery unresolved after recovery; nothing was replayed")
             return yield* schedule(run.runID)
@@ -545,7 +580,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
           if (node.runtime?.initial === "pending") yield* locked(run.runID, Effect.sync(() => {
             const current = store.getRun(run.runID)!
             const live = current.nodes.find((value) => value.definition.id === node.definition.id)
-            if (live?.runtime?.identity.token === node.runtime?.identity.token) save(updateNode(current, node.definition.id, (value) => ({ ...value, runtime: { ...value.runtime!, initial: "unresolved" } })))
+            if (live?.runtime?.initial === "pending" && stranded(run.runID, node)) save(updateNode(current, node.definition.id, (value) => ({ ...value, runtime: { ...value.runtime!, initial: "unresolved" } })))
           }))
           yield* interrupt(run.runID, node, node.runtime?.initial === "pending"
             ? "Initial prompt admission is unresolved after recovery; nothing was replayed"
@@ -581,9 +616,19 @@ export function createDagController(options: DagControllerOptions): DagControlle
     event(grown, "loop.grown", nodeID, { round: definition.nodes.filter((node) => node.id.startsWith(`${run.definition.loop!.fix}`)).length })
   }))
 
+  /** A node's fingerprint covers everything upstream of it, wherever its dependencies sit in the node list. */
   const fingerprintNodes = (definition: DagDefinition): Map<string, string> => {
+    const nodes = new Map(definition.nodes.map((node) => [node.id, node]))
     const fingerprints = new Map<string, string>()
-    for (const node of definition.nodes) fingerprints.set(node.id, nodeFingerprint(node, node.dependsOn.map((dependency) => fingerprints.get(dependency) ?? "")))
+    const of = (id: string): string => {
+      const known = fingerprints.get(id)
+      if (known !== undefined) return known
+      const node = nodes.get(id)!
+      const computed = nodeFingerprint(node, node.dependsOn.map(of))
+      fingerprints.set(id, computed)
+      return computed
+    }
+    for (const node of definition.nodes) of(node.id)
     return fingerprints
   }
 
@@ -657,20 +702,25 @@ export function createDagController(options: DagControllerOptions): DagControlle
       yield* schedule(runID)
       return yield* current(runID)
     }),
-    list: (ownerSessionID) => Effect.sync(() => store.listRuns(ownerSessionID)),
+    list: (ownerSessionID, listing) => Effect.sync(() => store.listRuns(ownerSessionID, listing)),
     snapshot: (runID, ownerSessionID) => owned(runID, ownerSessionID).pipe(Effect.map((run) => ({ run, events: store.events(runID), steering: store.steering(runID), notices: store.notices(runID) }))),
     node: (runID, ownerSessionID, nodeID) => owned(runID, ownerSessionID).pipe(Effect.flatMap((run) => {
       const record = run.nodes.find((candidate) => candidate.definition.id === nodeID)
       return record ? Effect.succeed(record) : Effect.fail(new DagValidationError(`Unknown DAG node: ${nodeID}`))
     })),
-    wait: (runID, ownerSessionID) => Effect.gen(function* () {
+    // The waiter is registered and its removal installed with interruption masked: a caller that stops waiting,
+    // even the moment it registered, leaves nothing behind for a run that may never finish.
+    wait: (runID, ownerSessionID) => Effect.uninterruptibleMask((restore) => Effect.gen(function* () {
       const run = yield* owned(runID, ownerSessionID)
       if (terminal(run.status)) return run
       const waiter = yield* Deferred.make<DagRunRecord>()
       const set = waiters.get(runID) ?? new Set<Deferred.Deferred<DagRunRecord>>()
       set.add(waiter); waiters.set(runID, set)
-      return yield* Deferred.await(waiter)
-    }),
+      return yield* restore(Deferred.await(waiter)).pipe(Effect.ensuring(Effect.sync(() => {
+        set.delete(waiter)
+        if (set.size === 0 && waiters.get(runID) === set) waiters.delete(runID)
+      })))
+    })),
     cancel: (runID, ownerSessionID, expectedGeneration) => operating(runID, locked(runID, Effect.gen(function* () {
       let run = yield* owned(runID, ownerSessionID)
       yield* checkGeneration(run, expectedGeneration)
@@ -680,7 +730,10 @@ export function createDagController(options: DagControllerOptions): DagControlle
       run = { ...run, status: "cancelled", updatedAt: now(), nodes: run.nodes.map((node) => node.status === "pending" || node.status === "ready" || node.status === "starting" || node.status === "running" || node.status === "needs_retry" || node.status === "waiting_approval"
         ? { ...node, status: "cancelled", ...(node.recovery ? { recovery: closedRecovery(node.recovery) } : {}), updatedAt: now() } : node) }
       save(run); event(run, "run.cancelled")
-      yield* Effect.forEach(refs, (ref) => Effect.ignore(runner.cancel(ref)), { discard: true })
+      for (const ref of refs) {
+        const stopped = yield* Effect.exit(runner.cancel(ref))
+        if (Exit.isFailure(stopped)) run = cancelFailed(run, ref, stopped.cause)
+      }
       notify(run)
       return run
     }))),
@@ -691,14 +744,37 @@ export function createDagController(options: DagControllerOptions): DagControlle
       yield* checkAtlas(run, run.definition)
       if (options.admit) yield* options.admit(ownerSessionID, run.definition, run.authorizedPlan)
       yield* checkGeneration(run, expectedGeneration)
+      if (nodeID !== undefined && !run.nodes.some((node) => node.definition.id === nodeID)) return yield* Effect.fail(new DagValidationError(`Unknown DAG node: ${nodeID}`))
       if (!terminal(run.status) && !run.nodes.some((node) => node.status === "needs_retry" || node.status === "interrupted")) return yield* Effect.fail(new DagValidationError("Retry requires a terminal run or a node needing retry"))
-      const selected = nodeID ? new Set([nodeID]) : new Set(run.nodes.filter((node) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry").map((node) => node.definition.id))
+      // Without a node id: whatever did not finish, which for a cancelled run is what the cancel stopped.
+      const unfinished = (node: DagNodeRecord) => node.status === "failed" || node.status === "interrupted" || node.status === "needs_retry" || (run.status === "cancelled" && node.status === "cancelled")
+      const selected = nodeID !== undefined ? new Set([nodeID]) : new Set(run.nodes.filter(unfinished).map((node) => node.definition.id))
+      if (!selected.size) return yield* Effect.fail(new DagValidationError("Nothing to retry: no node of this run failed, was interrupted or was cancelled"))
+      // Whatever ran on a retried node's previous result is stale, so everything downstream of it runs again too.
+      for (let grew = true; grew;) {
+        grew = false
+        for (const node of run.nodes) {
+          if (selected.has(node.definition.id) || !node.definition.dependsOn.some((id) => selected.has(id))) continue
+          selected.add(node.definition.id); grew = true
+        }
+      }
       if (run.nodes.some((node) => selected.has(node.definition.id) && (node.status === "starting" || node.status === "running"))) return yield* Effect.fail(new DagValidationError("Cannot retry a live execution"))
-       if (run.nodes.some((node) => (selected.has(node.definition.id) || (!nodeID && node.status === "cancelled")) && executionRequests(runID, node).length)) return yield* Effect.fail(new DagValidationError("Cannot retry a steered execution: reconcile its delivery or create a new flow with the complete task"))
-      if (run.nodes.some((node) => selected.has(node.definition.id) && node.runtime?.initial === "unresolved")) return yield* Effect.fail(new DagValidationError("Initial prompt admission is unresolved; refusing to replay the original task"))
+      // Fix rounds grown for a review that runs again answered a verdict that no longer exists; its new verdict decides.
+      const shrunk = shrinkLoop(run.definition, selected)
+      const definition = shrunk ? yield* validated(() => prepare(shrunk)) : run.definition
+      const kept = new Set(definition.nodes.map((node) => node.id))
+      // A restarted node runs in a fresh session, which would not have the supplements an earlier execution of it was
+      // given: any steering in the node's history refuses the retry, whichever execution finished it.
+      const restarted = (node: DagNodeRecord) => kept.has(node.definition.id) && (selected.has(node.definition.id) || node.status === "blocked")
+      const steered = new Set(store.steering(runID).map((request) => request.nodeID))
+      // A dropped review round may be grown again under the same ID. Dropping it must not bypass the replay guard.
+      const invalidated = (node: DagNodeRecord) => selected.has(node.definition.id) || restarted(node)
+      if (run.nodes.some((node) => invalidated(node) && steered.has(node.definition.id))) return yield* Effect.fail(new DagValidationError("Cannot retry a steered execution: reconcile its delivery or create a new flow with the complete task"))
+      if (run.nodes.some((node) => invalidated(node) && node.runtime?.initial === "unresolved")) return yield* Effect.fail(new DagValidationError("Initial prompt admission is unresolved; refusing to replay the original task"))
       // Blocked nodes return to pending too; the frontier blocks them again if another dependency still failed.
       // A retried node starts again from its planned model chain; an escalated node stays on its escalation lane.
-      const planned = new Map(run.definition.nodes.map((node) => [node.id, node]))
+      const planned = new Map(definition.nodes.map((node) => [node.id, node]))
+      const fingerprints = shrunk ? fingerprintNodes(definition) : undefined
       // An explicit retry is a fresh session: it continues nothing, and a spent rescue stays spent.
       const restart = (node: DagNodeRecord): DagNodeDefinition => {
         const original = planned.get(node.definition.id)
@@ -706,8 +782,11 @@ export function createDagController(options: DagControllerOptions): DagControlle
         const rescue = node.recovery?.rescue
         return rescue && normalizedModel(node.definition.model ?? "") === rescue.model ? rescue.preRescueDefinition : node.definition
       }
-      run = { ...run, generation: run.generation + 1, status: "running", updatedAt: now(), nodes: run.nodes.map((node) => selected.has(node.definition.id) || node.status === "blocked"
-        ? { ...node, definition: restart(node), ...(node.recovery ? { recovery: { ...closedRecovery(node.recovery)!, failedModels: [] } } : {}), status: "pending", error: undefined, execution: undefined, updatedAt: now() } : node) }
+      // A restarted node keeps nothing of its earlier run: a result left on it would be read as current if it is skipped this time.
+      run = { ...run, definition, ...(shrunk ? { fingerprint: graphFingerprint(definition) } : {}), generation: run.generation + 1, status: "running", updatedAt: now(),
+        nodes: run.nodes.filter((node) => kept.has(node.definition.id)).map((node) => restarted(node)
+          ? { ...node, definition: restart(node), ...(fingerprints ? { fingerprint: fingerprints.get(node.definition.id)! } : {}), ...(node.recovery ? { recovery: { ...closedRecovery(node.recovery)!, failedModels: [] } } : {}),
+              status: "pending", error: undefined, execution: undefined, result: undefined, runtime: undefined, updatedAt: now() } : node) }
       save(run); event(run, "node.retrying", nodeID)
       })))
       yield* schedule(runID)
@@ -735,12 +814,18 @@ export function createDagController(options: DagControllerOptions): DagControlle
       const message = note?.trim() ? `Rejected by approver: ${note.trim()}` : "Rejected by approver"
       let updated = updateNode(run, nodeID, (value) => ({ ...value, status: "failed", error: message, updatedAt: now() }))
       event(updated, "node.rejected", nodeID, { decision: "rejected", ...(note === undefined ? {} : { note }) })
+      // Everything downstream of the rejected gate is blocked, not only its direct dependents: a node left pending keeps the run open forever.
       const records = new Map(updated.nodes.map((node) => [node.definition.id, node]))
-      for (const node of updated.nodes) {
-        if (node.status !== "pending" && node.status !== "needs_retry") continue
-        if (dependencyState(node.definition, records) !== "blocked") continue
-        updated = updateNode(updated, node.definition.id, (value) => ({ ...value, status: "blocked", error: "A dependency did not complete successfully", updatedAt: now() }))
-        event(updated, "node.blocked", node.definition.id)
+      for (let settled = false; !settled;) {
+        settled = true
+        for (const node of updated.nodes) {
+          if (node.status !== "pending" && node.status !== "needs_retry") continue
+          if (dependencyState(node.definition, records) !== "blocked") continue
+          updated = updateNode(updated, node.definition.id, (value) => ({ ...value, status: "blocked", error: "A dependency did not complete successfully", updatedAt: now() }))
+          event(updated, "node.blocked", node.definition.id)
+          records.set(node.definition.id, updated.nodes.find((candidate) => candidate.definition.id === node.definition.id)!)
+          settled = false
+        }
       }
       return save(updateRunStatus(updated))
     })),
@@ -764,9 +849,11 @@ export function createDagController(options: DagControllerOptions): DagControlle
           if (!affected.has(node.id) && node.dependsOn.some((id) => affected.has(id))) { affected.add(node.id); changed = true }
         }
       }
+      // A result produced in another directory is not this run's result.
+      const moved = previous.definition.directory !== definition.directory
       const nextNodes = definition.nodes.map((node) => {
         const old = previousByID.get(node.id)
-        const same = old && !affected.has(node.id) && old.fingerprint === fingerprints.get(node.id) && (old.status === "completed" || old.status === "reused")
+        const same = old && !moved && !affected.has(node.id) && old.fingerprint === fingerprints.get(node.id) && (old.status === "completed" || old.status === "reused")
         // A removed and re-added node keeps its spent rescue; an amended node continues nothing.
         const recovery = closedRecovery(old?.recovery ?? store.recovery(runID, node.id))
         return { definition: node, fingerprint: fingerprints.get(node.id)!, status: same ? "reused" as const : "pending" as const, attempt: same ? old.attempt : 0, ...(recovery ? { recovery } : {}), ...(same && old.result ? { result: old.result } : {}), createdAt: old?.createdAt ?? now(), updatedAt: now() }
@@ -843,8 +930,7 @@ export function createDagController(options: DagControllerOptions): DagControlle
     observe: (input) => Effect.sync(() => {
       const at = now()
       const batch = input.batch ?? { kind: "call" as const, id: randomUUID() }
-      const run = input.runID ? store.getRun(input.runID) : store.listRuns(input.ownerSessionID).find((candidate) =>
-        candidate.definition.observed && candidate.definition.observedBatch?.kind === batch.kind && candidate.definition.observedBatch.id === batch.id)
+      const run = input.runID ? store.getRun(input.runID) : store.observedRun(input.ownerSessionID, batch)
       if (input.runID && (!run?.definition.observed || run.ownerSessionID !== input.ownerSessionID)) throw new Error("Unknown observed batch")
       if (input.parentNodeID && !run?.nodes.some((node) => node.definition.id === input.parentNodeID)) throw new Error("Parent must belong to the observed batch")
       const nodeID = `${(run?.nodes.length ?? 0) + 1}-${slug(input.title)}`
@@ -861,7 +947,20 @@ export function createDagController(options: DagControllerOptions): DagControlle
       save(next); event(next, "node.started", nodeID)
       return { runID: run.runID, nodeID }
     }),
-    observed: (runID, nodeID, update) => Effect.sync(() => {
+    observed: (runID, nodeID, update) => Effect.sync(() => observed(runID, nodeID, update)),
+    observedChild: (sessionID) => Effect.sync(() => {
+      const found = store.observedNode(sessionID)
+      return found ? { runID: found.runID, nodeID: found.nodeID, owner: found.ownerSessionID } : undefined
+    }),
+    close: Effect.sync(() => {
+      closed = true
+      Effect.runFork(Scope.close(scope, Exit.void))
+      for (const set of waiters.values()) for (const waiter of set) Deferred.doneUnsafe(waiter, Exit.fail(new DagValidationError("Iolaus DAG controller closed")) as never)
+      waiters.clear()
+      store.close()
+    }),
+  }
+  function observed(runID: string, nodeID: string, update: DagObservedUpdate): void {
       const run = store.getRun(runID)
       const node = run?.nodes.find((candidate) => candidate.definition.id === nodeID)
       if (!run || !node || !run.definition.observed) return
@@ -904,23 +1003,14 @@ export function createDagController(options: DagControllerOptions): DagControlle
         update.status === "completed" ? { text: update.text } : update.status === "running" ? undefined : { message: update.error, status: update.status })
       if (status !== run.status && (status === "completed" || status === "failed")) event(updated, status === "completed" ? "run.completed" : "run.failed")
       notify(updated)
-    }),
-    observedChild: (sessionID) => Effect.sync(() => {
-      const found = store.observedNode(sessionID)
-      return found ? { runID: found.runID, nodeID: found.nodeID, owner: found.ownerSessionID } : undefined
-    }),
-    close: Effect.sync(() => {
-      closed = true
-      Effect.runFork(Scope.close(scope, Exit.void))
-      for (const set of waiters.values()) for (const waiter of set) Deferred.doneUnsafe(waiter, Exit.fail(new DagValidationError("Iolaus DAG controller closed")) as never)
-      waiters.clear()
-      store.close()
-    }),
   }
   const shared: SharedController = { controller, refs: 1 }
   sharedControllers.set(key, shared)
-  if (options.notifier) Effect.runFork(Effect.forkIn(Effect.forEach(store.notices(), (notice) => deliverNotice(notice.eventID), { discard: true }), scope))
-  Effect.runFork(Effect.forkIn(Effect.forEach(store.listRuns().filter((run) => !terminal(run.status)), recover, { discard: true }), scope))
+  if (options.notifier) Effect.runFork(Effect.forkIn(Effect.forEach(store.undeliveredNotices(), (notice) => deliverNotice(notice.eventID), { discard: true }), scope))
+  // Read now, recovered later: a run created while recovery waits is this controller's own live work, not a stray,
+  // and `stranded` leaves alone any node that changed in the meantime.
+  const open = store.listRuns(undefined, { open: true })
+  Effect.runFork(Effect.forkIn(Effect.andThen(options.recoveryReady ?? Effect.void, Effect.forEach(open, recover, { discard: true })), scope))
   return { ...controller, close: Effect.sync(() => releaseSharedController(key, shared)) }
 }
 

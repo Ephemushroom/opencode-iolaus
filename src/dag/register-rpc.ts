@@ -34,7 +34,7 @@ export function nodeSummary(title: string | undefined, prompt: string): string |
 }
 
 export function dagView(controller: DagController, sessionID: string): Effect.Effect<DagView> {
-  return controller.list(sessionID).pipe(Effect.map((runs) => ({ runs: runs.slice(0, 50).map((run) => ({
+  return controller.list(sessionID, { limit: 50 }).pipe(Effect.map((runs) => ({ runs: runs.map((run) => ({
     runID: run.runID, name: run.name, generation: run.generation,
     status: run.status, createdAt: run.createdAt, updatedAt: run.updatedAt,
     ...(run.definition.observed ? { observed: true } : {}),

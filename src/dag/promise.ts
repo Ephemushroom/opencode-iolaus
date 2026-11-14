@@ -1,11 +1,12 @@
 import { Effect } from "effect"
 import type { DagController } from "./controller"
+import type { ListRunsOptions } from "./store"
 import type { DagDefinition, DagNodeRecord, DagRunRecord, DagSnapshot, DagSteerRequest } from "./types"
 
 /** Promise view of a DagController for tests, QA scripts and non-Effect callers. Errors reject with the typed error instance. */
 export interface DagControllerPromise {
   readonly create: (definition: DagDefinition, ownerSessionID: string) => Promise<DagRunRecord>
-  readonly list: (ownerSessionID?: string) => Promise<readonly DagRunRecord[]>
+  readonly list: (ownerSessionID?: string, options?: ListRunsOptions) => Promise<readonly DagRunRecord[]>
   readonly snapshot: (runID: string, ownerSessionID: string) => Promise<DagSnapshot>
   readonly node: (runID: string, ownerSessionID: string, nodeID: string) => Promise<DagNodeRecord>
   readonly wait: (runID: string, ownerSessionID: string) => Promise<DagRunRecord>
@@ -23,7 +24,7 @@ export function promiseController(controller: DagController): DagControllerPromi
   const run = <A, E>(effect: Effect.Effect<A, E>): Promise<A> => Effect.runPromise(effect)
   return {
     create: (d, o) => run(controller.create(d, o)),
-    list: (o) => run(controller.list(o)),
+    list: (o, options) => run(controller.list(o, options)),
     snapshot: (r, o) => run(controller.snapshot(r, o)),
     node: (r, o, n) => run(controller.node(r, o, n)),
     wait: (r, o) => run(controller.wait(r, o)),
