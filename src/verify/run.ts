@@ -1,4 +1,4 @@
-import { execFile } from "node:child_process"
+import { execFile, type ExecFileException } from "node:child_process"
 import { existsSync, readFileSync } from "node:fs"
 import { isAbsolute, relative, resolve } from "node:path"
 import type { Checker, VerifyConfig } from "./config"
@@ -47,76 +47,127 @@ function inside(directory: string, target: string): boolean {
 }
 
 // tsc:  src/a.ts(3,7): error TS2322: ...      eslint unix / ruff concise / cargo short / go vet: src/a.ts:3:7 - error ... or ./a.go:3:2: msg
-const LOCATION = /^(?<path>\.?\.?\/?[^\s:(]+(?:\/[^\s:(]+)*)(?:\((?<l1>\d+),\d+\)|:(?<l2>\d+)(?::\d+)?)[\s:-]+(?<msg>.*)$/
+const LOCATION = /^(?<path>[^:(]+)(?:\((?<l1>\d+),\d+\)|:(?<l2>\d+)(?::\d+)?)[\s:-]+(?<msg>.*)$/
 // biome --reporter=github:  ::error title=lint/x,file=src/a.ts,line=3,endLine=3,col=1,endColumn=2::message
 const GITHUB = /^::(?:error|warning|notice)\b(?<attrs>[^:]*)::(?<msg>.*)$/
 
-/** Keep lines that locate a diagnostic in one of the changed files. */
-export function filterDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
-  const wanted = new Set(changed.map((path) => resolve(directory, path)))
-  const result: Diagnostic[] = []
+/** A diagnostic with its absolute path, before it is narrowed to the changed files. */
+type Located = { readonly path: string; readonly line?: number; readonly message: string }
+
+function located(output: string, directory: string): Located[] {
+  const result: Located[] = []
   for (const raw of output.split(/\r?\n/)) {
     const gh = GITHUB.exec(raw.trim())
     if (gh?.groups) {
       const attrs = Object.fromEntries(gh.groups.attrs.split(",").map((pair) => pair.split("=").map((s) => s.trim())).filter((pair) => pair.length === 2))
-      if (attrs.file) {
-        const path = resolve(directory, attrs.file)
-        if (wanted.has(path)) result.push({ path: relative(directory, path), ...(attrs.line ? { line: Number(attrs.line) } : {}), message: `${attrs.title ? `${attrs.title}: ` : ""}${gh.groups.msg.trim()}` })
-      }
+      if (attrs.file) result.push({ path: resolve(directory, attrs.file), ...(attrs.line ? { line: Number(attrs.line) } : {}), message: `${attrs.title ? `${attrs.title}: ` : ""}${gh.groups.msg.trim()}` })
       continue
     }
     const match = LOCATION.exec(raw.trim())
     if (!match?.groups) continue
-    const path = resolve(directory, match.groups.path)
-    if (!wanted.has(path)) continue
     const line = Number(match.groups.l1 ?? match.groups.l2)
-    result.push({ path: relative(directory, path), ...(Number.isFinite(line) ? { line } : {}), message: match.groups.msg.trim() })
+    result.push({ path: resolve(directory, match.groups.path), ...(Number.isFinite(line) ? { line } : {}), message: match.groups.msg.trim() })
   }
   return result
 }
 
-/** JSON reporters: an array (or `diagnostics`/`results` array) of objects naming a file and optionally a line and message. */
-export function filterJsonDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
-  const wanted = new Set(changed.map((path) => resolve(directory, path)))
+/** JSON reporters: an array (or `diagnostics`/`results` array) of objects naming a file and optionally a line and message. Undefined for malformed or unsupported reports. */
+function locatedJson(output: string, directory: string): Located[] | undefined {
+  if (!output.trim()) return []
   let parsed: unknown
-  try { parsed = JSON.parse(output.trim()) } catch { return [] }
+  try { parsed = JSON.parse(output.trim()) } catch { return undefined }
   const list = Array.isArray(parsed) ? parsed
     : parsed && typeof parsed === "object" && Array.isArray((parsed as { diagnostics?: unknown }).diagnostics) ? (parsed as { diagnostics: unknown[] }).diagnostics
     : parsed && typeof parsed === "object" && Array.isArray((parsed as { results?: unknown }).results) ? (parsed as { results: unknown[] }).results
-    : []
-  const result: Diagnostic[] = []
+    : undefined
+  if (!list) return undefined
+  const result: Located[] = []
   for (const item of list) {
-    if (!item || typeof item !== "object") continue
+    if (!item || typeof item !== "object" || Array.isArray(item)) return undefined
     const record = item as Record<string, unknown>
     // ESLint's JSON groups messages per file.
-    if (Array.isArray(record.messages) && typeof record.filePath === "string") {
+    if (Array.isArray(record.messages) && typeof record.filePath === "string" && record.filePath.trim()) {
       const path = resolve(directory, record.filePath)
-      if (!wanted.has(path)) continue
-      for (const m of record.messages as Record<string, unknown>[]) result.push({ path: relative(directory, path), ...(typeof m.line === "number" ? { line: m.line } : {}), message: String(m.message ?? m.ruleId ?? "") })
+      for (const entry of record.messages) {
+        if (!entry || typeof entry !== "object" || Array.isArray(entry)) return undefined
+        const message = entry.message ?? entry.ruleId ?? ""
+        if (typeof message !== "string" && typeof message !== "number") return undefined
+        result.push({ path, ...(typeof entry.line === "number" ? { line: entry.line } : {}), message: String(message) })
+      }
       continue
     }
+    if (record.messages !== undefined) return undefined
     const file = record.file ?? record.path ?? record.filename ?? record.filePath ?? (record.location as { file?: unknown } | undefined)?.file
-    if (typeof file !== "string") continue
-    const path = resolve(directory, file)
-    if (!wanted.has(path)) continue
+    if (typeof file !== "string" || !file.trim()) return undefined
     const line = record.line ?? (record.location as { line?: unknown; row?: unknown } | undefined)?.line ?? (record.location as { row?: unknown } | undefined)?.row ?? (record.start as { line?: unknown } | undefined)?.line
-    result.push({ path: relative(directory, path), ...(typeof line === "number" ? { line } : {}), message: String(record.message ?? record.code ?? record.rule ?? "") })
+    const message = record.message ?? record.code ?? record.rule ?? ""
+    if (typeof message !== "string" && typeof message !== "number") return undefined
+    result.push({ path: resolve(directory, file), ...(typeof line === "number" ? { line } : {}), message: String(message) })
   }
   return result
+}
+
+function inChanged(all: readonly Located[], directory: string, changed: readonly string[]): Diagnostic[] {
+  const wanted = new Set(changed.map((path) => resolve(directory, path)))
+  return all.filter((item) => wanted.has(item.path)).map((item) => ({ ...item, path: relative(directory, item.path) }))
+}
+
+/** Keep lines that locate a diagnostic in one of the changed files. */
+export function filterDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
+  return inChanged(located(output, directory), directory, changed)
+}
+
+export function filterJsonDiagnostics(output: string, directory: string, changed: readonly string[]): Diagnostic[] {
+  return inChanged(locatedJson(output, directory) ?? [], directory, changed)
 }
 
 function runChecker(checker: Checker, directory: string, changed: readonly string[], timeoutMs: number, signal?: AbortSignal): Promise<CheckerResult> {
   const started = Date.now()
   return new Promise((done) => {
     const [command, ...args] = checker.argv
-    execFile(command, args, { cwd: directory, timeout: timeoutMs, maxBuffer: 16 * 1024 * 1024, encoding: "utf8", signal, env: { ...process.env, FORCE_COLOR: "0", NO_COLOR: "1" } }, (error, stdout, stderr) => {
+    let settled = false
+    let termination: string | undefined
+    let timeout: ReturnType<typeof setTimeout> | undefined
+    let grace: ReturnType<typeof setTimeout> | undefined
+    const finish = (error: ExecFileException | null, stdout: string, stderr: string) => {
+      if (settled || (termination && child.exitCode === null && child.signalCode === null && grace !== undefined)) return
+      settled = true
+      clearTimeout(timeout)
+      clearTimeout(grace)
+      signal?.removeEventListener("abort", abort)
       const durationMs = Date.now() - started
       const output = `${stdout ?? ""}\n${stderr ?? ""}`
-      const diagnostics = checker.format === "json" ? filterJsonDiagnostics(stdout ?? "", directory, changed) : filterDiagnostics(output, directory, changed)
-      const failedToRun = error && !("code" in error && typeof error.code === "number")
-      if (failedToRun) return done({ name: checker.name, ok: false, diagnostics, durationMs, error: String((error as Error).message).split("\n")[0] })
-      done({ name: checker.name, ok: diagnostics.length === 0, diagnostics, durationMs })
-    })
+      const all = checker.format === "json" ? locatedJson(stdout ?? "", directory) : located(output, directory)
+      const diagnostics = inChanged(all ?? [], directory, changed)
+      const said = output.split(/\r?\n/).find((line) => line.trim())?.trim().slice(0, 300) ?? "no output"
+      const code = error && "code" in error && typeof error.code === "number" ? error.code : undefined
+      // A checker that did not get as far as locating a problem checked nothing: it could not start, was killed,
+      // printed something unreadable, or exited with an error and no diagnostic. None of that is a pass.
+      const failure = termination ?? (child.killed || signal?.aborted || error?.killed || error?.signal || (error && code === undefined) ? String(error?.message ?? "checker terminated").split("\n")[0]
+        : all === undefined ? `output is not JSON: ${said}`
+        : code !== undefined && all.length === 0 ? `exit code ${code}: ${said}`
+        : undefined)
+      done({ name: checker.name, ok: failure === undefined && diagnostics.length === 0, diagnostics, durationMs, ...(failure === undefined ? {} : { error: failure }) })
+    }
+    const terminate = (reason: string) => {
+      if (settled || termination) return
+      termination = reason
+      clearTimeout(timeout)
+      grace = setTimeout(() => {
+        grace = undefined
+        if (child.exitCode === null && child.signalCode === null) child.kill("SIGKILL")
+        child.stdin?.destroy()
+        child.stdout?.destroy()
+        child.stderr?.destroy()
+        finish(null, "", "")
+      }, 100)
+      child.kill("SIGTERM")
+    }
+    const abort = () => terminate("checker cancelled")
+    const child = execFile(command, args, { cwd: directory, maxBuffer: 16 * 1024 * 1024, encoding: "utf8", env: { ...process.env, FORCE_COLOR: "0", NO_COLOR: "1" } }, finish)
+    timeout = setTimeout(() => terminate(`checker timed out after ${timeoutMs}ms`), timeoutMs)
+    signal?.addEventListener("abort", abort, { once: true })
+    if (signal?.aborted) abort()
   })
 }
 
@@ -137,9 +188,11 @@ export function scanComments(paths: readonly string[], directory: string, patter
 }
 
 export async function verify(config: VerifyConfig, directory: string, paths: readonly string[], signal?: AbortSignal): Promise<VerifyReport> {
+  signal?.throwIfAborted()
   const changed = paths.filter((path) => inside(directory, path) && existsSync(path))
   const applicable = config.checkers.filter((checker) => !checker.extensions || changed.some((path) => checker.extensions!.some((ext) => path.endsWith(ext))))
   const checkers = changed.length ? await Promise.all(applicable.map((checker) => runChecker(checker, directory, changed, config.timeoutMs, signal))) : []
+  signal?.throwIfAborted()
   return { paths: changed.map((path) => relative(directory, path)), checkers, comments: scanComments(changed, directory, config.commentPattern) }
 }
 
@@ -147,7 +200,7 @@ export async function verify(config: VerifyConfig, directory: string, paths: rea
 export function renderReport(report: VerifyReport): string {
   const lines: string[] = []
   for (const checker of report.checkers) {
-    if (checker.error) lines.push(`${checker.name}: could not run (${checker.error})`)
+    if (checker.error) lines.push(`${checker.name}: check failed (${checker.error})`)
     for (const d of checker.diagnostics) lines.push(`${checker.name}: ${d.path}${d.line ? `:${d.line}` : ""} ${d.message}`)
   }
   for (const d of report.comments) lines.push(`comment-check: ${d.path}:${d.line} ${d.message}`)

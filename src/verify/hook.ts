@@ -22,11 +22,12 @@ type AfterEvent = {
  * the hook itself never fail the edit.
  */
 export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> }, host: VerifyHost): Effect.Effect<void, never, Scope.Scope> {
-  return ctx.tool.hook("execute.after", (event) => Effect.promise(async () => {
+  return ctx.tool.hook("execute.after", (event) => Effect.promise(async (signal) => {
     const e = event as unknown as AfterEvent
     if (!MUTATION_TOOLS.has(e.tool) || e.status !== "completed") return
     try {
       const directory = await host.directory(e.sessionID)
+      if (signal.aborted) return
       const config = loadVerifyConfig(directory, host.config)
       if (config.source === "disabled") return
       const paths = mutatedPaths(e.input, directory)
@@ -34,7 +35,8 @@ export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> },
         host.trace?.("iolaus.verify.skipped", { tool: e.tool, reason: "no paths in input", keys: typeof e.input === "object" && e.input ? Object.keys(e.input) : [] })
         return
       }
-      const report = await verify(config, directory, paths)
+      const report = await verify(config, directory, paths, signal)
+      if (signal.aborted) return
       const text = renderReport(report)
       host.trace?.("iolaus.verify.ran", {
         tool: e.tool, agent: e.agent, paths: report.paths, source: config.source,
@@ -50,6 +52,7 @@ export function registerVerifyHook(ctx: { tool: Pick<Context["tool"], "hook"> },
       }
       if (typeof result.output === "string" && result.content === undefined) result.output = `${result.output}${text}`
     } catch (error) {
+      if (signal.aborted) return
       host.trace?.("iolaus.verify.failed", { tool: e.tool, error: String(error) })
     }
   })).pipe(Effect.asVoid)

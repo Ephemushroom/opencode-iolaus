@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test"
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs"
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
 import { DEFAULT_COMMENT_PATTERN, detectCheckers, loadVerifyConfig, parseVerifyConfig } from "../src/verify/config"
 import { filterDiagnostics, mutatedPaths, renderReport, scanComments, verify } from "../src/verify/run"
 import { registerVerifyHook } from "../src/verify/hook"
 import { parseOptions } from "../src/options"
-import { Effect } from "effect"
+import { Effect, Fiber } from "effect"
 
 function project(files: Record<string, string>): string {
   const dir = mkdtempSync(join(tmpdir(), "iolaus-verify-"))
@@ -45,6 +45,18 @@ test("comment scan flags request-explaining comments only", () => {
   expect(found.map((d) => d.line)).toEqual([1, 2, 5])
   expect(scanComments([join(dir, "a.ts")], dir, null)).toEqual([])
   rmSync(dir, { recursive: true, force: true })
+})
+
+test("diagnostics preserve spaces in relative and absolute paths", () => {
+  const directory = "/project with spaces"
+  expect(filterDiagnostics([
+    "src/my file.ts(3,7): error TS2322: bad type",
+    "/project with spaces/src/my file.ts:9:2: unused",
+    "src/other file.ts(1,1): error TS1000: ignored",
+  ].join("\n"), directory, [join(directory, "src/my file.ts")])).toEqual([
+    { path: "src/my file.ts", line: 3, message: "error TS2322: bad type" },
+    { path: "src/my file.ts", line: 9, message: "unused" },
+  ])
 })
 
 test("config: detection, global section, disabled and validation", () => {
@@ -153,4 +165,235 @@ test("json format parses flat arrays, wrapped arrays and eslint's per-file group
   const report = await verify({ checkers: [{ name: "j", argv: ["node", "-e", `console.log(JSON.stringify([{file:"src/a.ts",line:1,message:"from json"}]))`], format: "json" }], timeoutMs: 10_000, commentPattern: null, source: "config" }, dir, [join(dir, "src/a.ts")])
   expect(report.checkers[0].diagnostics).toEqual([{ path: "src/a.ts", line: 1, message: "from json" }])
   rmSync(dir, { recursive: true, force: true })
+})
+
+test("a checker that fails without locating a problem is reported, not passed", async () => {
+  const dir = project({ "src/a.ts": "export const a = 1\n" })
+  const run = (checker: { name: string; argv: string[]; format?: "json" }) =>
+    verify({ checkers: [checker], timeoutMs: 10_000, commentPattern: null, source: "config" }, dir, [join(dir, "src/a.ts")]).then((report) => ({ checker: report.checkers[0], text: renderReport(report) }))
+  const script = (body: string) => ["node", "-e", body]
+
+  const broken = await run({ name: "tsc", argv: script(`console.log("error TS5083: Cannot read file 'tsconfig.json'."); process.exit(1)`) })
+  expect(broken.checker).toMatchObject({ ok: false, diagnostics: [], error: "exit code 1: error TS5083: Cannot read file 'tsconfig.json'." })
+  expect(broken.text).toContain("tsc: check failed (exit code 1: error TS5083: Cannot read file 'tsconfig.json'.)")
+
+  // Problems it located in other files are the project's, not this edit's.
+  const elsewhere = await run({ name: "tsc", argv: script(`console.log("src/b.ts(1,5): error TS2322: bad"); process.exit(2)`) })
+  expect(elsewhere.checker).toMatchObject({ ok: true, diagnostics: [] })
+  expect(elsewhere.checker.error).toBeUndefined()
+  expect(elsewhere.text).toBe("")
+
+  const garbled = await run({ name: "lint", format: "json", argv: script(`console.log("Oops, something went wrong")`) })
+  expect(garbled.checker).toMatchObject({ ok: false, error: "output is not JSON: Oops, something went wrong" })
+  const crashed = await run({ name: "lint", format: "json", argv: script(`console.error("config error"); process.exit(2)`) })
+  expect(crashed.checker).toMatchObject({ ok: false, error: "exit code 2: config error" })
+  const clean = await run({ name: "lint", format: "json", argv: script(`console.log("[]")`) })
+  expect(clean.checker).toMatchObject({ ok: true, diagnostics: [] })
+  expect((await run({ name: "lint", format: "json", argv: script("") })).checker.ok).toBe(true)
+  rmSync(dir, { recursive: true, force: true })
+})
+
+test("JSON checker rejects malformed reports without throwing and keeps unrelated diagnostics clean", async () => {
+  const dir = project({ "a.ts": "export {}\n" })
+  try {
+    const run = (output: string, code = 0) => verify({
+      checkers: [{ name: "json", format: "json", argv: ["node", "-e", `process.stdout.write(${JSON.stringify(output)}); process.exit(${code})`] }],
+      timeoutMs: 10_000, commentPattern: null, source: "config",
+    }, dir, [join(dir, "a.ts")])
+    for (const output of ["{broken", "null", "42", '"text"', "{}", '{"results":{}}', "[null]", '[{"filePath":"a.ts","messages":[null]}]', '[{"filePath":" ","messages":[]}]', '[{"file":"a.ts","message":{"toString":null}}]']) {
+      const report = await run(output)
+      expect(report.checkers[0].ok).toBe(false)
+      expect(renderReport(report)).toContain("json: check failed")
+    }
+    const unrelated = await run('[{"filePath":"other file.ts","messages":[{"line":1,"message":"unrelated"}]}]', 1)
+    expect(unrelated.checkers[0]).toMatchObject({ ok: true, diagnostics: [] })
+    expect(renderReport(unrelated)).toBe("")
+    expect((await run('{"results":[]}')).checkers[0].ok).toBe(true)
+    expect((await run('[{"filePath":"a.ts","messages":[]}]')).checkers[0].ok).toBe(true)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("checker termination overrides numeric exits and partial unrelated diagnostics", async () => {
+  const dir = project({ "a.ts": "export {}\n" })
+  try {
+    for (const body of [
+      `process.on('SIGTERM', () => process.exit(2)); console.log('other.ts(1,1): error: unrelated'); setInterval(() => {}, 1000)`,
+      `process.on('SIGTERM', () => process.exit(0)); console.log('other.ts(1,1): error: unrelated'); setInterval(() => {}, 1000)`,
+      `console.log('other.ts(1,1): error: unrelated'); process.kill(process.pid, 'SIGTERM')`,
+    ]) {
+      const report = await verify({
+        checkers: [{ name: "terminated", argv: ["node", "-e", body] }], timeoutMs: 250, commentPattern: null, source: "config",
+      }, dir, [join(dir, "a.ts")])
+      expect(report.checkers[0]).toMatchObject({ ok: false, diagnostics: [], error: expect.any(String) })
+      expect(renderReport(report)).toContain("terminated: check failed")
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("timeout kills a checker ignoring TERM within a bounded grace period", async () => {
+  const dir = project({ "a.ts": "export {}\n" })
+  const ready = join(dir, "ready")
+  const stopped = join(dir, "stopped")
+  try {
+    const started = Date.now()
+    const report = await verify({
+      checkers: [{ name: "ignores-term", argv: ["node", "-e", `const fs = require('node:fs'); process.on('SIGTERM', () => fs.writeFileSync(${JSON.stringify(stopped)}, 'TERM')); fs.writeFileSync(${JSON.stringify(ready)}, String(process.pid)); setTimeout(() => process.exit(0), 2500)`] }],
+      timeoutMs: 250, commentPattern: null, source: "config",
+    }, dir, [join(dir, "a.ts")])
+    expect(Date.now() - started).toBeLessThan(1200)
+    expect(existsSync(stopped)).toBe(true)
+    expect(report.checkers[0]).toMatchObject({ ok: false, error: expect.any(String) })
+    const pid = Number(readFileSync(ready, "utf8"))
+    const deadline = Date.now() + 500
+    while (Date.now() < deadline) {
+      try { process.kill(pid, 0) } catch { break }
+      await new Promise((done) => setTimeout(done, 10))
+    }
+    expect(() => process.kill(pid, 0)).toThrow()
+  } finally {
+    if (existsSync(ready)) {
+      try { process.kill(Number(readFileSync(ready, "utf8")), "SIGKILL") } catch {}
+    }
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("abort kills a checker ignoring TERM without waiting for its normal timeout", async () => {
+  const dir = project({ "a.ts": "export {}\n" })
+  const ready = join(dir, "ready")
+  const stopped = join(dir, "stopped")
+  const controller = new AbortController()
+  const reason = new Error("cancel checker")
+  const result = verify({
+    checkers: [{ name: "ignores-term", argv: ["node", "-e", `const fs = require('node:fs'); process.on('SIGTERM', () => fs.writeFileSync(${JSON.stringify(stopped)}, 'TERM')); fs.writeFileSync(${JSON.stringify(ready)}, String(process.pid)); setTimeout(() => process.exit(0), 2500)`] }],
+    timeoutMs: 10_000, commentPattern: null, source: "config",
+  }, dir, [join(dir, "a.ts")], controller.signal).then(() => undefined, (error: unknown) => error)
+  try {
+    const deadline = Date.now() + 1000
+    while (!existsSync(ready) && Date.now() < deadline) await new Promise((done) => setTimeout(done, 10))
+    expect(existsSync(ready)).toBe(true)
+    const started = Date.now()
+    controller.abort(reason)
+    expect(await result).toBe(reason)
+    expect(Date.now() - started).toBeLessThan(1200)
+    expect(existsSync(stopped)).toBe(true)
+    const pid = Number(readFileSync(ready, "utf8"))
+    const stoppedDeadline = Date.now() + 500
+    while (Date.now() < stoppedDeadline) {
+      try { process.kill(pid, 0) } catch { break }
+      await new Promise((done) => setTimeout(done, 10))
+    }
+    expect(() => process.kill(pid, 0)).toThrow()
+  } finally {
+    controller.abort(reason)
+    if (existsSync(ready)) {
+      try { process.kill(Number(readFileSync(ready, "utf8")), "SIGKILL") } catch {}
+    }
+    await result
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("timeout and abort finish even when an exited checker's descendant holds its pipes", async () => {
+  for (const cancel of [false, true]) {
+    const dir = project({ "a.ts": "export {}\n" })
+    const ready = join(dir, "ready")
+    const controller = new AbortController()
+    const reason = new Error("cancel inherited pipes")
+    const descendant = `require('node:fs').writeFileSync(${JSON.stringify(ready)}, String(process.pid)); setTimeout(() => process.exit(0), 2500)`
+    const started = Date.now()
+    const result = verify({
+      checkers: [{ name: "inherited-pipes", argv: ["node", "-e", `require('node:child_process').spawn(process.execPath, ['-e', ${JSON.stringify(descendant)}], {stdio: ['ignore', 'inherit', 'inherit']}); process.exit(0)`] }],
+      timeoutMs: cancel ? 10_000 : 250, commentPattern: null, source: "config",
+    }, dir, [join(dir, "a.ts")], controller.signal).then((report) => report, (error: unknown) => error)
+    try {
+      const deadline = Date.now() + 1000
+      while (!existsSync(ready) && Date.now() < deadline) await new Promise((done) => setTimeout(done, 10))
+      expect(existsSync(ready)).toBe(true)
+      if (cancel) controller.abort(reason)
+      const outcome = await result
+      expect(Date.now() - started).toBeLessThan(1200)
+      if (cancel) expect(outcome).toBe(reason)
+      else expect(outcome).toMatchObject({ checkers: [{ ok: false, error: expect.any(String) }] })
+    } finally {
+      controller.abort(reason)
+      if (existsSync(ready)) {
+        try { process.kill(Number(readFileSync(ready, "utf8")), "SIGKILL") } catch {}
+      }
+      await result
+      rmSync(dir, { recursive: true, force: true })
+    }
+  }
+})
+
+test("interrupting the registered hook stops its checker and suppresses late postprocessing", async () => {
+  const dir = project({ "a.ts": "// added by AI\n" })
+  let handler!: (event: unknown) => Effect.Effect<void>
+  const traces: string[] = []
+  const ready = join(dir, "ready")
+  const stopped = join(dir, "stopped")
+  const body = `const fs = require('node:fs'); process.on('SIGTERM', () => { fs.writeFileSync(${JSON.stringify(stopped)}, 'stopped'); process.exit(2) }); fs.writeFileSync(${JSON.stringify(ready)}, String(process.pid)); console.log('other.ts(1,1): error: unrelated'); setInterval(() => {}, 1000)`
+  await Effect.runPromise(Effect.scoped(registerVerifyHook({ tool: { hook: (_name: string, callback: unknown) => Effect.sync(() => { handler = callback as never; return { dispose: Effect.void } }) } } as never,
+    { directory: async () => dir, trace: (event) => traces.push(event), config: { checkers: [{ name: "waiting", argv: ["node", "-e", body] }], timeoutMs: 10_000 } })))
+  const event = { tool: "patch", status: "completed", sessionID: "ses_cancel", agent: "sisyphus", input: { path: "a.ts" }, result: { content: "Edited." } }
+  const fiber = Effect.runFork(handler(event))
+  const waitFor = async (path: string) => {
+    const deadline = Date.now() + 1000
+    while (!existsSync(path) && Date.now() < deadline) await new Promise((done) => setTimeout(done, 10))
+    expect(existsSync(path)).toBe(true)
+  }
+  try {
+    await waitFor(ready)
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    await waitFor(stopped)
+    await new Promise((done) => setTimeout(done, 50))
+    expect(event.result.content).toBe("Edited.")
+    expect(traces).toEqual([])
+  } finally {
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    if (existsSync(ready)) {
+      try { process.kill(Number(readFileSync(ready, "utf8")), "SIGKILL") } catch {}
+    }
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("an interrupted hook does not resume after directory lookup finishes", async () => {
+  const dir = project({ "a.ts": "// added by AI\n" })
+  let handler!: (event: unknown) => Effect.Effect<void>
+  let finishDirectory!: (directory: string) => void
+  let enteredDirectory!: () => void
+  const entered = new Promise<void>((done) => { enteredDirectory = done })
+  const directory = new Promise<string>((done) => { finishDirectory = done })
+  const traces: string[] = []
+  await Effect.runPromise(Effect.scoped(registerVerifyHook({ tool: { hook: (_name: string, callback: unknown) => Effect.sync(() => { handler = callback as never; return { dispose: Effect.void } }) } } as never,
+    { directory: () => { enteredDirectory(); return directory }, trace: (event) => traces.push(event), config: { checkers: [] } })))
+  const event = { tool: "write", status: "completed", sessionID: "ses_lookup", agent: "sisyphus", input: { path: "a.ts" }, result: { content: "Written." } }
+  const fiber = Effect.runFork(handler(event))
+  try {
+    await entered
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    finishDirectory(dir)
+    await new Promise((done) => setTimeout(done, 20))
+    expect(event.result.content).toBe("Written.")
+    expect(traces).toEqual([])
+  } finally {
+    finishDirectory(dir)
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
+
+test("verify refuses an already cancelled signal before accessing checker configuration", async () => {
+  const controller = new AbortController()
+  const reason = new Error("verification cancelled")
+  controller.abort(reason)
+  await expect(verify({
+    get checkers(): never { throw new Error("checker configuration accessed after cancellation") },
+    timeoutMs: 1000, commentPattern: "(", source: "config",
+  }, "/p", [], controller.signal)).rejects.toBe(reason)
 })
