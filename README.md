@@ -53,7 +53,7 @@ Iolaus has three top-level workflows run by four primary agents. You pick the wo
 | Workflow | Primary | Command |
 | --- | --- | --- |
 | Do anything | Sisyphus | `/ultrawork <task>` |
-| Goal loop | Hephaestus | `/goal <task>` |
+| Goal loop | Hephaestus | `/goal <task>`, `/goal pause`, `/goal resume`, `/goal clear` |
 | Plan, then implement | Prometheus → Atlas | `/hyperplan <request>`, then `/start-work <plan>` |
 
 The slash commands have OMO-style keyword aliases. A leading keyword selects the same mode and hands the session to its owning agent, exactly as the command does:
@@ -80,6 +80,8 @@ Each primary has one job, and the plugin enforces it in code rather than in prom
   - `--ship` implies `--make-pr`; after the PR opens, an Atlas node watches `gh pr checks`, fixes failures on the branch, merges with a merge commit once the checks pass, and removes the worktree (never with `--force`).
 
 Running one of these commands in another agent's top-level session switches the session to the owning agent first; the session keeps its model. Commands act only in top-level sessions: in a subagent or DAG child, `/start-work` or `/goal` is ordinary prompt text.
+
+With Hephaestus enabled, `/goal` controls the Iolaus goal, not OpenCode's native goal store. Resume gives a paused goal a fresh budget; clear deletes it, so resuming cannot bring it back. Without Hephaestus, OpenCode keeps its native command.
 
 ### Who may delegate to whom
 
@@ -108,7 +110,10 @@ pinned model taken from `IOLAUS_HOME/iolaus.json`; an unconfigured lane is not
 registered. A DAG node may omit `model` to inherit the lane's model. Fan-in binds every
 upstream result with provenance through `inputs: [{node: "*"}]`, `when`
 predicates route conditionally by skipping branches, and `kind: "gate"` nodes
-pause the run for a human approve/reject.
+pause the run for a human approve/reject. A named input must be upstream of the
+node that binds it. Rejecting a gate blocks everything downstream of it and ends
+the run. Retrying a node reruns everything downstream of it, since those results
+came from the old one.
 
 ### Nonblocking flows and notifications
 

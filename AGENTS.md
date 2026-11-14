@@ -45,9 +45,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   DAG controller's `close` runs as a scope finalizer. Failures are typed:
   `DagValidationError` for caller mistakes, `DagRunnerError` for child
   execution, which the scheduler turns into node retry/failure and never lets
-  escape. Per-run mutual exclusion is a one-permit `Semaphore`; `wait` is a
-  `Deferred`; launch fibers are forked into the controller scope so `close`
-  interrupts them. `src/dag/promise.ts` is a Promise view for tests and QA;
+  escape. Per-run mutual exclusion is a one-permit `Semaphore` held in a keyed lock
+  (`src/keyed-lock.ts`) that drops a key once nothing holds or waits on it; `wait` is a
+  `Deferred` whose waiter is removed when the caller stops waiting; launch fibers are
+  forked into the controller scope so `close` interrupts them. `src/dag/promise.ts` is a Promise view for tests and QA;
   `src/effect-bridge.ts` lifts the Promise-authored ast_grep and gh tools into
   the Effect editor. `effect@4.1.0` is an exact peer and dependency pinned to the
   host's version and client peer contract, with
@@ -59,6 +60,22 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
 - `src/dag/` is the active Iolaus durable DAG module. It uses shared SQLite WAL state,
   graph/node fingerprints, dependency-frontier admission, node-level retry,
   cancellation and JSON-safe result envelopes.
+- Graph and state rules the controller enforces. An explicit `inputs: [{node}]` must name
+  a node upstream of its consumer (in `dependsOn`, or above a node that is), checked in
+  `validateDefinition`. A node's fingerprint covers everything upstream of it whatever the
+  node order, and `amend` reuses a result only while that fingerprint and the run
+  `directory` are unchanged. Rejecting a gate blocks every node downstream of it, so the
+  run ends `failed` instead of staying open. `retry` refuses an unknown `node_id` and
+  resets everything downstream of a retried node, completed results and approvals
+  included, because they were produced from the old result. `cancel` always cancels the
+  run; a child session that could not be stopped is recorded on its node (`error`, a
+  `node.failed` event with `status: "cancelled"`, trace `iolaus.dag.cancel-failed`).
+- `DagStore.saveRun` checks the snapshot's per-run revision inside the write transaction.
+  A conflicting save, even within one generation, writes no nodes, events or notices:
+  reload the run and reconsider the transition instead of replaying the stale snapshot.
+  Write stamps skip unchanged rows; keep node records and definitions immutable.
+  `listRuns(owner, {open, limit})`
+  filters in SQL; session state reads open runs only and the view reads the newest 50.
 - `src/dag/quiesce.ts` is the one place that knows a host subagent always runs in the
   background (2.3.0: no `background` input, no inline result, the parent idles and is woken
   by the child's report). `session.wait` only means "no active execution", so `settle`
@@ -66,9 +83,9 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   per generation), then on the session again, until `time.busy`/`time.idle` of the subtree
   stop changing; `busy` reads the same subtree without waiting; `stop` interrupts each
   generation deepest first and the session last, because the host leaves children running
-  when their parent is interrupted. The native runner's `finish` and `cancel`, the
-  subagent observer and the goal loop (`GoalRuntimePorts.waiting`) use it. Background
-  shells are not followed. Unit coverage: `tests/background-subagents.test.ts`.
+  when their parent is interrupted. The native runner's `finish` and `cancel` and the
+  subagent observer use it. Background shells are not followed. Unit coverage:
+  `tests/background-subagents.test.ts`.
 - `src/dag/observe.ts` records native `subagent` calls without changing them. The
   `execute.before` hook (registered after the role guard, so refused calls are not
   recorded) appends a node to an owner-scoped observed batch
@@ -218,8 +235,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   left, and traces host failures (`iolaus.state.failed`) without raising. The host
   renders it as `<context key="iolaus.state">`, announces changes at the next step
   without an extra turn or a system-prompt change, and keeps it across compaction
-  and revert, so there is no compaction hook. Event subscriptions name their
-  `types`. `script/qa-borrows.mjs` is the live QA for fallback, escalation, team,
+  and revert, so there is no compaction hook. A fork copies the parent's instruction
+  entries but none of the goal, role or runs they describe (those are keyed by session
+  ID), so the `fork` session hook recomputes the fork's entry and normally removes it.
+  Event subscriptions name their `types`. `script/qa-borrows.mjs` is the live QA for fallback, escalation, team,
   run directories, /start-work delivery and session state across compaction.
 - `src/ast-grep/` registers `ast_grep.search`, `ast_grep.rewrite` and
   `ast_grep.scan` as Code Mode tools when an `ast-grep` binary answers
@@ -275,7 +294,11 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `file(line,col)`, `file:line:col`, `./file:line:col` or GitHub-reporter
   `::error file=…,line=…::msg`; a checker with `format: "json"` is parsed as a
   JSON array (flat, `diagnostics`/`results`, or ESLint per-file groups). `verify: false`
-  or `{checkers: [], commentPattern: null}` disables it. Hook failures never
+  or `{checkers: [], commentPattern: null}` disables it. A checker that did not get as
+  far as locating a problem checked nothing and is reported as `<name>: check failed
+  (...)`: it could not start, was killed, printed non-JSON under `format: "json"`, or
+  exited non-zero with no located diagnostic. A non-zero exit whose diagnostics are all
+  in other files is still a pass for this edit. Hook failures never
   fail the edit. GPT model IDs get `patch` instead of `edit`/`write`; paths are
   taken from `*** Update/Add File:` headers as well as `filePath`/`path`.
 - DAG nodes execute through native OpenCode child sessions using the registered
@@ -312,7 +335,10 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   built-in default chain). Iolaus does not check provider connectivity or
   subscription; a lane the config does not name is not registered. A DAG node may omit `model` to run on its lane's
   configured model.
-- Restart recovery never replays a prompt. When a controller starts (plugin
+- Restart recovery never replays a prompt. It starts once the plugin has finished
+  registering (`recoveryReady`, resolved at the end of setup, so settled and launched
+  nodes see every hook, tool and RPC), on the runs that were open when the controller was
+  built. When a controller starts (plugin
   reload or restart) it reattaches every starting/running node whose child
   session already received its prompt (`runner.reattach`, no new prompt) and
   settles it with that child's own outcome, even one that finished while no
@@ -366,13 +392,22 @@ runner, the `ast_grep` and `gh` Code Mode namespaces, and the built-in
   `/start-work <plan>` (`plan.ts`, `startwork.ts`: one Atlas node per ticket in
   `Blocked by` order, `review-standards` and `review-spec` on Momus, `fix` when
   either says FAIL, `accept` gate) and sets Hephaestus goals. The goal loop
-  (`goal.ts`, after OMO's goal hook) continues a top-level Hephaestus session on
-  `session.execution.succeeded` via `session.synthetic` until `update_goal`
-  complete, pausing after 3 tool-less turns or 50 continuations; DAG nodes and
-  subagents never loop. A session whose subagents are still working is not continued
-  (`iolaus.goal.waiting`): their report wakes it, the loop decides at the end of that
-  turn, and the delegating turn's tool calls count for it. `get_goal`/`create_goal`/`update_goal` are denied by name to
-  every Iolaus lane but Hephaestus. Hephaestus renders its GPT variant on GPT models
+  (`goal.ts`, after OMO's goal hook) continues a top-level Hephaestus session from the
+  host's `experimental.idle` hook via `session.synthetic`, until `update_goal` complete,
+  pausing after 3 tool-less turns or 50 continuations; DAG nodes and subagents never
+  loop. No timer drives continuation: the hook runs when the host would
+  let the session go idle with nothing pending, and input it admits continues the same
+  execution. A session whose own subagent or image job is still running is not
+  continued (`iolaus.goal.waiting`): that job's report wakes it, the loop decides at the
+  end of that turn, and the delegating turn's tool calls count for it. `/goal` takes the
+  host's `pause`/`resume`/`clear` words as well as an objective (a resume starts a fresh
+  continuation budget). Iolaus's `/goal` replaces the host's `opencode.goal` command of the
+  same name (the later registration wins). It operates on Iolaus state, not the host's
+  goal store; without Hephaestus in `agents` the host's command is untouched. Clear
+  deletes the goal. Only a paused goal can resume. Failed continuation admission pauses
+  the goal without spending a round.
+  `get_goal`/`create_goal`/`update_goal` are denied by name to every Iolaus lane but
+  Hephaestus. Hephaestus renders its GPT variant on GPT models
   and the generic GPT body elsewhere. `script/qa-roles.mjs` is the live QA.
 - `ultrawork` and `hyperplan` are DAG modes (`src/prompts/mode-dag.ts`). The
   session that received `/ultrawork` or `/hyperplan` gets the OMO
