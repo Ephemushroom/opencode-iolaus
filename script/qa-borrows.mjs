@@ -119,8 +119,7 @@ const mock = http.createServer(async (req, res) => {
       outputs: (body.input ?? []).filter((i) => i?.type === "function_call_output").map((i) => String(i.output).slice(0, 400)),
       // What the current instruction block says, and whether the host has told the model it no longer applies.
       state: stateBlock(instructions + JSON.stringify(body.input ?? [])),
-      removal: (body.input ?? []).some((item) => Array.isArray(item.content) && item.content.some((part) =>
-        typeof part.text === "string" && part.text.includes('The context under "iolaus.state" no longer applies. Disregard it.'))) }
+      removal: JSON.stringify(body.input ?? []).replaceAll('\\"', '"').includes('The context under "iolaus.state" no longer applies. Disregard it.') }
     requests.push(record)
     appendFileSync(join(evidence, "requests.ndjson"), `${JSON.stringify(record)}\n`)
     assert.ok(requests.length < 300, "Unexpected model loop")
