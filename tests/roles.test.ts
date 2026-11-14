@@ -2,15 +2,16 @@ import { afterEach, expect, test } from "bun:test"
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs"
 import { tmpdir } from "node:os"
 import { join } from "node:path"
-import { Effect } from "effect"
+import { Deferred, Effect, Fiber, Queue, Stream } from "effect"
+import type { Context } from "@opencode/plugin/effect/plugin"
 import { Agent } from "@opencode/plugin"
 import type { AgentEditor } from "@opencode/plugin/effect/agent"
 import { loadPlan, resolvePlan, PLANNING_MARKER, ticketMarker } from "../src/roles/plan"
 import { compilePlan } from "../src/roles/startwork"
 import { denial, inheritPlanning, resolvePolicy } from "../src/roles/guard"
 import { parseCommand, COMMAND_OWNERS } from "../src/roles/command"
-import { createGoalRuntime, extendGoal, readGoal, saveGoal, setGoal, GOAL_MAX_CONTINUATIONS, GOAL_STAGNATION_LIMIT, GOAL_TOOL_NAMES, type Goal } from "../src/roles/goal"
-import { isGoalSessionInfo } from "../src/roles/register"
+import { clearGoal, createGoalRuntime, extendGoal, readGoal, resumeGoal, saveGoal, setGoal, updateGoal, GOAL_MAX_CONTINUATIONS, GOAL_STAGNATION_LIMIT, GOAL_TOOL_NAMES, type Goal } from "../src/roles/goal"
+import { isGoalSessionInfo, registerRoles } from "../src/roles/register"
 import { validateDefinition } from "../src/dag/graph"
 import { applyDefaultModels } from "../src/dag/controller"
 import { REVIEW_VERDICT_FAIL } from "../src/dag/templates"
@@ -144,20 +145,21 @@ test("goal loop continues an idle active goal, stops on completion, stagnation a
   const dispatched: string[] = []
   const runtime = createGoalRuntime({
     read: (s) => readGoal(dir, s), save: (g) => saveGoal(dir, g),
-    isGoalSession: async (s) => s !== "child", dispatch: async (s) => { dispatched.push(s) }, settle: async () => {},
+    isGoalSession: (s) => Effect.succeed(s !== "child"), dispatch: (s) => Effect.sync(() => { dispatched.push(s) }),
   })
   const turn = async (sessionID: string, toolCalls: number) => {
-    await runtime.handle({ type: "session.execution.started", data: { sessionID } })
-    for (let i = 0; i < toolCalls; i++) runtime.toolCalled(sessionID)
-    await runtime.handle({ type: "session.execution.succeeded", data: { sessionID } })
+    for (let i = 0; i < toolCalls; i++) await Effect.runPromise(runtime.toolCalled(sessionID))
+    await Effect.runPromise(runtime.idle(sessionID))
   }
   setGoal(dir, "s", "make tests green")
   await turn("s", 2)
   expect(dispatched).toEqual(["s"])
   expect(readGoal(dir, "s")?.continuations).toBe(1)
-  // A late idle edge from the same turn does not dispatch twice.
-  await runtime.handle({ type: "session.idle", data: { sessionID: "s" } })
+  expect(readGoal(dir, "s")?.stagnant).toBe(0)
+  // A subagent still running in the session wakes it with a report; the loop decides on that turn instead.
+  await Effect.runPromise(runtime.idle("s", [{ kind: "subagent", sessionID: "s" }]))
   expect(dispatched).toEqual(["s"])
+  expect(readGoal(dir, "s")?.continuations).toBe(1)
   saveGoal(dir, { ...readGoal(dir, "s")!, status: "complete" })
   await turn("s", 1)
   expect(dispatched).toEqual(["s"])
@@ -180,6 +182,157 @@ test("goal loop continues an idle active goal, stops on completion, stagnation a
   expect(readGoal(dir, "idle")?.status).toBe("active")
   expect(extendGoal(dir, "s", "new task").objective).toBe("new task")
   dir.close()
+})
+
+test("/goal accepts the host's pause, resume and clear, and a resume starts a fresh budget", () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-goal-control-"))
+  const dir = new SessionStateStore(join(directory, "iolaus.db"))
+  setGoal(dir, "s", "ship it")
+  saveGoal(dir, { ...readGoal(dir, "s")!, continuations: GOAL_MAX_CONTINUATIONS, stagnant: 2 })
+  expect(updateGoal(dir, "s", "paused", "Paused by the user")?.status).toBe("paused")
+  const resumed = resumeGoal(dir, "s")
+  expect(resumed).toMatchObject({ status: "active", continuations: 0, stagnant: 0 })
+  expect(readGoal(dir, "s")?.objective).toBe("ship it")
+  expect(resumeGoal(dir, "s")).toBeNull()
+  expect(clearGoal(dir, "s")?.objective).toBe("ship it")
+  expect(readGoal(dir, "s")).toBeNull()
+  expect(resumeGoal(dir, "s")).toBeNull()
+  setGoal(dir, "done", "done")
+  updateGoal(dir, "done", "complete")
+  expect(resumeGoal(dir, "done")).toBeNull()
+  expect(resumeGoal(dir, "none")).toBeNull()
+  expect(clearGoal(dir, "none")).toBeNull()
+  dir.close()
+})
+
+test("goal dispatch is lazy, charges only success, and preserves racing user controls", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-goal-dispatch-"))
+  const state = new SessionStateStore(join(directory, "iolaus.db"))
+  let dispatch = () => Effect.void as Effect.Effect<void, unknown>
+  const runtime = createGoalRuntime({
+    read: (s) => readGoal(state, s), save: (g) => saveGoal(state, g),
+    isGoalSession: () => Effect.succeed(true), dispatch: () => dispatch(),
+  })
+  try {
+    setGoal(state, "s", "ship")
+    runtime.idle("s")
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.continuations).toBe(1)
+    dispatch = () => Effect.fail(new Error("admission unavailable"))
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")).toMatchObject({ status: "paused", continuations: 1 })
+    expect(readGoal(state, "s")?.reason).toMatch(/admission unavailable.*\/goal resume/)
+    for (const [control, fails] of [["pause", false], ["clear", false], ["pause", true], ["clear", true]] as const) {
+      setGoal(state, "s", "ship")
+      const entered = Deferred.makeUnsafe<void>()
+      const release = Deferred.makeUnsafe<void>()
+      dispatch = () => Effect.gen(function* () {
+        yield* Deferred.succeed(entered, undefined)
+        yield* Deferred.await(release)
+        if (fails) yield* Effect.fail(new Error("admission unavailable"))
+      })
+      const fiber = Effect.runFork(runtime.idle("s"))
+      await Effect.runPromise(Deferred.await(entered))
+      expect(readGoal(state, "s")?.continuations).toBe(0)
+      if (control === "clear") clearGoal(state, "s")
+      else updateGoal(state, "s", "paused", "Paused by the user")
+      await Effect.runPromise(Deferred.succeed(release, undefined))
+      await Effect.runPromise(Fiber.join(fiber))
+      expect(readGoal(state, "s")?.status ?? null).toBe(control === "clear" ? null : "paused")
+    }
+    setGoal(state, "s", "ship")
+    dispatch = () => Effect.never
+    const fiber = Effect.runFork(runtime.idle("s"))
+    await Effect.runPromise(Effect.yieldNow)
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    expect(readGoal(state, "s")?.continuations).toBe(0)
+    dispatch = () => Effect.void
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.continuations).toBe(1)
+    expect(readGoal(state, "s")?.stagnant).toBe(1)
+  } finally { state.close() }
+})
+
+test("goal accounting belongs only to the current eligible goal and successful round", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-goal-round-"))
+  const state = new SessionStateStore(join(directory, "iolaus.db"))
+  let eligibility = Effect.succeed(false) as Effect.Effect<boolean>
+  const runtime = createGoalRuntime({
+    read: (s) => readGoal(state, s), save: (g) => saveGoal(state, g),
+    isGoalSession: () => eligibility, dispatch: () => Effect.void,
+  })
+  try {
+    setGoal(state, "s", "ship")
+    await Effect.runPromise(runtime.toolCalled("s"))
+    eligibility = Effect.succeed(true)
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.stagnant).toBe(1)
+    await Effect.runPromise(runtime.toolCalled("s"))
+    setGoal(state, "s", "replacement")
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.stagnant).toBe(1)
+    await Effect.runPromise(runtime.toolCalled("s"))
+    updateGoal(state, "s", "paused")
+    await Effect.runPromise(runtime.toolCalled("s"))
+    resumeGoal(state, "s")
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.stagnant).toBe(1)
+    await Effect.runPromise(runtime.toolCalled("s"))
+    const entered = Deferred.makeUnsafe<void>()
+    eligibility = Deferred.succeed(entered, undefined).pipe(Effect.andThen(Effect.never))
+    const fiber = Effect.runFork(runtime.idle("s"))
+    await Effect.runPromise(Deferred.await(entered))
+    await Effect.runPromise(Fiber.interrupt(fiber))
+    eligibility = Effect.succeed(true)
+    await Effect.runPromise(runtime.idle("s"))
+    expect(readGoal(state, "s")?.stagnant).toBe(2)
+  } finally { state.close() }
+})
+
+test("goal hooks remove cleared goals and discard failed or interrupted round accounting", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-goal-hooks-"))
+  const state = new SessionStateStore(join(directory, "iolaus.db"))
+  type Hook = (event: unknown) => Effect.Effect<unknown, unknown>
+  const hooks = new Map<string, Hook>()
+  const events = Effect.runSync(Queue.unbounded<{ type: string; data: { sessionID: string } }>())
+  const ctx = {
+    session: {
+      get: () => Effect.succeed({ agent: "hephaestus" }),
+      hook: (name: string, hook: Hook) => Effect.sync(() => { hooks.set(name, hook) }),
+      synthetic: () => Effect.void,
+    },
+    tool: {
+      hook: (name: string, hook: Hook) => Effect.sync(() => { hooks.set(name, hook) }),
+      transform: () => Effect.void,
+    },
+    event: { subscribe: () => Stream.fromQueue(events) },
+  } as unknown as Context
+  try {
+    await Effect.runPromise(Effect.scoped(Effect.gen(function* () {
+      yield* registerRoles(ctx, parseOptions({ agents: ["hephaestus"] }), {
+        state, trace: () => {}, directory: () => Effect.succeed(directory!), controller: {} as never, source: () => Effect.die("not used"),
+      })
+      for (const type of ["session.execution.failed", "session.execution.interrupted"]) {
+        setGoal(state, "s", "ship")
+        yield* hooks.get("execute.before")!({ sessionID: "s", agent: "hephaestus", tool: "read", input: {} })
+        yield* Queue.offer(events, { type, data: { sessionID: "s" } })
+        yield* Effect.yieldNow
+        yield* hooks.get("experimental.idle")!({ sessionID: "s", background: [] })
+        expect(readGoal(state, "s")?.stagnant).toBe(1)
+      }
+      for (const text of ["/goal clear", "/goal resume", "/goal", "<iolaus-command:goal>\nresume", "<iolaus-command:goal>\n"]) {
+        yield* hooks.get("prompt")!({ sessionID: "s", prompt: { text } })
+        expect(readGoal(state, "s")).toBeNull()
+      }
+      setGoal(state, "s", "ship")
+      saveGoal(state, { ...readGoal(state, "s")!, continuations: 7 })
+      yield* hooks.get("prompt")!({ sessionID: "s", prompt: { text: "/goal resume" } })
+      expect(readGoal(state, "s")?.continuations).toBe(7)
+      updateGoal(state, "s", "complete")
+      yield* hooks.get("prompt")!({ sessionID: "s", prompt: { text: "/goal resume" } })
+      expect(readGoal(state, "s")?.status).toBe("complete")
+    })))
+  } finally { state.close() }
 })
 
 test("roles and goals round-trip in one database without project JSON files", () => {

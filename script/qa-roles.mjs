@@ -195,6 +195,13 @@ async function reply(body, instructions, input, session) {
       if (rounds === 0) return outs.length ? { text: "STEP_ONE" } : { call: { name: "read", args: { path: "fixture.txt" } } }
       return /^(function|custom_tool)_call_output$/.test(last?.type) ? { text: "GOAL_DONE" } : { call: { name: "update_goal", args: { status: "complete" } } }
     }
+    case "goal-control": {
+      // One tool call, then one reply, per turn: every round counts as progress, so only the user's commands change the goal.
+      await sleep(300)
+      const turn = items.findLastIndex((item) => item?.type === "message" && (item.role === "user" || JSON.stringify(item).includes("Continue working toward the active session goal")))
+      const acted = items.slice(turn + 1).some((item) => /^(function|custom_tool)_call_output$/.test(item?.type))
+      return acted ? { text: "CONTROL_STEP" } : { call: { name: "read", args: { path: "fixture.txt" } } }
+    }
     case "goal-wait": {
       if (first.includes("GOAL_SUB_SCAN")) { await sleep(2500); return { text: "GOAL_SUB_DONE" } }
       const rounds = input.split("Continue working toward the active session goal").length - 1
@@ -510,6 +517,48 @@ try {
     assert.deepEqual(of(id).map((r) => r.text ?? r.call.name), ["subagent", "GOAL_DELEGATED", "GOAL_REPORT_READ", "update_goal", "GOAL_WAIT_DONE"])
     // The continuation was queued only once the subagent's answer was in the session.
     assert.ok(of(id).find((r) => r.call?.name === "update_goal").input.includes("GOAL_SUB_DONE"), "the loop continued before the subagent reported")
+  })
+
+  await check("/goal accepts the host's pause, resume and clear", async () => {
+    active = "goal-control"
+    const id = await create("hephaestus")
+    const goalRow = () => JSON.parse(execFileSync("sqlite3", ["-readonly", join(home, ".iolaus/iolaus.db"), `SELECT value_json FROM session_state WHERE session_id = '${id}' AND kind = 'goal'`], { encoding: "utf8" }).trim() || "null")
+    await api("POST", `/api/session/${id}/command`, { name: "goal", text: "IOLAUS_CONTROL_TASK keep reading the fixture" })
+    await until(() => traces().some((t) => t.event === "iolaus.goal.continued" && t.sessionID === id), "first continuation")
+    await api("POST", `/api/session/${id}/command`, { name: "goal", text: "pause" })
+    const paused = await until(() => { const goal = goalRow(); return goal.status === "paused" ? goal : undefined }, "paused goal")
+    assert.equal(paused.reason, "Paused by the user")
+    // The round in flight and the reply to the pause itself still finish; after that nothing may continue the session.
+    const quiet = async () => {
+      const deadline = Date.now() + 30000
+      while (Date.now() < deadline) {
+        const seen = of(id).length
+        await sleep(2000)
+        if (seen === of(id).length) return seen
+      }
+      throw new Error("goal control did not become quiet within 30 seconds")
+    }
+    const rounds = () => traces().filter((t) => t.event === "iolaus.goal.continued" && t.sessionID === id).length
+    const settled = await quiet(), continued = rounds()
+    await sleep(2500)
+    assert.equal(of(id).length, settled, "the loop kept going after /goal pause")
+    assert.equal(rounds(), continued, "a continuation was queued after /goal pause")
+    assert.equal(goalRow().status, "paused")
+    await api("POST", `/api/session/${id}/command`, { name: "goal", text: "resume" })
+    const resumed = await until(() => { const goal = goalRow(); return goal.status === "active" && goal.continuations > 0 ? goal : undefined }, "resumed goal")
+    assert.equal(resumed.stagnant, 0)
+    await api("POST", `/api/session/${id}/command`, { name: "goal", text: "clear" })
+    await until(() => goalRow() === null, "cleared goal")
+    const ended = await quiet()
+    await sleep(2500)
+    assert.equal(of(id).length, ended, "the loop kept going after /goal clear")
+    for (const text of ["resume", ""]) {
+      await api("POST", `/api/session/${id}/command`, { name: "goal", text })
+      await quiet()
+      assert.equal(goalRow(), null, "/goal resurrected a cleared goal")
+    }
+    const updates = traces().filter((t) => t.sessionID === id && t.event === "iolaus.goal.updated" && t.via === "command")
+    assert.deepEqual(updates.map((t) => t.status), ["paused", null])
   })
 
   await check("a goal that makes no progress pauses after three idle turns", async () => {

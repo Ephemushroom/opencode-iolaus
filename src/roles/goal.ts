@@ -1,20 +1,20 @@
-import { Effect } from "effect"
+import { Cause, Effect, Exit } from "effect"
 import type { Tool } from "@opencode/schema/tool"
 import type { SessionStateStore } from "../database"
+import { randomUUID } from "node:crypto"
 
 /**
  * Hephaestus goal loop, after OMO's goal hook (oh-my-openagent, OpenCode 2
- * adapter, hooks/goal): the session goal is persisted in the shared database,
- * and when the session goes idle with the goal still active the
- * plugin queues a continuation prompt until the agent calls `update_goal` with
- * `complete`. The runaway stops come from OMO's todo-continuation enforcer: a cap on
- * continuations and a stop after consecutive turns that made no tool call.
+ * adapter, hooks/goal) and the host's own `opencode.goal` plugin: the session goal is persisted in
+ * the shared database, and when the host is about to let the session go idle with the goal still
+ * active, a continuation prompt is admitted so the same execution keeps working. The host's
+ * `experimental.idle` hook is the trigger, so nothing polls and a turn that delegated to subagents
+ * resumes when their reports wake the session. The runaway stops are a cap on continuations and a
+ * stop after consecutive turns that made no tool call.
  */
 export const GOAL_MAX_CONTINUATIONS = 50
 export const GOAL_STAGNATION_LIMIT = 3
 const MAX_OBJECTIVE = 2000
-/** A queued continuation that never starts (host dropped it) stops being waited for after this. */
-const START_TIMEOUT_MS = 15000
 
 /** Direct tools are hidden per agent by their own name, so registration denies these to every lane but Hephaestus. */
 export const GOAL_TOOL_NAMES = ["get_goal", "create_goal", "update_goal"] as const
@@ -31,6 +31,7 @@ export interface Goal {
   readonly reason?: string
   readonly createdAt: number
   readonly updatedAt: number
+  readonly revision?: string
 }
 
 export function readGoal(state: SessionStateStore, sessionID: string): Goal | null {
@@ -39,7 +40,7 @@ export function readGoal(state: SessionStateStore, sessionID: string): Goal | nu
 }
 
 export function saveGoal(state: SessionStateStore, goal: Goal): void {
-  state.save("goal", goal.sessionID, goal)
+  state.save("goal", goal.sessionID, { ...goal, revision: randomUUID() })
 }
 
 export function setGoal(state: SessionStateStore, sessionID: string, objective: string, now = Date.now()): Goal {
@@ -56,6 +57,25 @@ export function extendGoal(state: SessionStateStore, sessionID: string, request:
   const next: Goal = { ...goal, objective: combined.length > MAX_OBJECTIVE ? request.trim().slice(0, MAX_OBJECTIVE) : combined, status: "active", stagnant: 0, updatedAt: now }
   saveGoal(state, next)
   return next
+}
+
+/** The host's `/goal pause | resume | clear` spellings, which Iolaus's `/goal` accepts too. */
+export const GOAL_CONTROLS = ["pause", "resume", "clear"] as const
+export type GoalControl = typeof GOAL_CONTROLS[number]
+
+/** A user resume starts a fresh continuation budget, as the host's `/goal resume` does. */
+export function resumeGoal(state: SessionStateStore, sessionID: string, now = Date.now()): Goal | null {
+  const goal = readGoal(state, sessionID)
+  if (!goal || goal.status !== "paused") return null
+  const next: Goal = { sessionID: goal.sessionID, objective: goal.objective, status: "active", continuations: 0, stagnant: 0, createdAt: goal.createdAt, updatedAt: now }
+  saveGoal(state, next)
+  return next
+}
+
+export function clearGoal(state: SessionStateStore, sessionID: string): Goal | null {
+  const goal = readGoal(state, sessionID)
+  state.delete("goal", sessionID)
+  return goal
 }
 
 export function updateGoal(state: SessionStateStore, sessionID: string, status: GoalStatus, reason?: string, now = Date.now()): Goal | null {
@@ -97,103 +117,109 @@ export function continuationPrompt(goal: Goal): string {
   ].join("\n")
 }
 
+/**
+ * The part of the host's `experimental.idle` background list the loop reads: a `subagent` or `image` job
+ * owned by the session itself wakes it when it finishes. Other fields are the host's and are not read.
+ */
+export interface IdleBackground {
+  readonly kind: string
+  readonly sessionID: string
+  readonly childSessionID?: string
+  readonly agent?: string
+  readonly description?: string
+  readonly model?: string
+  readonly path?: string
+  readonly shellID?: string
+  readonly command?: string
+}
+
 export interface GoalRuntimePorts {
   readonly read: (sessionID: string) => Goal | null
   readonly save: (goal: Goal) => void
   /** A top-level Hephaestus session; DAG children and subagent sessions never loop. */
-  readonly isGoalSession: (sessionID: string) => Promise<boolean>
-  readonly dispatch: (sessionID: string, text: string) => Promise<void>
-  readonly settle: () => Promise<void>
-  /** Subagents of the session are still working; their report wakes it, and the loop decides at that turn's end. */
-  readonly waiting?: (sessionID: string) => Promise<boolean>
+  readonly isGoalSession: (sessionID: string) => Effect.Effect<boolean>
+  /** Admits the continuation into the session that is about to go idle. */
+  readonly dispatch: (sessionID: string, text: string) => Effect.Effect<void, unknown>
   readonly now?: () => number
   readonly trace?: (event: string, data: Record<string, unknown>) => void
 }
 
 export type GoalRuntime = ReturnType<typeof createGoalRuntime>
 
-/** The host events `handle` switches on; the plugin subscribes to these only. */
-export const GOAL_EVENT_TYPES = ["session.execution.started", "session.execution.succeeded", "session.idle", "session.execution.failed", "session.execution.interrupted", "session.deleted"] as const
-
-function sessionOf(event: unknown): { readonly type: string; readonly sessionID?: string } {
-  const record = typeof event === "object" && event !== null ? event as { type?: unknown; data?: { sessionID?: unknown } } : {}
-  const sessionID = record.data?.sessionID
-  return { type: typeof record.type === "string" ? record.type : "", ...(typeof sessionID === "string" ? { sessionID } : {}) }
-}
-
 export function createGoalRuntime(ports: GoalRuntimePorts) {
   const now = ports.now ?? Date.now
-  const activity = new Map<string, "busy" | "idle">()
-  const calls = new Map<string, number>()
-  /** Sessions whose continuation was queued but has not started; their late idle edges are the previous turn's. */
-  const awaiting = new Map<string, number>()
+  /** Tool calls since the loop's last decision; a round that made none is a stagnant turn. */
+  const calls = new Map<string, { goal: string; count: number }>()
   const inflight = new Set<string>()
-  /** Sessions whose last turn ended waiting on subagents; the turn their report starts continues that turn's tool count. */
-  const waited = new Set<string>()
+  const fingerprint = (goal: Goal | null) => JSON.stringify(goal)
 
-  const continueGoal = async (sessionID: string): Promise<void> => {
-    const goal = ports.read(sessionID)
-    if (!goal || goal.status !== "active" || inflight.has(sessionID)) return
-    if ((awaiting.get(sessionID) ?? 0) > now()) return
-    inflight.add(sessionID)
-    try {
-      await ports.settle()
-      if (activity.get(sessionID) !== "idle" || !(await ports.isGoalSession(sessionID))) return
-      const current = ports.read(sessionID)
-      if (!current || current.status !== "active") return
-      if (await ports.waiting?.(sessionID)) {
-        waited.add(sessionID)
-        ports.trace?.("iolaus.goal.waiting", { sessionID })
-        return
-      }
-      waited.delete(sessionID)
-      const stagnant = (calls.get(sessionID) ?? 0) === 0 ? current.stagnant + 1 : 0
-      const stop = stagnant >= GOAL_STAGNATION_LIMIT ? "stagnated" : current.continuations >= GOAL_MAX_CONTINUATIONS ? "continuation limit" : undefined
-      if (stop) {
-        ports.save({ ...current, status: "paused", stagnant, reason: stop, updatedAt: now() })
-        ports.trace?.("iolaus.goal.paused", { sessionID, reason: stop, continuations: current.continuations })
-        return
-      }
-      const next: Goal = { ...current, stagnant, continuations: current.continuations + 1, updatedAt: now() }
-      ports.save(next)
-      activity.set(sessionID, "busy")
-      awaiting.set(sessionID, now() + START_TIMEOUT_MS)
-      await ports.dispatch(sessionID, continuationPrompt(next))
-      ports.trace?.("iolaus.goal.continued", { sessionID, continuations: next.continuations, stagnant })
-    } catch (error) {
-      awaiting.delete(sessionID)
-      ports.trace?.("iolaus.goal.continuation-failed", { sessionID, error: error instanceof Error ? error.message : String(error) })
-    } finally {
-      inflight.delete(sessionID)
+  const decide = (sessionID: string, background: readonly IdleBackground[]) => Effect.gen(function* () {
+    if (!(yield* ports.isGoalSession(sessionID))) {
+      calls.delete(sessionID)
+      return
     }
-  }
+    const current = ports.read(sessionID)
+    if (!current || current.status !== "active") {
+      calls.delete(sessionID)
+      return
+    }
+    if (background.some((work) => (work.kind === "subagent" || work.kind === "image") && work.sessionID === sessionID)) {
+      ports.trace?.("iolaus.goal.waiting", { sessionID })
+      return
+    }
+    const round = calls.get(sessionID)
+    const stagnant = round?.goal === fingerprint(current) && round.count > 0 ? 0 : current.stagnant + 1
+    calls.delete(sessionID)
+    const stop = stagnant >= GOAL_STAGNATION_LIMIT ? "stagnated" : current.continuations >= GOAL_MAX_CONTINUATIONS ? "continuation limit" : undefined
+    if (stop) {
+      ports.save({ ...current, status: "paused", stagnant, reason: stop, updatedAt: now() })
+      ports.trace?.("iolaus.goal.paused", { sessionID, reason: stop, continuations: current.continuations })
+      return
+    }
+    const next: Goal = { ...current, stagnant, continuations: current.continuations + 1, updatedAt: now() }
+    const dispatched = yield* Effect.exit(Effect.suspend(() => ports.dispatch(sessionID, continuationPrompt(next))))
+    if (fingerprint(ports.read(sessionID)) !== fingerprint(current)) return
+    if (Exit.isSuccess(dispatched)) {
+      ports.save(next)
+      ports.trace?.("iolaus.goal.continued", { sessionID, continuations: next.continuations, stagnant })
+    } else {
+      const error = String(Cause.squash(dispatched.cause)).slice(0, 300)
+      ports.save({ ...current, status: "paused", reason: `Continuation dispatch failed: ${error}. Fix the error and use /goal resume.`, updatedAt: now() })
+      ports.trace?.("iolaus.goal.continuation-failed", { sessionID, error })
+    }
+  })
 
   return {
-    toolCalled(sessionID: string): void {
-      calls.set(sessionID, (calls.get(sessionID) ?? 0) + 1)
+    reset(sessionID: string): void {
+      calls.delete(sessionID)
     },
-    async handle(event: unknown): Promise<void> {
-      const { type, sessionID } = sessionOf(event)
-      if (!sessionID) return
-      switch (type) {
-        case "session.execution.started":
-          activity.set(sessionID, "busy")
-          awaiting.delete(sessionID)
-          if (!waited.has(sessionID)) calls.set(sessionID, 0)
-          return
-        case "session.execution.succeeded":
-        case "session.idle":
-          activity.set(sessionID, "idle")
-          await continueGoal(sessionID)
-          return
-        case "session.execution.failed":
-        case "session.execution.interrupted":
-          activity.set(sessionID, "idle")
-          return
-        case "session.deleted":
-          activity.delete(sessionID); calls.delete(sessionID); awaiting.delete(sessionID); waited.delete(sessionID)
-          return
-      }
+    toolCalled(sessionID: string): Effect.Effect<void> {
+      return Effect.gen(function* () {
+        const goal = ports.read(sessionID)
+        if (!goal || goal.status !== "active") { calls.delete(sessionID); return }
+        if (!(yield* ports.isGoalSession(sessionID))) { calls.delete(sessionID); return }
+        const key = fingerprint(goal)
+        if (fingerprint(ports.read(sessionID)) !== key) return
+        const previous = calls.get(sessionID)
+        calls.set(sessionID, { goal: key, count: previous?.goal === key ? previous.count + 1 : 1 })
+      })
+    },
+    /**
+     * Runs when the host would let the session go idle. The session's own running subagent or image job
+     * wakes it with a report, so the loop leaves the decision to that turn instead of continuing now.
+     */
+    idle(sessionID: string, background: readonly IdleBackground[] = []): Effect.Effect<void> {
+      return Effect.suspend(() => {
+        if (inflight.has(sessionID)) return Effect.void
+        const goal = fingerprint(ports.read(sessionID))
+        return Effect.acquireUseRelease(
+          Effect.sync(() => { inflight.add(sessionID) }),
+          () => decide(sessionID, background).pipe(Effect.onExit((exit) => Effect.sync(() => {
+            if (Exit.isFailure(exit) && calls.get(sessionID)?.goal === goal) calls.delete(sessionID)
+          }))),
+          () => Effect.sync(() => { inflight.delete(sessionID) }),
+        )
+      })
     },
   }
 }
@@ -243,7 +269,7 @@ export function createGoalTools(state: SessionStateStore, isGoalSession: (sessio
         if (status !== "complete" && status !== "paused" && status !== "active") return Effect.succeed(reply({ error: 'status must be "complete", "paused" or "active"' }))
         const sessionID = String(context.sessionID)
         return guarded(sessionID, () => {
-          const goal = updateGoal(state, sessionID, status, typeof record.reason === "string" ? record.reason : undefined)
+          const goal = status === "active" ? resumeGoal(state, sessionID) : updateGoal(state, sessionID, status, typeof record.reason === "string" ? record.reason : undefined)
           if (goal) trace?.(status === "complete" ? "iolaus.goal.completed" : "iolaus.goal.updated", { sessionID, status, continuations: goal.continuations })
           return goal
         })

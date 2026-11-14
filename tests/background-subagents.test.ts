@@ -157,22 +157,19 @@ test("the goal loop waits for running subagents and counts the delegating turn's
   directory = mkdtempSync(join(tmpdir(), "iolaus-goal-wait-"))
   const state = new SessionStateStore(join(directory, "iolaus.db"))
   const dispatched: string[] = []
-  let waiting = true
   const runtime = createGoalRuntime({
-    read: (s) => readGoal(state, s), save: (g) => saveGoal(state, g), isGoalSession: async () => true,
-    dispatch: async (s) => { dispatched.push(s) }, settle: async () => {}, waiting: async () => waiting,
+    read: (s) => readGoal(state, s), save: (g) => saveGoal(state, g), isGoalSession: () => Effect.succeed(true),
+    dispatch: (s) => Effect.sync(() => { dispatched.push(s) }),
   })
+  const idle = (background: NonNullable<Parameters<typeof runtime.idle>[1]>) => Effect.runPromise(runtime.idle("s", background))
   setGoal(state, "s", "ship it")
   for (let round = 1; round <= 4; round++) {
-    waiting = true
-    await runtime.handle({ type: "session.execution.started", data: { sessionID: "s" } })
-    runtime.toolCalled("s")
-    await runtime.handle({ type: "session.execution.succeeded", data: { sessionID: "s" } })
+    // A turn that delegated and went idle: the subagent is still running, so nothing continues yet.
+    await Effect.runPromise(runtime.toolCalled("s"))
+    await idle([{ kind: "subagent", sessionID: "s", childSessionID: "ses_child", agent: "explore", description: "scan" }])
     expect(dispatched).toHaveLength(round - 1)
-    // The subagent's report starts a turn that only reads it.
-    waiting = false
-    await runtime.handle({ type: "session.execution.started", data: { sessionID: "s" } })
-    await runtime.handle({ type: "session.execution.succeeded", data: { sessionID: "s" } })
+    // Its report wakes the session; that turn only reads the report, but the delegating turn's call still counts.
+    await idle([])
     expect(dispatched).toHaveLength(round)
   }
   expect(readGoal(state, "s")).toMatchObject({ status: "active", continuations: 4, stagnant: 0 })
