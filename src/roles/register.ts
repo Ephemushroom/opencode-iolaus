@@ -7,7 +7,7 @@ import type { DagController } from "../dag/controller"
 import { DAG_CHILD_MARKER } from "../prompts/mode-dag"
 import { agentName, categoryName, explicitMode } from "../prompts/catalog"
 import { COMMAND_OWNERS, commandMarker, commandOwner, parseCommand } from "./command"
-import { createGoalRuntime, createGoalTools, extendGoal, GOAL_EVENT_TYPES, readGoal, saveGoal, setGoal, updateGoal } from "./goal"
+import { clearGoal, createGoalRuntime, createGoalTools, extendGoal, GOAL_CONTROLS, readGoal, resumeGoal, saveGoal, setGoal, updateGoal } from "./goal"
 import { denial, inheritPlanning, resolvePolicy, type RoleRecord } from "./guard"
 import { loadPlan, PLANNING_MARKER, PLANS_DIR, resolvePlan } from "./plan"
 import { compilePlan, gitHead, parseStartWork, type Delivery } from "./startwork"
@@ -16,7 +16,6 @@ import { homedir } from "node:os"
 import { resolve } from "node:path"
 import { isTopLevel, subagentTargets, tierDenial, type TierSource } from "./tier"
 import { DagValidationError } from "../dag/errors"
-import { createQuiescence } from "../dag/quiesce"
 
 type Trace = (event: string, data?: Record<string, unknown>) => void
 
@@ -130,9 +129,32 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
         return
       }
       if (agent !== "hephaestus" || !isGoalSessionInfo({ ...session, agent })) return
+      runtime.reset(sessionID)
       if (command?.name === "goal") {
-        const goal = command.args ? setGoal(state, sessionID, command.args) : readGoal(state, sessionID) ? updateGoal(state, sessionID, "active") : null
+        // The host's own `/goal pause | resume | clear` grammar, so the shared command name is not a defect.
+        const control = (GOAL_CONTROLS as readonly string[]).includes(command.args.toLowerCase()) ? command.args.toLowerCase() : undefined
+        if (control === "pause") {
+          const goal = readGoal(state, sessionID)?.status === "active" ? updateGoal(state, sessionID, "paused", "Paused by the user") : null
+          trace("iolaus.goal.updated", { sessionID, via: "command", status: goal?.status ?? null })
+          event.prompt.text = `${commandMarker("goal")}\n${goal ? 'The user paused the goal. Tell them it is paused and stop working; only a new request resumes it.' : 'There is no active goal to pause. Say so and stop.'}`
+          return
+        }
+        if (control === "clear") {
+          const goal = clearGoal(state, sessionID)
+          trace("iolaus.goal.updated", { sessionID, via: "command", status: null })
+          event.prompt.text = `${commandMarker("goal")}\n${goal ? 'The user cleared the goal. Confirm it is cleared and stop working.' : 'There is no goal to clear. Say so and stop.'}`
+          return
+        }
+        if (control === "resume") {
+          const goal = resumeGoal(state, sessionID)
+          trace("iolaus.goal.set", { sessionID, via: "command", active: goal?.status === "active" })
+          event.prompt.text = `${commandMarker("goal")}\n${goal ? 'The user resumed the goal. Continue working toward it until update_goal reports it complete.' : 'There is no goal to resume. Say so and stop.'}`
+          return
+        }
+        const current = readGoal(state, sessionID)
+        const goal = command.args ? setGoal(state, sessionID, command.args) : current?.status === "active" ? current : resumeGoal(state, sessionID)
         trace("iolaus.goal.set", { sessionID, via: "command", active: goal?.status === "active" })
+        if (!goal) event.prompt.text = `${commandMarker("goal")}\n/goal needs an objective or an existing goal. Ask the user what to pursue and stop.`
         return
       }
       if (command) return
@@ -140,20 +162,17 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
       trace("iolaus.goal.set", { sessionID, via: "prompt" })
     }))
 
-    const quiescence = createQuiescence(ctx.session)
     const runtime = createGoalRuntime({
       read: (sessionID) => readGoal(state, sessionID),
       save: (goal) => saveGoal(state, goal),
-      isGoalSession: (sessionID) => Effect.runPromise(isGoalSession(sessionID)),
-      dispatch: (sessionID, text) => Effect.runPromise(ctx.session.synthetic({ sessionID: sessionID as never, text, delivery: "queue", resume: true }).pipe(Effect.asVoid)),
-      settle: () => new Promise((done) => setTimeout(done, 150)),
-      waiting: (sessionID) => Effect.runPromise(quiescence.busy(sessionID).pipe(Effect.catchCause(() => Effect.succeed(false)))),
+      isGoalSession: (sessionID) => isGoalSession(sessionID),
+      dispatch: (sessionID, text) => ctx.session.synthetic({ sessionID: sessionID as never, text }).pipe(Effect.asVoid),
       trace,
     })
 
     yield* ctx.tool.hook("execute.before", (event) => Effect.gen(function* () {
       const sessionID = String(event.sessionID)
-      runtime.toolCalled(sessionID)
+      yield* runtime.toolCalled(sessionID)
       const agent = String(event.agent)
       const role = readRole(state, sessionID)
       if (event.tool === "subagent") {
@@ -182,12 +201,16 @@ export function registerRoles(ctx: Context, options: Options, host: RoleHost): E
     }))
 
     if (options.agents.includes("hephaestus")) {
+      yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: ["session.execution.failed", "session.execution.interrupted"] }), (event) => Effect.sync(() => {
+        const data = (event as unknown as { data: { sessionID?: string } }).data
+        if (data.sessionID) runtime.reset(data.sessionID)
+      })))
       const tools = createGoalTools(state, isGoalSession, trace)
       yield* ctx.tool.transform((editor) => { for (const tool of tools) editor.add(tool) })
-      // Only the edges the goal runtime switches on; the default stream carries every text and reasoning delta.
-      yield* Effect.forkScoped(Stream.runForEach(ctx.event.subscribe({ types: GOAL_EVENT_TYPES }), (event) =>
-        Effect.forkScoped(Effect.promise(() => runtime.handle(event))).pipe(Effect.asVoid)).pipe(
-        Effect.catchCause((cause) => Effect.sync(() => trace("iolaus.goal.events-stopped", { cause: String(cause) })))))
+      // The host runs this hook when the session would go idle with nothing pending; input admitted here continues
+      // the same execution, which is what a goal continuation is.
+      yield* ctx.session.hook("experimental.idle", (event) => runtime.idle(String(event.sessionID), event.background).pipe(
+        Effect.catchCause((cause) => Effect.sync(() => trace("iolaus.goal.failed", { sessionID: String(event.sessionID), cause: String(cause).slice(0, 300) })))))
     }
     trace("iolaus.roles.registered", { goal: options.agents.includes("hephaestus"), startWork: options.agents.includes("atlas") })
   })

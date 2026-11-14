@@ -1,8 +1,9 @@
-import { Effect, Semaphore } from "effect"
+import { Effect } from "effect"
 import type { Context } from "@opencode/plugin/effect/plugin"
 import type { SessionStateStore } from "./database"
 import type { DagController } from "./dag/controller"
 import type { DagRunRecord } from "./dag/types"
+import { createKeyedLock } from "./keyed-lock"
 import { readGoal } from "./roles/goal"
 import { readRole } from "./roles/register"
 
@@ -43,14 +44,10 @@ type Instructions = Context["session"]["instructions"]
  * Refreshes of one session are serialized so a stale snapshot never lands last.
  */
 export function createStateSync(instructions: Instructions, host: { readonly controller: DagController; readonly state: SessionStateStore; readonly trace: Trace }) {
-  const locks = new Map<string, Semaphore.Semaphore>()
-  const lock = (sessionID: string) => {
-    let permit = locks.get(sessionID)
-    if (!permit) locks.set(sessionID, permit = Semaphore.makeUnsafe(1))
-    return permit
-  }
-  const refresh = (sessionID: string): Effect.Effect<void> => lock(sessionID).withPermits(1)(Effect.gen(function* () {
-    const runs = yield* host.controller.list(sessionID)
+  const locks = createKeyedLock()
+  const refresh = (sessionID: string): Effect.Effect<void> => locks.withLock(sessionID, Effect.gen(function* () {
+    // Only unfinished runs are announced, so the session's finished history is never read for this.
+    const runs = yield* host.controller.list(sessionID, { open: true })
     const text = sessionState(readGoal(host.state, sessionID), readRole(host.state, sessionID), runs)
     if (text === undefined) yield* instructions.entry.remove({ sessionID: sessionID as never, key: STATE_ENTRY_KEY })
     else yield* instructions.entry.put({ sessionID: sessionID as never, key: STATE_ENTRY_KEY, value: text })

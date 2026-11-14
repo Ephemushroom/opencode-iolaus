@@ -58,7 +58,7 @@ const nodeSchema = {
     inputs: {
       type: "array",
       items: { type: "object", properties: { node: { type: "string" }, field: { type: "string" } }, required: ["node"], additionalProperties: false },
-      description: "Upstream results bound into this node's prompt inside <iolaus-dag-inputs>. node: \"*\" fans in every dependency.",
+      description: "Upstream results bound into this node's prompt inside <iolaus-dag-inputs>. Each named node must be upstream of this one (in dependsOn, or above a node that is). node: \"*\" fans in every dependency.",
     },
     when: conditionSchema,
     maxAttempts: { type: "integer", minimum: 1 },
@@ -172,7 +172,7 @@ export function createDagTool(controller: DagController): Tool.Info {
           case "node": return controller.node(runID(), sessionID, nodeID())
           case "wait": return controller.wait(runID(), sessionID)
           case "cancel": return controller.cancel(runID(), sessionID)
-          case "retry": return controller.retry(runID(), sessionID, typeof input.node_id === "string" ? input.node_id : undefined)
+          case "retry": return controller.retry(runID(), sessionID, input.node_id === undefined ? undefined : nodeID())
           case "resume": return controller.resume(runID(), sessionID)
           case "approve": return controller.approve(runID(), sessionID, nodeID(), note)
           case "reject": return controller.reject(runID(), sessionID, nodeID(), note)

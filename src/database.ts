@@ -32,6 +32,13 @@ export function openDatabase(path: string): Database {
       created_at INTEGER NOT NULL, updated_at INTEGER NOT NULL,
       PRIMARY KEY (run_id, node_id), FOREIGN KEY (run_id) REFERENCES dag_runs(run_id) ON DELETE CASCADE
     );
+    CREATE TABLE IF NOT EXISTS dag_run_revisions (
+      run_id TEXT PRIMARY KEY REFERENCES dag_runs(run_id) ON DELETE CASCADE,
+      revision INTEGER NOT NULL DEFAULT 0
+    );
+    INSERT OR IGNORE INTO dag_run_revisions (run_id) SELECT run_id FROM dag_runs;
+    CREATE TRIGGER IF NOT EXISTS dag_run_revision_insert AFTER INSERT ON dag_runs
+    BEGIN INSERT INTO dag_run_revisions (run_id) VALUES (NEW.run_id); END;
     CREATE TABLE IF NOT EXISTS dag_authorizations (
       run_id TEXT PRIMARY KEY REFERENCES dag_runs(run_id) ON DELETE CASCADE,
       plan TEXT NOT NULL, atlas_nodes_json TEXT NOT NULL
@@ -89,4 +96,8 @@ export class SessionStateStore {
     this.onSave?.(sessionID)
   }
   close(): void { this.db.close() }
+  delete(kind: "role" | "goal", sessionID: string): void {
+    this.db.run("DELETE FROM session_state WHERE session_id = ? AND kind = ?", [sessionID, kind])
+    this.onSave?.(sessionID)
+  }
 }

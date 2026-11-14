@@ -1,4 +1,4 @@
-import type { DagDefinition, DagLoop, DagNodeDefinition, DagRunRecord } from "./types"
+import type { DagCondition, DagDefinition, DagLoop, DagNodeDefinition, DagRunRecord } from "./types"
 
 function roundOf(id: string, base: string): number | undefined {
   if (id === base) return 0
@@ -61,6 +61,37 @@ export function growLoop(run: DagRunRecord, settled: string): DagDefinition | un
       }
     : node)
   return { ...run.definition, nodes: [...nodes.filter((node) => !tail.has(node.id)), fix, review, ...nodes.filter((node) => tail.has(node.id))] }
+}
+
+function renamed(condition: DagCondition, rename: (id: string) => string): DagCondition {
+  if ("all" in condition) return { all: condition.all.map((value) => renamed(value, rename)) }
+  if ("any" in condition) return { any: condition.any.map((value) => renamed(value, rename)) }
+  if ("not" in condition) return { not: renamed(condition.not, rename) }
+  return { ...condition, node: rename(condition.node) }
+}
+
+/**
+ * The inverse of `growLoop`: when the reviews in `rerun` are about to run again, the rounds grown after the
+ * earliest of them answered a verdict that no longer exists. Returns the definition without those rounds and
+ * with the tail following that review again, or undefined when no grown round is affected.
+ */
+export function shrinkLoop(definition: DagDefinition, rerun: ReadonlySet<string>): DagDefinition | undefined {
+  const loop = definition.loop
+  if (!loop) return undefined
+  const rounds = definition.nodes.flatMap((node) => { const round = rerun.has(node.id) ? roundOf(node.id, loop.review) : undefined; return round === undefined ? [] : [round] })
+  if (!rounds.length) return undefined
+  const keep = Math.min(...rounds)
+  const later = (id: string, base: string) => { const round = roundOf(id, base); return round !== undefined && round > keep }
+  const dropped = new Set(definition.nodes.filter((node) => later(node.id, loop.fix) || later(node.id, loop.review)).map((node) => node.id))
+  if (!dropped.size) return undefined
+  const at = (base: string) => keep === 0 ? base : `${base}${keep}`
+  const rename = (id: string) => !dropped.has(id) ? id : later(id, loop.review) ? at(loop.review) : at(loop.fix)
+  return { ...definition, nodes: definition.nodes.filter((node) => !dropped.has(node.id)).map((node) => (loop.tail ?? []).includes(node.id) ? {
+    ...node,
+    dependsOn: [...new Set(node.dependsOn.map(rename))],
+    ...(node.when ? { when: renamed(node.when, rename) } : {}),
+    ...(node.inputs ? { inputs: node.inputs.map((input) => ({ ...input, node: rename(input.node) })) } : {}),
+  } : node) }
 }
 
 export function buildLoop(input: Omit<DagLoop, "tail"> & { readonly tail?: readonly string[] }): DagLoop {

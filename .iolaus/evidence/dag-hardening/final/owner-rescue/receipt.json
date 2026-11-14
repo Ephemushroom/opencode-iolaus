@@ -1,0 +1,104 @@
+{
+  "verdict": "PASS",
+  "version": "opencode v2.3.0",
+  "checks": [
+    {
+      "name": "host version",
+      "verdict": "PASS",
+      "version": "opencode v2.3.0",
+      "binary": "/opt/homebrew/bin/opencode"
+    },
+    {
+      "name": "fallback and owner rescue continue one child session after a real tool effect",
+      "verdict": "PASS",
+      "sessionID": "ses_e25e4fe00ffe1KAcLf3q0Xuydu",
+      "events": [
+        "run.started",
+        "node.ready",
+        "node.started",
+        "node.fallback",
+        "node.ready",
+        "node.started",
+        "node.rescued",
+        "node.ready",
+        "node.started",
+        "node.completed",
+        "run.completed"
+      ],
+      "models": [
+        "gpt-a",
+        "gpt-b",
+        "gpt-owner"
+      ],
+      "sessionModel": {
+        "id": "gpt-owner",
+        "providerID": "openai",
+        "variant": "default"
+      },
+      "agent": "deep-low",
+      "progress": "STEP_A (once, not replayed)",
+      "historyInputs": [
+        "user",
+        "model-switched",
+        "user",
+        "model-switched",
+        "user"
+      ],
+      "provenance": {
+        "agent": "deep-low",
+        "execution": {
+          "attempt": 3,
+          "identity": {
+            "agent": "deep-low",
+            "model": "openai/gpt-owner",
+            "token": "b5b61faa-6619-467b-b8c7-af4bf00200f8"
+          },
+          "nodeID": "work",
+          "sessionID": "ses_e25e4fe00ffe1KAcLf3q0Xuydu"
+        },
+        "model": "openai/gpt-owner",
+        "parentNodeIDs": [],
+        "rescue": {
+          "decisionID": "9e1d2dc9-7bdc-4e4f-b379-8b4be5726b97",
+          "from": "openai/gpt-b",
+          "model": "openai/gpt-owner"
+        }
+      }
+    },
+    {
+      "name": "a steered node falls back in the same session with its supplement delivered once",
+      "verdict": "PASS",
+      "sessionID": "ses_e25e4fceeffezTqw26TrwM2A0u",
+      "events": [
+        "run.started",
+        "node.ready",
+        "node.started",
+        "node.steering",
+        "node.fallback",
+        "node.ready",
+        "node.started",
+        "node.completed",
+        "run.completed"
+      ],
+      "historyInputs": [
+        "user",
+        "synthetic",
+        "model-switched",
+        "user"
+      ],
+      "steering": [
+        "delivered"
+      ]
+    }
+  ],
+  "errors": [],
+  "cleanup": {
+    "sandboxRemoved": true,
+    "hostUnchanged": true
+  },
+  "command": "node script/qa-owner-rescue.mjs /Users/Bryan/Programme/Project/AI/opencode-iolaus-wt/iolaus-dag-hardening/.iolaus/evidence/dag-hardening/final/owner-rescue",
+  "limitations": [
+    "Mock OpenAI-compatible provider; one provider family, so cross-provider history conversion is covered only by same-session-probe/run3.",
+    "API sessions only, no TUI."
+  ]
+}

@@ -233,3 +233,44 @@ test("hyperplan template fans members through analyse, attack, defend, then dist
   expect(runner.prompts.get("review")).toContain("distill done")
   controller.close()
 })
+
+test("a node skipped after a retry does not keep the result of its earlier run", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
+  const runner = scriptedRunner({ decide: ["GO", "STOP"] })
+  const controller = createDagController({ directory, runner, defaultModel: lanes })
+  const run = await controller.create({ schemaVersion: 1, name: "t", nodes: [
+    { id: "decide", agent: "sisyphus", prompt: "decide", dependsOn: [] },
+    { id: "act", agent: "sisyphus", prompt: "act", dependsOn: ["decide"], when: { node: "decide", field: "text", includes: "GO" } },
+  ] }, "owner")
+  expect((await controller.wait(run.runID, "owner")).nodes[1]?.result?.payload).toEqual({ text: "act done" })
+  await controller.retry(run.runID, "owner", "decide")
+  const again = await controller.wait(run.runID, "owner")
+  expect(again.nodes.map((n) => [n.definition.id, n.status, n.result?.payload])).toEqual([["decide", "completed", { text: "STOP" }], ["act", "skipped", undefined]])
+  expect(runner.started).toEqual(["decide", "act", "decide"])
+  controller.close()
+})
+
+test("retrying the work of a grown loop drops the rounds its old review asked for", async () => {
+  directory = mkdtempSync(join(tmpdir(), "iolaus-dag-tpl-"))
+  const runner = scriptedRunner({ review: [`Nope.\n${REVIEW_VERDICT_FAIL}`, `Fine now.\n${REVIEW_VERDICT_PASS}`], review1: [`Good.\n${REVIEW_VERDICT_PASS}`] })
+  const controller = createDagController({ directory, runner, defaultModel: lanes })
+  const run = await controller.create(expandTemplate({ template: "goal-review", task: "t" }), "owner")
+  const paused = async () => {
+    let record = (await controller.snapshot(run.runID, "owner")).run
+    for (let i = 0; i < 50 && record.status !== "paused"; i++) { await new Promise((r) => setTimeout(r, 20)); record = (await controller.snapshot(run.runID, "owner")).run }
+    return record
+  }
+  expect((await paused()).definition.nodes.map((n) => n.id)).toEqual(["work", "review", "work1", "review1", "accept"])
+  await controller.approve(run.runID, "owner", "accept")
+  expect((await controller.wait(run.runID, "owner")).status).toBe("completed")
+
+  await controller.retry(run.runID, "owner", "work")
+  const again = await paused()
+  // The first review passes this time, so nothing asks for a fix round and the gate follows that review again.
+  expect(runner.started).toEqual(["work", "review", "work1", "review1", "work", "review"])
+  expect(again.definition.nodes.map((n) => n.id)).toEqual(["work", "review", "accept"])
+  expect(again.nodes.map((n) => [n.definition.id, n.status])).toEqual([["work", "completed"], ["review", "completed"], ["accept", "waiting_approval"]])
+  const accept = again.definition.nodes.find((n) => n.id === "accept")
+  expect([accept?.dependsOn, accept?.when]).toEqual([["review"], { node: "review", field: "text", includes: REVIEW_VERDICT_PASS }])
+  controller.close()
+})
