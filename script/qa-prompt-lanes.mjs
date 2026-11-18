@@ -45,10 +45,10 @@ async function check(name, fn) {
   console.error(`${results.at(-1).verdict} ${name}`)
 }
 
-function events(text) {
+function events(text, model) {
   const id = `resp_${requests.length}`, item = `item_${requests.length}`
   return [
-    { type: "response.created", response: { id, created_at: Math.floor(Date.now() / 1000), model: "gpt-5.5" } },
+    { type: "response.created", response: { id, created_at: Math.floor(Date.now() / 1000), model } },
     { type: "response.output_item.added", output_index: 0, item: { type: "message", id: item } },
     { type: "response.output_text.delta", item_id: item, output_index: 0, delta: text },
     { type: "response.output_item.done", output_index: 0, item: { type: "message", id: item } },
@@ -76,11 +76,13 @@ const server = http.createServer(async (req, res) => {
     for await (const chunk of req) chunks.push(chunk)
     const body = JSON.parse(Buffer.concat(chunks).toString())
     const anthropicWire = path === "/v1/messages"
-    // Messages API carries the system prompt in `system` (string or text blocks);
-    // Responses API carries it in `instructions`.
+    // Responses can carry stable instructions in developer/system input messages.
+    const inputInstructions = Array.isArray(body.input) ? body.input
+      .filter((item) => item.role === "developer" || item.role === "system")
+      .map((item) => typeof item.content === "string" ? item.content : (item.content ?? []).map((part) => part.text ?? "").join("\n")) : []
     const systemText = Array.isArray(body.system)
       ? body.system.filter((block) => block?.type === "text").map((block) => block.text).join("\n")
-      : body.system ?? body.instructions ?? ""
+      : body.system ?? [body.instructions, ...inputInstructions].filter(Boolean).join("\n")
     const record = {
       scenario: process.env.IOLAUS_QA_SCENARIO,
       wire: anthropicWire ? "messages" : "responses",
@@ -97,7 +99,7 @@ const server = http.createServer(async (req, res) => {
       for (const { event, data } of messageEvents("IOLAUS_PROMPT_QA_DONE")) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
       res.end()
     } else {
-      for (const event of events("IOLAUS_PROMPT_QA_DONE")) res.write(`data: ${JSON.stringify(event)}\n\n`)
+      for (const event of events("IOLAUS_PROMPT_QA_DONE", body.model)) res.write(`data: ${JSON.stringify(event)}\n\n`)
       res.end("data: [DONE]\n\n")
     }
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
@@ -125,6 +127,10 @@ const SCENARIOS = [
   { name: "gpt-6-astra", agent: "sisyphus", model: "openai/gpt-6-astra", expectName: "Astra" },
   { name: "gpt-5-5", agent: "sisyphus", model: "openai/gpt-5.5", expectName: "GPT-5.5" },
   { name: "hephaestus-astra", agent: "hephaestus", model: "openai/gpt-6-astra", expectName: "Astra" },
+  ...["sisyphus", "hephaestus"].flatMap((agent) => ["Astra", "Sol"].map((family) => ({
+    name: `${agent}-6-2-${family.toLowerCase()}`, agent,
+    model: `openai/gpt-6.2-${family.toLowerCase()}`, expectName: `GPT-6.2 ${family}`, identity: true,
+  }))),
   // Claude's large models are Hephaestus carriers too; they must get the Claude
   // body, not the generic GPT one.
   { name: "hephaestus-opus", agent: "hephaestus", model: "anthropic/claude-opus-5-5", expectName: "Claude Opus 5.5" },
@@ -189,6 +195,13 @@ try {
     })
 
     await check(`${scenario.name}: names the model it runs on`, () => {
+      if (scenario.identity) {
+        // OpenCode also appends the model name. Check Iolaus's self-description, not the host footer.
+        const lines = requests.slice(startIndex).filter((r) => r.model === served)
+          .flatMap((r) => r.instructions.split("\n")).filter((line) => line.toLowerCase().startsWith(`you are ${scenario.agent},`))
+        assert.ok(lines.length && lines.every((line) => line.includes(scenario.expectName)), `missing ${scenario.expectName} in ${JSON.stringify(lines)}`)
+        return
+      }
       const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
       assert.ok(instructions.includes(scenario.expectName), `prompt does not name ${scenario.expectName}`)
     })
@@ -264,10 +277,10 @@ try {
   await check("host state untouched", () => assert.deepEqual(after, before))
   await check("mock protocol", () => assert.deepEqual(errors, []))
 } finally {
-  writeFileSync(join(evidence, "receipt.json"), JSON.stringify({ binary, results, before, after, processes, sandboxRemoved: !existsSync(sandbox), mockClosed: !server.listening, requestCount: requests.length, omitted: "No user credentials or inherited environment dumps. Local mock only." }, null, 2))
   await new Promise((done) => server.close(done))
   for (const record of processes) { try { process.kill(-record.pid, "SIGKILL") } catch {} }
   rmSync(sandbox, { recursive: true, force: true })
+  writeFileSync(join(evidence, "receipt.json"), JSON.stringify({ binary, results, before, after, processes, sandboxRemoved: !existsSync(sandbox), mockClosed: !server.listening, requestCount: requests.length, omitted: "No user credentials or inherited environment dumps. Local mock only." }, null, 2))
   // Keep the rendered prompts for review; they contain no credentials.
   writeFileSync(join(evidence, "prompts.json"), JSON.stringify(requests.map((r) => ({ scenario: r.scenario, model: r.model, length: r.instructions.length, tools: r.tools })), null, 2))
   writeFileSync(join(evidence, "full-prompts.txt"), requests.map((r) => `===== ${r.scenario} (${r.model}) =====\n${r.instructions}\n`).join("\n"))

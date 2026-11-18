@@ -71,6 +71,29 @@ test("Hephaestus and the category lanes work under the completion contract, with
   }
 })
 
+for (const [model, identity] of [
+  ["proxy-codex/gpt-6.2-astra", "GPT-6.2 Astra"],
+  ["proxy-codex/gpt-6.2-sol", "GPT-6.2 Sol"],
+  ["proxy-codex/gpt-6.2", "GPT-6.2"],
+  ["proxy-codex/gpt-6.2-nova", "a GPT-family model"],
+  ["openai-codex/gpt-6-astra-fast", "GPT-6 Astra"],
+  ["openai/gpt-6-sol", "GPT-6 Sol"],
+  ["openai/gpt-6.1-sol", "GPT-6.1 Sol"],
+  ["openai/gpt-6-luna-fast", "GPT-6 Luna"],
+  ["openai/gpt-5-6-sol", "GPT-5.6 Sol"],
+  ["openai/gpt-5.6-terra", "GPT-5.6 Terra"],
+  ["openai/gpt-5.5", "GPT-5.5"],
+  ["openai/gpt-5.5-sol", "GPT-5.5 Sol"],
+]) {
+  test(`agent prompts identify ${model} independently of their prompt families`, () => {
+    for (const agent of ["sisyphus", "sisyphus-junior", "hephaestus"] as const) {
+      const prompt = renderAgent(agent, { model })
+      expect(prompt).toContain(identity)
+      if (model === "proxy-codex/gpt-6.2") expect(prompt).not.toContain("GPT-6.2 Sol")
+    }
+  })
+}
+
 test("mode prompts delegate with the native subagent contract", () => {
   for (const mode of ["ultrawork", "hyperplan", "team"] as const) {
     const prompt = renderMode(mode, "anthropic/claude-opus-5-5", "sisyphus")

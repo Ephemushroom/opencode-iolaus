@@ -1,4 +1,5 @@
 import { GPT_APPLY_PATCH_GUIDANCE } from "../gpt-apply-patch-guard"
+import { getGptPromptIdentity } from "../gpt-prompt-identity"
 import type {
   AvailableAgent,
   AvailableTool,
@@ -18,7 +19,7 @@ function buildTaskSystemGuide(_useTaskSystem: boolean): string {
   return buildIolausFlowSection({ worker: true })
 }
 
-const HEPHAESTUS_GPT_5_5_TEMPLATE = `You are Hephaestus, an autonomous deep worker based on GPT-5.5. You and the user share one workspace. You receive goals, not step-by-step instructions, and execute them end-to-end.
+const HEPHAESTUS_GPT_5_5_TEMPLATE = `You are Hephaestus, an autonomous deep worker based on {{ modelIdentity }}. You and the user share one workspace. You receive goals, not step-by-step instructions, and execute them end-to-end.
 
 ID contract: a child session is continued with \`subagent({sessionID: "ses_..."})\`.
 
@@ -231,6 +232,7 @@ Write the final message and stop **only when** Success Criteria are all true. Un
 `
 
 export function buildGpt55HephaestusPrompt(
+  model: string | undefined,
   availableAgents: AvailableAgent[],
   _availableTools: AvailableTool[] = [],
   availableSkills: AvailableSkill[] = [],
@@ -251,6 +253,7 @@ export function buildGpt55HephaestusPrompt(
   const frontendGuidance = buildFrontendGuidanceSection(availableCategories)
 
   return HEPHAESTUS_GPT_5_5_TEMPLATE
+    .replace("{{ modelIdentity }}", getGptPromptIdentity(model))
     .replace("{{ taskSystemGuide }}", taskSystemGuide)
     .replace("{{ categorySkillsGuide }}", categorySkillsGuide)
     .replace("{{ delegationTable }}", delegationTable)

@@ -1,4 +1,5 @@
 import { GPT_APPLY_PATCH_GUIDANCE } from "../gpt-apply-patch-guard"
+import { getGptPromptIdentity } from "../gpt-prompt-identity"
 import type {
   AvailableAgent,
   AvailableTool,
@@ -33,7 +34,7 @@ function buildTaskSystemGuide(_useTaskSystem: boolean): string {
  *   because strict "ask first" language written for earlier models reads to
  *   Astra as a reason to pause.
  */
-const HEPHAESTUS_GPT_6_ASTRA_TEMPLATE = `You are Hephaestus, an autonomous deep worker running on GPT-6 Astra. You and the user share one workspace. You receive goals, not step-by-step instructions, and you carry them to a working result.
+const HEPHAESTUS_GPT_6_ASTRA_TEMPLATE = `You are Hephaestus, an autonomous deep worker running on {{ modelIdentity }}. You and the user share one workspace. You receive goals, not step-by-step instructions, and you carry them to a working result.
 
 ID contract: a child session is continued with \`subagent({sessionID: "ses_..."})\`.
 
@@ -116,6 +117,7 @@ Work one part of a larger flow. Your prompt carries what done means for that par
 `
 
 export function buildGpt6AstraHephaestusPrompt(
+  model: string | undefined,
   availableAgents: AvailableAgent[],
   _availableTools: AvailableTool[] = [],
   availableSkills: AvailableSkill[] = [],
@@ -131,6 +133,7 @@ export function buildGpt6AstraHephaestusPrompt(
   void buildTaskSystemGuide
 
   return HEPHAESTUS_GPT_6_ASTRA_TEMPLATE
+    .replace("{{ modelIdentity }}", getGptPromptIdentity(model))
     .replace("{{ categorySkillsGuide }}", categorySkillsGuide)
     .replace("{{ delegationTable }}", delegationTable)
     .replace("{{ oracleSection }}", oracleSection)

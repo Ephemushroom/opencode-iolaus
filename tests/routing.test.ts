@@ -2,6 +2,7 @@ import { expect, test } from "bun:test"
 import { parseOptions } from "../src/options"
 import { resolveVariant } from "../src/prompts"
 import { getHephaestusPromptSource } from "../src/omo/agents/hephaestus/prompt-router"
+import { getSisyphusJuniorPromptSource } from "../src/omo/agents/sisyphus-junior/prompt-router"
 import { buildSisyphusPromptForModel } from "../src/prompts/sisyphus-route"
 import { buildGpt55SisyphusPrompt, buildClaudeOpus48SisyphusPrompt, buildClaudeOpus5SisyphusPrompt, buildClaudeOpus55SisyphusPrompt, buildGpt6AstraSisyphusPrompt } from "../src/omo/agents"
 import { identifyModel, resolvePromptIdiom, resolvePromptLane } from "../src/prompts/prompt-lanes"
@@ -21,6 +22,8 @@ test("Sisyphus selects retained family builders without asserting prose", () => 
   for (const [model, builder] of [
     ["openai/gpt-5.5", buildGpt55SisyphusPrompt],
     ["openai/gpt-6-astra", buildGpt6AstraSisyphusPrompt],
+    ["proxy-codex/gpt-6.2-astra", buildGpt6AstraSisyphusPrompt],
+    ["proxy-codex/gpt-6.2-sol", buildGpt55SisyphusPrompt],
     ["anthropic/claude-opus-4-8", buildClaudeOpus48SisyphusPrompt],
     ["anthropic/claude-opus-5", buildClaudeOpus5SisyphusPrompt],
     ["anthropic/claude-opus-5-5", buildClaudeOpus55SisyphusPrompt],
@@ -31,6 +34,18 @@ test("Sisyphus selects retained family builders without asserting prose", () => 
     ["custom/deepseek-v4", buildClaudeOpus5SisyphusPrompt],
   ] as const) {
     expect(buildSisyphusPromptForModel(model, [], [], [], [], false)).toBe(builder(model, [], [], [], [], false))
+  }
+})
+
+test("GPT-6.2 resolves to the retained prompt families", () => {
+  for (const [model, className, lane, hephaestus] of [
+    ["proxy-codex/gpt-6.2-astra", "astra", "gpt-6-astra", "gpt-6-astra"],
+    ["proxy-codex/gpt-6.2-sol", "sol", "gpt-5-5", "gpt-5-6"],
+  ] as const) {
+    expect(identifyModel(model)).toMatchObject({ vendor: "openai", className, version: [6, 2] })
+    expect(resolvePromptLane(model)?.lane).toBe(lane)
+    expect(getHephaestusPromptSource(model)).toBe(hephaestus)
+    expect(getSisyphusJuniorPromptSource(model)).toBe("gpt-5-5")
   }
 })
 

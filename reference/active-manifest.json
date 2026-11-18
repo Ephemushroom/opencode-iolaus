@@ -34,7 +34,7 @@
       "source": "reference/omo/packages/agents-core/src/gpt-prompt-identity.ts",
       "path": "src/omo/agents/gpt-prompt-identity.ts",
       "sourceSha256": "8d51ba16938e68ab4593a84b78dc804227c5bcba748c96a6fed2afad8a98f2ac",
-      "activeSha256": "8ca6a81c3a97067d2440ddeed36431e8e8ee5c995587b38b1fdb7046a10f01c5"
+      "activeSha256": "edc6003b174c290ffc58edfdc459500c7a0ffab5a39e1434024cfe729f5739d2"
     },
     {
       "source": "reference/omo/packages/agents-core/src/dynamic-agent-tool-categorization.ts",
@@ -190,19 +190,19 @@
       "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-6.ts",
       "path": "src/omo/agents/hephaestus/gpt-5-6.ts",
       "sourceSha256": "ae1651de7dcf7448b4af887cfeda154489b1733779bd5be253209392e5b53944",
-      "activeSha256": "5d67ad4a55630af6a9d2efac065ee55e818b496cac59ab55665a24ef66e0338d"
+      "activeSha256": "9cd8352a31524645d2dad85856559b9723c8b20ece665a7a95418a207d549857"
     },
     {
       "source": "reference/omo/packages/agents-core/src/hephaestus/prompt-router.ts",
       "path": "src/omo/agents/hephaestus/prompt-router.ts",
       "sourceSha256": "254b65abd8a6a3429fbf805b4639a80b2620a03af69e29c17ca198481dc3e314",
-      "activeSha256": "2a3dfb6407fb41dc2ab9c542922a1021644473942f4cf0efce16265f5bc4abcd"
+      "activeSha256": "a5bff1e7c3ada88d2254f2927f9bd3f0c2a21139d88b2fffd3ff390b2d8834b0"
     },
     {
       "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-5.ts",
       "path": "src/omo/agents/hephaestus/gpt-5-5.ts",
       "sourceSha256": "f3e57be0cf8aefc9e3712a5dec8a9960dee7f1ed4e008295036f12d7eac01d05",
-      "activeSha256": "4c48a092450393e62c60abca790477beb20bb93fd026b57d4093d62f2172a4ee"
+      "activeSha256": "c52bfae9ea9d97b074a2a883489243f50dd5cf0dc3bdec1d0e7032aca4123fde"
     },
     {
       "source": "reference/omo/packages/agents-core/src/hephaestus/gpt-5-4.ts",
