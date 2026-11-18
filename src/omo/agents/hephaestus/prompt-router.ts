@@ -135,10 +135,11 @@ export function buildDynamicHephaestusPrompt(ctx?: HephaestusContext): string {
       basePrompt = buildClaudePrompt(model ?? "", agents, tools, skills, categories, useTaskSystem);
       break;
     case "gpt-6-astra":
-      basePrompt = buildGpt6AstraPrompt(agents, tools, skills, categories, useTaskSystem);
+      basePrompt = buildGpt6AstraPrompt(model, agents, tools, skills, categories, useTaskSystem);
       break;
     case "gpt-5-6":
       basePrompt = buildGpt56Prompt(
+        model,
         agents,
         tools,
         skills,
@@ -148,6 +149,7 @@ export function buildDynamicHephaestusPrompt(ctx?: HephaestusContext): string {
       break;
     case "gpt-5-5":
       basePrompt = buildGpt55Prompt(
+        model,
         agents,
         tools,
         skills,
