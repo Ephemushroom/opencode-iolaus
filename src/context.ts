@@ -12,6 +12,7 @@ import {
 import { trace } from "./trace"
 import { DAG_CHILD_MARKER, DAG_MODE_TEMPLATES, modeDagInstruction } from "./prompts/mode-dag"
 import { ROLE_CONTRACTS } from "./roles/contract"
+import { isTopLevel } from "./roles/tier"
 
 export function lastUserText(messages: SessionContext["messages"]): string {
   for (const message of [...messages].reverse()) {
@@ -56,7 +57,7 @@ const SPECIALIST_METADATA: Partial<Record<AgentName, AgentPromptMetadata>> = {
 
 export function composeContext(
   event: SessionContext,
-  ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list"> },
+  ctx: { agent: Pick<Context["agent"], "list">; skill: Pick<Context["skill"], "list">; session: Pick<Context["session"], "get"> },
   options: Options,
   homeText?: string,
 ): Effect.Effect<void> {
@@ -93,7 +94,9 @@ export function composeContext(
       tools: categorizeTools(Object.keys(event.tools)),
     })
     const contract = ROLE_CONTRACTS[name]
-    event.system[index] = { type: "text", text: bindNative(contract ? `${prompt}\n\n${contract}` : prompt, homeText) }
+    const routing = name === "sisyphus" && !selectedMode && "iolaus_flow" in event.tools &&
+      (yield* ctx.session.get({ sessionID: event.sessionID }).pipe(Effect.map(isTopLevel), Effect.catch(() => Effect.succeed(false))))
+    event.system[index] = { type: "text", text: bindNative(contract ? `${prompt}\n\n${contract}` : prompt, homeText, { routing }) }
     trace("iolaus.agent.rendered", { agent: name, model, sessionID: event.sessionID })
   }
   if (selectedMode) {

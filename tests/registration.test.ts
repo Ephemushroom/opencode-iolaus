@@ -9,7 +9,7 @@ import { evaluate } from "../src/ast-grep/permissions"
 import { FLOW_TOOL_NAME } from "../src/dag/tool"
 import { parseOptions } from "../src/options"
 import { composeContext, NATIVE_DEFAULT_PROMPT_PREFIX } from "../src/context"
-import { agentID, modeMarker, explicitMode, AGENT_NAMES } from "../src/prompts/catalog"
+import { agentID, modeMarker, explicitMode, AGENT_NAMES, type AgentName } from "../src/prompts/catalog"
 import { ALL_LANES } from "./lanes"
 import { bindNative, renderAgent, renderMode } from "../src/prompts/render"
 import {
@@ -74,11 +74,12 @@ test("specialists follow OMO's per-agent deny lists", async () => {
 const catalogs = {
   agent: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
   skill: { list: () => Effect.succeed({ location: { directory: "/test" }, data: [] }) },
+  session: { get: () => Effect.succeed({ parentID: undefined, metadata: {} }) },
 } as never as Parameters<typeof composeContext>[1]
-function context(agent = "sisyphus", model = "openai/gpt-5.5"): SessionContext {
+function context(agent: "build" | AgentName = "sisyphus", model = "openai/gpt-5.5"): SessionContext {
   return {
     sessionID: Session.ID.make("ses_test"), agent: Agent.ID.make(agent), model: Model.Ref.parse(model),
-    system: [{ type: "text", text: agent === "build" ? "native" : agentMarker("sisyphus") }, { type: "text", text: "project guidance" }],
+    system: [{ type: "text", text: agent === "build" ? "native" : agentMarker(agent) }, { type: "text", text: "project guidance" }],
     messages: [], tools: { read: { description: "native read", input: { type: "object" } } }, options: {},
   }
 }
@@ -92,6 +93,26 @@ test("request model selects prompt while tools, model and other system parts are
     expect(event.system[1]).toEqual({ type: "text", text: "project guidance" })
     expect(event.tools).toEqual(tools)
     expect(event.model).toEqual(Model.Ref.parse(model))
+  }
+})
+
+test("the routing gate is reserved for the top-level Sisyphus orchestrator", async () => {
+  const sisyphus = context("sisyphus")
+  sisyphus.tools.iolaus_flow = sisyphus.tools.read
+  await Effect.runPromise(composeContext(sisyphus, catalogs, parseOptions({})))
+  expect(sisyphus.system[0].text).toContain("<iolaus-delegation-routing>")
+
+  const worker = context("hephaestus")
+  worker.tools.iolaus_flow = worker.tools.read
+  await Effect.runPromise(composeContext(worker, catalogs, parseOptions({})))
+  expect(worker.system[0].text).not.toContain("<iolaus-delegation-routing>")
+  expect(worker.system[0].text).toContain("Do not create a flow of your own")
+  for (const session of [{ parentID: "ses_parent" }, { metadata: { iolaus_dag_node: "implement" } }]) {
+    const child = context()
+    child.tools.iolaus_flow = child.tools.read
+    const nested = { ...catalogs, session: { get: () => Effect.succeed(session) } } as never as typeof catalogs
+    await Effect.runPromise(composeContext(child, nested, parseOptions({})))
+    expect(child.system[0].text).not.toContain("<iolaus-delegation-routing>")
   }
 })
 
@@ -120,7 +141,7 @@ test("Sisyphus lists the delegable specialists with OMO's prompt metadata and ot
 })
 
 test("ordinary native requests and user-owned agent prompts remain unchanged", async () => {
-  for (const agent of ["build", "sisyphus"]) {
+  for (const agent of ["build", "sisyphus"] as const) {
     const event = context(agent)
     event.system = [{ type: "text", text: "user-owned" }, ...event.system.slice(1)]
     const before = structuredClone(event)

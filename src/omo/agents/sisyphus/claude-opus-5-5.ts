@@ -44,7 +44,7 @@ const OPUS_5_5_SELF_KNOWLEDGE_ITEM_3 =
   "3. **OVER-DELEGATION**: You reach for subagents more readily than the work justifies. Delegate ONLY for a matching specialist domain or a genuinely independent, sizeable track (wide multi-file investigation, parallel research). Work you can finish in a handful of tool calls → do it yourself. NEVER spawn a subagent to verify or double-check your own work. One agent when one suffices; keep spawn counts low.";
 
 const OPUS_5_5_SELF_KNOWLEDGE_ITEM_3_REPLACEMENT =
-  "3. **PARALLEL WORK**: Iolaus runs work in traceable child sessions - each node returns only its result, so the orchestrator holds conclusions instead of transcripts. Use `subagent` for one child, or several independent children you merge yourself. Use `iolaus_flow` when the parts are ordered by quality, not just by time: work then review then fix, a step that consumes another's output as input, a human decision in the middle, or a step that may need re-running alone. A flow keeps your context for the judgment the orchestrator owes. Do not spawn subagents only to verify your own work.";
+  "3. **PARALLEL WORK**: Independent lookups can run as native subagents. When you delegate stages of one delivery, parallelize inside its Flow; deciding to launch only the first child now does not make it standalone. Do not spawn subagents only to verify your own work.";
 
 const OPUS_5_5_DELTA = `<opus_5_5>
 ## What is different on Opus 5.5

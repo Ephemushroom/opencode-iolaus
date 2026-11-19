@@ -62,17 +62,17 @@ Work one part of a larger flow. Your prompt carries what done means for that par
 
 ## Pick the shape, not the size
 
-Three levels, ascending cost. **Do it yourself** when it is one file and the context is already in your hands. **\`subagent\`** when it is one child, or several independent children whose results you merge yourself - they run concurrently and each reports as it goes idle. **\`iolaus_flow\`** when the parts are ordered by quality, not just by time.
+Do work you can finish yourself directly. When orchestrating a delivery, choose the tool for the whole delivery before assigning its first step. Implementation and preview edits can run in parallel inside a Flow; browser verification depends on the edits it exercises, and a fix consumes the review findings. Those handoffs still exist if you relay the findings yourself.
 
 A flow earns its cost when the work has one of these shapes, whatever its size:
 
 - **Work → review → fix.** Something must be judged and a FAIL must send the work back. A \`loop\` grows the next fix/review round by itself when the review settles FAIL; a subagent cannot act on a verdict.
 - **A step consumes another's result as input.** Declare \`dependsOn\` and bind the upstream with \`inputs: [{"node": "<id>"}]\`; the payload arrives with its provenance instead of being pasted into the next prompt by hand.
 - **A human decides mid-way.** A \`kind: "gate"\` node pauses the run in \`waiting_approval\` until the user answers.
-- **A step may need re-running alone.** \`retry\` re-runs one node and keeps every other result. An observed native \`subagent\` run can never be retried, resumed or amended - it is a read-only trace once it settles.
+- **A step needs recovery.** Retry resets the node and its dependents, preserving unaffected branches. Native calls are observed, not scheduled: their records cannot be retried, resumed, amended or rescued by Flow.
 - **The parts need different lanes.** Reading, implementing, reviewing and escalating are different jobs with different lane contracts and, usually, different models. One flow composes them; a sequence of subagent calls makes you carry each result across by hand.
 
-If none of those hold - the parts are independent and you are the one merging them - \`subagent\` is the right tool. A flow would only add a join node that does your own job.
+For an isolated change or independent lookups in the same repository whose answers go straight to you, use \`subagent\`. Sharing a checkout alone does not make read-only lookups dependent.
 
 ## Each node runs on the lane you choose
 

@@ -1,0 +1,298 @@
+[
+  {
+    "name": "opus-5-5: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-5-5: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-5-5: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-5-5: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-5-5: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8-gateway: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8-gateway: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8-gateway: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8-gateway: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "opus-4-8-gateway: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-6-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-6-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-6-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-6-astra: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-6-astra: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-5-5: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-5-5: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-5-5: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-5-5: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "gpt-5-5: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-astra: worker contract, not orchestration",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-astra: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-astra: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-sol: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-sol: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-sol: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-sol: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "sisyphus-6-2-sol: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-astra: worker contract, not orchestration",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-sol: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-sol: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-sol: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-6-2-sol: worker contract, not orchestration",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-opus: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-opus: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-opus: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "hephaestus-opus: worker contract, not orchestration",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-astra: planner doctrine is real content",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-opus: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-opus: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-opus: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus-opus: planner doctrine is real content",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "ulw-opus: keyword \"ultrawork\" injects the flow mandate",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: real session renders a prompt",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: names the model it runs on",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: carries no tool this harness does not register",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: ordinary owner gets delegation routing, explicit mode keeps its template",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: carries the flow rule",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mass-ulw-astra: keyword \"mass-ulw\" injects the flow mandate",
+    "verdict": "PASS"
+  },
+  {
+    "name": "prometheus: the planner prompt is identical on every model",
+    "verdict": "PASS"
+  },
+  {
+    "name": "host state untouched",
+    "verdict": "PASS"
+  },
+  {
+    "name": "mock protocol",
+    "verdict": "PASS"
+  }
+]
