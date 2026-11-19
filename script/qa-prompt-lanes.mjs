@@ -213,6 +213,11 @@ try {
     })
 
     if (scenario.agent === "sisyphus") {
+      await check(`${scenario.name}: ordinary owner gets delegation routing, explicit mode keeps its template`, () => {
+        const turns = requests.slice(startIndex).filter((r) => r.model === served && r.tools.includes("iolaus_flow"))
+        assert.ok(turns.length)
+        for (const turn of turns) assert.equal(turn.instructions.includes("<iolaus-delegation-routing>"), !scenario.keyword)
+      })
       await check(`${scenario.name}: carries the flow rule`, () => {
         const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
         assert.ok(instructions.includes("iolaus_flow"), "no iolaus_flow rule in the rendered prompt")

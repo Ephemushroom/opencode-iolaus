@@ -38,6 +38,7 @@ The two vendors do not respond best to the same shape, and pretending otherwise 
 - Do not ask for preambles or an intent line in an unattended run; that is a known cause of an early stop.
 - Do not pile on verification instructions. Current models run tests and check their own work; repeated "verify again" guidance produces unnecessary work.
 - Fewer itineraries. Guidance written for smaller models overconstrains the strong one. State outcomes and decision rules, not a step list.
+- Before delegating a delivery, put interacting edits, downstream verification and fixes, or work that needs scheduler recovery in one Flow. Parallelize independent stages inside it. Independent lookups in the same repository can still use native `subagent`; when independence is unclear, prefer Flow.
 
 **Other carriers (Kimi, GLM, DeepSeek).** They currently borrow the Anthropic idiom: their retained OMO bodies were tuned for a harness this one replaced and diverge from the behavior we want, so Sisyphus, Hephaestus, Sisyphus-Junior, Atlas and the mode prompts all address them in the Anthropic shape. The borrowed body names the model actually running (`on glm-5-2`, `kimi-k3`) and never claims to be a Claude model. The retained variants stay on disk, unreachable through routing, so a measured reason to split a carrier off is a one-line routing change, not a rewrite.
 

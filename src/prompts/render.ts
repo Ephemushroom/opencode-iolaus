@@ -11,7 +11,7 @@ import {
 import { resolvePromptIdiom, resolvePromptLane } from "./prompt-lanes"
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
-import { NATIVE_BINDINGS } from "./native-bindings"
+import { NATIVE_BINDINGS, NATIVE_ROUTING_GATE } from "./native-bindings"
 import { MASS_ULW_MODE_PROMPT, TEAM_DAG_MODE_PROMPT } from "./mode-dag"
 import { buildHephaestusPrompt } from "../omo/agents/hephaestus/gpt"
 
@@ -80,6 +80,7 @@ export function renderMode(mode: ModeName, model: string, agent?: AgentName): st
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }
 
-export function bindNative(prompt: string, homeText?: string): string {
-  return `${prompt}\n\n${NATIVE_BINDINGS}${homeText ? `\n${homeText}` : ""}`
+export function bindNative(prompt: string, homeText?: string, options: { readonly routing?: boolean } = {}): string {
+  const routing = options.routing ? `\n\n${NATIVE_ROUTING_GATE}` : ""
+  return `${prompt}${routing}\n\n${NATIVE_BINDINGS}${homeText ? `\n${homeText}` : ""}`
 }
