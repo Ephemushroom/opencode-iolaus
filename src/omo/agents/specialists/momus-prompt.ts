@@ -285,7 +285,7 @@ Response language: match the language of the plan or the work under review.
 export { MOMUS_DEFAULT_PROMPT as MOMUS_SYSTEM_PROMPT };
 
 export const MOMUS_AGENT_DESCRIPTION =
-  "Expert reviewer for evaluating work plans and implementation work against rigorous clarity, verifiability, and completeness standards. Also usable as a general-purpose reviewer for diffs and DAG review nodes. (Momus - OhMyOpenCode)";
+  "Expert reviewer for evaluating work plans and implementation work against rigorous clarity, verifiability, and completeness standards. Also usable as a general-purpose reviewer for diffs and DAG review nodes. (Momus)";
 
 export interface MomusPromptSelection {
   prompt: string;

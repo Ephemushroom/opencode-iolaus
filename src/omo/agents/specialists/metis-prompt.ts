@@ -291,7 +291,7 @@ subagent({agent: "librarian", prompt:"I'm looking for proven implementations of 
 `
 
 export const METIS_K2_7_SYSTEM_PROMPT = `<role>
-You are Metis, the pre-planning consultant from OhMyOpenCode, running on Kimi K2.7. Named for the Titan of deep counsel, you read a request before any plan exists and surface what would derail it: the hidden intent, the ambiguity, the AI-slop trap.
+You are Metis, the pre-planning consultant, running on Kimi K2.7. Named for the Titan of deep counsel, you read a request before any plan exists and surface what would derail it: the hidden intent, the ambiguity, the AI-slop trap.
 
 You are read-only — you analyze, question, and advise; you never implement or edit files. Your analysis feeds Prometheus, the planner, so it must be actionable: concrete directives, not observations.
 
@@ -387,7 +387,7 @@ For Build and Research, run the exploration yourself before questioning. Prompt 
 </critical_rules>`
 
 export const METIS_AGENT_DESCRIPTION =
-  "Pre-planning consultant that analyzes requests to identify hidden intentions, ambiguities, and AI failure points. (Metis - OhMyOpenCode)"
+  "Pre-planning consultant that analyzes requests to identify hidden intentions, ambiguities, and AI failure points. (Metis)"
 
 /** Selects the model-family Metis prompt variant. */
 export function getMetisPrompt(model: string): string {

@@ -11,7 +11,7 @@ import {
 import { resolvePromptIdiom, resolvePromptLane } from "./prompt-lanes"
 import { buildSisyphusPromptForModel } from "./sisyphus-route"
 import { CATEGORY_DESCRIPTIONS, type AgentName, type CategoryName, type ModeName } from "./catalog"
-import { NATIVE_BINDINGS, NATIVE_ROUTING_GATE } from "./native-bindings"
+import { nativeBindings, NATIVE_ROUTING_GATE } from "./native-bindings"
 import { MASS_ULW_MODE_PROMPT, TEAM_DAG_MODE_PROMPT } from "./mode-dag"
 import { buildHephaestusPrompt } from "../omo/agents/hephaestus/gpt"
 
@@ -31,7 +31,7 @@ export function renderAgent(name: AgentName, context: PromptContext): string {
       // Any model runs Hephaestus: GPT models get their tuned variant, others the generic GPT body, which names no model.
       return isHephaestusSupportedModel(model)
         ? buildDynamicHephaestusPrompt({ model, availableAgents: agents, availableSkills: skills, availableTools: tools, availableCategories: categories })
-        : `${buildAgentIdentitySection("Hephaestus", "Autonomous deep worker for software engineering from OhMyOpenCode")}\n${buildHephaestusPrompt(agents, tools, skills, categories, false)}`
+        : `${buildAgentIdentitySection("Hephaestus", "Autonomous deep worker for software engineering")}\n${buildHephaestusPrompt(agents, tools, skills, categories, false)}`
     case "sisyphus-junior": return buildSisyphusJuniorPrompt(model, false)
     case "explore": return EXPLORE_PROMPT
     case "librarian": return buildLibrarianPrompt()
@@ -80,7 +80,7 @@ export function renderMode(mode: ModeName, model: string, agent?: AgentName): st
   return loadPromptSync({ source: ultraworkPromptVariants[variant], name: mode, variant }).body
 }
 
-export function bindNative(prompt: string, homeText?: string, options: { readonly routing?: boolean } = {}): string {
+export function bindNative(prompt: string, homeText?: string, options: { readonly routing?: boolean; readonly delegation?: boolean } = {}): string {
   const routing = options.routing ? `\n\n${NATIVE_ROUTING_GATE}` : ""
-  return `${prompt}${routing}\n\n${NATIVE_BINDINGS}${homeText ? `\n${homeText}` : ""}`
+  return `${prompt}${routing}\n\n${nativeBindings(options.delegation ?? true)}${homeText ? `\n${homeText}` : ""}`
 }

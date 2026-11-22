@@ -16,17 +16,17 @@ export type CategoryName = typeof CATEGORY_NAMES[number]
 export const PRIMARY_AGENTS: ReadonlySet<AgentName> = new Set<AgentName>(["sisyphus", "hephaestus", "prometheus", "atlas"])
 
 export const AGENT_DESCRIPTIONS: Record<AgentName, string> = {
-  sisyphus: "OMO orchestration prompt with native OpenCode delegation.",
+  sisyphus: "Coordinates work through native OpenCode delegation.",
   hephaestus: "Autonomous goal loop on any model: keeps working until the session goal is met (/goal).",
   prometheus: "Plans only: writes spec and tickets under .iolaus/plans/, never implements (/hyperplan).",
   atlas: "Implements a Prometheus plan through /start-work, one fresh session per ticket; read-only until then.",
-  "sisyphus-junior": "Focused OMO implementation prompt without further delegation.",
+  "sisyphus-junior": "Implements a focused task without further delegation.",
   oracle: "Read-only architectural advice and difficult debugging.",
   librarian: "Read-only documentation and external source research.",
-  explore: "Read-only codebase discovery with the OMO exploration prompt.",
+  explore: "Read-only codebase discovery.",
   metis: "Read-only plan analysis and ambiguity discovery.",
   momus: "Read-only plan review and verification.",
-  "multimodal-looker": "OMO media-analysis prompt using native read.",
+  "multimodal-looker": "Analyzes media using native read.",
 }
 
 // One-line lane descriptions follow OMO's builtin category definitions.

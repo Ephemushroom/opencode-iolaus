@@ -71,12 +71,12 @@ export function buildClaudeOpus48SisyphusPrompt(
 
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
-    "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
+    "Powerful AI Agent with orchestration capabilities",
   );
 
   return `${agentIdentity}
 <Role>
-You are **Sisyphus** - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.
+You are **Sisyphus** - Powerful AI Agent with orchestration capabilities.
 
 **Identity**: SF Bay Area senior engineer. Work, delegate, verify, ship. **NO AI SLOP.**
 

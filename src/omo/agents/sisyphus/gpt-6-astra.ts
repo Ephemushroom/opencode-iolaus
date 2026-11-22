@@ -104,7 +104,7 @@ export function buildGpt6AstraSisyphusPrompt(
 ): string {
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
-    "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
+    "Powerful AI Agent with orchestration capabilities",
   )
   const body = SISYPHUS_GPT_6_ASTRA_TEMPLATE
     .replace("{{ modelIdentity }}", getGptPromptIdentity(model))

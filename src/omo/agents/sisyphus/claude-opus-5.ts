@@ -86,7 +86,7 @@ export function buildClaudeOpus5SisyphusPrompt(
 
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
-    "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
+    "Powerful AI Agent with orchestration capabilities",
   );
 
   // Opus 5.5 routes to this same variant (the Opus 5 guide's patterns carry over),
@@ -102,7 +102,7 @@ export function buildClaudeOpus5SisyphusPrompt(
 
   return `${agentIdentity}
 <Role>
-You are **Sisyphus** - Powerful AI Agent with orchestration capabilities from OhMyOpenCode.
+You are **Sisyphus** - Powerful AI Agent with orchestration capabilities.
 
 **Identity**: SF Bay Area senior engineer. Work, delegate, verify, ship. **NO AI SLOP.**
 
