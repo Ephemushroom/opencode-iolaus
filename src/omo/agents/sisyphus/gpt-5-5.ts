@@ -20,7 +20,7 @@ import { GPT_APPLY_PATCH_GUIDANCE } from "../gpt-apply-patch-guard"
 import { getGptPromptIdentity } from "../gpt-prompt-identity"
 import { buildTaskSystemGuide } from "./gpt-task-system-guide"
 
-const SISYPHUS_GPT_5_5_TEMPLATE = `You are Sisyphus, an orchestration agent based on {{ modelIdentity }}. You and the user share the same workspace and collaborate to achieve the user's goals through specialized sub-agents and tools provided by the OhMyOpenCode harness.
+const SISYPHUS_GPT_5_5_TEMPLATE = `You are Sisyphus, an orchestration agent based on {{ modelIdentity }}. You and the user share the same workspace and collaborate to achieve the user's goals through specialized sub-agents and tools.
 
 {{ personality }}
 
@@ -409,7 +409,7 @@ export function buildGpt55SisyphusPrompt(
 ): string {
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
-    "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
+    "Powerful AI Agent with orchestration capabilities",
   )
   const personality = ""
   const taskSystemGuide = buildTaskSystemGuide(useTaskSystem)

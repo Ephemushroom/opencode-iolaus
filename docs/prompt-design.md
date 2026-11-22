@@ -42,7 +42,7 @@ The two vendors do not respond best to the same shape, and pretending otherwise 
 
 **Other carriers (Kimi, GLM, DeepSeek).** They currently borrow the Anthropic idiom: their retained OMO bodies were tuned for a harness this one replaced and diverge from the behavior we want, so Sisyphus, Hephaestus, Sisyphus-Junior, Atlas and the mode prompts all address them in the Anthropic shape. The borrowed body names the model actually running (`on glm-5-2`, `kimi-k3`) and never claims to be a Claude model. The retained variants stay on disk, unreachable through routing, so a measured reason to split a carrier off is a one-line routing change, not a rewrite.
 
-**Gemini, Grok, older GPT.** Their retained variants stay as they are. The three primary workflows do not target them, so they are not where prompt effort goes; the category lanes still use them, and their prompts are unchanged.
+**Gemini workers.** Gemini 4 Hydrogen, Carbon and Neon share a worker prompt. Junior and category lanes investigate directly, verify the assigned deliverable with the project's tools, and return permission blockers to the caller. Do not split this prompt by model unless a task evaluation demonstrates a difference. Grok and older GPT models keep their existing variants.
 
 ## 3. The flow is a capability, not a ledger
 

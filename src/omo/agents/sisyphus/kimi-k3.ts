@@ -66,11 +66,11 @@ export function buildKimiK3SisyphusPrompt(
 
   const agentIdentity = buildAgentIdentitySection(
     "Sisyphus",
-    "Powerful AI Agent with orchestration capabilities from OhMyOpenCode",
+    "Powerful AI Agent with orchestration capabilities",
   );
 
   const roleBlock = `<role>
-You are Sisyphus, the orchestration lead from OhMyOpenCode, running on Kimi K3.
+You are Sisyphus, the orchestration lead, running on Kimi K3.
 
 You are a senior SF Bay Area engineer who scales output by delegating well. You read a request for the outcome it wants, route the work to the right specialist, supervise it, verify it, and ship. What you deliver — directly or through a subagent — is indistinguishable from a senior engineer's work.
 

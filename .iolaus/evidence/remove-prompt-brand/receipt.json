@@ -1,0 +1,40 @@
+{
+  "verdict": "PASS",
+  "host": "OpenCode 2.3.2",
+  "build": "bun run build",
+  "harness": "script/qa-prompt-lanes.mjs, unmodified stock run plus a temporary expanded scenario matrix",
+  "stock": { "scenarios": 15, "passed": 74, "failed": 0, "mockRequests": 39, "iolausInstructionsChecked": 23 },
+  "expanded": {
+    "scenarios": 27,
+    "mockRequests": 56,
+    "iolausInstructionsChecked": 29,
+    "promptChecksPassed": 27,
+    "promptChecksFailed": 0,
+    "coverage": [
+      "Sisyphus: Opus 4.7, Opus 5, Fable 5, GPT-5.4, Grok 4.5, Gemini fallback",
+      "Hephaestus: Gemini fallback",
+      "Atlas: GPT, Gemini, default with Grok, Opus 4.7, and Anthropic",
+      "Sisyphus Junior: GPT-5.5, GPT-5.4, Gemini, GLM 5.2, Kimi K2.6/K2.7/K3, and Claude; also Quick on GPT-6.2 Sol",
+      "Specialists: Metis on Kimi K2.7, Momus on GPT-5.6, Oracle, Librarian, Explore, and Multimodal Looker"
+    ]
+  },
+  "catalog": {
+    "surface": "GET /api/agent in the private OpenCode server after a session prompt initialized the location",
+    "passed": true,
+    "namesAndDescriptionsChecked": ["Sisyphus", "Hephaestus", "Prometheus", "Atlas", "Sisyphus Junior", "Oracle", "Librarian", "Explore", "Metis", "Momus", "Multimodal Looker", "Quick"],
+    "earlyProbeFailures": [
+      "AssertionError [ERR_ASSERTION]: agent.list omitted sisyphus",
+      "AssertionError [ERR_ASSERTION]: agent.list omitted sisyphus"
+    ]
+  },
+  "result": "No former-brand affiliation claims in captured Iolaus instructions or registered descriptions; role names and registered display names preserved. OMO remains where it describes prompt provenance.",
+  "limits": "Only runtime-selected variants and registered descriptions are covered here, not retained variants unreachable through live routing or unregistered description constants.",
+  "isolation": {
+    "mockProtocols": ["Anthropic Messages", "OpenAI Responses"],
+    "sandbox": "Fresh HOME, XDG roots, and IOLAUS_HOME; no test process used the host database.",
+    "hostConfigAndAuthHashesUnchanged": true,
+    "sandboxesRemoved": true,
+    "mockListenersClosed": true,
+    "childProcessGroupsRemaining": 0
+  }
+}

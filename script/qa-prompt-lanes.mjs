@@ -1,14 +1,10 @@
 /**
  * Live QA for vendor-lane prompt rendering.
  *
- * Runs real sessions in an isolated HOME against a local mock model, one per
- * model identity, and asserts on the system prompt the host actually handed to
- * the provider. That is the only place where prompt routing, the flow section
- * and the removal of the dead todo tools can be observed together.
- *
- * Positive: every lane renders, the model is named, and the flow rule is present.
- * Negative: no rendered prompt names a tool this harness does not register.
- * Isolation: sandbox HOME/XDG only; the user's host state is hashed before and after.
+ * Runs real sessions in isolated HOME/XDG against a loopback mock. Captures
+ * distinguish Iolaus agent turns from auxiliary host requests (such as titles).
+ * Use --compact to retain only the receipt and assertions. This verifies prompt
+ * delivery and advertised tools, not model behavior or performance.
  */
 import assert from "node:assert/strict"
 import { spawn } from "node:child_process"
@@ -21,15 +17,21 @@ import { dirname, join, resolve } from "node:path"
 import { fileURLToPath } from "node:url"
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
-const evidence = resolve(process.argv[2] ?? join(root, `.iolaus/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-prompt-lanes`))
+const args = process.argv.slice(2)
+const compact = args.includes("--compact")
+const evidence = resolve(args.find((arg) => arg !== "--compact") ?? join(root, `.iolaus/evidence/${new Date().toISOString().replace(/[:.]/g, "-")}-prompt-lanes`))
 assert.ok(evidence.startsWith(`${join(root, ".iolaus/evidence")}/`), "evidence dir must stay under .iolaus/evidence")
+const digest = (value) => createHash("sha256").update(value).digest("hex")
+const buildSHA256 = digest(readFileSync(join(root, "dist/index.js")))
 mkdirSync(evidence, { recursive: false })
 const sandbox = realpathSync(mkdtempSync(join(tmpdir(), "iolaus-prompt-qa-")))
 const binary = process.env.QA_OPENCODE_BIN ?? "/opt/homebrew/bin/opencode"
-const results = [], requests = [], processes = [], errors = []
+const results = [], requests = [], processes = [], errors = [], captures = []
+const MOCK_REPLY = "IOLAUS_PROMPT_QA_DONE"
 let scenarioRequests = 0
+let activeScenario
 
-const digest = (value) => createHash("sha256").update(value).digest("hex")
+const isAgentTurn = ({ instructions }) => instructions.includes("<iolaus-native-contract>")
 function hostState() {
   const home = homedir()
   const config = process.env.XDG_CONFIG_HOME ?? join(home, ".config")
@@ -84,22 +86,22 @@ const server = http.createServer(async (req, res) => {
       ? body.system.filter((block) => block?.type === "text").map((block) => block.text).join("\n")
       : body.system ?? [body.instructions, ...inputInstructions].filter(Boolean).join("\n")
     const record = {
-      scenario: process.env.IOLAUS_QA_SCENARIO,
+      scenario: activeScenario,
       wire: anthropicWire ? "messages" : "responses",
       model: body.model,
       instructions: systemText,
       tools: (body.tools ?? []).map((tool) => tool.name ?? tool.function?.name),
     }
     requests.push(record)
-    appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify({ scenario: record.scenario, wire: record.wire, model: record.model, chars: record.instructions.length, tools: record.tools }) + "\n")
+    if (!compact) appendFileSync(join(evidence, "requests.ndjson"), JSON.stringify({ scenario: record.scenario, wire: record.wire, model: record.model, chars: record.instructions.length, tools: record.tools }) + "\n")
     scenarioRequests += 1
     assert.ok(scenarioRequests < 8, "unexpected model loop")
     res.writeHead(200, { "content-type": "text/event-stream", "cache-control": "no-cache" })
     if (anthropicWire) {
-      for (const { event, data } of messageEvents("IOLAUS_PROMPT_QA_DONE")) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
+      for (const { event, data } of messageEvents(MOCK_REPLY)) res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
       res.end()
     } else {
-      for (const event of events("IOLAUS_PROMPT_QA_DONE", body.model)) res.write(`data: ${JSON.stringify(event)}\n\n`)
+      for (const event of events(MOCK_REPLY, body.model)) res.write(`data: ${JSON.stringify(event)}\n\n`)
       res.end("data: [DONE]\n\n")
     }
   } catch (error) { errors.push(String(error)); res.writeHead(500).end("mock error") }
@@ -108,12 +110,13 @@ const server = http.createServer(async (req, res) => {
 async function run(name, args, fixture) {
   const child = spawn(binary, args, { cwd: fixture.project, env: fixture.env, detached: true, stdio: ["ignore", "pipe", "pipe"] })
   processes.push({ name, pid: child.pid })
-  let output = ""
-  for (const stream of [child.stdout, child.stderr]) stream.on("data", (data) => { output += data; appendFileSync(join(evidence, `${name}.log`), data) })
+  let output = "", stdout = ""
+  child.stdout.on("data", (data) => { stdout += data })
+  for (const stream of [child.stdout, child.stderr]) stream.on("data", (data) => { output += data; if (!compact) appendFileSync(join(evidence, `${name}.log`), data) })
   const deadline = setTimeout(() => { try { process.kill(-child.pid, "SIGKILL") } catch {} }, 90000)
   try {
     const [code] = await once(child, "close")
-    return { code, output }
+    return { code, output, stdout }
   } finally { clearTimeout(deadline) }
 }
 
@@ -142,9 +145,56 @@ const SCENARIOS = [
   // `mass-ulw` must make the agent author the graph itself.
   { name: "ulw-opus", agent: "sisyphus", model: "anthropic/claude-opus-5-5", expectName: "claude-opus-5-5", task: "ulw Fix the failing build.", keyword: "ultrawork" },
   { name: "mass-ulw-astra", agent: "sisyphus", model: "openai/gpt-6-astra", expectName: "Astra", task: "mass-ulw Migrate every service.", keyword: "mass-ulw" },
+  { name: "audit-astra-oracle", agent: "oracle", model: "proxy-codex/gpt-6.2-astra", audit: "adviser" },
+  { name: "audit-fable-owner", agent: "sisyphus", model: "proxy-cc/claude-fable-5-2", audit: "owner" },
+  { name: "audit-fable-planner", agent: "prometheus", model: "proxy-cc/claude-fable-5-2", audit: "planner" },
+  { name: "audit-opus-owner", agent: "sisyphus", model: "proxy-cc/claude-opus-5-5", audit: "owner", opus: true },
+  ...[["hydrogen", "visual-engineering"], ["carbon", "quick"], ["neon", "deep-low"]].flatMap(([model, category]) => [
+    { name: `audit-${model}-junior`, agent: "sisyphus-junior", model: `bryan/gemini-4-${model}`, audit: "worker" },
+    { name: `audit-${model}-${category}`, agent: category, model: `bryan/gemini-4-${model}`, audit: "worker", category },
+  ]),
 ]
 
 const DEAD_TOOL = /todowrite|task_create|TaskCreate|TaskUpdate|task_update|TODO CONTINUATION|TASK CONTINUATION|background_output|background_cancel|load_skills|run_in_background|call_omo_agent|subagent_type|delegate_task|team_(?:create|task|send|shutdown|delete|approve|list)|update_plan|oh-my-opencode/i
+const TOOL_EDITS = ["edit", "write", "patch"]
+const DELEGATION_TOOLS = ["subagent", "iolaus_flow"]
+
+function checkAuditTurn(scenario, { tools, instructions }) {
+  const [body, binding] = instructions.split("<iolaus-native-contract>")
+  assert.ok(tools.includes("read"), "the agent was not advertised the read tool")
+  assert.ok(!tools.some((tool) => /^(?:lsp_\w+|get_goal|create_goal|update_goal)$/.test(tool)), "unexpected LSP or goal tool advertised")
+  switch (scenario.audit) {
+    case "adviser":
+      assert.match(body, /\bYou are Oracle\b/i)
+      assert.doesNotMatch(body, /\bGPT[- ]\d/i)
+      assert.ok(![...TOOL_EDITS, ...DELEGATION_TOOLS].some((tool) => tools.includes(tool)), "Oracle was advertised an edit or delegation tool")
+      assert.doesNotMatch(binding, /\b(?:subagent|iolaus_flow)\b/)
+      break
+    case "planner":
+      assert.match(body, /\bYou are Prometheus\b/i)
+      assert.doesNotMatch(body, /\bClaude[- ](?:Fable|Mythos)[- ]\d/i)
+      assert.ok(!tools.includes("shell"), "planner was advertised shell")
+      assert.ok(TOOL_EDITS.some((tool) => tools.includes(tool)), "planner has no editing surface for plans")
+      assert.ok(DELEGATION_TOOLS.every((tool) => tools.includes(tool)), "planner delegation surface is incomplete")
+      break
+    case "owner":
+      assert.match(body, /\bYou are \*{0,2}Sisyphus\b/i)
+      if (scenario.opus) assert.ok(body.includes("<opus_5_5>"), "Opus 5.5 variant missing")
+      else assert.ok(!body.match(/\bYou are\b[^\n]*\bClaude[- ](?:Fable|Mythos)[- ]\d/i), "Fable owner hardcodes a model identity")
+      assert.ok(instructions.includes("<iolaus-delegation-routing>"), "owner delegation routing missing")
+      assert.ok(DELEGATION_TOOLS.every((tool) => tools.includes(tool)), "owner delegation surface is incomplete")
+      break
+    case "worker":
+      assert.match(body, /\bYou are Sisyphus-Junior\b/i)
+      const category = body.match(/<Category_Context name="([^"]+)">/)?.[1]
+      assert.equal(category, scenario.category)
+      assert.ok(!tools.includes("subagent"), "worker was advertised native delegation")
+      assert.ok(tools.includes("shell") && TOOL_EDITS.some((tool) => tools.includes(tool)), "worker execution surface is incomplete")
+      assert.doesNotMatch(body, /\b(?:subagent|iolaus_flow|lsp_\w+)\b/)
+      assert.doesNotMatch(binding, /\b(?:subagent|iolaus_flow)\b/)
+      break
+  }
+}
 
 let after
 try {
@@ -153,7 +203,7 @@ try {
   const mockURL = `http://127.0.0.1:${server.address().port}/v1`
 
   for (const scenario of SCENARIOS) {
-    process.env.IOLAUS_QA_SCENARIO = scenario.name
+    activeScenario = scenario.name
     const home = join(sandbox, scenario.name, "home")
     const project = join(home, "project")
     mkdirSync(project, { recursive: true })
@@ -161,22 +211,26 @@ try {
     mkdirSync(join(config, "opencode"), { recursive: true })
     const iolausHome = join(home, ".iolaus")
     mkdirSync(iolausHome, { recursive: true })
-    // Anthropic models go over the native Messages API so the transport those
-    // models actually use is exercised; the rest use the OpenAI Responses wire.
-    const vendor = scenario.model.split("/")[0]
-    const served = scenario.model.split("/")[1]
-    const wire = scenario.model
-    const providerConfig = vendor === "anthropic"
-      ? { anthropic: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { [served]: { tool_call: true, limit: { context: 200000, output: 8192 } } } } }
-      : { openai: { options: { apiKey: "fake-key", baseURL: mockURL }, models: { [served]: { tool_call: true, limit: { context: 200000, output: 8192 } } } } }
-    const models = { agents: { [scenario.agent]: wire }, categories: { quick: wire } }
-    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], models }))
+    const [vendor, served] = scenario.model.split("/")
+    const anthropic = vendor === "anthropic" || vendor === "proxy-cc"
+    const providerPackage = anthropic ? "anthropic" : vendor === "bryan" ? "openai-compatible/responses" : "openai/responses"
+    const models = scenario.category ? { categories: { [scenario.category]: scenario.model } }
+      : { agents: { [scenario.agent]: scenario.model }, categories: { quick: scenario.model } }
+    writeFileSync(join(iolausHome, "iolaus.json"), JSON.stringify({ enabled: true, mcps: [], gh: false, models }))
     writeFileSync(join(config, "opencode/opencode.json"), JSON.stringify({
       plugins: [{ package: join(root, "dist") }],
-      model: wire,
+      model: scenario.model,
       default_agent: "build",
-      permissions: [{ action: "*", resource: "*", effect: "allow" }],
-      provider: providerConfig,
+      update: "disable",
+      policies: [
+        { action: "provider.use", resource: "*", effect: "deny" },
+        { action: "provider.use", resource: vendor, effect: "allow" },
+      ],
+      providers: { [vendor]: {
+        package: `@opencode/ai/providers/${providerPackage}`,
+        settings: { apiKey: "fake-key", baseURL: mockURL },
+        models: { [served]: { tool_call: true, limit: { context: 200000, output: 8192 } } },
+      } },
     }))
     const env = {
       PATH: process.env.PATH, TMPDIR: sandbox, HOME: home, USERPROFILE: home, PWD: project,
@@ -184,42 +238,69 @@ try {
       OPENCODE_TEST_HOME: home, OPENCODE_DISABLE_AUTOUPDATE: "1", OPENCODE_DISABLE_MODELS_FETCH: "1",
       IOLAUS_HOME: iolausHome, OPENAI_API_KEY: "fake-key", ANTHROPIC_API_KEY: "fake-key",
     }
-    writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && !k.endsWith("_API_KEY"))) }, null, 2))
+    if (!compact) writeFileSync(join(evidence, `${scenario.name}-isolation.json`), JSON.stringify({ project, env: Object.fromEntries(Object.entries(env).filter(([k]) => k !== "PATH" && !k.endsWith("_API_KEY"))) }, null, 2))
 
     scenarioRequests = 0
     const startIndex = requests.length
+    const agentTurns = () => requests.slice(startIndex).filter(isAgentTurn)
     await check(`${scenario.name}: real session renders a prompt`, async () => {
-      const result = await run(scenario.name, ["run", "--standalone", "--auto", "--print-logs", "--agent", scenario.agent, "--model", wire, scenario.task ?? "Return IOLAUS_PROMPT_QA_DONE."], { project, env })
+      const result = await run(scenario.name, ["run", "--standalone", "--print-logs", "--agent", scenario.agent, "--model", scenario.model, scenario.task ?? `Return ${MOCK_REPLY}.`], { project, env })
       assert.equal(result.code, 0, result.output.slice(-2000))
-      assert.ok(requests.length > startIndex, "the mock received no request, so no prompt was rendered")
+      assert.ok(agentTurns().length, "the mock captured no Iolaus agent turn (host title requests do not count)")
+      assert.ok(result.stdout.includes(MOCK_REPLY), result.output.slice(-2000))
     })
 
-    await check(`${scenario.name}: names the model it runs on`, () => {
+    if (scenario.audit) {
+      const turns = agentTurns()
+      const expectedWire = anthropic ? "messages" : "responses"
+      captures.push({ scenario: scenario.name, agent: scenario.agent, configuredModel: scenario.model,
+        transport: vendor === "bryan" ? "OpenAI-compatible Responses (not native Gemini wire)" : expectedWire,
+        ignoredHostRequests: requests.length - startIndex - turns.length,
+        agentTurns: turns.map(({ model, wire, tools }) => ({ model, wire, tools })) })
+      await check(`${scenario.name}: actual agent turn uses the configured model and mock wire`, () => {
+        assert.ok(turns.length, "no Iolaus agent turn to check")
+        for (const turn of turns) {
+          assert.equal(turn.model, served)
+          assert.equal(turn.wire, expectedWire)
+          assert.ok(turn.instructions.includes(`- Provider ID: ${vendor}\n`), "host model metadata names the wrong provider")
+        }
+      })
+      await check(`${scenario.name}: ${scenario.audit} identity and tool contract`, () => {
+        assert.ok(turns.length, "no Iolaus agent turn to check")
+        for (const turn of turns) checkAuditTurn(scenario, turn)
+      })
+    } else await check(`${scenario.name}: names the model it runs on`, () => {
       if (scenario.identity) {
         // OpenCode also appends the model name. Check Iolaus's self-description, not the host footer.
-        const lines = requests.slice(startIndex).filter((r) => r.model === served)
+        const lines = agentTurns().filter((r) => r.model === served)
           .flatMap((r) => r.instructions.split("\n")).filter((line) => line.toLowerCase().startsWith(`you are ${scenario.agent},`))
         assert.ok(lines.length && lines.every((line) => line.includes(scenario.expectName)), `missing ${scenario.expectName} in ${JSON.stringify(lines)}`)
         return
       }
-      const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
+      const instructions = agentTurns().map((r) => r.instructions).join("\n")
       assert.ok(instructions.includes(scenario.expectName), `prompt does not name ${scenario.expectName}`)
     })
 
     await check(`${scenario.name}: carries no tool this harness does not register`, () => {
-      const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
+      const instructions = agentTurns().map((r) => r.instructions).join("\n")
       const hit = instructions.match(DEAD_TOOL)
       assert.equal(hit?.[0], undefined, `dead tool reference: ${hit?.[0]}`)
     })
 
-    if (scenario.agent === "sisyphus") {
+    await check(`${scenario.name}: prompts omit upstream branding`, () => {
+      const turns = agentTurns()
+      assert.ok(turns.length, "no request carried the Iolaus contract")
+      for (const turn of turns) assert.doesNotMatch(turn.instructions, /\bOMO\b|oh[\s_-]*my[\s_-]*open[\s_-]*code/i)
+    })
+
+    if (!scenario.audit && scenario.agent === "sisyphus") {
       await check(`${scenario.name}: ordinary owner gets delegation routing, explicit mode keeps its template`, () => {
-        const turns = requests.slice(startIndex).filter((r) => r.model === served && r.tools.includes("iolaus_flow"))
+        const turns = agentTurns().filter((r) => r.model === served && r.tools.includes("iolaus_flow"))
         assert.ok(turns.length)
         for (const turn of turns) assert.equal(turn.instructions.includes("<iolaus-delegation-routing>"), !scenario.keyword)
       })
       await check(`${scenario.name}: carries the flow rule`, () => {
-        const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
+        const instructions = agentTurns().map((r) => r.instructions).join("\n")
         assert.ok(instructions.includes("iolaus_flow"), "no iolaus_flow rule in the rendered prompt")
         // The section is an orchestration capability, not a todo replacement: assert
         // what it promises and that it does not turn itself into a ledger.
@@ -230,7 +311,7 @@ try {
     }
     if (scenario.keyword) {
       await check(`${scenario.name}: keyword "${scenario.keyword}" injects the flow mandate`, () => {
-        const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
+        const instructions = agentTurns().map((r) => r.instructions).join("\n")
         assert.ok(instructions.includes("iolaus_flow"), "keyword mode rendered without iolaus_flow")
         const marker = scenario.keyword === "mass-ulw" ? 'mode="mass-ulw"' : 'template="ultrawork"'
         assert.ok(instructions.includes(marker), `keyword mode rendered without ${marker}`)
@@ -244,15 +325,13 @@ try {
     }
     if (scenario.agent === "hephaestus") {
       await check(`${scenario.name}: worker contract, not orchestration`, () => {
-        const instructions = requests.slice(startIndex).map((r) => r.instructions).join("\n")
+        const instructions = agentTurns().map((r) => r.instructions).join("\n")
         assert.ok(instructions.includes("Do not create a flow of your own"), "hephaestus got no worker contract")
       })
     }
-    if (scenario.agent === "prometheus") {
+    if (!scenario.audit && scenario.agent === "prometheus") {
       await check(`${scenario.name}: planner doctrine is real content`, () => {
-        // The host calls a title generator before the agent's first turn, so pick
-        // the request that actually carries the planner prompt.
-        const planner = requests.slice(startIndex).map((r) => r.instructions).filter((text) => text.includes("You are Prometheus"))
+        const planner = agentTurns().map((r) => r.instructions).filter((text) => text.includes("You are Prometheus"))
         assert.ok(planner.length > 0, "no request carried the Prometheus prompt")
         const text = planner.join("\n")
         assert.ok(text.includes("Blocked by"), "prometheus prompt has no ticket dependency contract")
@@ -274,7 +353,7 @@ try {
       return model === -1 ? withoutHome : withoutHome.slice(0, model)
     }
     const rendered = ["prometheus-astra", "prometheus-opus"].map((name) =>
-      requests.filter((r) => r.scenario === name).map((r) => r.instructions).filter((text) => text.includes("You are Prometheus")).map(iolausPart))
+      requests.filter((r) => r.scenario === name && isAgentTurn(r)).map((r) => r.instructions).filter((text) => text.includes("You are Prometheus")).map(iolausPart))
     assert.ok(rendered[0].length > 0 && rendered[1].length > 0, "one of the two models rendered no planner prompt")
     assert.equal(rendered[0][0], rendered[1][0], "the Prometheus prompt differs by model")
   })
@@ -285,10 +364,16 @@ try {
   await new Promise((done) => server.close(done))
   for (const record of processes) { try { process.kill(-record.pid, "SIGKILL") } catch {} }
   rmSync(sandbox, { recursive: true, force: true })
-  writeFileSync(join(evidence, "receipt.json"), JSON.stringify({ binary, results, before, after, processes, sandboxRemoved: !existsSync(sandbox), mockClosed: !server.listening, requestCount: requests.length, omitted: "No user credentials or inherited environment dumps. Local mock only." }, null, 2))
+  writeFileSync(join(evidence, "receipt.json"), JSON.stringify({ binary, buildSHA256,
+    scope: "Local mock only. Prompt delivery and advertised tool surface, not model behavior or performance.",
+    passed: results.filter(({ verdict }) => verdict === "PASS").length, failed: results.filter(({ verdict }) => verdict === "FAIL").length,
+    hostStateUnchanged: !!after && JSON.stringify(before) === JSON.stringify(after), sandboxRemoved: !existsSync(sandbox), mockClosed: !server.listening,
+    requestCount: requests.length, captures, ...(!compact && { results, before, after, processes }) }, null, 2))
   // Keep the rendered prompts for review; they contain no credentials.
-  writeFileSync(join(evidence, "prompts.json"), JSON.stringify(requests.map((r) => ({ scenario: r.scenario, model: r.model, length: r.instructions.length, tools: r.tools })), null, 2))
-  writeFileSync(join(evidence, "full-prompts.txt"), requests.map((r) => `===== ${r.scenario} (${r.model}) =====\n${r.instructions}\n`).join("\n"))
+  if (!compact) {
+    writeFileSync(join(evidence, "prompts.json"), JSON.stringify(requests.map((r) => ({ scenario: r.scenario, model: r.model, length: r.instructions.length, tools: r.tools })), null, 2))
+    writeFileSync(join(evidence, "full-prompts.txt"), requests.map((r) => `===== ${r.scenario} (${r.model}) =====\n${r.instructions}\n`).join("\n"))
+  }
 }
 const failed = results.filter((r) => r.verdict === "FAIL")
 console.log(JSON.stringify({ evidence, passed: results.length - failed.length, failed: failed.length }, null, 2))

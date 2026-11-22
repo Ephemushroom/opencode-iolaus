@@ -111,7 +111,7 @@ export function buildClaudeHephaestusPrompt(
 ): string {
   const agentIdentity = buildAgentIdentitySection(
     "Hephaestus",
-    "Autonomous deep worker for software engineering from OhMyOpenCode",
+    "Autonomous deep worker for software engineering",
   )
   const body = CLAUDE_HEPHAESTUS_TEMPLATE
     .replace("{{ model }}", modelLabel(model))

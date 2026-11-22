@@ -72,7 +72,7 @@ export function composeContext(
   if (index === -1 && !selectedMode) return
   const model = `${event.model.providerID}/${event.model.id}`
   if (category && index !== -1) {
-    event.system[index] = { type: "text", text: bindNative(renderCategory(category, model), homeText) }
+    event.system[index] = { type: "text", text: bindNative(renderCategory(category, model), homeText, { delegation: false }) }
     trace("iolaus.agent.rendered", { agent: category, kind: "category", model, sessionID: event.sessionID })
   } else if (name && index !== -1) {
     const [agents, skills] = yield* Effect.all([ctx.agent.list(), ctx.skill.list()], { concurrency: 2 }).pipe(Effect.orDie)
@@ -96,7 +96,7 @@ export function composeContext(
     const contract = ROLE_CONTRACTS[name]
     const routing = name === "sisyphus" && !selectedMode && "iolaus_flow" in event.tools &&
       (yield* ctx.session.get({ sessionID: event.sessionID }).pipe(Effect.map(isTopLevel), Effect.catch(() => Effect.succeed(false))))
-    event.system[index] = { type: "text", text: bindNative(contract ? `${prompt}\n\n${contract}` : prompt, homeText, { routing }) }
+    event.system[index] = { type: "text", text: bindNative(contract ? `${prompt}\n\n${contract}` : prompt, homeText, { routing, delegation: name !== "sisyphus-junior" && name !== "oracle" }) }
     trace("iolaus.agent.rendered", { agent: name, model, sessionID: event.sessionID })
   }
   if (selectedMode) {

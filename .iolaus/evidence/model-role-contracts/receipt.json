@@ -1,0 +1,282 @@
+{
+  "binary": "/opt/homebrew/bin/opencode",
+  "buildSHA256": "6f88175a39d108e5c4a816fed18ff8a56696739cfc7a358f48bf34e6895ecf7d",
+  "scope": "Local mock only. Prompt delivery and advertised tool surface, not model behavior or performance.",
+  "passed": 139,
+  "failed": 0,
+  "hostStateUnchanged": true,
+  "sandboxRemoved": true,
+  "mockClosed": true,
+  "requestCount": 59,
+  "captures": [
+    {
+      "scenario": "audit-astra-oracle",
+      "agent": "oracle",
+      "configuredModel": "proxy-codex/gpt-6.2-astra",
+      "transport": "responses",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gpt-6.2-astra",
+          "wire": "responses",
+          "tools": [
+            "glob",
+            "grep",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-fable-owner",
+      "agent": "sisyphus",
+      "configuredModel": "proxy-cc/claude-fable-5-2",
+      "transport": "messages",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "claude-fable-5-2",
+          "wire": "messages",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "subagent",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-fable-planner",
+      "agent": "prometheus",
+      "configuredModel": "proxy-cc/claude-fable-5-2",
+      "transport": "messages",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "claude-fable-5-2",
+          "wire": "messages",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "skill",
+            "subagent",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-opus-owner",
+      "agent": "sisyphus",
+      "configuredModel": "proxy-cc/claude-opus-5-5",
+      "transport": "messages",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "claude-opus-5-5",
+          "wire": "messages",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "subagent",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-hydrogen-junior",
+      "agent": "sisyphus-junior",
+      "configuredModel": "bryan/gemini-4-hydrogen",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-hydrogen",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-hydrogen-visual-engineering",
+      "agent": "visual-engineering",
+      "configuredModel": "bryan/gemini-4-hydrogen",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-hydrogen",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-carbon-junior",
+      "agent": "sisyphus-junior",
+      "configuredModel": "bryan/gemini-4-carbon",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-carbon",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-carbon-quick",
+      "agent": "quick",
+      "configuredModel": "bryan/gemini-4-carbon",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-carbon",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-neon-junior",
+      "agent": "sisyphus-junior",
+      "configuredModel": "bryan/gemini-4-neon",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-neon",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    },
+    {
+      "scenario": "audit-neon-deep-low",
+      "agent": "deep-low",
+      "configuredModel": "bryan/gemini-4-neon",
+      "transport": "OpenAI-compatible Responses (not native Gemini wire)",
+      "ignoredHostRequests": 1,
+      "agentTurns": [
+        {
+          "model": "gemini-4-neon",
+          "wire": "responses",
+          "tools": [
+            "edit",
+            "glob",
+            "grep",
+            "iolaus_flow",
+            "question",
+            "read",
+            "shell",
+            "skill",
+            "webfetch",
+            "websearch",
+            "write",
+            "execute"
+          ]
+        }
+      ]
+    }
+  ]
+}

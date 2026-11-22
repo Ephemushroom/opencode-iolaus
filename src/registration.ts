@@ -156,8 +156,8 @@ export function registerModes(ctx: {
       editor.add({
         name: mode,
         description: DAG_MODE_TEMPLATES[mode]
-          ? `Run the task as the Iolaus "${DAG_MODE_TEMPLATES[mode]}" DAG template under the retained OMO ${mode} prompt.`
-          : `Apply the retained OMO ${mode} prompt with native OpenCode tools.`,
+          ? `Run the task with the Iolaus "${DAG_MODE_TEMPLATES[mode]}" DAG template.`
+          : `Apply the ${mode} prompt with native OpenCode tools.`,
         execute: ({ sessionID, prompt, delivery }) => ctx.session.prompt({
           ...prompt,
           sessionID,
